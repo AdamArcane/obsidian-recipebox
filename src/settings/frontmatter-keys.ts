@@ -1,0 +1,17 @@
+export const RECIPE_FRONTMATTER = Object.freeze({
+	type: "type",
+	image: "image",
+	multiplier: "multiplier",
+	servings: "servings",
+	calories: "calories",
+	protein: "protein",
+	fat: "fat",
+	carbs: "carbs",
+	diet: "diet",
+	allergens: "allergens",
+	prepTime: "prepTime",
+	cookTime: "cookTime",
+	totalTime: "totalTime",
+	favorite: "favorite",
+	cookedCount: "cookedCount",
+} as const);

@@ -1,2 +1,54 @@
-# obsidian-recipebox
-Recipe management plugin for Obsidian
+# Recipe Box
+
+Plan meals, build grocery lists, and view recipes as interactive cards, all stored as plain markdown in your vault.
+
+Recipe Box treats recipes the same way Obsidian treats everything else: as notes you own. Meal plans and grocery lists are markdown files too, so you can edit them by hand, query them with Dataview or Bases, and sync them with whatever sync solution you already use.
+
+## Features
+
+### Recipe view
+Open any recipe note and Recipe Box renders it as an interactive card: a scalable ingredient list, step-by-step instructions, nutrition info, and configurable header badges (prep time, cook time, diet tags, or any frontmatter property you want surfaced). Scale a recipe up or down and every ingredient amount updates automatically.
+
+### Meal planning
+Drag recipes onto a weekly planner, including straight from the file explorer. A queue holds anything you haven't scheduled yet. Mark a day as leftovers without attaching a recipe. The plan itself lives in a single markdown note you can read and edit directly.
+
+### Grocery list
+Ingredients from your meal plan are automatically consolidated into a grocery list, grouped by category, recipe, or source. Add one-off items, check things off as you shop, and export the list in a few formats. The list is a markdown note, so it's just as editable by hand as it is through the plugin.
+
+### Recipe import
+Paste a URL from most recipe sites and Recipe Box extracts the ingredients, instructions, and metadata into a new note. Plain text and pasted captions work too, for recipes that don't come from a structured webpage.
+
+### Cook history
+Mark a recipe as cooked and Recipe Box can log the date, notes, and a photo to the note, store a queryable date array in frontmatter (for Dataview or Bases), or both.
+
+### Timers
+Step instructions with a duration ("bake for 30 minutes") get a tappable timer inline, with support for running several at once.
+
+## Settings
+
+Recipe Box is built to adapt to how you already organize your vault rather than imposing its own structure:
+
+- Recipe detection works off folder location, a frontmatter property, or both
+- Frontmatter property names are configurable throughout (ratings, allergens, nutrition, cook history, and more)
+- Category rules for the grocery list can be based on a dictionary, tags, or your own overrides
+- Meal-type notation can be written as nested tags, a Dataview inline field, or plain text, so it works whether or not you use Dataview
+
+## Browsing and organizing recipes
+
+Recipe Box doesn't include its own collection or index view. Obsidian's Bases and the Dataview plugin already do this well, so a tag or frontmatter property (`collection: weeknight`, for example) combined with a Base or Dataview query gives you sorting, filtering, and grouping without Recipe Box reinventing it. A starter Base is will be soon included if you want a working recipe browser without building one yourself.
+
+## Installation
+
+Not yet available in the community plugin directory. To install manually:
+
+1. Download the latest release
+2. Extract `main.js`, `manifest.json`, and `styles.css` into `<your vault>/.obsidian/plugins/recipe-box/`
+3. Reload Obsidian and enable Recipe Box in Settings → Community plugins
+
+## Getting started
+
+Tag a note with `type: recipe` (configurable) in its frontmatter, structure ingredients and instructions under headings of your choice, and open it. Recipe Box will detect it and offer to switch into recipe view.
+
+## License
+
+GPL-3.0-or-later

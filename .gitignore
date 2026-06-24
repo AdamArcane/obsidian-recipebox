@@ -1,0 +1,20 @@
+# folders
+.claude/
+.vscode/
+node_modules/
+
+# files
+.DS_Store
+.eslintcache
+
+*.map
+
+data.json
+main.js
+
+cleanroom-specs.md
+
+
+
+
+

@@ -1,0 +1,28 @@
+{
+  "name": "recipe-box",
+  "version": "0.1.0",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production && eslint src/",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-obsidianmd": "^0.3.0",
+    "globals": "^17.7.0",
+    "jiti": "^2.7.0",
+    "obsidian": "latest",
+    "tslib": "^2.4.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.62.0"
+  },
+  "dependencies": {
+    "recipe-scrapers": "^1.9.0"
+  }
+}

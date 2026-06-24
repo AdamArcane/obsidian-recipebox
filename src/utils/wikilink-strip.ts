@@ -1,0 +1,6 @@
+const WIKILINK_RE = /^!?\[\[([^\]#|]+)(?:[#|][^\]]*)?]]/;
+
+export function stripWikilink(value: string): string {
+	const m = value.match(WIKILINK_RE);
+	return m ? m[1].trim() : value;
+}

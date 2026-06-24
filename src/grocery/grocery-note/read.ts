@@ -1,0 +1,59 @@
+import { App } from "obsidian";
+import { RecipeBoxSettings } from "../../settings/settings-types";
+import { parseIngredientLine } from "../../parser/ingredient-parse";
+import { ingredientKey } from "../../parser/ingredient-clean";
+import { readNoteOrEmpty, writeNote } from "../../utils/vault-notes";
+import { parseGroceryNoteText } from "./parse";
+import { renderGroceryLine } from "./render";
+
+export interface GroceryNoteItem {
+	name: string;
+	unit: string;
+	quantity: number | null;
+	checked: boolean;
+	category: string;
+}
+
+export async function readGroceryNoteItems(app: App, settings: RecipeBoxSettings): Promise<Map<string, GroceryNoteItem>> {
+	const text = await readNoteOrEmpty(app, settings.groceryListPath);
+	if (!text) return new Map();
+
+	const result = new Map<string, GroceryNoteItem>();
+	for (const section of parseGroceryNoteText(text)) {
+		for (const line of section.lines) {
+			if (line.kind !== "item" || !line.key) continue;
+			result.set(line.key, { name: line.name, unit: line.unit, quantity: line.quantity, checked: line.checked, category: section.category });
+		}
+	}
+	return result;
+}
+
+export async function toggleGroceryNoteItemChecked(app: App, key: string, checked: boolean, settings: RecipeBoxSettings): Promise<void> {
+	const path = settings.groceryListPath;
+	const text = await readNoteOrEmpty(app, path);
+	if (!text) return;
+
+	const lines = text.split("\n");
+	let changed = false;
+
+	for (let i = 0; i < lines.length; i++) {
+		const m = lines[i].match(/^- \[([x ])\] (.+)$/i);
+		if (!m) continue;
+		const parsed = parseIngredientLine(m[2]);
+		if (!parsed?.name) continue;
+		if (ingredientKey(parsed.name, parsed.unit) !== key) continue;
+		const updated = renderGroceryLine(parsed.name, parsed.unit, parsed.quantity, checked);
+		lines[i] = updated;
+		changed = true;
+		break;
+	}
+
+	if (changed) await writeNote(app, path, lines.join("\n"));
+}
+
+export async function resetGroceryNoteChecks(app: App, settings: RecipeBoxSettings): Promise<void> {
+	const path = settings.groceryListPath;
+	const text = await readNoteOrEmpty(app, path);
+	if (!text) return;
+	await writeNote(app, path, text.replace(/^- \[x\]/gim, "- [ ]"));
+}

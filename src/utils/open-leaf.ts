@@ -1,0 +1,34 @@
+import { App, TFile, WorkspaceLeaf } from "obsidian";
+
+/**
+ * Finds an existing leaf of `viewType` (optionally showing `filePath`) and
+ * reveals it, or opens a new tab and sets it to that view/file.
+ *
+ * - Singleton views (grocery, meal plan): omit `filePath`.
+ * - File-backed views (recipe, markdown): pass `filePath` to reuse a leaf
+ *   already showing that specific file rather than opening a duplicate.
+ */
+export async function findOrOpenLeaf(
+	app: App,
+	viewType: string,
+	filePath?: string,
+): Promise<WorkspaceLeaf> {
+	const existing = filePath
+		? app.workspace.getLeavesOfType(viewType)
+			.find((l) => (l.view as { file?: TFile }).file?.path === filePath)
+		: app.workspace.getLeavesOfType(viewType)[0];
+
+	if (existing) {
+		void app.workspace.revealLeaf(existing);
+		return existing;
+	}
+
+	const leaf = app.workspace.getLeaf("tab");
+	await leaf.setViewState({
+		type: viewType,
+		...(filePath ? { state: { file: filePath } } : {}),
+		active: true,
+	});
+	void app.workspace.revealLeaf(leaf);
+	return leaf;
+}
