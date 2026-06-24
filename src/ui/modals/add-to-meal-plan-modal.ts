@@ -70,40 +70,46 @@ export class AddToMealPlanModal extends Modal {
 		if (this.prefill?.meal) mealInput.value = this.prefill.meal;
 		mealInput.addEventListener("input", () => { this.meal = mealInput.value.trim() || undefined; });
 
-		// ── Divider ───────────────────────────────────────────────────────────
-		contentEl.createEl("hr", { cls: "rb-modal-divider" });
+		let contributions: (() => ContributionMap) | undefined;
 
-		// ── Grocery section ───────────────────────────────────────────────────
-		const grocerySection = contentEl.createDiv({ cls: "rb-modal-section" });
+		if (!this.prefill) {
+			// ── Divider ───────────────────────────────────────────────────────────
+			contentEl.createEl("hr", { cls: "rb-modal-divider" });
 
-		const groceryHeader = grocerySection.createDiv({ cls: "rb-modal-section-header" });
-		setIcon(groceryHeader.createSpan({ cls: "rb-modal-section-icon rb-icon-green" }), "shopping-cart");
-		groceryHeader.createSpan({ cls: "rb-modal-section-heading", text: "Grocery ingredients" });
+			// ── Grocery section ───────────────────────────────────────────────────
+			const grocerySection = contentEl.createDiv({ cls: "rb-modal-section" });
 
-		grocerySection.createEl("p", {
-			cls: "rb-modal-section-desc",
-			text: "Checked ingredients will be added to your grocery list.",
-		});
+			const groceryHeader = grocerySection.createDiv({ cls: "rb-modal-section-header" });
+			setIcon(groceryHeader.createSpan({ cls: "rb-modal-section-icon rb-icon-green" }), "shopping-cart");
+			groceryHeader.createSpan({ cls: "rb-modal-section-heading", text: "Grocery ingredients" });
 
-		const counter = grocerySection.createEl("p", { cls: "rb-modal-selection-counter" });
+			grocerySection.createEl("p", {
+				cls: "rb-modal-section-desc",
+				text: "Checked ingredients will be added to your grocery list.",
+			});
 
-		const checklistEl = grocerySection.createDiv({ cls: "rb-checklist-container" });
+			const counter = grocerySection.createEl("p", { cls: "rb-modal-selection-counter" });
 
-		this.ingredients = await loadRecipeIngredients(this.app, this.file, this.settings);
-		this.ingredients.forEach(i => this.selectedKeys.add(i.key));
+			const checklistEl = grocerySection.createDiv({ cls: "rb-checklist-container" });
 
-		const updateCounter = (): void => {
-			const total = this.ingredients.length;
-			const selected = this.selectedKeys.size;
-			counter.textContent = `${selected} of ${total} selected`;
-		};
+			this.ingredients = await loadRecipeIngredients(this.app, this.file, this.settings);
+			this.ingredients.forEach(i => this.selectedKeys.add(i.key));
 
-		renderIngredientChecklist(checklistEl, this.ingredients, this.selectedKeys, (key, checked) => {
-			if (checked) this.selectedKeys.add(key);
-			else this.selectedKeys.delete(key);
+			const updateCounter = (): void => {
+				const total = this.ingredients.length;
+				const selected = this.selectedKeys.size;
+				counter.textContent = `${selected} of ${total} selected`;
+			};
+
+			renderIngredientChecklist(checklistEl, this.ingredients, this.selectedKeys, (key, checked) => {
+				if (checked) this.selectedKeys.add(key);
+				else this.selectedKeys.delete(key);
+				updateCounter();
+			});
 			updateCounter();
-		});
-		updateCounter();
+
+			contributions = () => buildContributions(this.ingredients, this.selectedKeys);
+		}
 
 		// ── Footer ────────────────────────────────────────────────────────────
 		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
@@ -113,9 +119,8 @@ export class AddToMealPlanModal extends Modal {
 		const confirmBtn = footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: this.prefill ? "Update" : "Add to plan" });
 		confirmBtn.addEventListener("click", () => { void (async () => {
 			confirmBtn.disabled = true;
-			confirmBtn.textContent = "Adding…";
-			const contributions = buildContributions(this.ingredients, this.selectedKeys);
-			await Promise.resolve(this.onConfirm(this.day, this.meal, contributions));
+			confirmBtn.textContent = this.prefill ? "Updating…" : "Adding…";
+			await Promise.resolve(this.onConfirm(this.day, this.meal, contributions?.()));
 			this.close();
 		})(); });
 	}
