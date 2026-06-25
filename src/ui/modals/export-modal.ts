@@ -2,17 +2,19 @@
  * Modal for exporting the current grocery list in plain text, checklist, or
  * grouped Markdown format, with a live preview and copy-to-clipboard action.
  */
-import { App, Modal, Notice, TFile } from "obsidian";
+import { App, Notice, TFile } from "obsidian";
 import { GroceryItem } from "../../types";
 import { ExportFormat, EXPORT_FORMAT_LABELS } from "../../grocery/export-format";
 import { exportGroceryList } from "../../grocery/export-render";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";
+import { BaseModal } from "./modal-shell";
 
-export class ExportModal extends Modal {
+export class ExportModal extends BaseModal {
 	private format: ExportFormat = "checklist";
 	private includeChecked = true;
 	private previewEl!: HTMLTextAreaElement;
+	private appendInput!: HTMLInputElement;
 
 	constructor(
 		app: App,
@@ -22,13 +24,11 @@ export class ExportModal extends Modal {
 		super(app);
 	}
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal", "rb-export-modal");
+	getTitle(): string { return "Export grocery list"; }
+	getContentClasses(): string[] { return ["rb-export-modal"]; }
 
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "Export grocery list" });
-
-		const opts = contentEl.createDiv({ cls: "rb-modal-fields" });
+	renderBody(bodyEl: HTMLElement): void {
+		const opts = bodyEl.createDiv({ cls: "rb-modal-fields" });
 
 		const fmtField = opts.createDiv({ cls: "rb-modal-field" });
 		fmtField.createEl("label", { text: "Format" });
@@ -51,38 +51,37 @@ export class ExportModal extends Modal {
 			this.refreshPreview();
 		});
 
-		contentEl.createEl("p", {
+		bodyEl.createEl("p", {
 			cls: "rb-modal-section-desc",
 			text: "Select all text below, then use your system's copy shortcut (Ctrl+C / ⌘C).",
 		});
 
-		this.previewEl = contentEl.createEl("textarea", {
+		this.previewEl = bodyEl.createEl("textarea", {
 			cls: "rb-export-preview",
 			attr: { readonly: "true", rows: "12" },
 		});
 		this.refreshPreview();
 
-		contentEl.createEl("hr", { cls: "rb-modal-divider" });
+		bodyEl.createEl("hr", { cls: "rb-modal-divider" });
 
-		const appendSection = contentEl.createDiv({ cls: "rb-modal-section" });
+		const appendSection = bodyEl.createDiv({ cls: "rb-modal-section" });
 		appendSection.createDiv({ cls: "rb-modal-section-heading", text: "Append to note" });
 
 		const appendField = appendSection.createDiv({ cls: "rb-modal-field" });
-		const appendInput = appendField.createEl("input", {
+		this.appendInput = appendField.createEl("input", {
 			cls: "rb-modal-input",
 			type: "text",
 			placeholder: "Vault-relative path, e.g. Notes/Grocery Export",
 		});
-		new NotePathSuggest(this.app, appendInput);
+		new NotePathSuggest(this.app, this.appendInput);
+	}
 
-		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
-		footer.createEl("button", {
-			cls: "rb-modal-btn rb-modal-btn-primary",
-			text: "Append to note",
-		}).addEventListener("click", () => { void this.appendToNote(appendInput.value); });
-
-		footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-cancel", text: "Close" })
+	renderFooter(footerEl: HTMLElement): void {
+		// Cancel first, then primary action (spec section 55)
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Close" })
 			.addEventListener("click", () => this.close());
+		footerEl.createEl("button", { cls: "mod-cta", text: "Append to note" })
+			.addEventListener("click", () => { void this.appendToNote(this.appendInput.value); });
 	}
 
 	private refreshPreview(): void {
@@ -128,9 +127,5 @@ export class ExportModal extends Modal {
 		} catch (err) {
 			new Notice(`Failed to write note: ${err instanceof Error ? err.message : String(err)}`);
 		}
-	}
-
-	onClose(): void {
-		this.contentEl.empty();
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * Renders the review and edit stage of the import modal, letting the user
- * correct extracted fields before the note is saved to the vault.
+ * Renders the review and edit stage of the import modal into the provided
+ * body and footer elements (supplied by BaseModal's shell).
  */
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -39,16 +39,14 @@ function inlineRow(
 }
 
 export function renderReviewStage(
-	container: HTMLElement,
+	bodyEl: HTMLElement,
+	footerEl: HTMLElement,
 	app: App,
 	settings: RecipeBoxSettings,
 	initial: ExtractedRecipe,
 	folder: string,
 	onBack: () => void,
 ): void {
-	container.empty();
-	container.addClass("rb-import-review-stage");
-
 	// Working copy — mutated by field inputs
 	const recipe: ExtractedRecipe = { ...initial,
 		ingredientGroups: [...initial.ingredientGroups],
@@ -58,7 +56,7 @@ export function renderReviewStage(
 	function field(label: string, value: string, multiline: false, onInput: (v: string) => void): void;
 	function field(label: string, value: string, multiline: true, onInput: (v: string) => void, cls?: string): void;
 	function field(label: string, value: string, multiline: boolean, onInput: (v: string) => void, cls?: string): void {
-		const wrap = container.createDiv({ cls: "rb-import-field" });
+		const wrap = bodyEl.createDiv({ cls: "rb-import-field" });
 		wrap.createDiv({ cls: "rb-import-field-label", text: label });
 		if (multiline) {
 			const ta = wrap.createEl("textarea", { cls: cls ?? "rb-import-textarea", attr: { rows: "4" } });
@@ -74,7 +72,7 @@ export function renderReviewStage(
 	field("Title", recipe.title, false, (v) => { recipe.title = v; });
 
 	// Servings (leading-int extraction)
-	const servWrap = container.createDiv({ cls: "rb-import-field" });
+	const servWrap = bodyEl.createDiv({ cls: "rb-import-field" });
 	servWrap.createDiv({ cls: "rb-import-field-label", text: "Servings" });
 	const servInput = servWrap.createEl("input", {
 		cls: "rb-import-text-input rb-import-text-input--short",
@@ -89,8 +87,8 @@ export function renderReviewStage(
 		cook: recipe.cookTime !== null ? String(recipe.cookTime) : "",
 		total: recipe.totalTime !== null ? String(recipe.totalTime) : "",
 	};
-	container.createDiv({ cls: "rb-import-field-label", text: "Timing (minutes)" });
-	inlineRow(container, [
+	bodyEl.createDiv({ cls: "rb-import-field-label", text: "Timing (minutes)" });
+	inlineRow(bodyEl, [
 		{ label: "Prep", placeholder: "15", value: timingValues.prep, onInput: (v) => { recipe.prepTime = parseNum(v); timingValues.prep = v; } },
 		{ label: "Cook", placeholder: "30", value: timingValues.cook, onInput: (v) => { recipe.cookTime = parseNum(v); timingValues.cook = v; } },
 		{ label: "Total", placeholder: "45", value: timingValues.total, onInput: (v) => { recipe.totalTime = parseNum(v); timingValues.total = v; } },
@@ -99,7 +97,7 @@ export function renderReviewStage(
 	field("Description", recipe.description, true, (v) => { recipe.description = v; });
 
 	// Side-by-side ingredients / instructions
-	const sideBySide = container.createDiv({ cls: "rb-import-side-by-side" });
+	const sideBySide = bodyEl.createDiv({ cls: "rb-import-side-by-side" });
 	const ingWrap = sideBySide.createDiv({ cls: "rb-import-field rb-import-field--grow" });
 	ingWrap.createDiv({ cls: "rb-import-field-label", text: "Ingredients" });
 	const ingTa = ingWrap.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--tall", attr: { rows: "10" } });
@@ -119,20 +117,19 @@ export function renderReviewStage(
 		fat: recipe.fat !== null ? String(recipe.fat) : "",
 		carb: recipe.carbs !== null ? String(recipe.carbs) : "",
 	};
-	container.createDiv({ cls: "rb-import-field-label", text: "Nutrition (per serving)" });
-	inlineRow(container, [
+	bodyEl.createDiv({ cls: "rb-import-field-label", text: "Nutrition (per serving)" });
+	inlineRow(bodyEl, [
 		{ label: "Calories", placeholder: "350", value: nutValues.cal, onInput: (v) => { recipe.calories = parseNum(v); } },
 		{ label: "Protein g", placeholder: "20", value: nutValues.prot, onInput: (v) => { recipe.protein = parseNum(v); } },
 		{ label: "Fat g", placeholder: "12", value: nutValues.fat, onInput: (v) => { recipe.fat = parseNum(v); } },
 		{ label: "Carbs g", placeholder: "40", value: nutValues.carb, onInput: (v) => { recipe.carbs = parseNum(v); } },
 	]);
 
-	// Footer
-	const footer = container.createDiv({ cls: "rb-import-footer" });
-	footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-cancel", text: "← back" })
+	// Cancel (back) first, then Save (spec section 55)
+	footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "← back" })
 		.addEventListener("click", onBack);
 
-	const saveBtn = footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: "Save recipe" });
+	const saveBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Save recipe" });
 	saveBtn.addEventListener("click", () => { void (async () => {
 		if (!recipe.title.trim()) recipe.title = "Untitled recipe";
 		saveBtn.disabled = true;

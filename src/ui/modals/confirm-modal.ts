@@ -2,7 +2,8 @@
  * Generic two-button confirmation modal with optional destructive styling,
  * used wherever an irreversible action needs explicit user approval.
  */
-import { App, Modal } from "obsidian";
+import { App } from "obsidian";
+import { BaseModal, addFooterButtons } from "./modal-shell";
 
 interface ConfirmOptions {
 	cancelLabel?: string;
@@ -10,7 +11,7 @@ interface ConfirmOptions {
 	onConfirm: () => void;
 }
 
-export class ConfirmModal extends Modal {
+export class ConfirmModal extends BaseModal {
 	constructor(
 		app: App,
 		private readonly heading: string,
@@ -21,30 +22,25 @@ export class ConfirmModal extends Modal {
 		super(app);
 	}
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal", "rb-confirm-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: this.heading });
+	getTitle(): string { return this.heading; }
+	getContentClasses(): string[] { return ["rb-confirm-modal"]; }
+
+	renderBody(bodyEl: HTMLElement): void {
 		if (this.message) {
-			contentEl.createEl("p", { cls: "rb-modal-message", text: this.message });
+			bodyEl.createEl("p", { cls: "rb-modal-message", text: this.message });
 		}
-
-		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
-		footer.createEl("button", {
-			cls: "rb-modal-btn rb-modal-btn-cancel",
-			text: this.options.cancelLabel ?? "Cancel",
-		}).addEventListener("click", () => this.close());
-
-		footer.createEl("button", {
-			cls: `rb-modal-btn ${this.options.destructive ? "rb-modal-btn-danger" : "rb-modal-btn-primary"}`,
-			text: this.confirmLabel,
-		}).addEventListener("click", () => {
-			this.close();
-			this.options.onConfirm();
-		});
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
+	renderFooter(footerEl: HTMLElement): void {
+		addFooterButtons(footerEl, {
+			cancelLabel: this.options.cancelLabel,
+			confirmLabel: this.confirmLabel,
+			destructive: this.options.destructive,
+			onCancel: () => this.close(),
+			onConfirm: () => {
+				this.close();
+				this.options.onConfirm();
+			},
+		});
 	}
 }

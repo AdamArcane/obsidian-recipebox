@@ -2,7 +2,7 @@
  * Modal for adding a recipe to the meal plan, letting the user choose a day,
  * meal type, and which ingredients to contribute to the grocery list.
  */
-import { App, Modal, setIcon, TFile } from "obsidian";
+import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap } from "../../types";
 import {
@@ -11,15 +11,20 @@ import {
 	renderIngredientChecklist,
 	LoadedIngredient,
 } from "./ingredient-loader";
+import { BaseModal } from "./modal-shell";
 
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const MEAL_SUGGESTIONS = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
-export class AddToMealPlanModal extends Modal {
+export class AddToMealPlanModal extends BaseModal {
 	private day: string | undefined = undefined;
 	private meal: string | undefined = undefined;
 	private readonly selectedKeys = new Set<string>();
 	private ingredients: LoadedIngredient[] = [];
+
+	// Set during renderBody so renderFooter's confirm handler can call it
+	private contributions: (() => ContributionMap) | undefined;
+	private confirmBtn!: HTMLButtonElement;
 
 	constructor(
 		app: App,
@@ -33,18 +38,14 @@ export class AddToMealPlanModal extends Modal {
 		this.meal = prefill?.meal;
 	}
 
-	async onOpen(): Promise<void> {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal", "rb-meal-plan-modal");
+	getTitle(): string { return (this.prefill ? "Edit" : "Add to") + " meal plan"; }
+	getSubtitle(): string { return this.file.basename; }
+	getIcon(): string { return "calendar"; }
+	getContentClasses(): string[] { return ["rb-meal-plan-modal"]; }
 
-		// ── Meal plan section ─────────────────────────────────────────────────
-		const planSection = contentEl.createDiv({ cls: "rb-modal-section" });
+	async renderBody(bodyEl: HTMLElement): Promise<void> {
+		const planSection = bodyEl.createDiv({ cls: "rb-modal-section" });
 
-		planSection.createEl("p", { cls: "rb-modal-recipe-name", text: this.file.basename });
-
-		const planHeader = planSection.createDiv({ cls: "rb-modal-section-header" });
-		setIcon(planHeader.createSpan({ cls: "rb-modal-section-icon" }), "calendar");
-		planHeader.createSpan({ cls: "rb-modal-section-heading", text: "Add to meal plan" });
 		planSection.createEl("p", {
 			cls: "rb-modal-section-desc",
 			text: "The recipe will be scheduled on your meal plan.",
@@ -74,62 +75,72 @@ export class AddToMealPlanModal extends Modal {
 		if (this.prefill?.meal) mealInput.value = this.prefill.meal;
 		mealInput.addEventListener("input", () => { this.meal = mealInput.value.trim() || undefined; });
 
-		let contributions: (() => ContributionMap) | undefined;
+		if (this.prefill) return; // edit mode: no grocery section
 
-		if (!this.prefill) {
-			// ── Divider ───────────────────────────────────────────────────────────
-			contentEl.createEl("hr", { cls: "rb-modal-divider" });
+		// ── Grocery section (collapsible, closed by default) ──────────────────
+		bodyEl.createEl("hr", { cls: "rb-modal-divider" });
+		const grocerySection = bodyEl.createDiv({ cls: "rb-modal-section" });
 
-			// ── Grocery section ───────────────────────────────────────────────────
-			const grocerySection = contentEl.createDiv({ cls: "rb-modal-section" });
+		let groceryExpanded = false;
 
-			const groceryHeader = grocerySection.createDiv({ cls: "rb-modal-section-header" });
-			setIcon(groceryHeader.createSpan({ cls: "rb-modal-section-icon rb-icon-green" }), "shopping-cart");
-			groceryHeader.createSpan({ cls: "rb-modal-section-heading", text: "Grocery ingredients" });
+		const groceryHeader = grocerySection.createDiv({ cls: "rb-modal-section-header rb-modal-section-header-toggle" });
+		setIcon(groceryHeader.createSpan({ cls: "rb-modal-section-icon rb-icon-green" }), "shopping-cart");
+		groceryHeader.createSpan({ cls: "rb-modal-section-heading", text: "Grocery ingredients" });
+		groceryHeader.createSpan({ cls: "rb-modal-section-hint", text: "Expand to add ingredients to your grocery list" });
+		const chevron = groceryHeader.createSpan({ cls: "rb-modal-section-chevron" });
+		setIcon(chevron, "chevron-right");
 
-			grocerySection.createEl("p", {
-				cls: "rb-modal-section-desc",
-				text: "Checked ingredients will be added to your grocery list.",
-			});
+		const groceryBody = grocerySection.createDiv({ cls: "rb-modal-section-body rb-modal-section-body-collapsed" });
 
-			const counter = grocerySection.createEl("p", { cls: "rb-modal-selection-counter" });
+		const counter = groceryBody.createEl("p", { cls: "rb-modal-selection-counter" });
 
-			const checklistEl = grocerySection.createDiv({ cls: "rb-checklist-container" });
+		groceryBody.createEl("p", {
+			cls: "rb-modal-section-desc",
+			text: "Checked ingredients will be added to your grocery list.",
+		});
 
-			this.ingredients = await loadRecipeIngredients(this.app, this.file, this.settings);
-			this.ingredients.forEach(i => this.selectedKeys.add(i.key));
+		const checklistEl = groceryBody.createDiv({ cls: "rb-checklist-container" });
 
-			const updateCounter = (): void => {
-				const total = this.ingredients.length;
-				const selected = this.selectedKeys.size;
-				counter.textContent = `${selected} of ${total} selected`;
-			};
+		const hintEl = groceryHeader.querySelector<HTMLElement>(".rb-modal-section-hint");
 
-			renderIngredientChecklist(checklistEl, this.ingredients, this.selectedKeys, (key, checked) => {
-				if (checked) this.selectedKeys.add(key);
-				else this.selectedKeys.delete(key);
-				updateCounter();
-			});
+		groceryHeader.addEventListener("click", () => {
+			groceryExpanded = !groceryExpanded;
+			groceryBody.toggleClass("rb-modal-section-body-collapsed", !groceryExpanded);
+			chevron.empty();
+			setIcon(chevron, groceryExpanded ? "chevron-down" : "chevron-right");
+			// Hide the hint once the user has opened the section
+			if (hintEl) hintEl.toggleClass("rb-hidden", groceryExpanded);
+		});
+
+		this.ingredients = await loadRecipeIngredients(this.app, this.file, this.settings);
+
+
+		const updateCounter = (): void => {
+			const total = this.ingredients.length;
+			const selected = this.selectedKeys.size;
+			counter.textContent = `${selected} of ${total} selected`;
+		};
+
+		renderIngredientChecklist(checklistEl, this.ingredients, this.selectedKeys, (key, checked) => {
+			if (checked) this.selectedKeys.add(key);
+			else this.selectedKeys.delete(key);
 			updateCounter();
+		});
+		updateCounter();
 
-			contributions = () => buildContributions(this.ingredients, this.selectedKeys);
-		}
-
-		// ── Footer ────────────────────────────────────────────────────────────
-		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
-		footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-cancel", text: "Cancel" })
-			.addEventListener("click", () => this.close());
-
-		const confirmBtn = footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: this.prefill ? "Update" : "Add to plan" });
-		confirmBtn.addEventListener("click", () => { void (async () => {
-			confirmBtn.disabled = true;
-			confirmBtn.textContent = this.prefill ? "Updating…" : "Adding…";
-			await Promise.resolve(this.onConfirm(this.day, this.meal, contributions?.()));
-			this.close();
-		})(); });
+		this.contributions = () => buildContributions(this.ingredients, this.selectedKeys);
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
+	renderFooter(footerEl: HTMLElement): void {
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+			.addEventListener("click", () => this.close());
+
+		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: this.prefill ? "Update" : "Add to plan" });
+		this.confirmBtn.addEventListener("click", () => { void (async () => {
+			this.confirmBtn.disabled = true;
+			this.confirmBtn.textContent = this.prefill ? "Updating…" : "Adding…";
+			await Promise.resolve(this.onConfirm(this.day, this.meal, this.contributions?.()));
+			this.close();
+		})(); });
 	}
 }

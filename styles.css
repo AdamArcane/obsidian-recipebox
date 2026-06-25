@@ -1,6 +1,6 @@
 /* ── Recipe Box ───────────────────────────────────────────────────────────── */
 
-.is-hidden { display: none; }
+
 
 /* ── Settings tab ────────────────────────────────────────────────────────── */
 
@@ -1810,6 +1810,93 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   padding: 0.25rem 0;
 }
 
+/* ── Modal shell (section 55): sticky header/footer, scrollable body ──────── */
+
+.rb-shell {
+  display: flex;
+  flex-direction: column;
+  /* Override Obsidian's overflow-y: auto on .modal-content so only
+     rb-shell-body scrolls, not the whole content area. */
+  overflow: hidden;
+  padding: 0;
+  /* Most modals don't need an explicit max-height here — Obsidian's
+     .modal already constrains to roughly 80vh. On very-short-content
+     modals this just means no extra blank space. */
+  max-height: 75vh;
+}
+
+.rb-shell-header {
+  display:flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.rb-shell-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+  color: var(--text-normal);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rb-shell-subtitle {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin: 0;
+  width: 100%;
+}
+
+.rb-shell-icon {
+  color: var(--interactive-accent);
+  flex: 0 0 auto;
+}
+
+.rb-shell-body {
+  flex: 1;
+  overflow-y: auto;
+  /* min-height: 0 is required for flex children to actually scroll in
+     some browsers (flex items default to min-height: auto). */
+  min-height: 0;
+  padding: 0.25rem 0;
+}
+
+.rb-shell-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+  /* Horizontal scroll if buttons overflow on very narrow viewports,
+     keeping them in one row without wrapping or truncating labels. */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.rb-shell-footer:empty {
+  display: none;
+}
+
+.rb-shell-cancel-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-m);
+}
+
+.rb-shell-cancel-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
 .rb-modal-title {
   font-size: 1.2rem;
   font-weight: 700;
@@ -1841,12 +1928,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 /* Ingredient checklist */
 
 .rb-checklist-container {
-  max-height: 260px;
-  overflow-y: auto;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-m);
-  padding: 0.25rem 0;
-  background: var(--background-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -1891,6 +1972,12 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 .rb-ingredient-checklist {
   display: flex;
   flex-direction: column;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.25rem 0;
+  background: var(--background-primary);
 }
 
 .rb-checklist-row {
@@ -1949,8 +2036,46 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 /* Image section (mark cooked) */
 
+.rb-mark-cooked-fields {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.rb-mark-cooked-date-field {
+  flex: 0 0 12rem;
+}
+
+.rb-mark-cooked-notes-field {
+  flex: 1 1 18rem;
+}
+
+.rb-mark-cooked-notes-input {
+  min-height: 8.25rem;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.rb-mark-cooked-modal .rb-modal-section-title {
+  margin-top: 0.75rem;
+}
+
+.rb-modal-image-layout {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.rb-modal-image-layout.rb-modal-image-layout-has-preview {
+  display: grid;
+  grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
 .rb-modal-image-preview {
-  margin: 0.4rem 0 0.6rem;
+  margin: 0;
   border-radius: var(--radius-m);
   overflow: hidden;
   background: var(--background-secondary);
@@ -1970,9 +2095,22 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 .rb-modal-image-btns {
   display: flex;
+  flex-direction: column;
   gap: 0.4rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  max-width: 13rem;
+}
+
+.rb-modal-image-layout.rb-modal-image-layout-has-preview .rb-modal-image-btns {
+  height: 100%;
+}
+
+.rb-modal-image-btns .rb-modal-btn {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.rb-modal-image-btns .rb-modal-btn-remove {
+  margin-top: auto;
 }
 
 /* Modal footer + buttons */
@@ -1992,10 +2130,16 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-size: var(--font-ui-small);
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
   color: var(--text-normal);
   transition: background 0.1s, color 0.1s;
+}
+.rb-modal-btn-icon {
+    display: flex;
 }
 
 .rb-modal-btn:hover {
@@ -2213,12 +2357,43 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-bottom: 0.2rem;
 }
 
-.rb-modal-section-icon {
+.rb-modal-section-header-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.rb-modal-section-header-toggle:hover .rb-modal-section-heading {
+  color: var(--text-normal);
+}
+
+.rb-modal-section-hint {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-left: 0.15rem;
+}
+
+.rb-modal-section-chevron {
   display: flex;
   align-items: center;
-  color: var(--interactive-accent);
-  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--text-faint);
 }
+
+.rb-modal-section-chevron svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.rb-modal-section-body-collapsed {
+  display: none;
+}
+
+.rb-hidden {
+  display: none;
+}
+
+
 
 .rb-modal-section-icon.rb-icon-green {
   color: var(--color-green);
@@ -2254,7 +2429,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-size: var(--font-ui-small);
   color: var(--interactive-accent);
   font-weight: 600;
-  margin: -0.4rem 0 0.5rem;
+  margin: 0.4rem 0 0.2rem;
 }
 
 .rb-modal-divider {
@@ -2549,13 +2724,40 @@ body.is-mobile .rb-modal-btn {
   justify-content: center;
 }
 
+body.is-mobile .rb-mark-cooked-date-field,
+body.is-mobile .rb-mark-cooked-notes-field {
+  flex: 1 1 100%;
+}
+
+body.is-mobile .rb-mark-cooked-notes-input {
+  min-height: 9rem;
+}
+
 /* Image section buttons in mark-cooked modal */
-body.is-mobile .rb-modal-image-btns {
+body.is-mobile .rb-modal-image-layout {
+  display: flex;
   flex-direction: column;
 }
 
+body.is-mobile .rb-modal-image-preview {
+  order: 1;
+}
+
+body.is-mobile .rb-modal-image-btns {
+  order: 2;
+  flex-direction: row;
+  flex-wrap: wrap;
+  max-width: none;
+}
+
 body.is-mobile .rb-modal-image-btns .rb-modal-btn {
-  width: 100%;
+  width: auto;
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+body.is-mobile .rb-modal-image-btns .rb-modal-btn-remove {
+  margin-top: 0;
 }
 
 /* Jump bar — bigger tap targets */

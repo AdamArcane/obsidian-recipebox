@@ -2,7 +2,7 @@
  * Modal for selectively adding or removing a recipe's ingredients from the
  * grocery list, showing a checklist of parsed ingredients with their current state.
  */
-import { App, Modal, TFile } from "obsidian";
+import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap, GroceryItem } from "../../types";
 import {
@@ -11,11 +11,15 @@ import {
 	renderIngredientChecklist,
 	LoadedIngredient,
 } from "./ingredient-loader";
+import { BaseModal } from "./modal-shell";
 
-export class AddToGroceryModal extends Modal {
+export class AddToGroceryModal extends BaseModal {
 	private readonly initialChecked = new Set<string>();
 	private readonly selectedKeys = new Set<string>();
 	private ingredients: LoadedIngredient[] = [];
+
+	// Held so the async confirm handler can capture it after renderBody loads
+	private confirmBtn!: HTMLButtonElement;
 
 	constructor(
 		app: App,
@@ -27,13 +31,11 @@ export class AddToGroceryModal extends Modal {
 		super(app);
 	}
 
-	async onOpen(): Promise<void> {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "Update grocery list" });
-		contentEl.createEl("p", { cls: "rb-modal-subtitle", text: this.file.basename });
+	getTitle(): string { return "Update grocery list"; }
+	getSubtitle(): string { return this.file.basename; }
 
-		const checklistEl = contentEl.createDiv({ cls: "rb-checklist-container" });
+	async renderBody(bodyEl: HTMLElement): Promise<void> {
+		const checklistEl = bodyEl.createDiv({ cls: "rb-checklist-container" });
 
 		this.ingredients = await loadRecipeIngredients(this.app, this.file, this.settings);
 		const onListKeys = new Set(this.getGroceryItems().map(i => i.key));
@@ -48,23 +50,20 @@ export class AddToGroceryModal extends Modal {
 			if (checked) this.selectedKeys.add(key);
 			else this.selectedKeys.delete(key);
 		});
+	}
 
-		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
-		footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-cancel", text: "Cancel" })
+	renderFooter(footerEl: HTMLElement): void {
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
 			.addEventListener("click", () => this.close());
 
-		const confirmBtn = footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: "Save changes" });
-		confirmBtn.addEventListener("click", () => { void (async () => {
-			confirmBtn.disabled = true;
+		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Save changes" });
+		this.confirmBtn.addEventListener("click", () => { void (async () => {
+			this.confirmBtn.disabled = true;
 			const toAddKeys = new Set([...this.selectedKeys].filter(k => !this.initialChecked.has(k)));
 			const toRemoveKeys = [...this.initialChecked].filter(k => !this.selectedKeys.has(k));
 			const toAdd = buildContributions(this.ingredients, toAddKeys);
 			await this.onConfirm(toAdd, toRemoveKeys);
 			this.close();
 		})(); });
-	}
-
-	onClose(): void {
-		this.contentEl.empty();
 	}
 }

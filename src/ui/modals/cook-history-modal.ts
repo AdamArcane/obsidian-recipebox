@@ -2,9 +2,10 @@
  * Modal that reads and displays a recipe's cook history entries from the note
  * body, rendering dates, notes, and embedded photos with lightbox support.
  */
-import { App, Component, MarkdownRenderer, Modal, setIcon, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { attachLightboxToImages } from "../components/lightbox";
+import { BaseModal } from "./modal-shell";
 
 interface NoteEntry {
 	date: string;
@@ -61,23 +62,32 @@ function parseNoteSection(content: string, heading: string): NoteEntry[] {
 	return entries;
 }
 
-export class CookHistoryModal extends Modal {
-	private recipeFile: TFile;
-	private settings: RecipeBoxSettings;
-	private editAsMarkdown: (path: string) => void;
+export class CookHistoryModal extends BaseModal {
+	// Stored so loadContent() can clear and repopulate them after async load
+	private shellBody!: HTMLElement;
+	private shellFooter!: HTMLElement;
 
-	constructor(app: App, recipeFile: TFile, settings: RecipeBoxSettings, editAsMarkdown: (path: string) => void) {
+	constructor(
+		app: App,
+		private readonly recipeFile: TFile,
+		private readonly settings: RecipeBoxSettings,
+		private readonly editAsMarkdown: (path: string) => void,
+	) {
 		super(app);
-		this.recipeFile = recipeFile;
-		this.settings = settings;
-		this.editAsMarkdown = editAsMarkdown;
 	}
 
-	onOpen(): void {
-		this.titleEl.setText(`Cook history — ${this.recipeFile.basename}`);
-		this.contentEl.addClass("rb-ch-modal");
-		this.contentEl.createDiv({ cls: "rb-ch-loading", text: "Loading…" });
+	getTitle(): string { return "Cook history"; }
+	getSubtitle(): string { return this.recipeFile.basename; }
+
+	renderBody(bodyEl: HTMLElement): void {
+		this.shellBody = bodyEl;
+		bodyEl.createDiv({ cls: "rb-ch-loading", text: "Loading…" });
 		void this.loadContent();
+	}
+
+	renderFooter(footerEl: HTMLElement): void {
+		// Footer is populated after loadContent() so it's stored for later use
+		this.shellFooter = footerEl;
 	}
 
 	private async loadContent(): Promise<void> {
@@ -97,19 +107,18 @@ export class CookHistoryModal extends Modal {
 		const noteDateSet = new Set(noteEntries.map(e => e.date));
 		const fmOnlyDates = fmDates.filter(d => !noteDateSet.has(d));
 
-		this.contentEl.empty();
-		this.contentEl.addClass("rb-ch-modal");
+		this.shellBody.empty();
 
 		if (noteEntries.length === 0 && fmDates.length === 0) {
-			this.contentEl.createDiv({ cls: "rb-ch-empty", text: "No cook history entries yet." });
+			this.shellBody.createDiv({ cls: "rb-ch-empty", text: "No cook history entries yet." });
 		} else {
-			const list = this.contentEl.createDiv({ cls: "rb-ch-entry-list" });
+			const list = this.shellBody.createDiv({ cls: "rb-ch-entry-list" });
 			for (const entry of noteEntries) {
 				await this.renderEntry(list, entry);
 			}
 
 			if (fmOnlyDates.length > 0) {
-				const fmSection = this.contentEl.createDiv({ cls: "rb-ch-fm-section" });
+				const fmSection = this.shellBody.createDiv({ cls: "rb-ch-fm-section" });
 				fmSection.createDiv({ cls: "rb-ch-fm-title", text: "Additional frontmatter dates" });
 				const chips = fmSection.createDiv({ cls: "rb-ch-fm-chips" });
 				for (const d of fmOnlyDates) {
@@ -118,8 +127,7 @@ export class CookHistoryModal extends Modal {
 			}
 		}
 
-		const footer = this.contentEl.createDiv({ cls: "rb-ch-footer" });
-		const editBtn = footer.createEl("button", { cls: "rb-ch-edit-btn" });
+		const editBtn = this.shellFooter.createEl("button", { cls: "rb-ch-edit-btn" });
 		const iconSpan = editBtn.createSpan({ cls: "rb-ch-edit-icon" });
 		setIcon(iconSpan, "pencil");
 		editBtn.createSpan({ text: "Edit in note" });
@@ -139,9 +147,5 @@ export class CookHistoryModal extends Modal {
 			await MarkdownRenderer.render(this.app, markdown.trim(), body, this.recipeFile.path, this as unknown as Component);
 			attachLightboxToImages(body);
 		}
-	}
-
-	onClose(): void {
-		this.contentEl.empty();
 	}
 }

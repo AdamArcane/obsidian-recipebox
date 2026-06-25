@@ -19,6 +19,19 @@ dependency rather than hand-rolled parsing — don't reimplement that.
 
 ## Code conventions
 
+- **Comment generously, but for reasoning, not mechanics.** Don't write
+  a comment that just restates what the next line obviously does (e.g.
+  // increment the counter above counter++). Do write a comment when
+  the why isn't obvious from the code alone: why this approach was
+  chosen over a simpler one, what edge case or bug a particular check is
+  guarding against, what tradeoff is being made, or what prompted a piece
+  of logic to be written the way it is (especially after a bug fix —
+  explain what was wrong before, not just what the fix does). Aim for
+  comments a developer reading the code six months from now would
+  actually need, not ones that pad the file. This applies throughout, not
+  just on first-write — when fixing a bug or revising existing logic,
+  update or add a comment explaining the change, don't leave the old
+  reasoning (or no reasoning) sitting next to new behavior.
 - **Small, single-purpose files.** Prefer many small files over a few
   large ones with multiple responsibilities. If a file is doing more than
   one job, split it.
@@ -59,6 +72,15 @@ dependency rather than hand-rolled parsing — don't reimplement that.
 
 ## Architecture notes
 
+- **Every modal extends a shared `BaseModal extends Modal`**, not
+  Obsidian's `Modal` directly. `BaseModal` owns `onOpen()` and builds the
+  sticky header / scrollable body / sticky footer structure itself;
+  concrete modals implement `getTitle()`, `renderBody(body)`, and
+  `renderFooter(footer)` and never touch `this.contentEl` or the
+  top-level layout directly. Footer buttons are right-aligned, one row,
+  horizontal-scroll on overflow rather than wrap. Order is Cancel then
+  the primary action. Primary action gets `mod-cta` (`mod-warning` if
+  destructive), not custom color CSS.
 - Recipe folders (where to scan) and recipe type (what counts as a
   recipe) combine with AND, not OR — folders narrow scope, type filters
   within that scope.

@@ -2,31 +2,27 @@
  * Modal for reordering grocery categories via drag-and-drop or up/down buttons
  * when automatic category sorting is disabled.
  */
-import { App, Modal } from "obsidian";
+import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";
+import { BaseModal } from "./modal-shell";
 
-export class CategoryOrderModal extends Modal {
+export class CategoryOrderModal extends BaseModal {
 	constructor(
 		app: App,
 		private readonly settings: RecipeBoxSettings,
 		private readonly save: () => Promise<void>,
 	) { super(app); }
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "Category order" });
-		contentEl.createDiv({ cls: "rb-modal-desc", text: "Drag or use buttons to set the display order when auto-sort is off." });
-		contentEl.createEl("hr");
+	getTitle(): string { return "Category order"; }
+	getSubtitle(): string { return "Drag or use buttons to set the display order when auto-sort is off."; }
 
-		const list = contentEl.createDiv("recipe-box-order-list");
+	renderBody(bodyEl: HTMLElement): void {
+		const list = bodyEl.createDiv("recipe-box-order-list");
 		this.renderList(list);
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
-	}
+	renderFooter(_footerEl: HTMLElement): void { /* live-edit, no action buttons */ }
 
 	private renderList(list: HTMLElement): void {
 		list.empty();

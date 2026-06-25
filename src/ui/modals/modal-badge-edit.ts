@@ -1,15 +1,16 @@
 /**
- * Per-badge edit modal — holds a draft copy of one badge and only
+ * Per-badge edit modal -- holds a draft copy of one badge and only
  * commits to settings on explicit Save. Cancel discards with no write.
  *
  * Modes:
- *  isNew=true  → "Add badge" title, Use-formula toggle at top
- *  builtin     → "Edit badge: {name}" title, label/icon/color only
- *  formula     → "Edit badge: {name}" title, formula + label/icon/color
- *  regular     → "Edit badge: {name}" title, property/prefix/suffix/split + label/icon/color
+ *  isNew=true  -> "Add badge" title, Use-formula toggle at top
+ *  builtin     -> "Edit badge: {name}" title, label/icon/color only
+ *  formula     -> "Edit badge: {name}" title, formula + label/icon/color
+ *  regular     -> "Edit badge: {name}" title, property/prefix/suffix/split + label/icon/color
  */
-import { App, Modal, Setting, setIcon } from "obsidian";
+import { App, Setting, setIcon } from "obsidian";
 import { CustomBadge, BadgeColor } from "../../types";
+import { BaseModal } from "./modal-shell";
 
 const COLOR_OPTIONS: Record<BadgeColor, string> = {
 	default: "Default",
@@ -20,7 +21,7 @@ const COLOR_OPTIONS: Record<BadgeColor, string> = {
 	red: "Red",
 };
 
-export class BadgeEditModal extends Modal {
+export class BadgeEditModal extends BaseModal {
 	private draft: CustomBadge;
 	private useFormula: boolean;
 
@@ -35,27 +36,31 @@ export class BadgeEditModal extends Modal {
 		this.useFormula = !!source.formula;
 	}
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal", "rb-badge-edit-modal");
-		contentEl.createEl("h2", {
-			cls: "rb-modal-title",
-			text: this.isNew
-				? "Add badge"
-				: `Edit badge: ${this.draft.label || this.draft.property}`,
-		});
-		this.renderFields(contentEl);
+	getTitle(): string {
+		return this.isNew ? "Add badge" : `Edit badge: ${this.draft.label || this.draft.property}`;
+	}
+	getContentClasses(): string[] { return ["rb-badge-edit-modal"]; }
+
+	renderBody(bodyEl: HTMLElement): void {
+		this.rebuildFields(bodyEl);
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
+	renderFooter(footerEl: HTMLElement): void {
+		this.rebuildButtons(footerEl);
 	}
 
-	private renderFields(el: HTMLElement): void {
-		el.querySelector(".rb-badge-edit-body")?.remove();
-		el.querySelector(".rb-badge-edit-footer")?.remove();
+	/**
+	 * Re-renders both body and footer when the "Use formula" toggle changes.
+	 * Clears and rebuilds rather than patching, to keep state consistent.
+	 */
+	private rerenderAll(): void {
+		const bodyEl = this.contentEl.querySelector<HTMLElement>(".rb-shell-body");
+		const footerEl = this.contentEl.querySelector<HTMLElement>(".rb-shell-footer");
+		if (bodyEl) { bodyEl.empty(); this.rebuildFields(bodyEl); }
+		if (footerEl) { footerEl.empty(); this.rebuildButtons(footerEl); }
+	}
 
-		const body = el.createDiv({ cls: "rb-badge-edit-body" });
+	private rebuildFields(body: HTMLElement): void {
 		const isBuiltin = this.source.builtin && !this.isNew;
 
 		if (isBuiltin) {
@@ -82,7 +87,7 @@ export class BadgeEditModal extends Modal {
 						this.useFormula = v;
 						if (!v) this.draft.formula = undefined;
 						else if (!this.draft.formula) this.draft.formula = "";
-						this.renderFields(el);
+						this.rerenderAll();
 					}),
 				);
 
@@ -93,17 +98,16 @@ export class BadgeEditModal extends Modal {
 			}
 			this.renderLabelSection(body);
 		}
+	}
 
-		const footer = el.createDiv({ cls: "rb-badge-edit-footer" });
-		footer
-			.createEl("button", { cls: "mod-cta", text: "Save" })
+	private rebuildButtons(footer: HTMLElement): void {
+		footer.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+			.addEventListener("click", () => this.close());
+		footer.createEl("button", { cls: "mod-cta", text: "Save" })
 			.addEventListener("click", () => {
 				this.onSave({ ...this.draft });
 				this.close();
 			});
-		footer
-			.createEl("button", { text: "Cancel" })
-			.addEventListener("click", () => this.close());
 	}
 
 	private renderFormulaSection(body: HTMLElement): void {

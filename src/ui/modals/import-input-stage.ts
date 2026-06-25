@@ -1,6 +1,6 @@
 /**
- * Renders the URL / paste-text input stage of the import modal, delegating
- * submission to import-submit.ts and handing the result to the review stage.
+ * Renders the URL / paste-text input stage of the import modal into the
+ * provided body and footer elements (supplied by BaseModal's shell).
  */
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -17,17 +17,15 @@ export interface InputStageState {
 }
 
 export function renderInputStage(
-	container: HTMLElement,
+	bodyEl: HTMLElement,
+	footerEl: HTMLElement,
 	app: App,
 	settings: RecipeBoxSettings,
 	state: InputStageState,
 	onResult: (recipe: ExtractedRecipe, folder: string) => void,
 ): void {
-	container.empty();
-	container.addClass("rb-import-input-stage");
-
 	// Tab switcher
-	const tabs = container.createDiv({ cls: "rb-import-tabs" });
+	const tabs = bodyEl.createDiv({ cls: "rb-import-tabs" });
 	const urlTab = tabs.createEl("button", { cls: "rb-import-tab", text: "From URL" });
 	const textTab = tabs.createEl("button", { cls: "rb-import-tab", text: "From text" });
 
@@ -43,7 +41,7 @@ export function renderInputStage(
 	textTab.addEventListener("click", () => setTab("text"));
 
 	// URL pane
-	const urlPane = container.createDiv({ cls: "rb-import-pane" });
+	const urlPane = bodyEl.createDiv({ cls: "rb-import-pane" });
 	urlPane.createDiv({ cls: "rb-import-field-label", text: "Recipe URL" });
 	const urlInput = urlPane.createEl("input", {
 		cls: "rb-import-text-input",
@@ -53,7 +51,7 @@ export function renderInputStage(
 	urlInput.addEventListener("input", () => { state.url = urlInput.value; });
 
 	// Text pane
-	const textPane = container.createDiv({ cls: "rb-import-pane" });
+	const textPane = bodyEl.createDiv({ cls: "rb-import-pane" });
 	textPane.createDiv({ cls: "rb-import-field-label", text: "Title (optional)" });
 	const titleInput = textPane.createEl("input", {
 		cls: "rb-import-text-input",
@@ -62,12 +60,15 @@ export function renderInputStage(
 	titleInput.value = state.titleOverride;
 	titleInput.addEventListener("input", () => { state.titleOverride = titleInput.value; });
 	textPane.createDiv({ cls: "rb-import-field-label", text: "Paste recipe text" });
-	const textArea = textPane.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--tall", attr: { placeholder: "Paste ingredients and instructions here…" } });
+	const textArea = textPane.createEl("textarea", {
+		cls: "rb-import-textarea rb-import-textarea--tall",
+		attr: { placeholder: "Paste ingredients and instructions here…" },
+	});
 	textArea.value = state.text;
 	textArea.addEventListener("input", () => { state.text = textArea.value; });
 
 	// Shared folder field
-	const folderSection = container.createDiv({ cls: "rb-import-folder-row" });
+	const folderSection = bodyEl.createDiv({ cls: "rb-import-folder-row" });
 	folderSection.createDiv({ cls: "rb-import-field-label", text: "Destination folder" });
 	const folderInput = folderSection.createEl("input", {
 		cls: "rb-import-text-input",
@@ -78,9 +79,7 @@ export function renderInputStage(
 	folderInput.addEventListener("input", () => { state.folder = folderInput.value; });
 	new FolderSuggest(app, folderInput);
 
-	// Import button
-	const footer = container.createDiv({ cls: "rb-import-footer" });
-	const importBtn = footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: "Import" });
+	const importBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
 	importBtn.addEventListener("click", () => { void (async () => {
 		importBtn.disabled = true;
 		importBtn.setText("Importing…");

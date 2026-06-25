@@ -2,30 +2,26 @@
  * Modal for editing the user's personal allergen list, used from the health
  * and safety settings section.
  */
-import { App, Modal } from "obsidian";
+import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { BaseModal } from "./modal-shell";
 
-export class AllergensModal extends Modal {
+export class AllergensModal extends BaseModal {
 	constructor(
 		app: App,
 		private readonly settings: RecipeBoxSettings,
 		private readonly save: () => Promise<void>,
 	) { super(app); }
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "My allergens" });
-		contentEl.createDiv({ cls: "rb-modal-desc", text: "Warn when a recipe contains any of these allergens." });
-		contentEl.createEl("hr");
+	getTitle(): string { return "My allergens"; }
+	getSubtitle(): string { return "Warn when a recipe contains any of these allergens."; }
 
-		const wrapper = contentEl.createDiv("recipe-box-tag-editor");
+	renderBody(bodyEl: HTMLElement): void {
+		const wrapper = bodyEl.createDiv("recipe-box-tag-editor");
 		this.renderEditor(wrapper);
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
-	}
+	renderFooter(_footerEl: HTMLElement): void { /* live-edit, no action buttons */ }
 
 	private renderEditor(wrapper: HTMLElement): void {
 		wrapper.empty();

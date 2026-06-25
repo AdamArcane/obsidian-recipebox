@@ -2,32 +2,30 @@
  * Modal for editing the user's custom high-GI food pattern list, with a live
  * validation pass against the pattern compiler.
  */
-import { App, Modal } from "obsidian";
+import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { compileGiDictionary, DEFAULT_GI_DICTIONARY } from "../../parser/glycemic-dictionary";
 import { debounce } from "../../utils/debounce";
+import { BaseModal } from "./modal-shell";
 
-export class GiDictionaryModal extends Modal {
+export class GiDictionaryModal extends BaseModal {
 	constructor(
 		app: App,
 		private readonly settings: RecipeBoxSettings,
 		private readonly save: () => Promise<void>,
 	) { super(app); }
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "High-gi dictionary" });
-		contentEl.createDiv({ cls: "rb-modal-desc", text: "One regex pattern per line. Lines starting with # are comments." });
-		contentEl.createEl("hr");
+	getTitle(): string { return "High-GI dictionary"; }
+	getSubtitle(): string { return "One regex pattern per line. Lines starting with # are comments."; }
 
-		const textarea = contentEl.createEl("textarea", {
+	renderBody(bodyEl: HTMLElement): void {
+		const textarea = bodyEl.createEl("textarea", {
 			cls: "recipe-box-gi-textarea recipe-box-gi-textarea--modal",
 			text: this.settings.giDictionary,
 		});
 		textarea.rows = 24;
 
-		const errorEl = contentEl.createDiv({ cls: "recipe-box-gi-errors" });
+		const errorEl = bodyEl.createDiv({ cls: "recipe-box-gi-errors" });
 		const showErrors = (text: string): void => {
 			const { errors } = compileGiDictionary(text);
 			errorEl.empty();
@@ -47,7 +45,7 @@ export class GiDictionaryModal extends Modal {
 
 		let resetPending = false;
 		let resetTimer: number | null = null;
-		const resetBtn = contentEl.createEl("button", { cls: "recipe-box-reset-btn", text: "Reset to defaults" });
+		const resetBtn = bodyEl.createEl("button", { cls: "recipe-box-reset-btn", text: "Reset to defaults" });
 		resetBtn.addEventListener("click", () => {
 			if (!resetPending) {
 				resetPending = true;
@@ -69,7 +67,5 @@ export class GiDictionaryModal extends Modal {
 		});
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
-	}
+	renderFooter(_footerEl: HTMLElement): void { /* live-edit, no action buttons */ }
 }

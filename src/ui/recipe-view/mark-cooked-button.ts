@@ -40,7 +40,7 @@ export function renderMarkCookedButton(
 		attr: { "aria-label": "Mark as cooked" },
 	});
 	const iconEl = btn.createSpan();
-	setIcon(iconEl, "chef-hat");
+	setIcon(iconEl, "circle-check-big");
 
 	btn.addEventListener("click", () => {
 		if (needsModal) {

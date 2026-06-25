@@ -2,11 +2,12 @@
  * Modal for managing ingredient-name substring rules that force specific grocery
  * categories, overriding the automatic dictionary-based categorisation.
  */
-import { App, Modal } from "obsidian";
+import { App } from "obsidian";
 import { CategoryOverride } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { BaseModal } from "./modal-shell";
 
-export class CategoryOverridesModal extends Modal {
+export class CategoryOverridesModal extends BaseModal {
 	constructor(
 		app: App,
 		private readonly settings: RecipeBoxSettings,
@@ -14,20 +15,15 @@ export class CategoryOverridesModal extends Modal {
 		private readonly getKnownCategories: () => string[],
 	) { super(app); }
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "Category overrides" });
-		contentEl.createDiv({ cls: "rb-modal-desc", text: "Map ingredient name substrings to specific categories." });
-		contentEl.createEl("hr");
+	getTitle(): string { return "Category overrides"; }
+	getSubtitle(): string { return "Map ingredient name substrings to specific categories."; }
 
-		const list = contentEl.createDiv("recipe-box-override-list");
+	renderBody(bodyEl: HTMLElement): void {
+		const list = bodyEl.createDiv("recipe-box-override-list");
 		this.renderList(list);
 	}
 
-	onClose(): void {
-		this.contentEl.empty();
-	}
+	renderFooter(_footerEl: HTMLElement): void { /* live-edit, no action buttons */ }
 
 	private renderList(list: HTMLElement): void {
 		list.empty();

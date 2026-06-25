@@ -2,13 +2,14 @@
  * Modal for stamping a recipe as cooked, collecting a date, optional notes,
  * and an optional photo before writing the history entry.
  */
-import { App, Modal, Platform, Setting, TFile } from "obsidian";
+import { App, Platform, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { CookedImageResult } from "../recipe-view/recipe-view-deps";
 import { VaultImageSuggestModal } from "./vault-image-suggest-modal";
 import { localDateISO } from "../../utils/date";
+import { BaseModal } from "./modal-shell";
 
-export class MarkCookedModal extends Modal {
+export class MarkCookedModal extends BaseModal {
 	private selectedDate: string;
 	private notes = "";
 	private imageResult: CookedImageResult | null = null;
@@ -24,82 +25,123 @@ export class MarkCookedModal extends Modal {
 		this.selectedDate = localDateISO();
 	}
 
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.addClass("rb-modal");
-		contentEl.createEl("h2", { cls: "rb-modal-title", text: "Mark as cooked" });
-		contentEl.createEl("p", { cls: "rb-modal-subtitle", text: this.file.basename });
+	getTitle(): string { return "Mark as cooked"; }
+	getIcon(): string { return "circle-check-big"; }
+	getSubtitle(): string { return this.file.basename; }
+	getContentClasses(): string[] { return ["rb-mark-cooked-modal"]; }
 
-		new Setting(contentEl)
-			.setName("Date")
-			.addText(text => {
-				text.inputEl.type = "date";
-				text.setValue(this.selectedDate);
-				text.onChange(v => { this.selectedDate = v || localDateISO(); });
-			});
+	renderBody(bodyEl: HTMLElement): void {
+		const fields = bodyEl.createDiv({ cls: "rb-mark-cooked-fields" });
+
+		const dateField = fields.createDiv({ cls: "rb-modal-field rb-mark-cooked-date-field" });
+		dateField.createEl("label", { cls: "rb-modal-field-label", text: "Date" });
+		const dateInput = dateField.createEl("input", {
+			cls: "rb-modal-input",
+			attr: { type: "date" },
+		});
+		dateInput.value = this.selectedDate;
+		dateInput.addEventListener("change", () => {
+			this.selectedDate = dateInput.value || localDateISO();
+			if (!dateInput.value) dateInput.value = this.selectedDate;
+		});
 
 		if (this.settings.cookHistoryEnabled) {
-			new Setting(contentEl)
-				.setName("Notes")
-				.setDesc("How did it turn out?")
-				.addTextArea(ta => {
-					ta.setPlaceholder("Optional…");
-					ta.onChange(v => { this.notes = v; });
-				});
+			const notesField = fields.createDiv({ cls: "rb-modal-field rb-mark-cooked-notes-field" });
+			notesField.createEl("label", { cls: "rb-modal-field-label", text: "Notes" });
+			const notesInput = notesField.createEl("textarea", {
+				cls: "rb-modal-input rb-mark-cooked-notes-input",
+				attr: { rows: "6", placeholder: "How did it turn out?" },
+			});
+			notesInput.addEventListener("input", () => { this.notes = notesInput.value; });
+			
+			window.requestAnimationFrame(() => notesInput.focus());
 
-			this.buildImageSection(contentEl);
+			this.buildImageSection(bodyEl);
 		}
+	}
 
-		const footer = contentEl.createDiv({ cls: "rb-modal-footer" });
-		footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-cancel", text: "Cancel" })
+	renderFooter(footerEl: HTMLElement): void {
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
 			.addEventListener("click", () => this.close());
-		footer.createEl("button", { cls: "rb-modal-btn rb-modal-btn-primary", text: "Mark as cooked" })
+		footerEl.createEl("button", { cls: "mod-cta", text: "Mark as cooked" })
 			.addEventListener("click", () => {
 				this.onStamp(this.selectedDate, this.notes.trim(), this.imageResult);
 				this.close();
 			});
 	}
 
+	override onClose(): void {
+		this.releasePreview();
+		this.contentEl.empty();
+	}
+
 	private buildImageSection(container: HTMLElement): void {
 		container.createEl("p", { cls: "rb-modal-section-title", text: "Photo" });
 
-		const previewWrap = container.createDiv({ cls: "rb-modal-image-preview" });
-		const previewImg = previewWrap.createEl("img", { attr: { alt: "" }, cls: "is-hidden" });
+		const imageLayout = container.createDiv({ cls: "rb-modal-image-layout" });
+		const btnRow = imageLayout.createDiv({ cls: "rb-modal-image-btns" });
+		const previewWrap = imageLayout.createDiv({ cls: "rb-modal-image-preview" });
+		const previewImg = previewWrap.createEl("img", { attr: { alt: "" }, cls: "rb-hidden" });
 
-		const showPreview = (src: string | null): void => {
-			if (src) { previewImg.src = src; }
-			previewImg.toggleClass("is-hidden", !src);
-		};
+		// Image selection buttons: vault, upload, camera (mobile only), remove
 
-		const btnRow = container.createDiv({ cls: "rb-modal-image-btns" });
-
-		btnRow.createEl("button", { cls: "rb-modal-btn", text: "Choose from vault" })
-			.addEventListener("click", () => {
+		// VAULT
+		const vaultBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Choose from vault" });
+		vaultBtn.addEventListener("click", () => {
 				new VaultImageSuggestModal(this.app, vaultFile => {
 					this.releasePreview();
 					this.imageResult = { kind: "vault-file", file: vaultFile };
 					showPreview(this.app.vault.getResourcePath(vaultFile));
 				}).open();
 			});
+		const vaultIcon = vaultBtn.createSpan({ cls: "rb-modal-btn-icon" });
+		setIcon(vaultIcon, "folder");
+		if (!Platform.isMobile) vaultBtn.createSpan({ text: "Select from vault" });
 
+		// UPLOAD
 		const uploadInput = container.createEl("input", {
 			attr: { type: "file", accept: "image/*", style: "display:none" },
 		});
-		btnRow.createEl("button", { cls: "rb-modal-btn", text: "Upload file" })
-			.addEventListener("click", () => uploadInput.click());
 		uploadInput.addEventListener("change", () => void this.handleFileInput(uploadInput, showPreview));
 
+		const uploadBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Upload image"});
+		uploadBtn.addEventListener("click", () => uploadInput.click());
+
+		const uploadIcon = uploadBtn.createSpan({ cls: "rb-modal-btn-icon" });
+		setIcon(uploadIcon, "upload");
+		if (!Platform.isMobile) uploadBtn.createSpan({ text: "Upload" });
+
+
 		if (Platform.isMobile) {
+
+			// CAMERA (mobile only)
 			const cameraInput = container.createEl("input", {
 				attr: { type: "file", accept: "image/*", capture: "environment", style: "display:none" },
 			});
-			btnRow.createEl("button", { cls: "rb-modal-btn", text: "Take photo" })
-				.addEventListener("click", () => cameraInput.click());
+			const cameraBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Take photo", text: "" });
+			cameraBtn.addEventListener("click", () => cameraInput.click());
+			setIcon(cameraBtn, "camera");
 			cameraInput.addEventListener("change", () => void this.handleFileInput(cameraInput, showPreview));
 		}
 
-		btnRow.createEl("button", { cls: "rb-modal-btn rb-modal-btn-danger", text: "Remove" })
-			.addEventListener("click", () => { this.releasePreview(); this.imageResult = null; showPreview(null); });
+		// REMOVE
+		const removeBtn = btnRow.createEl("button", { cls: "rb-modal-btn rb-modal-btn-danger rb-modal-btn-remove", title: "Remove image", text: "" });
+		removeBtn.addEventListener("click", () => { this.releasePreview(); this.imageResult = null; showPreview(null); });
+		setIcon(removeBtn, "trash-2");
+		if (!Platform.isMobile) removeBtn.createSpan({ text: "Remove" });
+
+
+		// Show or hide the preview image and remove button based on whether an image is selected
+		const showPreview = (src: string | null): void => {
+			const hasImage = Boolean(src);
+			if (src) { previewImg.src = src; }
+			imageLayout.toggleClass("rb-modal-image-layout-has-preview", hasImage);
+			previewWrap.toggleClass("rb-hidden", !hasImage);
+			previewImg.toggleClass("rb-hidden", !hasImage);
+			removeBtn.toggleClass("rb-hidden", !hasImage);
+		};
+		showPreview(null);
+
 	}
 
 	private async handleFileInput(input: HTMLInputElement, showPreview: (src: string | null) => void): Promise<void> {
@@ -114,10 +156,5 @@ export class MarkCookedModal extends Modal {
 
 	private releasePreview(): void {
 		if (this.previewUrl) { URL.revokeObjectURL(this.previewUrl); this.previewUrl = null; }
-	}
-
-	onClose(): void {
-		this.releasePreview();
-		this.contentEl.empty();
 	}
 }
