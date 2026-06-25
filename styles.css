@@ -2554,6 +2554,21 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   justify-content: flex-end;
 }
 
+.rb-confirm-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.rb-confirm-checkbox-row input[type="checkbox"] {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
 /* ── Responsive — narrow pane (desktop split-pane or web) ────────────────── */
 
 @media (max-width: 600px) {

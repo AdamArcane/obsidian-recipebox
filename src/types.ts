@@ -4,6 +4,10 @@
  */
 export type ContributionMap = Record<string, { name: string; unit: string; quantity: number | null }>;
 
+export type GroceryContributionSource =
+	| { kind: "recipe"; path: string; day?: string; mealType?: string }
+	| { kind: "manual" };
+
 export interface ParsedIngredient {
 	quantity: number | null;
 	unit: string;
@@ -31,6 +35,8 @@ export interface GroceryItemSource {
 	label: string;
 	path?: string;
 	quantity?: number | null;
+	day?: string;
+	mealType?: string;
 }
 
 export interface GroceryItem {

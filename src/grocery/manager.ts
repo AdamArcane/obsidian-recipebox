@@ -6,7 +6,7 @@
  * without needing a direct reference to any view.
  */
 import { App, Events, Notice } from "obsidian";
-import { ContributionMap, GroceryItem, MealPlanEntry, OneOffItem } from "../types";
+import { ContributionMap, GroceryContributionSource, GroceryItem, MealPlanEntry, OneOffItem } from "../types";
 import { writeNote } from "../utils/vault-notes";
 import { rebuildGroceryItems } from "./grocery-rebuild";
 import { isGroupCollapsed, setGroupCollapsed, autoCollapseGroups } from "./group-collapse";
@@ -53,8 +53,9 @@ export class GroceryManager extends Events {
 		await this.refresh();
 	}
 
-	async addToGroceryOnly(contributions: ContributionMap, silent = false): Promise<void> {
-		await addToGroceryOnly(this.app, contributions, this.sink.getSettings(), silent);
+	async addToGroceryOnly(contributions: ContributionMap, source: GroceryContributionSource, silent = false): Promise<void> {
+		await addToGroceryOnly(this.app, contributions, source, this.sink.getSettings(), silent);
+		await this.sink.save();
 		await this.refresh();
 	}
 
@@ -85,8 +86,8 @@ export class GroceryManager extends Events {
 		this.trigger("change");
 	}
 
-	async clearMealPlan(): Promise<number> {
-		const count = await clearMealPlan(this.app, this.sink.getSettings(), () => this.sink.save());
+	async clearMealPlan(alsoRemoveFromGrocery: boolean): Promise<number> {
+		const count = await clearMealPlan(this.app, alsoRemoveFromGrocery, this.sink.getSettings(), () => this.sink.save());
 		await writeNote(this.app, this.sink.getSettings().mealPlanPath, "# Meal Plan\n");
 		await this.refresh();
 		return count;

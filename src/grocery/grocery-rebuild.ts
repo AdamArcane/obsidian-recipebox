@@ -1,50 +1,30 @@
 /**
- * Rebuilds the in-memory GroceryItem list by correlating the grocery note's
- * current lines with meal-plan contributions and one-off items from settings.
+ * Rebuilds the in-memory GroceryItem list from the grocery note and the
+ * persisted per-key contribution history, with no inference step.
  */
 import { App } from "obsidian";
-import { GroceryItem, GroceryItemSource } from "../types";
+import { GroceryContributionSource, GroceryItem, GroceryItemSource } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { readGroceryNoteItems } from "./grocery-note/read";
 
+function toDisplaySource(app: App, source: GroceryContributionSource, quantity: number | null): GroceryItemSource {
+	if (source.kind === "manual") {
+		return { kind: "one-off", label: "added manually", quantity };
+	}
+	const file = app.vault.getFileByPath(source.path);
+	const label = file?.basename ?? source.path.split("/").pop()?.replace(/\.md$/, "") ?? source.path;
+	return { kind: "recipe", label, path: source.path, quantity, day: source.day, mealType: source.mealType };
+}
+
 export async function rebuildGroceryItems(app: App, settings: RecipeBoxSettings): Promise<GroceryItem[]> {
 	const noteItems = await readGroceryNoteItems(app, settings);
-
-	// key → contributing recipe sources
-	const recipeByKey = new Map<string, Array<{ recipeName: string; recipePath: string; quantity: number | null }>>();
-	for (const entry of (settings.state.mealPlan ?? [])) {
-		const file = app.vault.getFileByPath(entry.recipePath);
-		const recipeName = file?.basename ?? entry.recipePath;
-		for (const [key, contrib] of Object.entries(entry.contributions)) {
-			if (!recipeByKey.has(key)) recipeByKey.set(key, []);
-			recipeByKey.get(key)!.push({ recipeName, recipePath: entry.recipePath, quantity: contrib.quantity });
-		}
-	}
-
-	// key → one-off item
-	const oneOffByKey = new Map(
-		(settings.state.oneOffItems ?? []).map((item) => {
-			const key = `${item.name.toLowerCase().trim()}|${item.unit.toLowerCase()}`;
-			return [key, item] as const;
-		})
-	);
+	const history = settings.state.groceryContributions ?? {};
 
 	const items: GroceryItem[] = [];
 	for (const [key, note] of noteItems) {
-		const sources: GroceryItemSource[] = [];
-
-		const recipeSources = recipeByKey.get(key);
-		if (recipeSources) {
-			for (const rs of recipeSources) {
-				sources.push({ kind: "recipe", label: rs.recipeName, path: rs.recipePath, quantity: rs.quantity });
-			}
-		}
-
-		const oneOff = oneOffByKey.get(key);
-		if (oneOff) sources.push({ kind: "one-off", label: oneOff.name, quantity: oneOff.quantity });
-
+		const records = history[key] ?? [];
+		const sources: GroceryItemSource[] = records.map(r => toDisplaySource(app, r.source, r.quantity));
 		if (sources.length === 0) sources.push({ kind: "one-off", label: "added manually" });
-
 		items.push({ key, name: note.name, unit: note.unit, quantity: note.quantity, category: note.category, sources, checked: note.checked });
 	}
 

@@ -6,6 +6,7 @@ import { ItemView, Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 import { renderWeekGrid } from "./week-grid";
 import { ConfirmModal } from "../modals/confirm-modal";
+import { RecipePickerModal } from "../modals/recipe-picker-modal";
 
 export const MEAL_PLAN_VIEW_TYPE = "recipe-box-meal-plan-view";
 
@@ -39,6 +40,16 @@ export class MealPlanView extends ItemView {
 		contentEl.addClass("rb-meal-plan-view");
 
 		const topBar = contentEl.createDiv({ cls: "rb-mpv-top-bar" });
+
+		const addRecipeBtn = topBar.createEl("button", { cls: "rb-mpv-add-recipe-btn" });
+		setIcon(addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-icon" }), "plus");
+		addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-label", text: "Add recipe" });
+		addRecipeBtn.addEventListener("click", () => {
+			new RecipePickerModal(this.app, this.deps.getSettings(), undefined, (file) => {
+				this.deps.openAddToMealPlanModal(file);
+			}).open();
+		});
+
 		const clearBtn = topBar.createEl("button", { cls: "rb-mpv-clear-btn" });
 		setIcon(clearBtn.createSpan({ cls: "rb-mpv-clear-btn-icon" }), "trash-2");
 		clearBtn.createSpan({ cls: "rb-mpv-clear-btn-label", text: "Clear meal plan" });
@@ -46,12 +57,16 @@ export class MealPlanView extends ItemView {
 			new ConfirmModal(
 				this.app,
 				"Clear meal plan?",
-				"This removes every scheduled recipe and leftovers card from the meal plan, and also removes their contributed ingredients from your grocery list (anything you added manually stays untouched).",
+				"Every scheduled recipe and leftovers card will be removed from the meal plan.",
 				"Clear meal plan",
 				{
 					destructive: true,
-					onConfirm: () => {
-						void this.deps.clearMealPlan().then((count) => {
+					checkbox: {
+						label: "Also remove these recipes' ingredients from the grocery list",
+						defaultChecked: true,
+					},
+					onConfirm: (removeFromGrocery) => {
+						void this.deps.clearMealPlan(removeFromGrocery).then((count) => {
 							const n = count === 1 ? "entry" : "entries";
 							new Notice(`Cleared ${count} meal plan ${n}.`);
 						});

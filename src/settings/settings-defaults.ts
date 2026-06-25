@@ -163,5 +163,6 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		mealPlan: [],
 		oneOffItems: [],
 		collapsedSections: {},
+		groceryContributions: {},
 	},
 };

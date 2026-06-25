@@ -78,7 +78,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				removeFromMealPlan: (id) => plugin.manager.removeFromMealPlan(id),
 				rescheduleMealPlanEntry: (id, day) => plugin.manager.rescheduleMealPlanEntry(id, day),
 				setMealType: (id, mealType) => plugin.manager.setMealType(id, mealType),
-				clearMealPlan: () => plugin.manager.clearMealPlan(),
+				clearMealPlan: (alsoRemove) => plugin.manager.clearMealPlan(alsoRemove),
 				subscribeToChanges: (cb) => {
 					plugin.manager.on("change", cb);
 					return () => plugin.manager.off("change", cb);
@@ -95,6 +95,17 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					if (!file) return;
 					const leaf2 = plugin.app.workspace.getLeaf(false);
 					void leaf2.setViewState({ type: "markdown", state: { file: path }, active: true });
+				},
+				openAddToMealPlanModal: (file, prefill) => {
+					new AddToMealPlanModal(
+						plugin.app,
+						file,
+						plugin.settings,
+						(day, meal, contributions) => {
+							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {});
+						},
+						prefill,
+					).open();
 				},
 			}),
 	);
@@ -133,7 +144,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 						() => plugin.manager.groceryItems,
 						async (toAdd, toRemoveKeys) => {
 							const addCount = Object.keys(toAdd).length;
-							if (addCount > 0) await plugin.manager.addToGroceryOnly(toAdd, true);
+							if (addCount > 0) await plugin.manager.addToGroceryOnly(toAdd, { kind: "recipe", path: file.path }, true);
 							for (const key of toRemoveKeys) await plugin.manager.removeFromGroceryByKey(key, true);
 							const parts: string[] = [];
 							if (addCount > 0) parts.push(`${addCount} item${addCount === 1 ? "" : "s"} added`);

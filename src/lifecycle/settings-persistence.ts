@@ -8,6 +8,7 @@ import {
 	BadgeValueType,
 	CategoryOverride,
 	CustomBadge,
+	GroceryContributionSource,
 	GroupingMode,
 	MealPlanEntry,
 	OneOffItem,
@@ -212,6 +213,42 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 				? (state.oneOffItems as unknown[]).map(validateOneOffItem).filter((x): x is OneOffItem => x !== null)
 				: [],
 			collapsedSections,
+			groceryContributions: validateGroceryContributions(state.groceryContributions),
 		},
 	};
+}
+
+function validateGroceryContributionSource(raw: unknown): GroceryContributionSource | null {
+	if (!raw || typeof raw !== "object") return null;
+	const s = raw as Record<string, unknown>;
+	if (s.kind === "manual") return { kind: "manual" };
+	if (s.kind === "recipe" && typeof s.path === "string" && s.path) {
+		return {
+			kind: "recipe",
+			path: s.path,
+			day: typeof s.day === "string" ? s.day : undefined,
+			mealType: typeof s.mealType === "string" ? s.mealType : undefined,
+		};
+	}
+	return null;
+}
+
+function validateGroceryContributions(
+	raw: unknown,
+): Record<string, Array<{ source: GroceryContributionSource; quantity: number | null }>> {
+	if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+	const result: Record<string, Array<{ source: GroceryContributionSource; quantity: number | null }>> = {};
+	for (const [key, list] of Object.entries(raw as Record<string, unknown>)) {
+		if (!Array.isArray(list)) continue;
+		const validated = (list as unknown[]).flatMap((entry) => {
+			if (!entry || typeof entry !== "object") return [];
+			const e = entry as Record<string, unknown>;
+			const source = validateGroceryContributionSource(e.source);
+			if (!source) return [];
+			const quantity = typeof e.quantity === "number" ? e.quantity : null;
+			return [{ source, quantity }];
+		});
+		if (validated.length > 0) result[key] = validated;
+	}
+	return result;
 }

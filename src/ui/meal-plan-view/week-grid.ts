@@ -53,12 +53,8 @@ function renderColumn(
 	addBtn.setText("+");
 	addBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
-		const rect = addBtn.getBoundingClientRect();
-		const anchor: PopoverAnchor = { kind: "point", x: rect.left, y: rect.bottom };
-		new RecipePickerModal(app, deps.getSettings(), dayKey, (file, day) => {
-			void deps.addToMealPlan(file.path, day).then((newId) => {
-				if (newId) showMealTypePopover(anchor, newId, deps);
-			});
+		new RecipePickerModal(app, deps.getSettings(), dayKey, (file) => {
+			deps.openAddToMealPlanModal(file, { day: dayKey });
 		}).open();
 	});
 

@@ -6,6 +6,7 @@ import {
 	GroupingMode,
 	CategorySource,
 	CategoryOverride,
+	GroceryContributionSource,
 	MealPlanEntry,
 	OneOffItem,
 	CustomBadge,
@@ -107,5 +108,6 @@ export interface RecipeBoxSettings {
 		mealPlan: MealPlanEntry[];
 		oneOffItems: OneOffItem[];
 		collapsedSections: Record<string, boolean>;
+		groceryContributions: Record<string, Array<{ source: GroceryContributionSource; quantity: number | null }>>;
 	};
 }

@@ -53,7 +53,7 @@ export class MarkCookedModal extends BaseModal {
 				attr: { rows: "6", placeholder: "How did it turn out?" },
 			});
 			notesInput.addEventListener("input", () => { this.notes = notesInput.value; });
-			
+
 			window.requestAnimationFrame(() => notesInput.focus());
 
 			this.buildImageSection(bodyEl);
@@ -88,12 +88,12 @@ export class MarkCookedModal extends BaseModal {
 		// VAULT
 		const vaultBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Choose from vault" });
 		vaultBtn.addEventListener("click", () => {
-				new VaultImageSuggestModal(this.app, vaultFile => {
-					this.releasePreview();
-					this.imageResult = { kind: "vault-file", file: vaultFile };
-					showPreview(this.app.vault.getResourcePath(vaultFile));
-				}).open();
-			});
+			new VaultImageSuggestModal(this.app, vaultFile => {
+				this.releasePreview();
+				this.imageResult = { kind: "vault-file", file: vaultFile };
+				showPreview(this.app.vault.getResourcePath(vaultFile));
+			}).open();
+		});
 		const vaultIcon = vaultBtn.createSpan({ cls: "rb-modal-btn-icon" });
 		setIcon(vaultIcon, "folder");
 		if (!Platform.isMobile) vaultBtn.createSpan({ text: "Select from vault" });
@@ -104,7 +104,7 @@ export class MarkCookedModal extends BaseModal {
 		});
 		uploadInput.addEventListener("change", () => void this.handleFileInput(uploadInput, showPreview));
 
-		const uploadBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Upload image"});
+		const uploadBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Upload image" });
 		uploadBtn.addEventListener("click", () => uploadInput.click());
 
 		const uploadIcon = uploadBtn.createSpan({ cls: "rb-modal-btn-icon" });

@@ -13,6 +13,7 @@ import { localDateISO } from "../utils/date";
 import { readNoteOrEmpty } from "../utils/vault-notes";
 import { parseMealPlanNote } from "./meal-plan-note/parse";
 import { addToGroceryNote, removeFromGroceryNote } from "./grocery-note/write";
+import { recordContributions } from "./contribution-history";
 
 export interface GroceryManagerSink {
 	getSettings(): RecipeBoxSettings;
@@ -97,6 +98,7 @@ async function tryAutoAdd(app: App, entry: MealPlanEntry, settings: RecipeBoxSet
 		entry.contributions = contributions;
 		entry.autoAddProcessed = true;
 		if (Object.keys(contributions).length > 0) {
+			recordContributions(contributions, { kind: "recipe", path: entry.recipePath, day: entry.day, mealType: entry.meal }, settings);
 			await addToGroceryNote(app, contributions, settings);
 		}
 	} catch (err) {

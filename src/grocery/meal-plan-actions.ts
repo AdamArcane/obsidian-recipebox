@@ -3,11 +3,12 @@
  * entries — each function updates settings state, saves, and writes to the notes.
  */
 import { App, Notice } from "obsidian";
-import { ContributionMap, MealPlanEntry } from "../types";
+import { ContributionMap, GroceryContributionSource, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { generateEntryId, localDateISO } from "../utils/date";
 import { addToGroceryNote, removeFromGroceryNote } from "./grocery-note/write";
 import { insertMealPlanEntry, removeMealPlanEntry } from "./meal-plan-note/write";
+import { recordContributions, unrecordContributions, severScheduleLinks } from "./contribution-history";
 
 function resolveRecipeName(app: App, filePath: string): string {
 	return app.vault.getFileByPath(filePath)?.basename ?? filePath.split("/").pop()?.replace(/\.md$/, "") ?? filePath;
@@ -30,6 +31,7 @@ export async function addToMealPlan(
 		const old = settings.state.mealPlan[existingIdx];
 		if (Object.keys(old.contributions).length > 0) {
 			await removeFromGroceryNote(app, old.contributions, settings);
+			unrecordContributions(old.contributions, { kind: "recipe", path: old.recipePath, day: old.day, mealType: old.meal }, settings);
 		}
 		settings.state.mealPlan.splice(existingIdx, 1);
 	}
@@ -43,6 +45,11 @@ export async function addToMealPlan(
 		contributions,
 		autoAddProcessed: Object.keys(contributions).length > 0,
 	};
+
+	if (Object.keys(contributions).length > 0) {
+		const source: GroceryContributionSource = { kind: "recipe", path: recipePath.trim(), day: day?.trim() || undefined, mealType: mealType?.trim() || undefined };
+		recordContributions(contributions, source, settings);
+	}
 
 	settings.state.mealPlan.push(entry);
 	await save();
@@ -127,10 +134,12 @@ export async function addLeftoversEntry(
 export async function addToGroceryOnly(
 	app: App,
 	contributions: ContributionMap,
+	source: GroceryContributionSource,
 	settings: RecipeBoxSettings,
 	silent = false,
 ): Promise<void> {
 	if (Object.keys(contributions).length === 0) return;
+	recordContributions(contributions, source, settings);
 	await addToGroceryNote(app, contributions, settings);
 	if (!silent) {
 		const n = Object.keys(contributions).length;
@@ -163,6 +172,7 @@ export async function rescheduleMealPlanEntry(
 async function reverseContributions(app: App, entry: MealPlanEntry, settings: RecipeBoxSettings): Promise<void> {
 	await removeMealPlanEntry(app, entry.recipePath, settings, entry.day);
 	if (Object.keys(entry.contributions).length > 0) {
+		unrecordContributions(entry.contributions, { kind: "recipe", path: entry.recipePath, day: entry.day, mealType: entry.meal }, settings);
 		await removeFromGroceryNote(app, entry.contributions, settings);
 	}
 }
@@ -188,14 +198,23 @@ export async function removeFromMealPlan(
 
 export async function clearMealPlan(
 	app: App,
+	alsoRemoveFromGrocery: boolean,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>
 ): Promise<number> {
 	const entries = [...settings.state.mealPlan];
 	const count = entries.length;
 
-	for (const entry of entries) {
-		await reverseContributions(app, entry, settings);
+	if (alsoRemoveFromGrocery) {
+		for (const entry of entries) {
+			await reverseContributions(app, entry, settings);
+		}
+	} else {
+		// Keep grocery quantities intact — only sever the schedule link so items
+		// are no longer attributed to a day that no longer exists in the plan.
+		for (const entry of entries) {
+			if (entry.recipePath) severScheduleLinks(entry.recipePath, settings);
+		}
 	}
 
 	settings.state.mealPlan = [];
