@@ -175,12 +175,13 @@ export class RecipeView extends TextFileView {
 		instructionSplit: ReturnType<typeof splitBodyAroundInstructions>,
 		groceryItems: GroceryItem[],
 	): Promise<void> {
+		const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === this.file!.path);
+
 		renderMetaBanner(
 			wrap, this.app, this.file!, fm, settings,
-			multiplier, servings, inPlan, this.deps,
+			multiplier, servings, inPlan, planEntries, this.deps,
 		);
 
-		const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === this.file!.path);
 		renderMealPlanStatus(wrap, this.app, this.file!, planEntries, this.deps);
 
 		if (before.trim()) {

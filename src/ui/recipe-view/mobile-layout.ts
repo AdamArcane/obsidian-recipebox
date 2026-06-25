@@ -204,6 +204,7 @@ function renderScaleActionsRow(
 	file: TFile,
 	fm: Record<string, unknown>,
 	multiplier: number,
+	servings: number | null,
 	inPlan: boolean,
 	settings: RecipeBoxSettings,
 	deps: RecipeViewDeps,
@@ -212,25 +213,55 @@ function renderScaleActionsRow(
 
 	let current = multiplier;
 	const scaleCol = row.createDiv({ cls: "rb-mobile-scale-col" });
-	scaleCol.createDiv({ cls: "rb-mobile-scale-label", text: "Scale" });
-	const scaleValue = scaleCol.createDiv({ cls: "rb-mobile-scale-value", text: `${current}×` });
 
-	scaleCol.addEventListener("click", () => {
-		new ScalePickerModal(app, current, async (value) => {
-			current = value;
-			scaleValue.textContent = `${value}×`;
-			await app.fileManager.processFrontMatter(file, (fm) => {
-				const f = fm as Record<string, unknown>;
-				if (value === 1) delete f[RECIPE_FRONTMATTER.multiplier];
-				else f[RECIPE_FRONTMATTER.multiplier] = value;
-			});
-		}).open();
-	});
+	// Scale cell
+	const scaleCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
+	scaleCell.createDiv({ cls: "rb-mobile-scale-label", text: "Scale" });
+	const scaleValue = scaleCell.createDiv({ cls: "rb-mobile-scale-value", text: `${current}×` });
+
+	// Servings cell (only if the recipe has a servings value)
+	if (servings !== null) {
+		scaleCol.createDiv({ cls: "rb-mobile-scale-divider" });
+		const servingsCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
+		servingsCell.createDiv({ cls: "rb-mobile-scale-label", text: "Serves" });
+		const servingsValue = servingsCell.createDiv({ cls: "rb-mobile-scale-value" });
+		const updateServings = (mult: number): void => {
+			const scaled = Math.round(servings * mult * 10) / 10;
+			servingsValue.textContent = String(scaled % 1 === 0 ? Math.round(scaled) : scaled);
+		};
+		updateServings(current);
+
+		scaleCol.addEventListener("click", () => {
+			new ScalePickerModal(app, current, async (value) => {
+				current = value;
+				scaleValue.textContent = `${value}×`;
+				updateServings(value);
+				await app.fileManager.processFrontMatter(file, (fm) => {
+					const f = fm as Record<string, unknown>;
+					if (value === 1) delete f[RECIPE_FRONTMATTER.multiplier];
+					else f[RECIPE_FRONTMATTER.multiplier] = value;
+				});
+			}).open();
+		});
+	} else {
+		scaleCol.addEventListener("click", () => {
+			new ScalePickerModal(app, current, async (value) => {
+				current = value;
+				scaleValue.textContent = `${value}×`;
+				await app.fileManager.processFrontMatter(file, (fm) => {
+					const f = fm as Record<string, unknown>;
+					if (value === 1) delete f[RECIPE_FRONTMATTER.multiplier];
+					else f[RECIPE_FRONTMATTER.multiplier] = value;
+				});
+			}).open();
+		});
+	}
 
 	const actions = row.createDiv({ cls: "rb-mobile-actions" });
 	renderFavoriteToggle(actions, app, file, fm);
 	renderMarkCookedButton(actions, app, file, settings, deps);
-	renderMealPlanToggle(actions, file, inPlan, deps);
+	const planEntries = deps.getMealPlan().filter(e => e.recipePath === file.path);
+	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
 }
 
 function renderMobileNutritionStrip(
@@ -347,7 +378,7 @@ export async function renderMobileLayout(
 	renderBadgeRow(container, settings, fm, skipOnMobile);
 
 	// Scale tap column + action row
-	renderScaleActionsRow(container, app, file, fm, multiplier, inPlan, settings, deps);
+	renderScaleActionsRow(container, app, file, fm, multiplier, servings, inPlan, settings, deps);
 
 	// Meal plan status notice
 	const planEntries = deps.getMealPlan().filter(e => e.recipePath === file.path);

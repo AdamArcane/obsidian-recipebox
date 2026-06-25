@@ -473,6 +473,7 @@
 
 .rb-meta-banner {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
@@ -484,16 +485,18 @@
   border-left: 3px solid var(--interactive-accent);
 }
 
+
 .rb-banner-cells {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  align-items: flex-start;
+  /* align-items: flex-start; */
 }
 
 .rb-banner-cell {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.3rem;
 }
 
@@ -517,8 +520,17 @@
   color: var(--interactive-accent);
 }
 
-/* Multiplier stepper */
 
+/* Multiplier stepper */
+.rb-multiplier-cell {
+  display: flex;
+  align-items: center;
+}
+.rb-stepper-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
 .rb-stepper {
   display: inline-flex;
   align-items: center;
@@ -600,7 +612,7 @@
 .rb-nutrition-grid {
   display: grid;
   grid-template-columns: max-content max-content max-content max-content;
-  row-gap: 0.1rem;
+  row-gap: 0.3rem;
   column-gap: 0.35rem;
   align-items: baseline;
 }
@@ -636,8 +648,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: var(--radius-m);
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
@@ -647,8 +659,8 @@
 }
 
 .rb-action-btn svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .rb-action-btn:hover {
@@ -1301,7 +1313,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 .rb-mobile-native-card .rb-image-card {
-  width: 38%;
+  width: 44%;
   flex-shrink: 0;
   border-radius: 0;
 }
@@ -1399,19 +1411,35 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 .rb-mobile-scale-col {
-  flex: 1;
+  /* Shrinks to content; the row's flex gap handles spacing to the action buttons */
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  cursor: pointer;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-secondary);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+/* Each stat cell inside the scale col (scale value, divider, servings) */
+.rb-mobile-scale-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.15rem;
-  cursor: pointer;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-m);
-  padding: 0.4rem 0.5rem;
-  background: var(--background-secondary);
-  user-select: none;
-  -webkit-user-select: none;
+  padding: 0.4rem 0.75rem;
+}
+
+.rb-mobile-scale-divider {
+  width: 1px;
+  background: var(--background-modifier-border);
+  flex-shrink: 0;
+  margin: 0.35rem 0;
 }
 
 .rb-mobile-scale-col:active {
@@ -1610,6 +1638,8 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   display: flex;
   gap: 0.4rem;
   flex-shrink: 0;
+  /* Push action buttons to the right edge, keeping scale box left-aligned */
+  margin-left: auto;
 }
 
 .rb-compact-times {
@@ -1619,6 +1649,26 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   font-weight: 500;
+}
+
+.rb-servings-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  
+}
+.rb-servings-label {
+  font-size: var(--font-ui-small);
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.rb-servings-value {
+  font-size: var(--font-ui-medium);
+  font-weight: 700;
+  color: var(--interactive-accent);
+  text-align: right;
 }
 
 .rb-compact-servings {
@@ -1880,6 +1930,13 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 .rb-shell-footer:empty {
   display: none;
+}
+
+/* Use a more specific selector to beat Obsidian's .mod-cta rule on mobile
+   without !important, keeping footer buttons square with rounded corners. */
+.rb-shell-footer .mod-cta,
+.rb-shell-footer .mod-warning {
+  border-radius: var(--radius-m);
 }
 
 .rb-shell-cancel-btn {
@@ -2519,16 +2576,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
     width: 100%;
   }
 
-  /* Let banner cells wrap more comfortably */
-  .rb-meta-banner {
-    flex-direction: column;
-    gap: 0.75rem;
-    border-left-width: 3px;
-  }
-
-  .rb-banner-cells {
-    gap: 0.75rem;
-  }
 
   /* Remove left-border dividers when cells wrap to new lines */
   .rb-banner-cell+.rb-banner-cell {
@@ -2659,7 +2706,10 @@ body.is-mobile .rb-tab-btn {
 /* Scale col: match action button height exactly */
 body.is-mobile .rb-mobile-scale-col {
   height: 2.75rem;
-  padding: 0;
+}
+
+body.is-mobile .rb-mobile-scale-cell {
+  padding: 0 0.75rem;
 }
 
 /* Ingredient quantity column — narrower on mobile to reclaim horizontal space */

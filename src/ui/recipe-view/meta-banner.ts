@@ -10,6 +10,7 @@ import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { renderFavoriteToggle } from "./favorite-toggle";
 import { renderMealPlanToggle } from "./meal-plan-toggle";
 import { renderMarkCookedButton } from "./mark-cooked-button";
+import { MealPlanEntry } from "../../types";
 
 function renderMultiplierCell(
 	container: HTMLElement,
@@ -18,6 +19,7 @@ function renderMultiplierCell(
 	multiplier: number,
 ): void {
 	const cell = container.createDiv({ cls: "rb-banner-cell rb-multiplier-cell" });
+	// cell.createSpan({ cls: "rb-nutrition-label", text: "Scale" });
 	const control = cell.createDiv({ cls: "rb-stepper" });
 
 	const decBtn = control.createEl("button", { text: "−", cls: "rb-step-btn" });
@@ -51,9 +53,8 @@ function renderServingsCell(
 	const cell = container.createDiv({ cls: "rb-banner-cell rb-servings-cell" });
 	const scaled = baseServings * multiplier;
 	const display = Number.isInteger(scaled) ? String(scaled) : scaled.toFixed(2).replace(/\.?0+$/, "");
-	const row = cell.createDiv({ cls: "rb-nutrition-entry" });
-	row.createSpan({ cls: "rb-nutrition-label", text: "Serves" });
-	row.createSpan({ cls: "rb-nutrition-value", text: display });
+	cell.createSpan({ cls: "rb-servings-label", text: "Serves" });
+	cell.createSpan({ cls: "rb-servings-value", text: display });
 }
 
 function renderNutritionCell(
@@ -81,6 +82,7 @@ export function renderMetaBanner(
 	multiplier: number,
 	servings: number | null,
 	inPlan: boolean,
+	planEntries: MealPlanEntry[],
 	deps: RecipeViewDeps,
 ): void {
 	const banner = container.createDiv({ cls: "rb-meta-banner" });
@@ -92,5 +94,5 @@ export function renderMetaBanner(
 	const actions = banner.createDiv({ cls: "rb-header-actions" });
 	renderFavoriteToggle(actions, app, file, fm);
 	renderMarkCookedButton(actions, app, file, settings, deps);
-	renderMealPlanToggle(actions, file, inPlan, deps);
+	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
 }
