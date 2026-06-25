@@ -1,3 +1,6 @@
+/**
+ * Removes the YAML frontmatter block from raw note content, returning the body text only.
+ */
 export function stripFrontmatter(contents: string): string {
 	if (!contents.startsWith("---")) return contents;
 	const closeIdx = contents.indexOf("\n---", 3);

@@ -1,3 +1,7 @@
+/**
+ * Dependency interface injected into MealPlanView, decoupling the view from
+ * the live plugin instance.
+ */
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

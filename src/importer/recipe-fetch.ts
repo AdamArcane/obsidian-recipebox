@@ -1,3 +1,7 @@
+/**
+ * Fetches the HTML of a recipe URL via Obsidian's requestUrl, spoofing a
+ * desktop browser User-Agent to improve compatibility with recipe sites.
+ */
 import { requestUrl } from "obsidian";
 
 const REQUEST_HEADERS = {

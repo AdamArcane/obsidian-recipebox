@@ -1,3 +1,7 @@
+/**
+ * Alias lists for well-known recipe frontmatter fields, enabling case-insensitive
+ * lookup across common spelling variants (e.g. "prep", "prepTime", "prep_time").
+ */
 import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 
 export const ALIASES: Record<string, string[]> = {

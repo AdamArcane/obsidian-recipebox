@@ -1,3 +1,7 @@
+/**
+ * Settings section for note storage paths — grocery list note path and meal
+ * plan note path.
+ */
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";

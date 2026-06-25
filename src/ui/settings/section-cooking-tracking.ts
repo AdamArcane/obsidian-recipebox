@@ -1,3 +1,7 @@
+/**
+ * Settings section for cook history and tracking options — storage mode,
+ * heading name, frontmatter property, last-made, and cooked count.
+ */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings, CookHistoryStorage } from "../../settings/settings-types";
 

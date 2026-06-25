@@ -1,3 +1,7 @@
+/**
+ * Helpers for determining whether a file lives in the configured recipe folders
+ * and whether a Boolean frontmatter property flags it as selected.
+ */
 import { TFile, CachedMetadata } from "obsidian";
 
 export function fileInRecipeFolders(file: TFile, folders: string[]): boolean {

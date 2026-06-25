@@ -1,3 +1,7 @@
+/**
+ * Lookup table and detection pattern for Unicode vulgar fraction characters
+ * (¼, ½, ¾, etc.) used during quantity parsing.
+ */
 export const UNICODE_FRACTIONS: Record<string, number> = {
 	"¼": 0.25,   // ¼
 	"½": 0.5,    // ½

@@ -1,3 +1,7 @@
+/**
+ * Fuzzy-search modal for picking a recipe file from the vault, used when
+ * dropping a recipe card onto a day column in the meal plan view.
+ */
 import { App, FuzzyMatch, FuzzySuggestModal, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { isRecipeFile } from "../../lifecycle/recipe-file-detection";

@@ -1,3 +1,10 @@
+/**
+ * Renders the mobile recipe layout — a tab-based (Ingredients / Steps / Info)
+ * single-column view with native card, stat row, and scale picker.
+ *
+ * The desktop layout is handled by meta-banner.ts, ingredients-section.ts,
+ * instructions-section.ts, and section-sidebar.ts instead.
+ */
 import { App, Component, getAllTags, MarkdownRenderer, Modal, setIcon, TFile } from "obsidian";
 import { CustomBadge, IngredientGroup, InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

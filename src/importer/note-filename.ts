@@ -1,3 +1,7 @@
+/**
+ * Converts a recipe title to a safe vault filename by stripping characters
+ * that Obsidian and common filesystems disallow.
+ */
 const UNSAFE_CHARS_RE = /[\\/:*?"<>|#[\]]/g;
 const WHITESPACE_RUN_RE = /\s+/g;
 const FALLBACK_FILENAME = "Untitled Recipe";

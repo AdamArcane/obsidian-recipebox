@@ -1,3 +1,7 @@
+/**
+ * The meal plan view — an Obsidian ItemView that renders the weekly grid and
+ * queue column, re-rendering on every "change" event.
+ */
 import { ItemView, Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 import { renderWeekGrid } from "./week-grid";

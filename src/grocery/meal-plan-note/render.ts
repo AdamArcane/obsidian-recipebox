@@ -1,3 +1,7 @@
+/**
+ * Renders MealPlanEntry objects into Markdown lines and inserts or rewrites
+ * entries in the meal plan note, ordering day sections by weekday rank.
+ */
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { slugifyMealType } from "../../utils/text-case";

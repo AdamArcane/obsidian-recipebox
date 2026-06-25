@@ -1,3 +1,7 @@
+/**
+ * Converts between ImportedGroup arrays and editable textarea strings, used by
+ * the import review stage to let users edit ingredients and instructions freely.
+ */
 import { ImportedGroup } from "./recipe-extract-types";
 
 const LIST_MARKER_RE = /^(?:\d+\.|-|\*|\+|•)\s+/;

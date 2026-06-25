@@ -1,3 +1,8 @@
+/**
+ * Low-level text-cleaning utilities for ingredient lines — strips list markers,
+ * extracts parenthesised notes and trailing tags, normalises names, and generates
+ * deduplication keys. Used by ingredient-parse.ts and the grocery pipeline.
+ */
 export function stripListMarkers(line: string): string {
 	let prev = "";
 	let cur = line;

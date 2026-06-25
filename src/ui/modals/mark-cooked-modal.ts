@@ -1,3 +1,7 @@
+/**
+ * Modal for stamping a recipe as cooked, collecting a date, optional notes,
+ * and an optional photo before writing the history entry.
+ */
 import { App, Modal, Platform, Setting, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { CookedImageResult } from "../recipe-view/recipe-view-deps";

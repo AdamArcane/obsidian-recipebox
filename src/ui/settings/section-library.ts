@@ -1,3 +1,7 @@
+/**
+ * Settings section for library configuration — recipe folders, type property
+ * name, and recipe type value used to identify recipe files.
+ */
 import { App, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";

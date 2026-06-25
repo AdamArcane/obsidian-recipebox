@@ -1,3 +1,7 @@
+/**
+ * Determines whether a vault file qualifies as a recipe and registers the
+ * auto-open and file-menu context-menu hooks that act on qualifying files.
+ */
 import { App, MarkdownView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";

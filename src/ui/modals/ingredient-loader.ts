@@ -1,3 +1,7 @@
+/**
+ * Loads parsed ingredients from a recipe file and renders an interactive
+ * checklist used by both the add-to-meal-plan and add-to-grocery modals.
+ */
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap } from "../../types";

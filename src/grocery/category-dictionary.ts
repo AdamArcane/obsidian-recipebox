@@ -1,3 +1,7 @@
+/**
+ * Static keyword dictionary mapping grocery category names to lists of ingredient
+ * substrings used for automatic categorisation via longest-match lookup.
+ */
 // category name → keywords (substring match, longer keywords checked first)
 export const CATEGORY_KEYWORDS: Record<string, string[]> = {
 	Produce: [

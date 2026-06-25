@@ -1,3 +1,8 @@
+/**
+ * Manages the singleton timer tray container and the registry of active timer
+ * widgets, creating the tray on demand and destroying it when the last widget
+ * is unregistered.
+ */
 export interface DestroyableTimer {
 	destroy(): void;
 }

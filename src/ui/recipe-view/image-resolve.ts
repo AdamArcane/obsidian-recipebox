@@ -1,3 +1,7 @@
+/**
+ * Resolves a recipe's hero image value (URL, wikilink, or vault path) to a
+ * displayable resource URL and renders it inside a card element.
+ */
 import { App, TFile } from "obsidian";
 import { stripWikilink } from "../../utils/wikilink-strip";
 import { makeLightboxable } from "../components/lightbox";

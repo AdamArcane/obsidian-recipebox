@@ -1,3 +1,7 @@
+/**
+ * Parses the meal plan note Markdown into a structured list of sections and
+ * entry lines, extracting recipe wikilinks, day headings, and meal-type suffixes.
+ */
 import { deslugifyMealType } from "../../utils/text-case";
 
 export interface MealPlanLine {

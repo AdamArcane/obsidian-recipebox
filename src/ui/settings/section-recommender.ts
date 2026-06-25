@@ -1,3 +1,7 @@
+/**
+ * Settings section for the meal recommender — day window and suggestion count
+ * used when generating recipe recommendations.
+ */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

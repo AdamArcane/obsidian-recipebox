@@ -1,3 +1,7 @@
+/**
+ * Settings section for in-recipe timers — enable/disable, auto-start, compact
+ * display, range default, and minute increment.
+ */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

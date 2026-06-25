@@ -1,3 +1,7 @@
+/**
+ * Settings section for the inline header badge list — add, edit, reorder, and
+ * delete custom and built-in badges displayed in the recipe view header.
+ */
 import { Setting } from "obsidian";
 import { BadgeColor, BadgeValueType, CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

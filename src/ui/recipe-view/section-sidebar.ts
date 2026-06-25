@@ -1,3 +1,7 @@
+/**
+ * Splits trailing Markdown sections from the recipe body and renders them as
+ * collapsible cards in the desktop sidebar, adjacent to the instructions column.
+ */
 import { App, Component, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { SectionCard, renderSectionCard } from "./section-card";

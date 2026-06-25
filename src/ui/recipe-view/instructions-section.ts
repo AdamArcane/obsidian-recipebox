@@ -1,3 +1,7 @@
+/**
+ * Renders the instructions section of the recipe view, including sub-group
+ * headings and Markdown-rendered steps with optional inline timer injection.
+ */
 import { App, Component, MarkdownRenderer, setIcon } from "obsidian";
 import { InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

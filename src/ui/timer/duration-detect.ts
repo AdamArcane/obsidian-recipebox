@@ -1,3 +1,10 @@
+/**
+ * Regex patterns and parser for detecting cooking durations in instruction text,
+ * supporting ranges, compound h/m expressions, and plain minutes or seconds.
+ *
+ * Range patterns are declared before single-value patterns to prevent partial
+ * consumption of "10–15 minutes" by a plain-minutes branch.
+ */
 // Range patterns must appear before single-value patterns so "10-15 minutes"
 // or "10 to 15 minutes" isn't partially consumed by the plain-minutes branch first.
 // Groups: (1,2) hour range · (3,4) min range · (5,6) sec range

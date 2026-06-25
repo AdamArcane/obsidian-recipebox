@@ -1,3 +1,7 @@
+/**
+ * Modal for editing the user's personal allergen list, used from the health
+ * and safety settings section.
+ */
 import { App, Modal } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

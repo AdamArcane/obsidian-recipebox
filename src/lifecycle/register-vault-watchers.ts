@@ -1,3 +1,7 @@
+/**
+ * Registers debounced vault event listeners that trigger a GroceryManager refresh
+ * when the meal plan or grocery list notes are modified, deleted, or renamed.
+ */
 import { TFile } from "obsidian";
 import RecipeBoxPlugin from "../main";
 import { debounce } from "../utils/debounce";

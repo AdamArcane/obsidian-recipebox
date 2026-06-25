@@ -1,3 +1,7 @@
+/**
+ * Resolves an ingredient name to a grocery category by applying user overrides,
+ * optional tag-based hints, and the built-in keyword dictionary in priority order.
+ */
 import { CategoryOverride, CategorySource } from "../types";
 import { CATEGORY_KEYWORDS } from "./category-dictionary";
 import { pickTagCategory } from "./category-tags";

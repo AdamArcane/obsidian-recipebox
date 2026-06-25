@@ -1,3 +1,7 @@
+/**
+ * Recursively collects all Markdown files from a vault folder tree, optionally
+ * filtered to the configured recipe folders.
+ */
 import { App, TFile, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
 

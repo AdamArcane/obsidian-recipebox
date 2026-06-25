@@ -1,3 +1,7 @@
+/**
+ * Dependency interface injected into RecipeView, decoupling the view from the
+ * live plugin instance. Also exports the CookedImageResult union type.
+ */
 import { TFile } from "obsidian";
 import { ContributionMap, GroceryItem, MealPlanEntry, OneOffItem } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

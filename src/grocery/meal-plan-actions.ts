@@ -1,3 +1,7 @@
+/**
+ * Stateless action functions for adding, removing, and rescheduling meal plan
+ * entries — each function updates settings state, saves, and writes to the notes.
+ */
 import { App, Notice } from "obsidian";
 import { ContributionMap, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";

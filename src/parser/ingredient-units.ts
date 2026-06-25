@@ -1,3 +1,7 @@
+/**
+ * Exhaustive synonym map from every known unit spelling and pluralisation to its
+ * canonical abbreviated form, used during ingredient parsing to normalise units.
+ */
 // Maps every known spelling/pluralization to its canonical singular form.
 // Filler words ("unit", "whole", "each") map to "" — consumed, contribute no unit.
 export const UNIT_SYNONYMS: Record<string, string> = {

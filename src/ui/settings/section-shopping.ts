@@ -1,3 +1,7 @@
+/**
+ * Settings section for shopping list behaviour — grouping mode, category source,
+ * auto-sort, manual order, category overrides, and auto-collapse.
+ */
 import { App, Setting } from "obsidian";
 import { GroupingMode, CategorySource } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

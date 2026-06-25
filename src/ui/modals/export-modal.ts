@@ -1,3 +1,7 @@
+/**
+ * Modal for exporting the current grocery list in plain text, checklist, or
+ * grouped Markdown format, with a live preview and copy-to-clipboard action.
+ */
 import { App, Modal, Notice, TFile } from "obsidian";
 import { GroceryItem } from "../../types";
 import { ExportFormat, EXPORT_FORMAT_LABELS } from "../../grocery/export-format";

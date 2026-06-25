@@ -1,3 +1,7 @@
+/**
+ * Registers the three plugin views (GroceryView, MealPlanView, RecipeView) with
+ * Obsidian and wires each view's dependency interface to the live plugin instance.
+ */
 import { Notice, TFile } from "obsidian";
 import RecipeBoxPlugin from "../main";
 import { GroceryView, GROCERY_VIEW_TYPE } from "../ui/grocery-view";

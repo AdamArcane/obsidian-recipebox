@@ -1,3 +1,7 @@
+/**
+ * Modal for editing the user's custom high-GI food pattern list, with a live
+ * validation pass against the pattern compiler.
+ */
 import { App, Modal } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { compileGiDictionary, DEFAULT_GI_DICTIONARY } from "../../parser/glycemic-dictionary";

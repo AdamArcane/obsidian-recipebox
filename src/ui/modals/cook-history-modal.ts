@@ -1,3 +1,7 @@
+/**
+ * Modal that reads and displays a recipe's cook history entries from the note
+ * body, rendering dates, notes, and embedded photos with lightbox support.
+ */
 import { App, Component, MarkdownRenderer, Modal, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { attachLightboxToImages } from "../components/lightbox";

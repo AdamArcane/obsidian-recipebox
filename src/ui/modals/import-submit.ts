@@ -1,3 +1,7 @@
+/**
+ * Orchestrates recipe extraction from a URL or raw text and writes the resulting
+ * note to the vault, handling conflicts and social platform edge cases.
+ */
 import { App, Notice } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";

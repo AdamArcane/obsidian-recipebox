@@ -1,3 +1,7 @@
+/**
+ * Renders the configurable header badge row in the recipe view, evaluating
+ * badge formulas, formatting values, and supporting separator/newline badge types.
+ */
 import { setIcon } from "obsidian";
 import { CustomBadge, BadgeType } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

@@ -1,3 +1,7 @@
+/**
+ * Attaches a cross-platform long-press handler to a DOM element — uses touch
+ * events on mobile and contextmenu on desktop — returning a cleanup function.
+ */
 export interface LongPressPosition {
 	x: number;
 	y: number;

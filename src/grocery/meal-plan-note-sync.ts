@@ -1,3 +1,8 @@
+/**
+ * Syncs the meal plan note's wikilink entries with the plugin's settings state,
+ * adding new entries, removing stale ones, and optionally auto-adding grocery
+ * contributions for newly discovered recipe entries.
+ */
 import { App } from "obsidian";
 import { ContributionMap, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";

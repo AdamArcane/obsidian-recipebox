@@ -1,3 +1,7 @@
+/**
+ * Renders a full-screen image lightbox overlay and attaches click handlers to
+ * make existing <img> elements lightbox-able.
+ */
 export function openLightbox(src: string): void {
 	const overlay = activeDocument.body.createDiv({ cls: "rb-lightbox-overlay" });
 

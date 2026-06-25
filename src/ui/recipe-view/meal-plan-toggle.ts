@@ -1,3 +1,6 @@
+/**
+ * Renders the add-to / remove-from meal plan toggle button in the recipe view header.
+ */
 import { setIcon, TFile } from "obsidian";
 import { ContributionMap } from "../../types";
 import { RecipeViewDeps } from "./recipe-view-deps";

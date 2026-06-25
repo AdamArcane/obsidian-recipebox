@@ -1,3 +1,7 @@
+/**
+ * Renders the action bar at the top of the grocery view — sync, grouping,
+ * export, reset, add-item, and clear buttons.
+ */
 import { Menu, Notice, setIcon } from "obsidian";
 import { GroupingMode } from "../../types";
 import { GroceryViewDeps } from "./grocery-view-deps";

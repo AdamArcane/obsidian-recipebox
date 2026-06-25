@@ -1,3 +1,7 @@
+/**
+ * Lightweight frontmatter accessor helpers used within the recipe view to
+ * extract typed string, number, and nutrient values from raw frontmatter maps.
+ */
 type FM = Record<string, unknown>;
 
 export function fmStr(fm: FM, keys: string[]): string | null {

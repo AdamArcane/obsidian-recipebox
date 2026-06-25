@@ -1,3 +1,7 @@
+/**
+ * Regular expressions and helpers for recognising "Ingredients" and "Instructions"
+ * section headings in free-form recipe text, used by text-recipe-parse.ts.
+ */
 // Optional markdown heading prefix followed by the keyword
 const HEAD_PREFIX = "(?:#{1,6}\\s+)?";
 

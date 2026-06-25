@@ -1,3 +1,7 @@
+/**
+ * Rebuilds the in-memory GroceryItem list by correlating the grocery note's
+ * current lines with meal-plan contributions and one-off items from settings.
+ */
 import { App } from "obsidian";
 import { GroceryItem, GroceryItemSource } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";

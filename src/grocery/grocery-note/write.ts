@@ -1,3 +1,7 @@
+/**
+ * Merges ingredient contributions into the grocery list note and removes
+ * them when a recipe is taken off the meal plan, writing changes back to the vault.
+ */
 import { App } from "obsidian";
 import { ContributionMap } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

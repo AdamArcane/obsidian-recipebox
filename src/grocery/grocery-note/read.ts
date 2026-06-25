@@ -1,3 +1,7 @@
+/**
+ * Reads checked/unchecked state from the grocery list note and exposes helpers
+ * for toggling individual items and bulk-resetting all checks.
+ */
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";

@@ -1,3 +1,7 @@
+/**
+ * Settings section for meal plan configuration — note path, auto-add on sync,
+ * tag filter, and meal type notation format.
+ */
 import { App, Setting } from "obsidian";
 import { MealTypeNotation, RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";

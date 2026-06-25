@@ -1,3 +1,7 @@
+/**
+ * Modal for adding a recipe to the meal plan, letting the user choose a day,
+ * meal type, and which ingredients to contribute to the grocery list.
+ */
 import { App, Modal, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap } from "../../types";

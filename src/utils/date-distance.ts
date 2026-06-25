@@ -1,3 +1,4 @@
+/** Computes the number of days elapsed since an ISO date string, using local midnight for accurate day-boundary calculation. */
 export function daysSince(isoDateString: string): number | null {
 	const parts = isoDateString.split("-");
 	if (parts.length !== 3) return null;

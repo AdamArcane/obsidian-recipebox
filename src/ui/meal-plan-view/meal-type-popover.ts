@@ -1,3 +1,7 @@
+/**
+ * Shows a small floating popover for selecting or entering a meal type
+ * (Breakfast, Lunch, Dinner, Snack, or a custom value) after a recipe is dropped.
+ */
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 
 const MEAL_CHIPS = ["Breakfast", "Lunch", "Dinner", "Snack"];

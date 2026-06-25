@@ -1,3 +1,7 @@
+/**
+ * Reuses an existing leaf of the given view type (optionally showing a specific
+ * file) or opens a new tab — used by all three plugin views.
+ */
 import { App, TFile, WorkspaceLeaf } from "obsidian";
 
 /**

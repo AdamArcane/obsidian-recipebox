@@ -1,3 +1,7 @@
+/**
+ * The recipe view — an Obsidian TextFileView that renders a recipe note as a
+ * structured cooking card with ingredients, instructions, metadata, and timers.
+ */
 import { EventRef, MarkdownRenderer, Menu, Platform, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { findOrOpenLeaf } from "../../utils/open-leaf";
 import { GroceryItem, IngredientGroup } from "../../types";

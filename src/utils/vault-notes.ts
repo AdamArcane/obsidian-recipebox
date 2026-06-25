@@ -1,3 +1,4 @@
+/** Vault I/O helpers: read note text (returning empty string if absent), ensure parent folders exist, and write note content atomically. */
 import { App, TFile } from "obsidian";
 
 export async function readNoteOrEmpty(app: App, path: string): Promise<string> {

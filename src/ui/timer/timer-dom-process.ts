@@ -1,3 +1,7 @@
+/**
+ * Walks rendered instruction DOM nodes to find duration text and replaces matches
+ * with interactive TimerWidget elements.
+ */
 import { setIcon } from "obsidian";
 import { DURATION_RE, matchToSeconds } from "./duration-detect";
 import { TimerWidget, TimerOptions } from "./timer-widget";

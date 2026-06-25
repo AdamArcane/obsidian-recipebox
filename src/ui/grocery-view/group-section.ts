@@ -1,3 +1,7 @@
+/**
+ * Renders a collapsible group section in the grocery view, including the header
+ * with badge count and the list of item rows beneath it.
+ */
 import { setIcon } from "obsidian";
 import { GroupingMode } from "../../types";
 import { DisplayGroup } from "./display-groups";

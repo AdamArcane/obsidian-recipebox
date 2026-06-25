@@ -1,3 +1,7 @@
+/**
+ * Modal for managing ingredient-name substring rules that force specific grocery
+ * categories, overriding the automatic dictionary-based categorisation.
+ */
 import { App, Modal } from "obsidian";
 import { CategoryOverride } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

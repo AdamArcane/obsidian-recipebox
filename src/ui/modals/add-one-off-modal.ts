@@ -1,3 +1,7 @@
+/**
+ * Modal for adding a new one-off grocery item or editing an existing one,
+ * with freeform ingredient parsing and optional category override.
+ */
 import { App, Modal, Notice } from "obsidian";
 import { OneOffItem } from "../../types";
 import { parseFreeformOneOff } from "../../grocery/one-off-actions";

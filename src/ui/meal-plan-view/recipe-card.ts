@@ -1,3 +1,7 @@
+/**
+ * Renders a single recipe card within the meal plan week grid, including the
+ * thumbnail, name, meal type, and drag handle.
+ */
 import { App, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { makeDraggable } from "./drag-reschedule";

@@ -1,3 +1,7 @@
+/**
+ * Renders the ingredients section of the recipe view, including sub-group
+ * headings, quantity display, grocery-status icons, and food safety warnings.
+ */
 import { App, setIcon, TFile } from "obsidian";
 import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

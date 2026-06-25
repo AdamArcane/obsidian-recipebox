@@ -1,3 +1,7 @@
+/**
+ * Appends a "cooked" entry to a recipe note — either as a bullet in the note
+ * body, as a frontmatter date array, or both, depending on settings.
+ */
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { CookedImageResult } from "../ui/recipe-view/recipe-view-deps";

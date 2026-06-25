@@ -1,3 +1,7 @@
+/**
+ * Makes meal plan cards draggable and day columns into drop targets, supporting
+ * both internal card drags and drops from Obsidian's file explorer.
+ */
 import { App, TFile } from "obsidian";
 
 export function makeDraggable(cardEl: HTMLElement, entryId: string): void {

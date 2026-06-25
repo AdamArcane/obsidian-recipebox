@@ -1,3 +1,7 @@
+/**
+ * Settings section for grocery list display — grouping mode and category
+ * source selection.
+ */
 import { Setting } from "obsidian";
 import { GroupingMode, CategorySource, CategoryOverride } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

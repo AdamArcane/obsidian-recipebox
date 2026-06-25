@@ -1,3 +1,7 @@
+/**
+ * Fuzzy-search modal for picking an image file from the vault, used when
+ * attaching a photo to a cook history entry.
+ */
 import { App, FuzzySuggestModal, TFile } from "obsidian";
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif", "heic", "heif"]);

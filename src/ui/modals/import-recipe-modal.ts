@@ -1,3 +1,7 @@
+/**
+ * Two-stage import modal: input stage (URL or pasted text) followed by a
+ * review/edit stage before the note is written to the vault.
+ */
 import { App, Modal } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";

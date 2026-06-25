@@ -1,3 +1,8 @@
+/**
+ * Lightweight GroceryManager stub used during early bootstrap before the full
+ * manager (manager.ts) takes over. Kept for backward compatibility with imports
+ * that reference this path directly.
+ */
 import { GroceryItem, MealPlanEntry, OneOffItem } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 

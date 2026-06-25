@@ -1,3 +1,6 @@
+/**
+ * Autocomplete suggest widget for vault folder paths, used in settings text inputs.
+ */
 import { AbstractInputSuggest, App, TFolder } from "obsidian";
 
 export class FolderSuggest extends AbstractInputSuggest<TFolder> {

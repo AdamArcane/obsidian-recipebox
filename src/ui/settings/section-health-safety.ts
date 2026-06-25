@@ -1,3 +1,7 @@
+/**
+ * Settings section for health and dietary safety — personal allergen list,
+ * high-GI warnings, and the GI pattern dictionary editor.
+ */
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { AllergensModal } from "../modals/modal-allergens";

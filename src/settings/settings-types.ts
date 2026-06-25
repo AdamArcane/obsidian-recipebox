@@ -1,3 +1,7 @@
+/**
+ * TypeScript types and interfaces for all plugin settings, including the
+ * persisted runtime state (meal plan, one-off items, collapsed sections).
+ */
 import {
 	GroupingMode,
 	CategorySource,

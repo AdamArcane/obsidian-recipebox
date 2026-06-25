@@ -1,3 +1,7 @@
+/**
+ * Splits the recipe body around the ingredients heading into structured
+ * IngredientGroups, preserving sub-group headings and surrounding content.
+ */
 import { IngredientGroup } from "../types";
 import { findHeadingIndex } from "./recipe-heading-search";
 

@@ -1,3 +1,7 @@
+/**
+ * Autocomplete suggest widget for vault Markdown file paths, used in settings
+ * text inputs where a note path is required.
+ */
 import { AbstractInputSuggest, App, TFile } from "obsidian";
 
 export class NotePathSuggest extends AbstractInputSuggest<TFile> {

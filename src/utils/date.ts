@@ -1,3 +1,7 @@
+/**
+ * Date and ID utilities: generates short unique IDs for meal plan entries and
+ * returns today's date as YYYY-MM-DD in the user's local timezone.
+ */
 /** Generates a short unique ID suitable for meal plan entries. */
 export function generateEntryId(): string {
 	return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 6);

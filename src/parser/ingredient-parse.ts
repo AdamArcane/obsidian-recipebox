@@ -1,3 +1,7 @@
+/**
+ * Parses a single raw ingredient line into a structured ParsedIngredient with
+ * quantity, unit, name, inline note, and tags.
+ */
 import { ParsedIngredient } from "../types";
 import { parseLeadingQuantity } from "./quantity-parse";
 import { UNIT_SYNONYMS } from "./ingredient-units";

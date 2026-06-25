@@ -1,3 +1,10 @@
+/**
+ * Renders the final Markdown note for an imported recipe by substituting token
+ * placeholders in a user-supplied or built-in template string.
+ *
+ * Token values are produced by note-template-tokens.ts; this file handles
+ * grouped content (ingredients, instructions) and heading-depth detection.
+ */
 import { App } from "obsidian";
 import { ExtractedRecipe, ImportedGroup } from "./recipe-extract-types";
 import { RecipeBoxSettings } from "../settings/settings-types";

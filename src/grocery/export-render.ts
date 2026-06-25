@@ -1,3 +1,7 @@
+/**
+ * Assembles the full exported grocery list string — sorted or category-grouped —
+ * by delegating per-line formatting to export-render-line.ts.
+ */
 import { GroceryItem } from "../types";
 import { ExportFormat } from "./export-format";
 import { renderLine, RenderOptions } from "./export-render-line";

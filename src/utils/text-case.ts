@@ -1,3 +1,4 @@
+/** String case utilities: slug/deslugify for meal type tag segments and toTitleCase for display names. */
 /** Converts a meal type string to a valid Obsidian tag segment: lowercase, spaces/punctuation → hyphens, leading/trailing hyphens stripped. */
 export function slugifyMealType(value: string): string {
 	return value

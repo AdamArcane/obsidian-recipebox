@@ -1,3 +1,7 @@
+/**
+ * Case-insensitive frontmatter lookup that returns the first non-null value
+ * found among a list of candidate key names.
+ */
 export function findValue(
 	frontmatter: Record<string, unknown>,
 	candidateKeys: string[],

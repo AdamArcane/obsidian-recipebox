@@ -1,3 +1,7 @@
+/**
+ * Renders a single grocery item row with a checkbox, name, quantity, source
+ * attribution, and a long-press / right-click context menu for one-off items.
+ */
 import { setIcon } from "obsidian";
 import { GroceryItem, OneOffItem, GroupingMode } from "../../types";
 import { toTitleCase } from "../../utils/text-case";

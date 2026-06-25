@@ -1,3 +1,7 @@
+/**
+ * Parses a plain-text or lightly-marked-up recipe (e.g. pasted from a social
+ * caption) into an ExtractedRecipe by running a section state machine over its lines.
+ */
 import { ExtractedRecipe, ImportedGroup } from "./recipe-extract-types";
 import { decodeHtmlEntities } from "./html-entity-decode";
 import { INGREDIENTS_SECTION_RE, INSTRUCTIONS_SECTION_RE, isSectionKeyword } from "./text-recipe-detect";

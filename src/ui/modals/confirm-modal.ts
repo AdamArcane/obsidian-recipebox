@@ -1,3 +1,7 @@
+/**
+ * Generic two-button confirmation modal with optional destructive styling,
+ * used wherever an irreversible action needs explicit user approval.
+ */
 import { App, Modal } from "obsidian";
 
 interface ConfirmOptions {

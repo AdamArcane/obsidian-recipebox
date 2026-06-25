@@ -1,3 +1,7 @@
+/**
+ * Manages collapsed/expanded state for grocery-view groups and auto-collapses
+ * a group when all its items are checked (if the setting is enabled).
+ */
 import { GroceryItem, GroupingMode } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 

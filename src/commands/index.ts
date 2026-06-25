@@ -1,3 +1,6 @@
+/**
+ * Registers all plugin commands with Obsidian's command palette.
+ */
 import { Notice } from "obsidian";
 import RecipeBoxPlugin from "../main";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";

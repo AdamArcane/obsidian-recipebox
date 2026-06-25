@@ -1,3 +1,7 @@
+/**
+ * Shared domain types used across the plugin — ingredients, grocery items,
+ * meal plan entries, badges, and supporting enumerations.
+ */
 export type ContributionMap = Record<string, { name: string; unit: string; quantity: number | null }>;
 
 export interface ParsedIngredient {

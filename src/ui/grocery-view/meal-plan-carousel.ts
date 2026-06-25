@@ -1,3 +1,7 @@
+/**
+ * Renders the horizontal meal-plan carousel above the grocery list, showing
+ * planned recipes grouped by day so users can navigate to them quickly.
+ */
 import { App, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { GroceryViewDeps } from "./grocery-view-deps";

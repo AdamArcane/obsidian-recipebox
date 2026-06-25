@@ -1,3 +1,7 @@
+/**
+ * Renders the desktop recipe meta banner — the multiplier stepper, nutrition
+ * cells, and action buttons (favorite, mark cooked, meal plan toggle).
+ */
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";

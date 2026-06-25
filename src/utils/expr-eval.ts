@@ -1,3 +1,7 @@
+/**
+ * Tiny arithmetic expression evaluator supporting +, -, *, /, parentheses, and
+ * named variables from a scope object; used for badge formula evaluation.
+ */
 // Tiny arithmetic expression evaluator supporting +, -, *, /, parens, and
 // named variables from a scope object. Used for badge formula evaluation.
 

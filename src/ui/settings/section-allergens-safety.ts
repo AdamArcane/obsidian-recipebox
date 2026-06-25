@@ -1,3 +1,7 @@
+/**
+ * Settings section for allergen and food safety configuration — allergen
+ * property name, personal allergen list, and meat temperature warnings.
+ */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

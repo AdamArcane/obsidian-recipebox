@@ -1,3 +1,7 @@
+/**
+ * Plugin entry point — bootstraps the GroceryManager, registers all views,
+ * commands, lifecycle hooks, and the settings tab on Obsidian load.
+ */
 import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { findOrOpenLeaf } from "./utils/open-leaf";
 import { RecipeBoxSettings } from "./settings/settings-types";

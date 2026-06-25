@@ -1,3 +1,7 @@
+/**
+ * Detects whether a URL belongs to a known social video platform so the importer
+ * can choose the appropriate extraction strategy.
+ */
 export type SocialPlatform = "youtube" | "tiktok" | "instagram" | "unknown";
 
 export function detectPlatform(url: string): SocialPlatform {

@@ -1,3 +1,7 @@
+/**
+ * Persists individual meal plan entry changes to the meal plan note —
+ * inserting new lines and removing existing ones by wikilink and day section.
+ */
 import { App } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";

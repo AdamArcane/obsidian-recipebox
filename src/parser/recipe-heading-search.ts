@@ -1,3 +1,7 @@
+/**
+ * Locates a Markdown heading by name within a pre-split array of lines,
+ * returning its index and level for use by the ingredient and instruction parsers.
+ */
 export interface HeadingResult {
 	index: number;
 	level: number;

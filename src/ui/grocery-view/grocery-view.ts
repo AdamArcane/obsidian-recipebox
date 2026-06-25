@@ -1,3 +1,7 @@
+/**
+ * The grocery list view — an Obsidian ItemView that renders grouped items,
+ * the meal-plan carousel, and the summary bar, re-rendering on every "change" event.
+ */
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { GroceryViewDeps } from "./grocery-view-deps";
 import { renderHeaderActions } from "./header-actions";

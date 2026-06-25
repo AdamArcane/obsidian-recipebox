@@ -1,3 +1,6 @@
+/**
+ * Decodes common HTML entities in scraped text to plain Unicode characters.
+ */
 const ENTITY_MAP: Record<string, string> = {
 	"&amp;": "&",
 	"&nbsp;": " ",

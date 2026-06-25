@@ -1,3 +1,7 @@
+/**
+ * Renders the seven-column week grid and the unscheduled queue column for
+ * the meal plan view, wiring drag-drop, recipe picker, and meal type popover.
+ */
 import { App, setIcon } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";

@@ -1,3 +1,6 @@
+/**
+ * Extracts the leading numeric value from a nutrient string such as "12.5g" or "300 kcal".
+ */
 const LEADING_NUMBER_RE = /\d+(?:\.\d+)?/;
 
 export function parseNutrient(value: string): number | null {

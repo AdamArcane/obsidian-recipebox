@@ -1,3 +1,4 @@
+/** Plays a short completion chime using the Web Audio API when a cooking timer reaches zero. */
 export function playCompletionSound(): void {
 	try {
 		const ctx = new AudioContext();

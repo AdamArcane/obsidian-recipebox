@@ -1,3 +1,7 @@
+/**
+ * Renders an interactive 5-star rating widget that reads from and writes to
+ * a configurable frontmatter property.
+ */
 import { App, TFile } from "obsidian";
 
 const STAR_COUNT = 5;

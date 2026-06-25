@@ -1,3 +1,7 @@
+/**
+ * Splits the recipe body around the instructions heading into structured
+ * InstructionGroups, collecting ordered or unordered steps per sub-section.
+ */
 import { InstructionGroup } from "../types";
 import { findHeadingIndex } from "./recipe-heading-search";
 

@@ -1,3 +1,7 @@
+/**
+ * Derives a grocery category from an ingredient's inline tags by picking the
+ * most-frequent tag, falling back to the earliest occurrence on a tie.
+ */
 export function pickTagCategory(tags: string[] | undefined): string | null {
 	if (!tags || tags.length === 0) return null;
 

@@ -1,3 +1,7 @@
+/**
+ * Obsidian settings tab that assembles all plugin settings sections into a
+ * single scrollable settings page.
+ */
 import { App, PluginSettingTab } from "obsidian";
 import RecipeBoxPlugin from "../../main";
 import { renderSectionLibrary } from "./section-library";

@@ -1,3 +1,7 @@
+/**
+ * Default high-GI food pattern list and the compiler that converts it to
+ * pre-built RegExp objects for fast per-ingredient lookups.
+ */
 export const DEFAULT_GI_DICTIONARY = `
 # High-glycemic foods (GI >= 70)
 # One regex pattern per line. Lines starting with # are comments.

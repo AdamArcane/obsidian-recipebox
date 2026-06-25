@@ -1,3 +1,7 @@
+/**
+ * Parses the leading quantity token from an ingredient string, handling integers,
+ * decimals, ASCII fractions, mixed numbers, and Unicode vulgar fractions.
+ */
 import { UNICODE_FRACTIONS, UNICODE_FRACTION_PATTERN } from "./quantity-fractions";
 
 export interface QuantityResult {

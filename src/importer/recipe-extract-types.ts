@@ -1,3 +1,6 @@
+/**
+ * Type definitions for structured recipe data produced by the importer pipeline.
+ */
 export interface ImportedGroup {
 	name: string | null;
 	items: string[];

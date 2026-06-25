@@ -1,3 +1,7 @@
+/**
+ * Default values for all plugin settings, including the built-in grocery
+ * category sort order and the default GI dictionary text.
+ */
 import { RecipeBoxSettings } from "./settings-types";
 import { DEFAULT_GI_DICTIONARY } from "../parser/glycemic-dictionary";
 

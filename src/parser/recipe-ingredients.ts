@@ -1,3 +1,7 @@
+/**
+ * Reads and parses all ingredient lines from a recipe file, applying the
+ * configured multiplier and filtering out lines tagged with #ignoreIngredient.
+ */
 import { App, TFile, CachedMetadata } from "obsidian";
 import { RecipeIngredient } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";

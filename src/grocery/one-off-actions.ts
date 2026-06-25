@@ -1,3 +1,7 @@
+/**
+ * CRUD operations for one-off grocery items — items added manually by the user
+ * that are not tied to a recipe in the meal plan.
+ */
 import { App, Notice } from "obsidian";
 import { ContributionMap, OneOffItem } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";

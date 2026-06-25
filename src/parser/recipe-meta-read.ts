@@ -1,3 +1,7 @@
+/**
+ * Reads structured recipe metadata (diet, allergens, times, favorite flag,
+ * cooked count, last-made date) from a file's cached frontmatter.
+ */
 import { CachedMetadata } from "obsidian";
 import { findValue } from "./frontmatter-lookup";
 import { toTagArray, toNumber, toBoolean } from "./frontmatter-coerce";

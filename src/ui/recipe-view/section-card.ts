@@ -1,3 +1,7 @@
+/**
+ * Renders a collapsible section card for "after" content sections in the
+ * desktop recipe view sidebar (e.g. Notes, Cook History).
+ */
 import { App, Component, MarkdownRenderer, setIcon } from "obsidian";
 
 export interface SectionCard {

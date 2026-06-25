@@ -1,3 +1,7 @@
+/**
+ * Type-coercion helpers that convert raw frontmatter values to the primitives
+ * the plugin needs: tag arrays, numbers, and booleans.
+ */
 export function toTagArray(value: unknown): string[] {
 	let items: unknown[];
 	if (Array.isArray(value)) {

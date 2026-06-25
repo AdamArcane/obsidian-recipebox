@@ -1,3 +1,7 @@
+/**
+ * Settings section for recipe location — the folder(s) that contain recipe
+ * notes and the heading names used to find ingredients and instructions.
+ */
 import { App, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";

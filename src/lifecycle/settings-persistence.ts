@@ -1,3 +1,7 @@
+/**
+ * Deserialises raw plugin data into a fully-typed RecipeBoxSettings object,
+ * applying defaults and validation for every field so no corrupt value reaches the UI.
+ */
 import {
 	BadgeColor,
 	BadgeType,

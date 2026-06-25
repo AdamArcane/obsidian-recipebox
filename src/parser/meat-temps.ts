@@ -1,3 +1,7 @@
+/**
+ * Static data tables: safe internal cooking temperatures per meat category and
+ * qualifier words that indicate a meat keyword should be ignored (e.g. "imitation").
+ */
 export interface TempCategory {
 	name: string;
 	fahrenheit: number;

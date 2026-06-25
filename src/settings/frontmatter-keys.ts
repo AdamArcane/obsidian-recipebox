@@ -1,3 +1,7 @@
+/**
+ * Frozen map of canonical frontmatter property names used by the plugin,
+ * providing a single source of truth for key strings across the codebase.
+ */
 export const RECIPE_FRONTMATTER = Object.freeze({
 	type: "type",
 	image: "image",

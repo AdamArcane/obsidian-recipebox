@@ -1,3 +1,7 @@
+/**
+ * Renders the "Mark as cooked" button in the recipe view header and handles
+ * the quick-stamp path (no modal) as well as the full history modal path.
+ */
 import { App, Notice, setIcon, TFile } from "obsidian";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { RecipeBoxSettings } from "../../settings/settings-types";

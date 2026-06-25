@@ -1,3 +1,10 @@
+/**
+ * Central GroceryManager — owns the authoritative GroceryItem list and
+ * coordinates all meal-plan, one-off, check-state, and grocery-note mutations.
+ *
+ * Extends Obsidian's Events so UI components can subscribe to the "change" event
+ * without needing a direct reference to any view.
+ */
 import { App, Events, Notice } from "obsidian";
 import { ContributionMap, GroceryItem, MealPlanEntry, OneOffItem } from "../types";
 import { writeNote } from "../utils/vault-notes";

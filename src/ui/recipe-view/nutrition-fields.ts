@@ -1,3 +1,7 @@
+/**
+ * Defines the four standard nutrition fields (calories, protein, fat, carbs)
+ * and resolves their display values with per-serving or total scaling.
+ */
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { fmNutrient } from "./frontmatter-read-helpers";
 

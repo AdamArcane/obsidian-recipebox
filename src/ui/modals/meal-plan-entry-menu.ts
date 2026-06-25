@@ -1,3 +1,7 @@
+/**
+ * Opens a context menu for a specific meal plan entry in the recipe view,
+ * providing navigate, edit, and remove actions.
+ */
 import { App, Menu, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeViewDeps } from "../recipe-view/recipe-view-deps";

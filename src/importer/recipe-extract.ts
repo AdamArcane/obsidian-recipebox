@@ -1,3 +1,7 @@
+/**
+ * Extracts structured recipe data from raw HTML using the recipe-scrapers library
+ * and maps it to the plugin's ExtractedRecipe shape.
+ */
 import { scrapeRecipe } from "recipe-scrapers";
 import { ExtractedRecipe, ImportedGroup } from "./recipe-extract-types";
 import { parseNutrient } from "./nutrient-parse";

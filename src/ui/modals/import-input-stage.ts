@@ -1,3 +1,7 @@
+/**
+ * Renders the URL / paste-text input stage of the import modal, delegating
+ * submission to import-submit.ts and handing the result to the review stage.
+ */
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";

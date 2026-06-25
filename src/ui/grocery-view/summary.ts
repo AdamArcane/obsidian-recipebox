@@ -1,3 +1,7 @@
+/**
+ * Renders the summary bar at the top of the grocery list, composing the
+ * meal-plan carousel and the checked/total item count with a link to the note.
+ */
 import { App } from "obsidian";
 import { GroceryItem, MealPlanEntry } from "../../types";
 import { GroceryViewDeps } from "./grocery-view-deps";

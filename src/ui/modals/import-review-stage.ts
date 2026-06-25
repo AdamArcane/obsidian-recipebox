@@ -1,3 +1,7 @@
+/**
+ * Renders the review and edit stage of the import modal, letting the user
+ * correct extracted fields before the note is saved to the vault.
+ */
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";

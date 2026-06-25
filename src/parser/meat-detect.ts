@@ -1,3 +1,7 @@
+/**
+ * Detects whether an ingredient name refers to a specific cut or type of meat
+ * and returns its safe-cooking temperature category if so.
+ */
 import { MEAT_CATEGORIES, NON_MEAT_QUALIFIERS, TempCategory } from "./meat-temps";
 
 function wordBoundaryRegex(keyword: string): RegExp {

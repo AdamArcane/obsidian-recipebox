@@ -1,3 +1,7 @@
+/**
+ * Modal for reordering grocery categories via drag-and-drop or up/down buttons
+ * when automatic category sorting is disabled.
+ */
 import { App, Modal } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";

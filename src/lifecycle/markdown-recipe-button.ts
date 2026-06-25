@@ -1,3 +1,7 @@
+/**
+ * Injects an "Open as recipe" action button into the Markdown view toolbar
+ * whenever the active file qualifies as a recipe, and removes it otherwise.
+ */
 import { MarkdownView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { isRecipeFile } from "./recipe-file-detection";

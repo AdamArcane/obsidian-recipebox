@@ -1,3 +1,7 @@
+/**
+ * Builds the flat token table (string → string) consumed by note-template-render.ts,
+ * including nutrition scaling when the source is a per-serving total.
+ */
 import { ExtractedRecipe } from "./recipe-extract-types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { localDateISO } from "../utils/date";

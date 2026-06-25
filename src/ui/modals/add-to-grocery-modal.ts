@@ -1,3 +1,7 @@
+/**
+ * Modal for selectively adding or removing a recipe's ingredients from the
+ * grocery list, showing a checklist of parsed ingredients with their current state.
+ */
 import { App, Modal, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap, GroceryItem } from "../../types";

@@ -1,3 +1,7 @@
+/**
+ * Strips redundant content from the rendered recipe body — the title heading
+ * and hero image embed — when the recipe view already displays them separately.
+ */
 import { findHeadingIndex } from "./recipe-heading-search";
 
 export interface BodyCleanOptions {

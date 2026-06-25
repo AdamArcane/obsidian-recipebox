@@ -1,3 +1,7 @@
+/**
+ * Parses the raw text of the grocery list note into typed sections and line
+ * objects, distinguishing recognised ingredient checkboxes from opaque lines.
+ */
 import { parseIngredientLine } from "../../parser/ingredient-parse";
 import { ingredientKey } from "../../parser/ingredient-clean";
 

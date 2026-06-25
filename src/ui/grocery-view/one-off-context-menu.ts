@@ -1,3 +1,7 @@
+/**
+ * Shows a context menu for a one-off grocery item, offering edit, category
+ * override, and remove actions.
+ */
 import { Menu } from "obsidian";
 import { OneOffItem } from "../../types";
 import { LongPressPosition } from "./long-press";

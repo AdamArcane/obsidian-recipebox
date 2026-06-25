@@ -1,3 +1,7 @@
+/**
+ * Renders grocery list sections back to Markdown text, respecting the configured
+ * category display order and formatting each item as a checkbox line.
+ */
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { formatQuantity } from "../../parser/quantity-format";
 import { GrocerySection } from "./parse";

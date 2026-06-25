@@ -1,3 +1,7 @@
+/**
+ * Renders the meal plan status notice in the recipe view — showing whether
+ * a recipe is scheduled, on which day, and offering a context menu for edits.
+ */
 import { App, Modal, setIcon, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeViewDeps } from "./recipe-view-deps";

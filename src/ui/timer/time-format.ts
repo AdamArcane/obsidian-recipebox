@@ -1,3 +1,7 @@
+/**
+ * Formats a seconds count as a MM:SS or H:MM:SS display string and parses
+ * human-readable timer input back to seconds.
+ */
 function pad(n: number): string { return String(n).padStart(2, "0"); }
 
 export function formatTime(seconds: number): string {

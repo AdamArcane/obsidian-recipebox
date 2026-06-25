@@ -1,3 +1,7 @@
+/**
+ * Enables free-floating drag behaviour for timer widgets, letting them detach
+ * from the tray and be repositioned anywhere on screen.
+ */
 import { getTray, removeTray } from "./timer-tray";
 
 export function makeDraggable(widget: HTMLElement, handle: HTMLElement): () => void {

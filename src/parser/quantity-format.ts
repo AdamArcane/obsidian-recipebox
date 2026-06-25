@@ -1,3 +1,7 @@
+/**
+ * Formats a numeric quantity for display, snapping near-integers and expressing
+ * common fractions as "1 1/2" rather than "1.5".
+ */
 const DENOMINATORS = [2, 3, 4, 6, 8];
 const SNAP_TOLERANCE = 0.02;
 const FRACTION_TOLERANCE = 0.04;

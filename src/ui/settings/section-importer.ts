@@ -1,3 +1,7 @@
+/**
+ * Settings section for the recipe importer — default save folder and optional
+ * custom Markdown template path.
+ */
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";

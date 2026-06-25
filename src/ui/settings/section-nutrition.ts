@@ -1,3 +1,7 @@
+/**
+ * Settings section for nutrition display options — property names for calories,
+ * protein, fat, and carbs, plus per-serving vs. total display mode.
+ */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings, NutritionDisplay, NutritionSource } from "../../settings/settings-types";
 

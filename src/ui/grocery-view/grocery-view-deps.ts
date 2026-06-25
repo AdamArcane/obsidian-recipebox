@@ -1,3 +1,7 @@
+/**
+ * Dependency interface injected into GroceryView, decoupling the view from
+ * the live plugin instance and enabling isolated testing.
+ */
 import { OneOffItem, GroceryItem, MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 

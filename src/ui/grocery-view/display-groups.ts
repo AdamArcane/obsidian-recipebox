@@ -1,3 +1,7 @@
+/**
+ * Groups the flat GroceryItem list into DisplayGroups according to the current
+ * grouping mode (category, recipe/source, or none).
+ */
 import { GroceryItem, GroupingMode } from "../../types";
 
 export interface DisplayGroup {

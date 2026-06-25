@@ -1,3 +1,7 @@
+/**
+ * Reads the recipe scaling multiplier from the "multiplier" frontmatter field,
+ * defaulting to 1 when absent or invalid.
+ */
 import { CachedMetadata } from "obsidian";
 import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 

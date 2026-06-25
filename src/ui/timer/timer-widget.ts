@@ -1,3 +1,7 @@
+/**
+ * The countdown timer widget — renders the timer UI, manages the countdown
+ * interval, triggers audio on completion, and supports drag via timer-drag.ts.
+ */
 import { Notice, setIcon } from "obsidian";
 import { formatTime, parseTimeInput } from "./time-format";
 import { playCompletionSound } from "./timer-audio";

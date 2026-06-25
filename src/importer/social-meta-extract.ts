@@ -1,3 +1,7 @@
+/**
+ * Extracts Open Graph / Twitter Card title and description from HTML, used as
+ * the recipe source for social platforms that don't expose structured recipe data.
+ */
 import { decodeHtmlEntities } from "./html-entity-decode";
 
 export interface SocialMeta {

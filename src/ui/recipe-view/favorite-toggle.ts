@@ -1,3 +1,7 @@
+/**
+ * Renders the heart-shaped favorite toggle button in the recipe view header
+ * and persists its state to the "favorite" frontmatter property.
+ */
 import { App, setIcon, TFile } from "obsidian";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { toBoolean } from "../../parser/frontmatter-coerce";

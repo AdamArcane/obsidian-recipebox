@@ -1,3 +1,7 @@
+/**
+ * Formats a single GroceryItem into a plain-text or markdown checkbox line for export.
+ * Full list assembly (sorting, grouping) lives in export-render.ts.
+ */
 import { GroceryItem } from "../types";
 import { ExportFormat } from "./export-format";
 import { formatQuantity } from "../parser/quantity-format";
