@@ -74,7 +74,7 @@ export const MEAT_CATEGORIES: TempCategory[] = [
 ];
 
 export const NON_MEAT_QUALIFIERS = [
-	"stock", "broth", "bouillon", "consomme", "consommé",
-	"sauce", "powder", "extract", "flavor", "flavour",
+	"stock", "broth", "bouillon", "consomme", "consommé", "stuffing",
+	"sauce", "powder", "extract", "flavor", "flavour", "cream of",
 	"flavoring", "flavouring", "seasoning", "rub", "jerky",
 ];
