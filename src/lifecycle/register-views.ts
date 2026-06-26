@@ -10,7 +10,7 @@ import { MealPlanView, MEAL_PLAN_VIEW_TYPE } from "../ui/meal-plan-view/meal-pla
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { AddToGroceryModal } from "../ui/modals/add-to-grocery-modal";
 import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
-import { AddOneOffModal } from "../ui/modals/add-one-off-modal";
+import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { ExportModal } from "../ui/modals/export-modal";
 
 export function registerViews(plugin: RecipeBoxPlugin): void {
@@ -22,15 +22,15 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				saveSettings: () => plugin.saveSettings(),
 				getGroceryItems: () => plugin.manager.groceryItems,
 				getMealPlan: () => plugin.manager.mealPlan,
-				getOneOffItems: () => plugin.manager.oneOffItems,
+				getGroceryItemEntries: () => plugin.manager.groceryItemEntries,
 				toggleChecked: (key, checked) => plugin.manager.toggleChecked(key, checked),
 				isGroupCollapsed: (name) => plugin.manager.isGroupCollapsed(name),
 				setGroupCollapsed: (name, collapsed) => plugin.manager.setGroupCollapsed(name, collapsed),
 				getKnownCategories: () => plugin.manager.getKnownCategories(),
 				syncFromMealPlanNote: () => plugin.manager.syncFromMealPlanNote(),
-				addOneOff: (item) => plugin.manager.addOneOff(item),
-				updateOneOff: (id, updates) => plugin.manager.updateOneOff(id, updates),
-				removeOneOff: (id) => plugin.manager.removeOneOff(id),
+				addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
+				updateGroceryItem: (id, updates) => plugin.manager.updateGroceryItem(id, updates),
+				removeGroceryItem: (id) => plugin.manager.removeGroceryItem(id),
 				resetChecks: () => plugin.manager.resetChecks(),
 				clearAll: async () => { await plugin.manager.clearAll(); },
 				subscribeToChanges: (cb) => {
@@ -49,10 +49,10 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					const leaf = plugin.app.workspace.getLeaf(false);
 					await leaf.openFile(file);
 				},
-				openAddOneOffModal: (existing) => {
-					new AddOneOffModal(plugin.app, {
-						addOneOff: (item) => plugin.manager.addOneOff(item),
-						updateOneOff: (id, updates) => plugin.manager.updateOneOff(id, updates),
+				openAddGroceryItemModal: (existing) => {
+					new AddGroceryItemModal(plugin.app, {
+						addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
+						updateGroceryItem: (id, updates) => plugin.manager.updateGroceryItem(id, updates),
 						getKnownCategories: () => plugin.manager.getKnownCategories(),
 					}, existing).open();
 				},
@@ -122,8 +122,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				removeFromMealPlan: (path) => plugin.manager.removeFromMealPlan(path),
 				getGroceryItems: () => plugin.manager.groceryItems,
 				removeGroceryByKey: (key) => plugin.manager.removeFromGroceryByKey(key),
-				addOneOffItem: (item) => plugin.manager.addOneOff(item),
-				removeOneOffItem: (id) => plugin.manager.removeOneOff(id),
+				addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
+				removeGroceryItem: (id) => plugin.manager.removeGroceryItem(id),
 				subscribeToChanges: (cb) => {
 					plugin.manager.on("change", cb);
 					return () => plugin.manager.off("change", cb);

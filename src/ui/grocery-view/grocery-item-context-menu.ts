@@ -1,22 +1,22 @@
 /**
- * Shows a context menu for a one-off grocery item, offering edit, category
- * override, and remove actions.
+ * Shows a context menu for a manually-added grocery item, offering edit,
+ * category override, and remove actions.
  */
 import { Menu } from "obsidian";
-import { OneOffItem } from "../../types";
+import { GroceryItemEntry } from "../../types";
 import { LongPressPosition } from "./long-press";
 import { GroceryViewDeps } from "./grocery-view-deps";
 
-export function openOneOffContextMenu(
+export function openGroceryItemContextMenu(
 	pos: LongPressPosition,
-	item: OneOffItem,
+	item: GroceryItemEntry,
 	deps: GroceryViewDeps
 ): void {
 	const menu = new Menu();
 
 	menu.addItem((menuItem) => {
 		menuItem.setTitle("Edit item…").setIcon("pencil");
-		menuItem.onClick(() => deps.openAddOneOffModal(item));
+		menuItem.onClick(() => deps.openAddGroceryItemModal(item));
 	});
 
 	menu.addItem((menuItem) => {
@@ -28,7 +28,7 @@ export function openOneOffContextMenu(
 			sub.addItem((autoItem) => {
 				autoItem.setTitle("Auto-detect").setChecked(!item.categoryOverride);
 				autoItem.onClick(() =>
-					deps.updateOneOff(item.id, { categoryOverride: null })
+					void deps.updateGroceryItem(item.id, { categoryOverride: null })
 				);
 			});
 
@@ -36,7 +36,7 @@ export function openOneOffContextMenu(
 				sub.addItem((catItem) => {
 					catItem.setTitle(cat).setChecked(item.categoryOverride === cat);
 					catItem.onClick(() =>
-						deps.updateOneOff(item.id, { categoryOverride: cat })
+						void deps.updateGroceryItem(item.id, { categoryOverride: cat })
 					);
 				});
 			}
@@ -45,7 +45,7 @@ export function openOneOffContextMenu(
 
 			sub.addItem((newCatItem) => {
 				newCatItem.setTitle("New category…").setIcon("plus");
-				newCatItem.onClick(() => deps.openAddOneOffModal(item));
+				newCatItem.onClick(() => deps.openAddGroceryItemModal(item));
 			});
 
 			sub.showAtPosition(pos);
@@ -56,7 +56,7 @@ export function openOneOffContextMenu(
 
 	menu.addItem((removeItem) => {
 		removeItem.setTitle("Remove").setIcon("trash-2").setWarning(true);
-		removeItem.onClick(() => deps.removeOneOff(item.id));
+		removeItem.onClick(() => void deps.removeGroceryItem(item.id));
 	});
 
 	menu.showAtPosition(pos);

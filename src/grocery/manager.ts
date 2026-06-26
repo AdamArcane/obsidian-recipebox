@@ -1,22 +1,22 @@
 /**
  * Central GroceryManager — owns the authoritative GroceryItem list and
- * coordinates all meal-plan, one-off, check-state, and grocery-note mutations.
+ * coordinates all meal-plan, manually-added grocery item, check-state, and
+ * grocery-note mutations.
  *
  * Extends Obsidian's Events so UI components can subscribe to the "change" event
  * without needing a direct reference to any view.
  */
 import { App, Events, Notice } from "obsidian";
-import { ContributionMap, GroceryContributionSource, GroceryItem, MealPlanEntry, OneOffItem } from "../types";
+import { ContributionMap, GroceryContributionSource, GroceryItem, GroceryItemEntry, MealPlanEntry } from "../types";
 import { writeNote } from "../utils/vault-notes";
 import { rebuildGroceryItems } from "./grocery-rebuild";
 import { isGroupCollapsed, setGroupCollapsed, autoCollapseGroups } from "./group-collapse";
 import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addLeftoversEntry, setMealPlanEntryMealType, clearMealPlan } from "./meal-plan-actions";
-import { addOneOff, updateOneOff, removeOneOff, removeFromGroceryByKey, parseFreeformOneOff } from "./one-off-actions";
+import { addGroceryItem, updateGroceryItem, removeGroceryItem, removeFromGroceryByKey } from "./grocery-item-actions";
 import { syncMealPlanNote, GroceryManagerSink } from "./meal-plan-note-sync";
 import { toggleGroceryNoteItemChecked, resetGroceryNoteChecks } from "./grocery-note/read";
 
 export { GroceryManagerSink };
-export { parseFreeformOneOff };
 
 export class GroceryManager extends Events {
 	private items: GroceryItem[] = [];
@@ -27,7 +27,7 @@ export class GroceryManager extends Events {
 	}
 
 	get groceryItems(): GroceryItem[] { return [...this.items]; }
-	get oneOffItems(): OneOffItem[] { return this.sink.getSettings().state.oneOffItems ?? []; }
+	get groceryItemEntries(): GroceryItemEntry[] { return this.sink.getSettings().state.groceryItems ?? []; }
 	get mealPlan(): MealPlanEntry[] { return this.sink.getSettings().state.mealPlan ?? []; }
 
 	// ── Refresh / rebuild ─────────────────────────────────────────────────────
@@ -120,18 +120,18 @@ export class GroceryManager extends Events {
 
 	// ── One-off items ─────────────────────────────────────────────────────────
 
-	async addOneOff(rawItem: Omit<OneOffItem, "id">): Promise<void> {
-		const result = await addOneOff(this.app, rawItem, this.sink.getSettings(), () => this.sink.save());
+	async addGroceryItem(rawItem: Omit<GroceryItemEntry, "id">): Promise<void> {
+		const result = await addGroceryItem(this.app, rawItem, this.sink.getSettings(), () => this.sink.save());
 		if (result) await this.refresh();
 	}
 
-	async updateOneOff(id: string, updates: Partial<Omit<OneOffItem, "id">>): Promise<void> {
-		await updateOneOff(this.app, id, updates, this.sink.getSettings(), () => this.sink.save());
+	async updateGroceryItem(id: string, updates: Partial<Omit<GroceryItemEntry, "id">>): Promise<void> {
+		await updateGroceryItem(this.app, id, updates, this.sink.getSettings(), () => this.sink.save());
 		await this.refresh();
 	}
 
-	async removeOneOff(id: string): Promise<void> {
-		await removeOneOff(this.app, id, this.sink.getSettings(), () => this.sink.save());
+	async removeGroceryItem(id: string): Promise<void> {
+		await removeGroceryItem(this.app, id, this.sink.getSettings(), () => this.sink.save());
 		await this.refresh();
 	}
 
@@ -153,13 +153,13 @@ export class GroceryManager extends Events {
 
 	// ── Bulk operations ───────────────────────────────────────────────────────
 
-	async clearAll(): Promise<{ mealPlanCount: number; oneOffCount: number }> {
+	async clearAll(): Promise<{ mealPlanCount: number; groceryItemCount: number }> {
 		const s = this.sink.getSettings();
 		const mealPlanCount = s.state.mealPlan.length;
-		const oneOffCount = s.state.oneOffItems.length;
+		const groceryItemCount = s.state.groceryItems.length;
 
 		s.state.mealPlan = [];
-		s.state.oneOffItems = [];
+		s.state.groceryItems = [];
 		s.state.collapsedSections = {};
 		await this.sink.save();
 
@@ -170,9 +170,9 @@ export class GroceryManager extends Events {
 		this.trigger("change");
 
 		const meals = mealPlanCount === 1 ? "meal" : "meals";
-		const items = oneOffCount === 1 ? "item" : "items";
-		new Notice(`Cleared ${mealPlanCount} ${meals} and ${oneOffCount} one-off ${items}.`);
-		return { mealPlanCount, oneOffCount };
+		const items = groceryItemCount === 1 ? "item" : "items";
+		new Notice(`Cleared ${mealPlanCount} ${meals} and ${groceryItemCount} grocery ${items}.`);
+		return { mealPlanCount, groceryItemCount };
 	}
 
 	async resetChecks(): Promise<void> {

@@ -22,7 +22,7 @@ export interface RecipeIngredient extends ParsedIngredient {
 	sourceLabel: string;
 }
 
-export interface OneOffItem {
+export interface GroceryItemEntry {
 	id: string;
 	name: string;
 	quantity: number | null;
@@ -31,7 +31,7 @@ export interface OneOffItem {
 }
 
 export interface GroceryItemSource {
-	kind: "recipe" | "one-off";
+	kind: "recipe" | "manual";
 	label: string;
 	path?: string;
 	quantity?: number | null;

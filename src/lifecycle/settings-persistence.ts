@@ -11,7 +11,7 @@ import {
 	GroceryContributionSource,
 	GroupingMode,
 	MealPlanEntry,
-	OneOffItem,
+	GroceryItemEntry,
 } from "../types";
 import { generateEntryId } from "../utils/date";
 import {
@@ -81,7 +81,7 @@ function validateMealPlanEntry(raw: unknown): MealPlanEntry | null {
 	};
 }
 
-function validateOneOffItem(raw: unknown): OneOffItem | null {
+function validateGroceryItemEntry(raw: unknown): GroceryItemEntry | null {
 	if (!raw || typeof raw !== "object") return null;
 	const i = raw as Record<string, unknown>;
 	if (typeof i.id !== "string" || !i.id) return null;
@@ -209,8 +209,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 			mealPlan: Array.isArray(state.mealPlan)
 				? (state.mealPlan as unknown[]).map(validateMealPlanEntry).filter((x): x is MealPlanEntry => x !== null)
 				: [],
-			oneOffItems: Array.isArray(state.oneOffItems)
-				? (state.oneOffItems as unknown[]).map(validateOneOffItem).filter((x): x is OneOffItem => x !== null)
+			groceryItems: Array.isArray(state.groceryItems)
+				? (state.groceryItems as unknown[]).map(validateGroceryItemEntry).filter((x): x is GroceryItemEntry => x !== null)
 				: [],
 			collapsedSections,
 			groceryContributions: validateGroceryContributions(state.groceryContributions),

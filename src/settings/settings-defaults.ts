@@ -161,7 +161,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 
 	state: {
 		mealPlan: [],
-		oneOffItems: [],
+		groceryItems: [],
 		collapsedSections: {},
 		groceryContributions: {},
 	},

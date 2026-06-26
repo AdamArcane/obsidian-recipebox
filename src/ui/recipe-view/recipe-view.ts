@@ -85,17 +85,41 @@ export class RecipeView extends TextFileView {
 	refresh(): void { void this.render(); }
 
 	onPaneMenu(menu: Menu, source: string): void {
-		if (source === "more-options") {
+		if (source === "more-options" && this.file) {
+			const file = this.file;
 			const settings = this.deps.getSettings();
-			if (settings.cookHistoryEnabled && this.file) {
-				const file = this.file;
+
+			if (settings.cookHistoryEnabled) {
 				menu.addItem(item =>
 					item.setTitle("Cook history")
 						.setIcon("clock")
 						.onClick(() => new CookHistoryModal(this.app, file, settings, this.deps.editAsMarkdown).open())
 				);
-				menu.addSeparator();
 			}
+
+			const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === file.path);
+			const inPlan = planEntries.length > 0;
+			menu.addItem(item =>
+				item.setTitle(inPlan ? "Remove from meal plan" : "Add to meal plan")
+					.setIcon(inPlan ? "calendar-x-2" : "calendar-plus")
+					.onClick(() => {
+						if (inPlan) {
+							for (const entry of planEntries) void this.deps.removeFromMealPlanById(entry.id);
+						} else {
+							this.deps.openAddToMealPlanModal(file, (day, meal, contributions) => {
+								void this.deps.addToMealPlan(file.path, day, meal, contributions);
+							});
+						}
+					})
+			);
+
+			menu.addItem(item =>
+				item.setTitle("Open as Markdown")
+					.setIcon("pencil")
+					.onClick(() => this.deps.editAsMarkdown(file.path))
+			);
+
+			menu.addSeparator();
 		}
 		super.onPaneMenu(menu, source);
 	}

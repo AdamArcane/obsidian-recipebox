@@ -9,7 +9,7 @@ import { readGroceryNoteItems } from "./grocery-note/read";
 
 function toDisplaySource(app: App, source: GroceryContributionSource, quantity: number | null): GroceryItemSource {
 	if (source.kind === "manual") {
-		return { kind: "one-off", label: "added manually", quantity };
+		return { kind: "manual", label: "added manually", quantity };
 	}
 	const file = app.vault.getFileByPath(source.path);
 	const label = file?.basename ?? source.path.split("/").pop()?.replace(/\.md$/, "") ?? source.path;
@@ -24,7 +24,7 @@ export async function rebuildGroceryItems(app: App, settings: RecipeBoxSettings)
 	for (const [key, note] of noteItems) {
 		const records = history[key] ?? [];
 		const sources: GroceryItemSource[] = records.map(r => toDisplaySource(app, r.source, r.quantity));
-		if (sources.length === 0) sources.push({ kind: "one-off", label: "added manually" });
+		if (sources.length === 0) sources.push({ kind: "manual", label: "added manually" });
 		items.push({ key, name: note.name, unit: note.unit, quantity: note.quantity, category: note.category, sources, checked: note.checked });
 	}
 

@@ -62,7 +62,7 @@ export function renderHeaderActions(
 
 	const addBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Add grocery item" } });
 	setIcon(addBtn, "plus");
-	addBtn.addEventListener("click", () => deps.openAddOneOffModal());
+	addBtn.addEventListener("click", () => deps.openAddGroceryItemModal());
 
 	const clearBtn = bar.createDiv({ cls: "rb-gv-header-btn rb-gv-header-btn--danger", attr: { "aria-label": "Clear all items" } });
 	setIcon(clearBtn, "trash-2");

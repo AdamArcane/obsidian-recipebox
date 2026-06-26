@@ -2,7 +2,7 @@
  * Dependency interface injected into GroceryView, decoupling the view from
  * the live plugin instance and enabling isolated testing.
  */
-import { OneOffItem, GroceryItem, MealPlanEntry } from "../../types";
+import { GroceryItemEntry, GroceryItem, MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 
 export interface GroceryViewDeps {
@@ -10,21 +10,21 @@ export interface GroceryViewDeps {
 	saveSettings: () => Promise<void>;
 	getGroceryItems: () => GroceryItem[];
 	getMealPlan: () => MealPlanEntry[];
-	getOneOffItems: () => OneOffItem[];
+	getGroceryItemEntries: () => GroceryItemEntry[];
 	toggleChecked: (key: string, checked: boolean) => Promise<void>;
 	isGroupCollapsed: (name: string) => boolean;
 	setGroupCollapsed: (name: string, collapsed: boolean) => Promise<void>;
 	getKnownCategories: () => string[];
 	syncFromMealPlanNote: () => Promise<void>;
-	addOneOff: (item: Omit<OneOffItem, "id">) => Promise<void>;
-	updateOneOff: (id: string, updates: Partial<Omit<OneOffItem, "id">>) => Promise<void>;
-	removeOneOff: (id: string) => Promise<void>;
+	addGroceryItem: (item: Omit<GroceryItemEntry, "id">) => Promise<void>;
+	updateGroceryItem: (id: string, updates: Partial<Omit<GroceryItemEntry, "id">>) => Promise<void>;
+	removeGroceryItem: (id: string) => Promise<void>;
 	resetChecks: () => Promise<void>;
 	clearAll: () => Promise<void>;
 	subscribeToChanges: (cb: () => void) => () => void;
 	openFile: (path: string, newTab: boolean) => void;
 	openOrCreateNote: (path: string) => Promise<void>;
-	openAddOneOffModal: (existingItem?: OneOffItem) => void;
+	openAddGroceryItemModal: (existingItem?: GroceryItemEntry) => void;
 	openExportModal: () => void;
 	openMealPlanView: () => void;
 }

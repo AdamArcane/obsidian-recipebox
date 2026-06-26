@@ -1,39 +1,31 @@
 /**
- * CRUD operations for one-off grocery items — items added manually by the user
+ * CRUD operations for manually-added grocery items (GroceryItemEntry records)
  * that are not tied to a recipe in the meal plan.
  */
 import { App, Notice } from "obsidian";
-import { ContributionMap, OneOffItem } from "../types";
+import { ContributionMap, GroceryItemEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { ingredientKey } from "../parser/ingredient-clean";
-import { parseIngredientLine } from "../parser/ingredient-parse";
 import { toTitleCase } from "../utils/text-case";
 import { addToGroceryNote, removeFromGroceryNote } from "./grocery-note/write";
 import { recordContributions, unrecordContributions } from "./contribution-history";
 
 const MANUAL_SOURCE = { kind: "manual" } as const;
 
-function generateOneOffId(): string {
-	return `oneoff-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+function generateGroceryItemId(): string {
+	return `groceryitem-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export function parseFreeformOneOff(raw: string): { name: string; quantity: number | null; unit: string } | null {
-	if (!raw.trim()) return null;
-	const parsed = parseIngredientLine(raw);
-	if (!parsed?.name) return null;
-	return { name: parsed.name, quantity: parsed.quantity, unit: parsed.unit };
-}
-
-export async function addOneOff(
+export async function addGroceryItem(
 	app: App,
-	rawItem: Omit<OneOffItem, "id">,
+	rawItem: Omit<GroceryItemEntry, "id">,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>
-): Promise<OneOffItem | null> {
+): Promise<GroceryItemEntry | null> {
 	if (!rawItem.name.trim()) return null;
 
-	const item: OneOffItem = { ...rawItem, id: generateOneOffId(), name: rawItem.name.trim(), unit: rawItem.unit.trim() };
-	settings.state.oneOffItems.push(item);
+	const item: GroceryItemEntry = { ...rawItem, id: generateGroceryItemId(), name: rawItem.name.trim(), unit: rawItem.unit.trim() };
+	settings.state.groceryItems.push(item);
 
 	const key = ingredientKey(item.name, item.unit);
 	const contrib: ContributionMap = { [key]: { name: item.name, unit: item.unit, quantity: item.quantity } };
@@ -45,17 +37,17 @@ export async function addOneOff(
 	return item;
 }
 
-export async function updateOneOff(
+export async function updateGroceryItem(
 	app: App,
 	id: string,
-	updates: Partial<Omit<OneOffItem, "id">>,
+	updates: Partial<Omit<GroceryItemEntry, "id">>,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>
 ): Promise<void> {
-	const idx = settings.state.oneOffItems.findIndex((i) => i.id === id);
+	const idx = settings.state.groceryItems.findIndex((i) => i.id === id);
 	if (idx < 0) return;
 
-	const old = settings.state.oneOffItems[idx];
+	const old = settings.state.groceryItems[idx];
 	const oldKey = ingredientKey(old.name, old.unit);
 	const oldContrib: ContributionMap = { [oldKey]: { name: old.name, unit: old.unit, quantity: old.quantity } };
 
@@ -78,17 +70,17 @@ export async function updateOneOff(
 	await addToGroceryNote(app, newContrib, settings);
 }
 
-export async function removeOneOff(
+export async function removeGroceryItem(
 	app: App,
 	id: string,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>
 ): Promise<void> {
-	const idx = settings.state.oneOffItems.findIndex((i) => i.id === id);
+	const idx = settings.state.groceryItems.findIndex((i) => i.id === id);
 	if (idx < 0) return;
 
-	const item = settings.state.oneOffItems[idx];
-	settings.state.oneOffItems.splice(idx, 1);
+	const item = settings.state.groceryItems[idx];
+	settings.state.groceryItems.splice(idx, 1);
 
 	const key = ingredientKey(item.name, item.unit);
 	const contrib: ContributionMap = { [key]: { name: item.name, unit: item.unit, quantity: item.quantity } };
@@ -107,7 +99,7 @@ export async function removeFromGroceryByKey(
 ): Promise<void> {
 	const item = items.find((i) => i.key === key);
 	if (!item) return;
-	// Removing from the note only — does not clean up meal plan contributions or one-off records
+	// Removing from the note only — does not clean up meal plan contributions or grocery item records
 	// intentionally: removing from the shopping list shouldn't silently un-plan a meal.
 	await removeFromGroceryNote(app, { [key]: { name: item.name, unit: item.unit, quantity: item.quantity } }, settings);
 	if (!silent) new Notice(toTitleCase(item.name) + " removed from grocery list.");

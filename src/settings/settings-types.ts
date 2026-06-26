@@ -1,6 +1,6 @@
 /**
  * TypeScript types and interfaces for all plugin settings, including the
- * persisted runtime state (meal plan, one-off items, collapsed sections).
+ * persisted runtime state (meal plan, grocery items, collapsed sections).
  */
 import {
 	GroupingMode,
@@ -8,7 +8,7 @@ import {
 	CategoryOverride,
 	GroceryContributionSource,
 	MealPlanEntry,
-	OneOffItem,
+	GroceryItemEntry,
 	CustomBadge,
 } from "../types";
 
@@ -106,7 +106,7 @@ export interface RecipeBoxSettings {
 	// Persisted runtime state
 	state: {
 		mealPlan: MealPlanEntry[];
-		oneOffItems: OneOffItem[];
+		groceryItems: GroceryItemEntry[];
 		collapsedSections: Record<string, boolean>;
 		groceryContributions: Record<string, Array<{ source: GroceryContributionSource; quantity: number | null }>>;
 	};

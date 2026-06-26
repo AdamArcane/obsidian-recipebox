@@ -3,7 +3,7 @@
  * live plugin instance. Also exports the CookedImageResult union type.
  */
 import { TFile } from "obsidian";
-import { ContributionMap, GroceryItem, MealPlanEntry, OneOffItem } from "../../types";
+import { ContributionMap, GroceryItem, GroceryItemEntry, MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 
 export type CookedImageResult =
@@ -18,8 +18,8 @@ export interface RecipeViewDeps {
 	removeFromMealPlan: (path: string) => Promise<void>;
 	getGroceryItems: () => GroceryItem[];
 	removeGroceryByKey: (key: string) => Promise<void>;
-	addOneOffItem: (item: Omit<OneOffItem, "id">) => Promise<void>;
-	removeOneOffItem: (id: string) => Promise<void>;
+	addGroceryItem: (item: Omit<GroceryItemEntry, "id">) => Promise<void>;
+	removeGroceryItem: (id: string) => Promise<void>;
 	subscribeToChanges: (cb: () => void) => () => void;
 	navigateToGroceryCategory: (category: string) => Promise<void>;
 	editAsMarkdown: (path: string) => void;
