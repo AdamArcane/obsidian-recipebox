@@ -961,11 +961,28 @@ button:not(.clickable-icon).rb-grocery-add-btn {
   line-height: 1.4;
 }
 
+/* MarkdownRenderer.render() wraps output in a <p>; strip the block margin
+   so the rendered name sits inline within the ingredient row layout. */
+.rb-ingredient-name > p {
+  margin: 0;
+  display: inline;
+}
+
 .rb-ingredient-note {
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
   padding-left: 0.5em;
   line-height: 1.3;
+}
+
+.rb-ingredient-tag {
+  display: inline-block;
+  margin-left: 0.4em;
+  font-size: var(--font-ui-smaller);
+  color: var(--tag-color);
+  background: var(--tag-background);
+  border-radius: var(--tag-radius);
+  padding: 0 0.35em;
 }
 
 .rb-meat-temp-badge,

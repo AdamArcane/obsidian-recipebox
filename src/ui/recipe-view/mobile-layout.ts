@@ -398,10 +398,11 @@ export async function renderMobileLayout(
 	_tabs = [tabIngr, tabSteps, tabInfo];
 
 	// Ingredients tab
-	renderIngredientsSection(
+	await renderIngredientsSection(
 		panelIngr, app, file, ingredientGroups, settings, groceryItems, multiplier,
 		(key) => { void deps.removeGroceryByKey(key); },
 		() => { deps.openAddToGroceryModal(file); },
+		component,
 	);
 
 	// Steps tab

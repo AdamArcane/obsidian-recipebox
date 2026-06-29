@@ -227,11 +227,12 @@ export class RecipeView extends TextFileView {
 		if (hasIngredients || hasRightCol) {
 			const bodyRow = wrap.createDiv({ cls: "rb-body-row" });
 			if (hasIngredients) {
-				renderIngredientsSection(
+				void renderIngredientsSection(
 					bodyRow, this.app, this.file!, ingredientGroups,
 					settings, groceryItems, multiplier,
 					(key) => { void this.deps.removeGroceryByKey(key); },
 					() => { this.deps.openAddToGroceryModal(this.file!); },
+					this,
 				);
 			}
 			if (hasRightCol) {

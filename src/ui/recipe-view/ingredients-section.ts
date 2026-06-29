@@ -1,8 +1,10 @@
 /**
  * Renders the ingredients section of the recipe view, including sub-group
  * headings, quantity display, grocery-status icons, and food safety warnings.
+ * Ingredient names are rendered through Obsidian's full markdown renderer so
+ * that wikilinks, bold, and other inline formatting work naturally.
  */
-import { App, setIcon, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
 import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { GroceryItem } from "../../types";
@@ -12,9 +14,8 @@ import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
 import { compileGiDictionary } from "../../parser/glycemic-dictionary";
 import { formatQuantity } from "../../parser/quantity-format";
-import { toTitleCase } from "../../utils/text-case";
 
-export function renderIngredientsSection(
+export async function renderIngredientsSection(
 	container: HTMLElement,
 	app: App,
 	file: TFile,
@@ -24,7 +25,8 @@ export function renderIngredientsSection(
 	multiplier: number,
 	onRemoveFromGrocery: (key: string) => void,
 	onOpenGroceryModal: () => void,
-): void {
+	component: Component,
+): Promise<void> {
 	const groceryKeySet = new Set(groceryItems.map(i => i.key));
 	const giPatterns = settings.showHighGIWarnings ? compileGiDictionary(settings.giDictionary).patterns : [];
 
@@ -78,7 +80,11 @@ export function renderIngredientsSection(
 			}
 
 			const nameCol = row.createDiv({ cls: "rb-ingredient-name-col" });
-			nameCol.createSpan({ cls: "rb-ingredient-name", text: toTitleCase(parsed.name) });
+			const nameEl = nameCol.createDiv({ cls: "rb-ingredient-name" });
+			await MarkdownRenderer.render(app, parsed.name, nameEl, file.path, component);
+			for (const tag of parsed.tags) {
+				nameEl.createSpan({ cls: "rb-ingredient-tag", text: `#${tag}` });
+			}
 			if (parsed.note) {
 				nameCol.createDiv({ cls: "rb-ingredient-note", text: parsed.note });
 			}
