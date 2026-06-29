@@ -1322,18 +1322,27 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 /* ── Heading level variants inside instruction groups ────────────────────── */
 
+/* Shallower headings appear larger and more prominent; deeper ones are
+   visually subordinate. text-transform/letter-spacing are dropped at h4+
+   so sub-headings read as labels rather than section titles, reinforcing
+   the hierarchy without true DOM nesting. */
 .rb-group-header.rb-heading-level-2 {
-  font-size: 0.85rem;
+  font-size: 1rem;
+  color: var(--text-normal);
 }
 
 .rb-group-header.rb-heading-level-3 {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 .rb-group-header.rb-heading-level-4,
 .rb-group-header.rb-heading-level-5,
 .rb-group-header.rb-heading-level-6 {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-faint);
 }
 
 /* ── Mobile layout ───────────────────────────────────────────────────────── */
