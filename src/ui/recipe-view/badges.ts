@@ -2,7 +2,7 @@
  * Renders the configurable header badge row in the recipe view, evaluating
  * badge formulas, formatting values, and supporting separator/newline badge types.
  */
-import { setIcon } from "obsidian";
+import { App, getAllTags, setIcon, TFile } from "obsidian";
 import { CustomBadge, BadgeType } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { stripWikilink } from "../../utils/wikilink-strip";
@@ -103,9 +103,31 @@ export function renderBadgeRow(
 		if (type === "separator") {
 			row.createSpan({ cls: "rb-badge-separator" });
 		} else if (type === "newline") {
-			row.createEl("br");
+			// <br> is ignored inside flex containers; a 100%-wide zero-height div forces a wrap break.
+			row.createDiv({ cls: "rb-badge-newline" });
 		} else {
 			for (const value of values) renderBadgeChip(row, badge, value);
 		}
+	}
+}
+
+/** Renders the tag row beneath the badge row in the desktop recipe header. */
+export function renderTagRow(
+	container: HTMLElement,
+	app: App,
+	file: TFile,
+	settings: RecipeBoxSettings,
+): void {
+	if (!settings.showTagsInHeader) return;
+	const cache = app.metadataCache.getFileCache(file);
+	const allTags = cache ? (getAllTags(cache) ?? []) : [];
+	if (allTags.length === 0) return;
+
+	const row = container.createDiv({ cls: "rb-tag-row" });
+	for (const tag of allTags) {
+		const base = tag.startsWith("#") ? tag.slice(1) : tag;
+		const segment = settings.showFullTagPath ? base : (base.split("/").pop() ?? base);
+		const display = settings.prefixTagsWithHash ? `#${segment}` : segment;
+		row.createSpan({ cls: "rb-tag", text: display });
 	}
 }

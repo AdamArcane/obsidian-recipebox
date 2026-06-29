@@ -14,6 +14,8 @@ export interface DiscoveredField {
 	type: FilterableType;
 	/** Distinct observed values as strings, sorted. Used for "one of" pickers. */
 	values: string[];
+	/** True if this field's value was an array in at least one recipe. */
+	hasArrayValues: boolean;
 }
 
 export interface DiscoveryResult {
@@ -43,7 +45,7 @@ export class DiscoveryCache {
 			const values = [...valueSet]
 				.map(v => String(v))
 				.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-			fields.push({ key, type, values });
+			fields.push({ key, type, values, hasArrayValues: raw.arrayFields.has(key) });
 		}
 		fields.sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: "base" }));
 

@@ -3,6 +3,11 @@
  * Tags are encoded as pseudo-fields with a "#" prefix (e.g. "#vegetarian").
  */
 
+// FieldFilter lives in types.ts so that strategy-types.ts can import it without
+// creating a transitive back-edge from discovery-cache.ts into this directory.
+import type { FieldFilter } from "../types";
+export type { FieldFilter };
+
 /** Inferred data type for a discovered frontmatter field. */
 export type FieldType = "number" | "date" | "boolean" | "string";
 
@@ -22,6 +27,7 @@ export const OPERATORS: Record<FilterableType, readonly { id: string; label: str
 		{ id: "before", label: "before" },
 		{ id: "after", label: "after" },
 		{ id: "within-last", label: "within last N days" },
+		{ id: "not-within-last", label: "not within last N days" },
 		{ id: "between", label: "between" },
 	],
 	boolean: [
@@ -38,20 +44,6 @@ export const OPERATORS: Record<FilterableType, readonly { id: string; label: str
 		{ id: "not-has", label: "doesn't have tag" },
 	],
 };
-
-/**
- * A single filter expression. Value shape depends on operator:
- * - "between": [lo, hi] pair (numbers or ISO date strings)
- * - "one-of": string[]
- * - "within-last": number (days)
- * - "is-true", "is-false", "has", "not-has": value unused (pass undefined)
- * - all others: scalar matching the field's inferred type
- */
-export interface FieldFilter {
-	field: string;    // frontmatter key, or "#tagname" for tag pseudo-fields
-	operator: string; // one of the ids from OPERATORS
-	value: unknown;   // shape depends on operator
-}
 
 /** All filters are ANDed: a recipe must pass every filter. */
 export type FilterSet = FieldFilter[];

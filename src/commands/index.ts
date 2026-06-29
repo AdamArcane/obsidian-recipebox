@@ -9,8 +9,9 @@ import RecipeBoxPlugin from "../main";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
+import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { isRecipeFile } from "../lifecycle/recipe-file-detection";
-import { RecipeView } from "../ui/recipe-view/recipe-view";
+import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 
 export function registerCommands(plugin: RecipeBoxPlugin): void {
 	plugin.addCommand({
@@ -98,7 +99,23 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 	plugin.addCommand({
 		id: "suggest-meal",
 		name: "Suggest a meal",
-		callback: () => new Notice("Meal suggestion is not yet available."),
+		callback: () => {
+			new SuggestMealModal(plugin.app, {
+				getSettings: () => plugin.settings,
+				saveSettings: () => plugin.saveSettings(),
+				getDiscovery: () => plugin.discoveryCache.get(),
+				openFile: (file) => {
+					const leaf = plugin.app.workspace.getLeaf(false);
+					void leaf.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: file.path }, active: true });
+				},
+				addToQueue: async (files) => {
+					for (const file of files) {
+						await plugin.manager.addToMealPlan(file.path, undefined, undefined, {});
+					}
+				},
+				openMealPlan: () => { void plugin.activateMealPlanView(); },
+			}).open();
+		},
 	});
 
 	plugin.addCommand({

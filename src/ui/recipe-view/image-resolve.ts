@@ -8,7 +8,7 @@ import { makeLightboxable } from "../components/lightbox";
 
 const ABSOLUTE_URL_RE = /^(?:https?|data|app|capacitor):\/\//i;
 
-function resolveImagePath(app: App, imageValue: string): string | null {
+export function resolveImagePath(app: App, imageValue: string): string | null {
 	if (ABSOLUTE_URL_RE.test(imageValue)) return imageValue;
 
 	// Unwrap wikilink/embed syntax to get bare path

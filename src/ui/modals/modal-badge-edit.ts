@@ -11,6 +11,10 @@
 import { App, Setting, setIcon } from "obsidian";
 import { CustomBadge, BadgeColor } from "../../types";
 import { BaseModal } from "./modal-shell";
+import { DiscoveryResult } from "../../discovery/discovery-cache";
+import { RecipeBoxSettings } from "../../settings/settings-types";
+import { buildFieldPickerBtn, buildPickerFieldList } from "../components/field-picker";
+import { propertyToLabel } from "../../utils/property-label";
 
 const COLOR_OPTIONS: Record<BadgeColor, string> = {
 	default: "Default",
@@ -24,12 +28,16 @@ const COLOR_OPTIONS: Record<BadgeColor, string> = {
 export class BadgeEditModal extends BaseModal {
 	private draft: CustomBadge;
 	private useFormula: boolean;
+	/** Tracks whether the user has manually changed the label, suppressing auto-populate from property. */
+	private labelManuallyEdited = false;
 
 	constructor(
 		app: App,
 		private readonly source: CustomBadge,
 		private readonly onSave: (updated: CustomBadge) => void,
 		private readonly isNew: boolean = false,
+		private readonly getDiscovery?: () => DiscoveryResult | null,
+		private readonly getSettings?: () => RecipeBoxSettings,
 	) {
 		super(app);
 		this.draft = { ...source };
@@ -126,17 +134,33 @@ export class BadgeEditModal extends BaseModal {
 	}
 
 	private renderPropertySection(body: HTMLElement): void {
-		new Setting(body)
+		const discovery = this.getDiscovery?.() ?? null;
+		const settings = this.getSettings?.();
+		const fields = settings ? buildPickerFieldList(settings, discovery) : [];
+		const selectedField = fields.find(f => f.key === this.draft.property);
+
+		const propSetting = new Setting(body)
 			.setName("Property")
-			.setDesc("Frontmatter key to read from the recipe note.")
-			.addText((t) =>
-				t
-					.setValue(this.draft.property)
-					.setPlaceholder("E.g. Cuisine")
-					.onChange((v) => {
-						this.draft.property = v;
-					}),
+			.setDesc("Frontmatter key to read from the recipe note.");
+
+		if (fields.length > 0) {
+			propSetting.settingEl.createDiv({ cls: "rb-badge-prop-picker" }, (el) => {
+				buildFieldPickerBtn(el, this.draft.property, fields, (val) => {
+					this.draft.property = val;
+					// Auto-populate label from property name unless the user already customized it.
+					if (!this.labelManuallyEdited && val) {
+						this.draft.label = propertyToLabel(val);
+					}
+					this.rerenderAll();
+				});
+			});
+		} else {
+			// No discovery available -- fall back to text input.
+			propSetting.addText((t) =>
+				t.setValue(this.draft.property).setPlaceholder("E.g. Cuisine")
+					.onChange((v) => { this.draft.property = v; }),
 			);
+		}
 
 		new Setting(body)
 			.setName("Prefix")
@@ -162,39 +186,48 @@ export class BadgeEditModal extends BaseModal {
 					}),
 			);
 
-		new Setting(body)
-			.setName("Split array")
-			.setDesc(
-				"When the property is a list, show one badge per item instead of a single comma-joined badge.",
-			)
-			.addToggle((t) =>
-				t.setValue(this.draft.splitArray).onChange((v) => {
-					this.draft.splitArray = v;
-				}),
-			);
+		// Only show "Split array" when discovery confirms this field carries array values.
+		// If discovery is unavailable, show it unconditionally rather than hiding a useful option.
+		const showSplitArray = !selectedField || selectedField.hasArrayValues;
+		if (showSplitArray) {
+			new Setting(body)
+				.setName("Split array")
+				.setDesc(
+					"When the property is a list, show one badge per item instead of a single comma-joined badge.",
+				)
+				.addToggle((t) =>
+					t.setValue(this.draft.splitArray).onChange((v) => {
+						this.draft.splitArray = v;
+					}),
+				);
+		}
 	}
 
 	private renderLabelSection(body: HTMLElement): void {
-		new Setting(body)
-			.setName("Label")
-			.setDesc("Display label shown in the badge. Defaults to the property name.")
-			.addText((t) =>
-				t
-					.setValue(this.draft.label)
-					.setPlaceholder("Ex. Cuisine")
-					.onChange((v) => {
-						this.draft.label = v;
-					}),
-			);
-
 		new Setting(body)
 			.setName("Show label")
 			.setDesc("When off, only the value is shown with no label text.")
 			.addToggle((t) =>
 				t.setValue(!(this.draft.hideLabel ?? false)).onChange((v) => {
 					this.draft.hideLabel = !v;
+					this.rerenderAll();
 				}),
 			);
+
+		if (!this.draft.hideLabel) {
+			new Setting(body)
+				.setName("Label")
+				.setDesc("Display label shown in the badge.")
+				.addText((t) =>
+					t
+						.setValue(this.draft.label)
+						.setPlaceholder("Ex. Cuisine")
+						.onChange((v) => {
+							this.draft.label = v;
+							this.labelManuallyEdited = true;
+						}),
+				);
+		}
 
 		new Setting(body)
 			.setName("Icon")

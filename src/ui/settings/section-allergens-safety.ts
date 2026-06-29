@@ -4,24 +4,27 @@
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 
 export function renderSectionAllergensSafety(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
-	_rerender: () => void
+	rerender: () => void
 ): void {
 	new Setting(container).setName("Allergens & food safety").setHeading();
 
 	new Setting(container)
 		.setName("Allergens frontmatter property")
 		.setDesc("Property name holding a recipe's allergen list (CSV string or YAML list).")
-		.addText((t) =>
+		.addText((t) => {
 			t.setValue(settings.allergensProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.allergensProperty, v);
 				settings.allergensProperty = v;
 				await save();
-			})
-		);
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
 
 	const allergenSetting = new Setting(container)
 		.setName("My allergens")

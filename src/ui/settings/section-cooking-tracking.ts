@@ -4,6 +4,7 @@
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings, CookHistoryStorage } from "../../settings/settings-types";
+import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 
 const STORAGE_OPTIONS: Record<CookHistoryStorage, string> = {
 	note: "Note body only",
@@ -51,12 +52,14 @@ export function renderSectionCookingTracking(
 	if (settings.trackLastMade) {
 		new Setting(container)
 			.setName("Last made property name")
-			.addText((t) =>
+			.addText((t) => {
 				t.setValue(settings.lastMadeProperty).onChange(async (v) => {
+					settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.lastMadeProperty, v);
 					settings.lastMadeProperty = v;
 					await save();
-				})
-			);
+				});
+				t.inputEl.addEventListener("blur", () => rerender());
+			});
 	}
 
 	new Setting(container)

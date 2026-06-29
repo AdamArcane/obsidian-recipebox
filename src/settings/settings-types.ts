@@ -11,6 +11,7 @@ import {
 	GroceryItemEntry,
 	CustomBadge,
 } from "../types";
+import type { SuggesterMode } from "../suggester/strategy-types";
 
 export type NutritionDisplay = "per-serving" | "total";
 export type CookHistoryStorage = "note" | "frontmatter" | "both";
@@ -71,8 +72,8 @@ export interface RecipeBoxSettings {
 	carbsProperty: string;
 
 	// Meal recommender
-	suggestionDayWindow: number;
 	suggestionCount: number;
+	suggesterModes: SuggesterMode[];
 
 	// Diabetic mode
 	showHighGIWarnings: boolean;
@@ -109,5 +110,6 @@ export interface RecipeBoxSettings {
 		groceryItems: GroceryItemEntry[];
 		collapsedSections: Record<string, boolean>;
 		groceryContributions: Record<string, Array<{ source: GroceryContributionSource; quantity: number | null }>>;
+		lastUsedModeId?: string;
 	};
 }

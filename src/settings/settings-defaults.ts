@@ -4,6 +4,7 @@
  */
 import { RecipeBoxSettings } from "./settings-types";
 import { DEFAULT_GI_DICTIONARY } from "../parser/glycemic-dictionary";
+import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 
 export const DEFAULT_CATEGORY_ORDER: string[] = [
 	"Produce",
@@ -76,8 +77,8 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	fatProperty: "fat",
 	carbsProperty: "carbs",
 
-	suggestionDayWindow: 14,
 	suggestionCount: 5,
+	suggesterModes: BUILTIN_MODES,
 
 	showHighGIWarnings: false,
 	giDictionary: DEFAULT_GI_DICTIONARY,

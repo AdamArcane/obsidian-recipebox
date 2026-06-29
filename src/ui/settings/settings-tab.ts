@@ -37,12 +37,12 @@ export class RecipeBoxSettingsTab extends PluginSettingTab {
 		renderSectionLibrary(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionNotesStorage(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionImporter(this.containerEl, this.plugin.settings, save, rerender, this.app);
-		renderSectionRecipeView(this.containerEl, this.plugin.settings, save, rerender, this.app);
+		renderSectionRecipeView(this.containerEl, this.plugin.settings, save, rerender, this.app, () => this.plugin.discoveryCache.get());
 		renderSectionTimers(this.containerEl, this.plugin.settings, save, rerender);
 		renderSectionShopping(this.containerEl, this.plugin.settings, save, rerender, this.app, () => this.plugin.manager.getKnownCategories());
 		renderSectionCookingTracking(this.containerEl, this.plugin.settings, save, rerender);
 		renderSectionNutrition(this.containerEl, this.plugin.settings, save, rerender);
-		renderSectionRecommender(this.containerEl, this.plugin.settings, save, rerender);
+		renderSectionRecommender(this.containerEl, this.plugin.settings, save, rerender, this.app, () => this.plugin.discoveryCache.get());
 		renderSectionHealthSafety(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionMealPlan(this.containerEl, this.plugin.settings, save, rerender, this.app);
 	}

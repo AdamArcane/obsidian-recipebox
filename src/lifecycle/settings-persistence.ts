@@ -13,6 +13,9 @@ import {
 	MealPlanEntry,
 	GroceryItemEntry,
 } from "../types";
+import type { SuggesterMode, ScoringRule } from "../suggester/strategy-types";
+import type { FieldFilter } from "../types";
+import { BUILTIN_MODES, BUILTIN_MODE_IDS } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
 import {
 	CategorySource,
@@ -115,6 +118,66 @@ function validateBadge(raw: unknown): CustomBadge | null {
 	};
 }
 
+// ── suggester validators ─────────────────────────────────────────────────────
+
+function validateFieldFilter(raw: unknown): FieldFilter | null {
+	if (!raw || typeof raw !== "object") return null;
+	const f = raw as Record<string, unknown>;
+	if (typeof f.field !== "string" || !f.field) return null;
+	if (typeof f.operator !== "string" || !f.operator) return null;
+	return { field: f.field, operator: f.operator, value: f.value };
+}
+
+function validateScoringRule(raw: unknown): ScoringRule | null {
+	if (!raw || typeof raw !== "object") return null;
+	const r = raw as Record<string, unknown>;
+	if (typeof r.field !== "string" || !r.field) return null;
+	if (r.direction !== "favor-high" && r.direction !== "favor-low" && r.direction !== "favor-none") return null;
+	return { field: r.field, direction: r.direction };
+}
+
+function validateSuggesterMode(raw: unknown): SuggesterMode | null {
+	if (!raw || typeof raw !== "object") return null;
+	const s = raw as Record<string, unknown>;
+	if (typeof s.id !== "string" || !s.id) return null;
+	if (typeof s.name !== "string" || !s.name) return null;
+	const filters = Array.isArray(s.filters)
+		? (s.filters as unknown[]).map(validateFieldFilter).filter((x): x is FieldFilter => x !== null)
+		: [];
+	const rules = Array.isArray(s.rules)
+		? (s.rules as unknown[]).map(validateScoringRule).filter((x): x is ScoringRule => x !== null)
+		: [];
+	return {
+		id: s.id,
+		name: s.name,
+		filters,
+		rules,
+		isBuiltin: bool(s.isBuiltin, false),
+		isDefault: bool(s.isDefault, false),
+	};
+}
+
+/**
+ * Load saved modes, falling back to the built-in defaults for any that
+ * are missing. Built-ins are never removed even if the saved list omits them,
+ * so an upgrade that adds a new built-in mode shows up without a full reset.
+ */
+function mergeModes(raw: unknown): SuggesterMode[] {
+	if (!Array.isArray(raw)) return BUILTIN_MODES.map(s => ({ ...s }));
+
+	const saved = (raw as unknown[])
+		.map(validateSuggesterMode)
+		.filter((x): x is SuggesterMode => x !== null);
+
+	// Re-add any built-ins the saved list doesn't contain (e.g. a new built-in added in an update).
+	const savedIds = new Set(saved.map(s => s.id));
+	for (const builtin of BUILTIN_MODES) {
+		if (!savedIds.has(builtin.id)) saved.push({ ...builtin });
+	}
+
+	return saved;
+}
+
 // ── public API ────────────────────────────────────────────────────────────────
 
 export function mergeSettings(raw: unknown): RecipeBoxSettings {
@@ -132,7 +195,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		if (typeof v === "boolean") collapsedSections[k] = v;
 	}
 
-	return {
+	const merged: RecipeBoxSettings = {
 		recipeFolders: strArr(r.recipeFolders, d.recipeFolders),
 		mealPlanPath: str(r.mealPlanPath, d.mealPlanPath),
 		groceryListPath: str(r.groceryListPath, d.groceryListPath),
@@ -177,8 +240,9 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		fatProperty: str(r.fatProperty, d.fatProperty),
 		carbsProperty: str(r.carbsProperty, d.carbsProperty),
 
-		suggestionDayWindow: num(r.suggestionDayWindow, d.suggestionDayWindow, 1),
 		suggestionCount: num(r.suggestionCount, d.suggestionCount, 1),
+		// Support migration from the old "suggesterStrategies" key (renamed to "suggesterModes")
+		suggesterModes: mergeModes(r.suggesterModes ?? r.suggesterStrategies),
 
 		showHighGIWarnings: bool(r.diabeticModeEnabled, d.showHighGIWarnings),
 		giDictionary: str(r.giDictionary, d.giDictionary),
@@ -214,8 +278,29 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 				: [],
 			collapsedSections,
 			groceryContributions: validateGroceryContributions(state.groceryContributions),
+			// Support migration from old "lastUsedStrategyId" key
+			lastUsedModeId: typeof state.lastUsedModeId === "string" ? state.lastUsedModeId
+				: typeof state.lastUsedStrategyId === "string" ? state.lastUsedStrategyId : undefined,
 		},
 	};
+
+	// Section 65 migration: if the old global exclusion-window setting was in use
+	// and we haven't yet saved modes (first load after upgrade), fold its value
+	// into the Rediscover mode's filters so the user's old behaviour is preserved.
+	if (
+		typeof r.suggestionDayWindow === "number" &&
+		r.suggestionDayWindow > 0 &&
+		!Array.isArray(r.suggesterModes) &&
+		!Array.isArray(r.suggesterStrategies)
+	) {
+		const rediscover = merged.suggesterModes.find(s => s.id === BUILTIN_MODE_IDS.rediscover);
+		if (rediscover && !rediscover.filters.some(f => f.operator === "not-within-last")) {
+			const lastMadeProp = merged.lastMadeProperty;
+			rediscover.filters.push({ field: lastMadeProp, operator: "not-within-last", value: r.suggestionDayWindow });
+		}
+	}
+
+	return merged;
 }
 
 function validateGroceryContributionSource(raw: unknown): GroceryContributionSource | null {

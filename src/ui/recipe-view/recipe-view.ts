@@ -16,7 +16,7 @@ import { readRecipeMeta, matchingAllergens } from "../../parser/recipe-meta-read
 import { fmNum, fmStr } from "./frontmatter-read-helpers";
 import { renderMetaBanner } from "./meta-banner";
 import { renderStarRating } from "./rating";
-import { renderBadgeRow } from "./badges";
+import { renderBadgeRow, renderTagRow } from "./badges";
 import { renderIngredientsSection } from "./ingredients-section";
 import { renderInstructionsSection } from "./instructions-section";
 import { clearAllTimers } from "../timer/timer-tray";
@@ -157,6 +157,7 @@ export class RecipeView extends TextFileView {
 		const titleBlock = wrap.createDiv({ cls: "rb-title-block" });
 		titleBlock.createEl("h1", { cls: "rb-recipe-title", text: this.file.basename });
 		if (!Platform.isMobile) {
+			renderTagRow(titleBlock, this.app, this.file, settings);
 			renderStarRating(titleBlock, this.app, this.file, fm, settings.ratingProperty, true);
 			renderBadgeRow(titleBlock, settings, fm);
 		}

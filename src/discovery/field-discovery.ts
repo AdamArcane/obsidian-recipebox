@@ -24,12 +24,15 @@ const SKIP_KEYS = new Set<string>([
 export interface RawDiscovery {
 	/** Frontmatter key -> distinct observed scalar values across all recipes. */
 	fields: Map<string, Set<unknown>>;
+	/** Keys whose value was an array in at least one recipe (enables "split array" UI). */
+	arrayFields: Set<string>;
 	/** Distinct tag names, without the leading "#". */
 	tags: Set<string>;
 }
 
 export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): RawDiscovery {
 	const fields = new Map<string, Set<unknown>>();
+	const arrayFields = new Set<string>();
 	const tags = new Set<string>();
 
 	for (const file of app.vault.getMarkdownFiles()) {
@@ -48,6 +51,7 @@ export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): Raw
 			// individually so type inference sees "nuts" and "dairy" as strings,
 			// not the array itself.
 			if (Array.isArray(value)) {
+				arrayFields.add(key);
 				for (const item of value) {
 					if (item !== null && item !== undefined) set.add(item);
 				}
@@ -63,5 +67,5 @@ export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): Raw
 		}
 	}
 
-	return { fields, tags };
+	return { fields, arrayFields, tags };
 }

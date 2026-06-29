@@ -6,6 +6,7 @@ import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { findOrOpenLeaf } from "./utils/open-leaf";
 import { RecipeBoxSettings } from "./settings/settings-types";
 import { GroceryManager } from "./grocery/manager";
+import { DiscoveryCache } from "./discovery/discovery-cache";
 import { mergeSettings } from "./lifecycle/settings-persistence";
 import { registerViews } from "./lifecycle/register-views";
 import { registerVaultWatchers } from "./lifecycle/register-vault-watchers";
@@ -21,6 +22,7 @@ import { scrollToHeading } from "./ui/recipe-view/jump-bar";
 export default class RecipeBoxPlugin extends Plugin {
 	settings!: RecipeBoxSettings;
 	manager!: GroceryManager;
+	discoveryCache!: DiscoveryCache;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -29,6 +31,7 @@ export default class RecipeBoxPlugin extends Plugin {
 			getSettings: () => this.settings,
 			save: () => this.saveSettings(),
 		});
+		this.discoveryCache = new DiscoveryCache();
 
 		registerViews(this);
 		registerCommands(this);
@@ -55,7 +58,11 @@ export default class RecipeBoxPlugin extends Plugin {
 			(leaf, file) => this.openCurrentFileAsRecipe(leaf, file)
 		);
 
-		this.app.workspace.onLayoutReady(() => this.manager.refresh());
+		this.app.workspace.onLayoutReady(() => {
+			void this.manager.refresh();
+			// Populate the discovery cache so the mode editor field picker has real fields.
+			void this.discoveryCache.refresh(this.app, this.settings);
+		});
 
 	}
 

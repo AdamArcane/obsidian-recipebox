@@ -4,6 +4,7 @@
  */
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 import { AllergensModal } from "../modals/modal-allergens";
 import { GiDictionaryModal } from "../modals/modal-gi-dictionary";
 
@@ -19,12 +20,14 @@ export function renderSectionHealthSafety(
 	new Setting(container)
 		.setName("Allergens frontmatter property")
 		.setDesc("Property name holding a recipe's allergen list (CSV string or YAML list).")
-		.addText((t) =>
+		.addText((t) => {
 			t.setValue(settings.allergensProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.allergensProperty, v);
 				settings.allergensProperty = v;
 				await save();
-			})
-		);
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
 
 	new Setting(container)
 		.setName("My allergens")

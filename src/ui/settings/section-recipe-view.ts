@@ -5,16 +5,19 @@
 import { App, setIcon, Setting } from "obsidian";
 import { CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";
 import { BadgeEditModal } from "../modals/modal-badge-edit";
 import { SeparatorEditModal } from "../modals/modal-separator-edit";
+import { DiscoveryResult } from "../../discovery/discovery-cache";
 
 export function renderSectionRecipeView(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
 	rerender: () => void,
-	app: App
+	app: App,
+	getDiscovery?: () => DiscoveryResult | null,
 ): void {
 	new Setting(container).setName("Recipe view").setHeading();
 
@@ -51,12 +54,14 @@ export function renderSectionRecipeView(
 	new Setting(container)
 		.setName("Rating frontmatter property")
 		.setDesc("The property name used to store star ratings (1–5).")
-		.addText((t) =>
+		.addText((t) => {
 			t.setValue(settings.ratingProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.ratingProperty, v);
 				settings.ratingProperty = v;
 				await save();
-			})
-		);
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
 
 	new Setting(container)
 		.setName("Show tags in header")
@@ -96,7 +101,7 @@ export function renderSectionRecipeView(
 	badgeSetting.settingEl.addClass("recipe-box-badge-setting");
 
 	const listEl = badgeSetting.settingEl.createDiv({ cls: "recipe-box-badge-list" });
-	renderBadgeList(listEl, settings, save, app);
+	renderBadgeList(listEl, settings, save, app, getDiscovery);
 }
 
 function badgePrimary(badge: CustomBadge): string {
@@ -121,6 +126,7 @@ function renderBadgeList(
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
 	app: App,
+	getDiscovery?: () => DiscoveryResult | null,
 ): void {
 	listEl.empty();
 	let dragFromIndex = -1;
@@ -155,7 +161,7 @@ function renderBadgeList(
 		del.addEventListener("click", (e) => {
 			e.stopPropagation();
 			settings.headerBadges.splice(i, 1);
-			void save().then(() => renderBadgeList(listEl, settings, save, app));
+			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 		});
 
 		// Click info area to edit (not checkbox/delete/handle)
@@ -165,13 +171,13 @@ function renderBadgeList(
 				if (badge.type === "separator") {
 					new SeparatorEditModal(app, badge, (updated) => {
 						Object.assign(badge, updated);
-						void save().then(() => renderBadgeList(listEl, settings, save, app));
+						void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 					}).open();
 				} else {
 					new BadgeEditModal(app, badge, (updated) => {
 						Object.assign(badge, updated);
-						void save().then(() => renderBadgeList(listEl, settings, save, app));
-					}).open();
+						void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
+					}, false, getDiscovery, () => settings).open();
 				}
 			});
 		}
@@ -197,7 +203,7 @@ function renderBadgeList(
 			const [moved] = settings.headerBadges.splice(dragFromIndex, 1);
 			settings.headerBadges.splice(i, 0, moved);
 			dragFromIndex = -1;
-			void save().then(() => renderBadgeList(listEl, settings, save, app));
+			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 		});
 	});
 
@@ -212,14 +218,14 @@ function renderBadgeList(
 		};
 		new BadgeEditModal(app, blank, (created) => {
 			settings.headerBadges.push(created);
-			void save().then(() => renderBadgeList(listEl, settings, save, app));
-		}, true).open();
+			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
+		}, true, getDiscovery, () => settings).open();
 	});
 
 	footer.createEl("button", { text: "+ separator" }).addEventListener("click", () => {
 		new SeparatorEditModal(app, null, (badge) => {
 			settings.headerBadges.push(badge);
-			void save().then(() => renderBadgeList(listEl, settings, save, app));
+			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 		}).open();
 	});
 
@@ -229,7 +235,7 @@ function renderBadgeList(
 			color: "default", valueType: "auto", splitArray: false,
 			enabled: true, builtin: false,
 		});
-		void save().then(() => renderBadgeList(listEl, settings, save, app));
+		void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 	});
 
 	let resetPending = false;
@@ -243,7 +249,7 @@ function renderBadgeList(
 		} else {
 			if (resetTimer) window.clearTimeout(resetTimer);
 			settings.headerBadges = structuredClone(DEFAULT_SETTINGS.headerBadges);
-			void save().then(() => renderBadgeList(listEl, settings, save, app));
+			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 		}
 	});
 }

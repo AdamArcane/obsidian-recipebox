@@ -365,6 +365,24 @@
   margin: 0.5rem 0 0.25rem;
 }
 
+/* Forces a line break inside the flex badge row without adding visible height. */
+.rb-badge-newline {
+  flex-basis: 100%;
+  height: 0;
+}
+
+.rb-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+}
+
+.rb-tag {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
 .rb-badge {
   display: inline-flex;
   align-items: center;
@@ -526,11 +544,13 @@
   display: flex;
   align-items: center;
 }
+
 .rb-stepper-entry {
   display: flex;
   align-items: baseline;
   gap: 0.35rem;
 }
+
 .rb-stepper {
   display: inline-flex;
   align-items: center;
@@ -1656,8 +1676,9 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-  
+
 }
+
 .rb-servings-label {
   font-size: var(--font-ui-small);
   color: var(--text-faint);
@@ -1876,7 +1897,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 .rb-shell-header {
-  display:flex;
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   column-gap: 0.5rem;
@@ -2195,8 +2216,9 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--text-normal);
   transition: background 0.1s, color 0.1s;
 }
+
 .rb-modal-btn-icon {
-    display: flex;
+  display: flex;
 }
 
 .rb-modal-btn:hover {
@@ -3265,6 +3287,7 @@ body.is-mobile .rb-duration-btn {
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -4337,4 +4360,480 @@ body.is-mobile .rb-gv-group-header {
   color: var(--text-normal);
   border-color: var(--background-modifier-border-hover);
   border-style: solid;
+}
+
+/* ── Meal Suggester ──────────────────────────────────────────────────────────── */
+
+.rb-suggest-controls-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-2);
+}
+
+.rb-suggest-controls-row .rb-modal-select {
+  flex: 1;
+  width: auto;
+}
+
+.rb-suggest-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.rb-suggest-icon-btn svg,
+.rb-suggest-icon-btn span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-suggest-icon-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.rb-suggest-hint,
+.rb-suggest-empty,
+.rb-suggest-partial {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  margin: 0.5rem 0;
+}
+
+.rb-suggest-partial {
+  color: var(--text-accent);
+}
+
+.rb-suggest-list {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.rb-suggest-add-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.rb-suggest-add-btn:not(:disabled):hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+}
+
+.rb-suggest-add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rb-suggest-checkbox {
+  flex-shrink: 0;
+  cursor: pointer;
+  margin: 0;
+  align-self: center;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--interactive-accent);
+}
+
+.rb-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-3);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.rb-suggest-item:last-child {
+  border-bottom: none;
+}
+
+.rb-suggest-recipe-link {
+  flex: 1;
+  cursor: pointer;
+  color: var(--text-normal);
+  text-decoration: none;
+}
+
+.rb-suggest-recipe-link:hover {
+  color: var(--text-accent);
+  text-decoration: underline;
+}
+
+.rb-suggest-score {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.rb-suggest-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rb-suggest-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+
+.rb-suggest-result-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.rb-suggest-thumbnail {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border-radius: var(--radius-s);
+  flex-shrink: 0;
+  background: var(--background-secondary);
+}
+
+.rb-suggest-text-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.rb-suggest-result-link {
+  color: var(--link-color);
+  text-decoration: none;
+  font-weight: var(--link-weight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-suggest-result-link:hover {
+  color: var(--text-accent);
+  text-decoration: underline;
+}
+
+.rb-suggest-info-line {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.rb-suggest-info-line::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
+}
+
+/* Compact select used inside filter/rule rows (not full-width like rb-modal-select). */
+.rb-select {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  padding: 0.3rem 1.8rem 0.3rem 0.5rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+  transition: border-color 0.1s;
+}
+
+.rb-select:focus {
+  border-color: var(--interactive-accent);
+}
+
+/* ── Strategy Editor ─────────────────────────────────────────────────────────── */
+
+.rb-strategy-editor-modal .rb-rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2-2);
+  margin-bottom: var(--size-2-2);
+}
+
+.rb-strategy-editor-modal .rb-rule-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-2);
+  flex-wrap: wrap;
+}
+
+.rb-strategy-editor-modal .rb-rule-field-input {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.rb-field-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 8rem;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.1s;
+}
+
+.rb-field-picker-btn:hover,
+.rb-field-picker-btn:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.rb-field-picker-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.rb-field-picker-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.rb-field-picker-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-field-picker-chevron {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.rb-field-picker-chevron svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.rb-strategy-editor-modal .rb-filter-value-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-1);
+  flex: 1;
+}
+
+.rb-filter-between-input {
+  flex: 1;
+  min-width: 4rem;
+}
+
+.rb-filter-between-sep,
+.rb-filter-days-label {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.rb-filter-days-input {
+  width: 5rem;
+}
+
+.rb-add-rule-btn {
+  align-self: flex-start;
+  padding: 0.15rem 0.55rem;
+  background: transparent;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.rb-add-rule-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+  border-style: solid;
+}
+
+.rb-rule-prefer-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-1);
+  white-space: nowrap;
+  flex: 1;
+  min-width: 10rem;
+}
+
+/* Drag handle shown at the left of each scoring rule row */
+.rb-rule-drag-handle {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.rb-rule-drag-handle:active {
+  cursor: grabbing;
+}
+
+.rb-rule-drag-handle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-rule-row--draggable.rb-dragging {
+  opacity: 0.4;
+}
+
+.rb-rule-row--draggable.rb-drag-over {
+  outline: 2px solid var(--interactive-accent);
+  border-radius: var(--radius-s);
+}
+
+.rb-rule-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  flex-shrink: 0;
+}
+
+.rb-rule-delete-btn svg,
+.rb-rule-delete-btn span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-rule-delete-btn:hover {
+  color: var(--text-error);
+  background: var(--background-modifier-hover);
+}
+
+.rb-rule-label {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+/* ── Strategy management in settings ────────────────────────────────────────── */
+
+.rb-modes-setting.setting-item {
+  display: block;
+}
+
+.rb-strategies-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+.rb-strategy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--background-primary);
+  transition: background 0.1s;
+}
+
+.rb-strategy-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.rb-modes-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.5rem 0.25rem 0.25rem;
+}
+
+.rb-modes-footer button {
+  font-size: var(--font-ui-small);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.rb-modes-footer button:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.rb-strategy-name {
+  flex: 1;
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+.rb-strategy-meta {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.rb-strategy-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  flex-shrink: 0;
+}
+
+.rb-strategy-action-btn svg,
+.rb-strategy-action-btn span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-strategy-action-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.rb-strategy-action-btn--delete:hover {
+  color: var(--text-error);
+  background: color-mix(in srgb, var(--text-error) 12%, transparent);
 }
