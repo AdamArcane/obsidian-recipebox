@@ -93,7 +93,7 @@ export class RecipeView extends TextFileView {
 				menu.addItem(item =>
 					item.setTitle("Cook history")
 						.setIcon("clock")
-						.onClick(() => new CookHistoryModal(this.app, file, settings, this.deps.editAsMarkdown).open())
+						.onClick(() => new CookHistoryModal(this.app, file, settings).open())
 				);
 			}
 
@@ -183,7 +183,7 @@ export class RecipeView extends TextFileView {
 			await this.renderDesktop(
 				wrap, fm, settings, multiplier, servings, inPlan,
 				before, ingredientGroups, instructionSplit,
-				groceryItems,
+				groceryItems, meta.cookedCount,
 			);
 		}
 	}
@@ -199,6 +199,7 @@ export class RecipeView extends TextFileView {
 		ingredientGroups: IngredientGroup[],
 		instructionSplit: ReturnType<typeof splitBodyAroundInstructions>,
 		groceryItems: GroceryItem[],
+		cookedCount: number,
 	): Promise<void> {
 		const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === this.file!.path);
 
@@ -271,7 +272,8 @@ export class RecipeView extends TextFileView {
 				rightCol, cardsContainer,
 				trailingSections,
 				this.app, this, this.file!,
-				settings, this.deps.editAsMarkdown,
+				settings,
+				cookedCount,
 			);
 		}
 	}

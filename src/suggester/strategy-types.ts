@@ -3,7 +3,7 @@
  * the mode container that holds filters + rules together.
  * Lives in the suggester module to keep core types.ts free of discovery imports.
  */
-import type { FieldFilter } from "../types";
+
 
 /**
  * Direction for a scoring rule.
@@ -20,6 +20,20 @@ export interface ScoringRule {
 	/** Frontmatter key or "#tagname" pseudo-field to score by. */
 	field: string;
 	direction: ScoringDirection;
+}
+
+/**
+ * A single filter expression. Value shape depends on operator:
+ * - "between": [lo, hi] pair
+ * - "one-of": string[]
+ * - "within-last" / "not-within-last": number (days)
+ * - boolean/tag operators: value unused
+ * - all others: scalar matching the field type
+ */
+export interface FieldFilter {
+	field: string;    // frontmatter key, or "#tagname" for tag pseudo-fields
+	operator: string; // one of the operator ids from filter-types.ts OPERATORS
+	value: unknown;   // shape depends on operator
 }
 
 /**

@@ -5,7 +5,7 @@
 
 // FieldFilter lives in types.ts so that strategy-types.ts can import it without
 // creating a transitive back-edge from discovery-cache.ts into this directory.
-import type { FieldFilter } from "../types";
+import type { FieldFilter } from "../suggester/strategy-types";
 export type { FieldFilter };
 
 /** Inferred data type for a discovered frontmatter field. */

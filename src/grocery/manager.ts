@@ -11,9 +11,9 @@ import { ContributionMap, GroceryContributionSource, GroceryItem, GroceryItemEnt
 import { writeNote } from "../utils/vault-notes";
 import { rebuildGroceryItems } from "./grocery-rebuild";
 import { isGroupCollapsed, setGroupCollapsed, autoCollapseGroups } from "./group-collapse";
-import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addLeftoversEntry, setMealPlanEntryMealType, clearMealPlan } from "./meal-plan-actions";
+import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addLeftoversEntry, setMealPlanEntryMealType, clearMealPlan } from "../meal-plan/meal-plan-actions";
 import { addGroceryItem, updateGroceryItem, removeGroceryItem, removeFromGroceryByKey } from "./grocery-item-actions";
-import { syncMealPlanNote, GroceryManagerSink } from "./meal-plan-note-sync";
+import { syncMealPlanNote, GroceryManagerSink } from "../meal-plan/meal-plan-note-sync";
 import { toggleGroceryNoteItemChecked, resetGroceryNoteChecks } from "./grocery-note/read";
 
 export { GroceryManagerSink };

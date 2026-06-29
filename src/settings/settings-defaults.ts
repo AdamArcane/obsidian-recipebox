@@ -57,9 +57,9 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	stripBodyTitle: true,
 	stripHeroImage: true,
 
-	cookHistoryEnabled: false,
+	cookHistoryEnabled: true,
 	cookHistoryHeading: "Cook History",
-	cookHistoryStorage: "note",
+	cookHistoryStorage: "both",
 	cookHistoryFrontmatterProperty: "cookHistory",
 
 	trackLastMade: true,

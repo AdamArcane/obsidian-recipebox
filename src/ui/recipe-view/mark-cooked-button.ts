@@ -7,7 +7,7 @@ import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { localDateISO } from "../../utils/date";
-import { appendCookHistoryEntry } from "../../grocery/cook-history";
+import { addCookHistoryEntry } from "../../recipe-history/cook-history";
 
 async function stampCooked(app: App, file: TFile, settings: RecipeBoxSettings, date: string): Promise<void> {
 	await app.fileManager.processFrontMatter(file, (fm) => {
@@ -45,9 +45,15 @@ export function renderMarkCookedButton(
 	btn.addEventListener("click", () => {
 		if (needsModal) {
 			deps.openMarkCookedModal(file, (date, notes, image) => {
-				void stampCooked(app, file, settings, date);
 				if (settings.cookHistoryEnabled) {
-					void appendCookHistoryEntry(app, file, settings, date, notes, image);
+					// addCookHistoryEntry derives lastMade/cookedCount from the full
+					// entry list it writes, so stampCooked must not also touch those
+					// fields here -- both would race on the same processFrontMatter
+					// keys and could leave an incorrect count depending on which
+					// write lands last.
+					void addCookHistoryEntry(app, file, settings, date, notes, image);
+				} else {
+					void stampCooked(app, file, settings, date);
 				}
 			});
 		} else {

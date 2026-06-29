@@ -314,10 +314,7 @@ function renderMobileCookHistoryRow(
 	}
 
 	row.addEventListener("click", () => {
-		new CookHistoryModal(app, file, settings, (path) => {
-			const leaf = app.workspace.getLeaf(false);
-			if (leaf) void leaf.setViewState({ type: "markdown", state: { file: path }, active: true });
-		}).open();
+		new CookHistoryModal(app, file, settings).open();
 	});
 }
 

@@ -42,7 +42,7 @@ export function renderSectionSidebar(
 	component: Component,
 	recipeFile: TFile,
 	settings: RecipeBoxSettings,
-	editAsMarkdown: (path: string) => void,
+	cookedCount: number,
 ): void {
 	const hasCookHistory = settings.cookHistoryEnabled;
 	if (sections.length === 0 && !hasCookHistory) return;
@@ -73,8 +73,11 @@ export function renderSectionSidebar(
 		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon" });
 		setIcon(iconSpan, "history");
 		btn.createSpan({ cls: "rb-sidebar-btn-label", text: "Cook history" });
+		if (cookedCount > 0) {
+			btn.createSpan({ cls: "rb-sidebar-btn-badge", text: String(cookedCount) });
+		}
 		btn.addEventListener("click", () => {
-			new CookHistoryModal(app, recipeFile, settings, editAsMarkdown).open();
+			new CookHistoryModal(app, recipeFile, settings).open();
 		});
 	}
 }

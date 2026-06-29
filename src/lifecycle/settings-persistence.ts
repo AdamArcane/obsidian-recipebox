@@ -13,8 +13,7 @@ import {
 	MealPlanEntry,
 	GroceryItemEntry,
 } from "../types";
-import type { SuggesterMode, ScoringRule } from "../suggester/strategy-types";
-import type { FieldFilter } from "../types";
+import type { SuggesterMode, FieldFilter, ScoringRule } from "../suggester/strategy-types";
 import { BUILTIN_MODES, BUILTIN_MODE_IDS } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
 import {

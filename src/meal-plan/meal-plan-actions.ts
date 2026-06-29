@@ -6,9 +6,9 @@ import { App, Notice } from "obsidian";
 import { ContributionMap, GroceryContributionSource, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { generateEntryId, localDateISO } from "../utils/date";
-import { addToGroceryNote, removeFromGroceryNote } from "./grocery-note/write";
+import { addToGroceryNote, removeFromGroceryNote } from "../grocery/grocery-note/write";
 import { insertMealPlanEntry, removeMealPlanEntry } from "./meal-plan-note/write";
-import { recordContributions, unrecordContributions, severScheduleLinks } from "./contribution-history";
+import { recordContributions, unrecordContributions, severScheduleLinks } from "../grocery/contribution-history";
 
 function resolveRecipeName(app: App, filePath: string): string {
 	return app.vault.getFileByPath(filePath)?.basename ?? filePath.split("/").pop()?.replace(/\.md$/, "") ?? filePath;

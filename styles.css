@@ -1167,6 +1167,18 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+}
+
+.rb-sidebar-btn-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.2em 0.5em;
+  border-radius: 999px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
 }
 
 /* ── Extra section cards (trailing content, collapsed by default) ─────────── */
@@ -1252,6 +1264,23 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-bottom: 0.75rem;
 }
 
+.rb-ch-entry--odd {
+  background: var(--background-secondary);
+}
+
+/* Text column and photo thumbnail side by side; photo pinned to the right edge. */
+.rb-ch-entry-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.rb-ch-entry-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .rb-ch-entry-date {
   font-weight: 600;
   color: var(--text-muted);
@@ -1259,15 +1288,67 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-bottom: 0.25rem;
 }
 
-.rb-ch-entry-body {
-  font-size: var(--font-ui-medium);
+.rb-ch-entry-photo {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
-.rb-ch-entry-body img {
-  max-width: 200px;
-  border-radius: var(--radius-m);
+.rb-ch-entry-photo img {
   display: block;
-  margin-top: 0.4rem;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--background-modifier-border);
+  cursor: zoom-in;
+}
+
+.rb-ch-entry-note {
+  color: var(--text-normal);
+  font-size: var(--font-ui-medium);
+  line-height: 1.4;
+  margin-top: 0.15rem;
+  white-space: pre-wrap;
+}
+
+.rb-ch-entry-actions {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.rb-ch-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.rb-ch-icon-btn svg,
+.rb-ch-icon-btn span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-ch-icon-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.rb-ch-icon-btn-danger:hover {
+  color: var(--color-red);
+  border-color: color-mix(in srgb, var(--color-red) 40%, transparent);
+}
+
+.rb-ch-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
 }
 
 .rb-ch-fm-section {

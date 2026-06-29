@@ -12,8 +12,8 @@ import { generateEntryId } from "../utils/date";
 import { localDateISO } from "../utils/date";
 import { readNoteOrEmpty } from "../utils/vault-notes";
 import { parseMealPlanNote } from "./meal-plan-note/parse";
-import { addToGroceryNote, removeFromGroceryNote } from "./grocery-note/write";
-import { recordContributions } from "./contribution-history";
+import { addToGroceryNote, removeFromGroceryNote } from "../grocery/grocery-note/write";
+import { recordContributions } from "../grocery/contribution-history";
 
 export interface GroceryManagerSink {
 	getSettings(): RecipeBoxSettings;

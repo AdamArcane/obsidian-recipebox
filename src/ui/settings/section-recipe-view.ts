@@ -91,6 +91,17 @@ export function renderSectionRecipeView(
 					await save();
 				})
 			);
+
+		new Setting(container)
+			.setName("Cross off while cooking")
+			.setDesc("Clicking an ingredient or instruction step marks it as done for the current session.")
+			.addToggle((t) =>
+				t.setValue(settings.crossOffWhileCooking).onChange(async (v) => {
+					settings.crossOffWhileCooking = v;
+					await save();
+				})
+			);
+
 	}
 
 	// ── Inline badge list ────────────────────────────────────────────────────
