@@ -19,8 +19,9 @@ export interface GroceryViewDeps {
 	addGroceryItem: (item: Omit<GroceryItemEntry, "id">) => Promise<void>;
 	updateGroceryItem: (id: string, updates: Partial<Omit<GroceryItemEntry, "id">>) => Promise<void>;
 	removeGroceryItem: (id: string) => Promise<void>;
-	resetChecks: () => Promise<void>;
-	clearAll: () => Promise<void>;
+	removeFromGroceryByKey: (key: string) => Promise<void>;
+	setAllChecked: (checked: boolean) => Promise<void>;
+	clearGroceryOnly: () => Promise<void>;
 	subscribeToChanges: (cb: () => void) => () => void;
 	openFile: (path: string, newTab: boolean) => void;
 	openOrCreateNote: (path: string) => Promise<void>;

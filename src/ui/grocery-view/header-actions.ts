@@ -1,8 +1,9 @@
 /**
- * Renders the action bar at the top of the grocery view — sync, grouping,
- * export, reset, add-item, and clear buttons.
+ * Renders the action toolbar at the top of the grocery view.
+ * Toolbar order: group-by dropdown — export — clear grocery list.
+ * "Add item" and "check all / uncheck all" live above the list, not here.
  */
-import { Menu, Notice, setIcon } from "obsidian";
+import { Notice, setIcon } from "obsidian";
 import { GroupingMode } from "../../types";
 import { GroceryViewDeps } from "./grocery-view-deps";
 import { ConfirmModal } from "../modals/confirm-modal";
@@ -23,59 +24,34 @@ export function renderHeaderActions(
 ): void {
 	const bar = container.createDiv({ cls: "rb-gv-header" });
 
-	const syncBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Sync from meal plan note" } });
-	setIcon(syncBtn, "refresh-cw");
-	syncBtn.addEventListener("click", () => {
-		void deps.syncFromMealPlanNote().then(() => {
-			onRefresh();
-			new Notice("Grocery list synced from meal plan.");
-		});
-	});
-
-	const groupBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Change grouping" } });
-	setIcon(groupBtn, "layers");
-	groupBtn.addEventListener("click", (e) => {
-		const menu = new Menu();
-		const currentMode = deps.getSettings().groupingMode;
-		for (const [mode, label] of Object.entries(GROUPING_LABELS) as [GroupingMode, string][]) {
-			menu.addItem((item) => {
-				item.setTitle(label).setChecked(currentMode === mode);
-				item.onClick(() => {
-					deps.getSettings().groupingMode = mode;
-					void deps.saveSettings().then(() => onRefresh());
-				});
-			});
-		}
-		const rect = groupBtn.getBoundingClientRect();
-		menu.showAtPosition({ x: e.clientX || rect.left, y: e.clientY || rect.bottom });
+	// Labeled dropdown makes the current grouping visible without requiring a click,
+	// replacing the old icon-only button that opened a hidden menu.
+	const groupSelect = bar.createEl("select", { cls: "rb-gv-group-select" });
+	for (const [mode, label] of Object.entries(GROUPING_LABELS) as [GroupingMode, string][]) {
+		const opt = groupSelect.createEl("option", { value: mode, text: label });
+		if (deps.getSettings().groupingMode === mode) opt.selected = true;
+	}
+	groupSelect.addEventListener("change", () => {
+		deps.getSettings().groupingMode = groupSelect.value as GroupingMode;
+		void deps.saveSettings().then(() => onRefresh());
 	});
 
 	const exportBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Export grocery list" } });
 	setIcon(exportBtn, "share");
 	exportBtn.addEventListener("click", () => deps.openExportModal());
 
-	const resetBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Reset all checks" } });
-	setIcon(resetBtn, "rotate-ccw");
-	resetBtn.addEventListener("click", () => {
-		void deps.resetChecks().then(() => new Notice("All checks cleared."));
-	});
-
-	const addBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Add grocery item" } });
-	setIcon(addBtn, "plus");
-	addBtn.addEventListener("click", () => deps.openAddGroceryItemModal());
-
-	const clearBtn = bar.createDiv({ cls: "rb-gv-header-btn rb-gv-header-btn--danger", attr: { "aria-label": "Clear all items" } });
+	const clearBtn = bar.createDiv({ cls: "rb-gv-header-btn rb-gv-header-btn--danger", attr: { "aria-label": "Clear grocery list" } });
 	setIcon(clearBtn, "trash-2");
 	clearBtn.addEventListener("click", () => {
 		new ConfirmModal(
 			app,
 			"Clear grocery list",
-			"This will clear all items from both the grocery note and the meal plan note — not just the in-memory list. This cannot be undone.",
-			"Clear all",
+			"This will remove all items from the grocery note. The meal plan is not affected.",
+			"Clear grocery list",
 			{
 				destructive: true,
 				onConfirm: () => {
-					void deps.clearAll().then(() => new Notice("Grocery list cleared."));
+					void deps.clearGroceryOnly().then(() => new Notice("Grocery list cleared."));
 				},
 			},
 		).open();

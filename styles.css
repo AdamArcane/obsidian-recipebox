@@ -3258,6 +3258,83 @@ body.is-mobile .rb-duration-btn {
   color: var(--color-red);
 }
 
+.rb-gv-group-select {
+  width: auto;
+  font-size: var(--font-ui-small);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.25rem;
+  border-radius: var(--radius-s);
+  appearance: auto;
+}
+
+.rb-gv-group-select:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Force readable text in the native dropdown list — Electron/Chromium renders
+   option elements with system colors that ignore the dark theme otherwise. */
+.rb-gv-group-select option {
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
+}
+
+/* ── Above-list row (check-all toggle + add item) ────────────────────────── */
+
+.rb-gv-above-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.rb-gv-above-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rb-gv-above-list button.rb-gv-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--font-ui-small);
+  color: var(--link-color);
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 0.1s;
+}
+
+.rb-gv-above-list button.rb-gv-link-btn:hover {
+  color: var(--link-color-hover);
+  text-decoration: underline;
+}
+
+.rb-gv-link-btn-icon {
+  display: flex;
+  align-items: center;
+}
+
+.rb-gv-link-btn-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.rb-gv-check-count {
+  font-size: var(--font-ui-small);
+  color: var(--text-faint);
+}
+
 /* ── Meal plan carousel ──────────────────────────────────────────────────── */
 
 .rb-gv-carousel-section {
@@ -3719,34 +3796,41 @@ body.is-mobile .rb-gv-group-header {
 .rb-mpv-top-bar {
   display: flex;
   justify-content: flex-end;
+  gap: 0.4rem;
   margin-bottom: 0.5rem;
 }
 
+.rb-mpv-add-recipe-btn,
 .rb-mpv-clear-btn {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: none;
-  border: 1px solid var(--background-modifier-border);
+  background: transparent;
+  border: none;
   border-radius: var(--radius-s);
   color: var(--text-muted);
   cursor: pointer;
   font-size: var(--font-ui-small);
-  padding: 0.25rem 0.65rem;
-  transition: border-color 120ms, color 120ms, background 120ms;
+  padding: 0.3rem 0.6rem;
+  transition: background 120ms, color 120ms;
+}
+
+.rb-mpv-add-recipe-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
 }
 
 .rb-mpv-clear-btn:hover {
   background: var(--background-modifier-error);
-  /* border-color: var(--text-error); */
-  /* color: var(--text-error); */
 }
 
+.rb-mpv-add-recipe-btn-icon,
 .rb-mpv-clear-btn-icon {
   display: flex;
   align-items: center;
 }
 
+.rb-mpv-add-recipe-btn-icon svg,
 .rb-mpv-clear-btn-icon svg {
   width: 0.85rem;
   height: 0.85rem;

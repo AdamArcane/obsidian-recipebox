@@ -2,7 +2,7 @@
  * The grocery list view — an Obsidian ItemView that renders grouped items,
  * the meal-plan carousel, and the summary bar, re-rendering on every "change" event.
  */
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, setIcon, WorkspaceLeaf } from "obsidian";
 import { GroceryViewDeps } from "./grocery-view-deps";
 import { renderHeaderActions } from "./header-actions";
 import { renderSummary } from "./summary";
@@ -65,7 +65,7 @@ export class GroceryView extends ItemView {
 		const mealPlan = this.deps.getMealPlan();
 		const mode = this.deps.getSettings().groupingMode;
 
-		renderSummary(content, items, mealPlan, this.app, this.deps);
+		renderSummary(content, mealPlan, this.app, this.deps);
 
 		if (items.length === 0) {
 			const empty = content.createDiv({ cls: "rb-gv-empty" });
@@ -76,6 +76,25 @@ export class GroceryView extends ItemView {
 			});
 			return;
 		}
+
+		const aboveList = content.createDiv({ cls: "rb-gv-above-list" });
+		const aboveLeft = aboveList.createDiv({ cls: "rb-gv-above-left" });
+		const allChecked = items.every((i) => i.checked);
+		const checkedCount = items.filter((i) => i.checked).length;
+
+		const checkToggle = aboveLeft.createEl("button", { cls: "rb-gv-link-btn" });
+		setIcon(checkToggle.createSpan({ cls: "rb-gv-link-btn-icon" }), allChecked ? "square" : "square-check");
+		checkToggle.createSpan({ text: allChecked ? "Uncheck all" : "Check all" });
+		checkToggle.addEventListener("click", () => {
+			void this.deps.setAllChecked(!allChecked);
+		});
+
+		aboveLeft.createSpan({ cls: "rb-gv-check-count", text: `${checkedCount}/${items.length}` });
+
+		const addItemBtn = aboveList.createEl("button", { cls: "rb-gv-link-btn" });
+		setIcon(addItemBtn.createSpan({ cls: "rb-gv-link-btn-icon" }), "plus");
+		addItemBtn.createSpan({ text: "Add item" });
+		addItemBtn.addEventListener("click", () => this.deps.openAddGroceryItemModal());
 
 		const groups = buildDisplayGroups(items, mode);
 		const listEl = content.createDiv({ cls: "rb-gv-list" });

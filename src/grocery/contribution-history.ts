@@ -21,6 +21,10 @@ export function recordContributions(
 	const history = settings.state.groceryContributions;
 	for (const [key, contrib] of Object.entries(contributions)) {
 		if (!history[key]) history[key] = [];
+		// Guard against double-recording from the same source (e.g. addToMealPlan then
+		// addToGroceryOnly both called for the same recipe). sourcesMatch compares recipe
+		// sources by path so this catches all combinations regardless of day/mealType.
+		if (history[key].some(r => sourcesMatch(r.source, source))) continue;
 		history[key].push({ source, quantity: contrib.quantity });
 	}
 }

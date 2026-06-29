@@ -31,8 +31,9 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
 				updateGroceryItem: (id, updates) => plugin.manager.updateGroceryItem(id, updates),
 				removeGroceryItem: (id) => plugin.manager.removeGroceryItem(id),
-				resetChecks: () => plugin.manager.resetChecks(),
-				clearAll: async () => { await plugin.manager.clearAll(); },
+				removeFromGroceryByKey: (key) => plugin.manager.removeFromGroceryByKey(key),
+				setAllChecked: (checked) => plugin.manager.setAllChecked(checked),
+				clearGroceryOnly: () => plugin.manager.clearGroceryOnly(),
 				subscribeToChanges: (cb) => {
 					plugin.manager.on("change", cb);
 					return () => plugin.manager.off("change", cb);
@@ -98,9 +99,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				},
 				openAddToMealPlanModal: (file, prefill) => {
 					new AddToMealPlanModal(
-						plugin.app,
-						file,
-						plugin.settings,
+						plugin.app, file, plugin.settings,
 						(day, meal, contributions) => {
 							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {});
 						},

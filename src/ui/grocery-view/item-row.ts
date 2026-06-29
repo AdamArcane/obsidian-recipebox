@@ -78,15 +78,20 @@ export function renderItemRow(
 	}
 
 	const entry = findMatchingEntry(item, deps.getGroceryItemEntries());
-	if (entry) {
-		const removeBtn = row.createDiv({ cls: "rb-gv-item-remove" });
-		setIcon(removeBtn, "x");
-		removeBtn.setAttribute("aria-label", "Remove item");
-		removeBtn.addEventListener("click", (e) => {
-			e.stopPropagation();
-			void deps.removeGroceryItem(entry.id);
-		});
 
+	const removeBtn = row.createDiv({ cls: "rb-gv-item-remove" });
+	setIcon(removeBtn, "x");
+	removeBtn.setAttribute("aria-label", "Remove item");
+	removeBtn.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (entry) {
+			void deps.removeGroceryItem(entry.id);
+		} else {
+			void deps.removeFromGroceryByKey(item.key);
+		}
+	});
+
+	if (entry) {
 		const detach = attachLongPress(row, (pos) => {
 			openGroceryItemContextMenu(pos, entry, deps);
 		});

@@ -6,7 +6,7 @@
  * Extends Obsidian's Events so UI components can subscribe to the "change" event
  * without needing a direct reference to any view.
  */
-import { App, Events, Notice } from "obsidian";
+import { App, Events } from "obsidian";
 import { ContributionMap, GroceryContributionSource, GroceryItem, GroceryItemEntry, MealPlanEntry } from "../types";
 import { writeNote } from "../utils/vault-notes";
 import { rebuildGroceryItems } from "./grocery-rebuild";
@@ -14,7 +14,7 @@ import { isGroupCollapsed, setGroupCollapsed, autoCollapseGroups } from "./group
 import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addLeftoversEntry, setMealPlanEntryMealType, clearMealPlan } from "../meal-plan/meal-plan-actions";
 import { addGroceryItem, updateGroceryItem, removeGroceryItem, removeFromGroceryByKey } from "./grocery-item-actions";
 import { syncMealPlanNote, GroceryManagerSink } from "../meal-plan/meal-plan-note-sync";
-import { toggleGroceryNoteItemChecked, resetGroceryNoteChecks } from "./grocery-note/read";
+import { toggleGroceryNoteItemChecked, resetGroceryNoteChecks, setAllGroceryNoteChecks } from "./grocery-note/read";
 
 export { GroceryManagerSink };
 
@@ -153,26 +153,26 @@ export class GroceryManager extends Events {
 
 	// ── Bulk operations ───────────────────────────────────────────────────────
 
-	async clearAll(): Promise<{ mealPlanCount: number; groceryItemCount: number }> {
+	async setAllChecked(checked: boolean): Promise<void> {
 		const s = this.sink.getSettings();
-		const mealPlanCount = s.state.mealPlan.length;
-		const groceryItemCount = s.state.groceryItems.length;
-
-		s.state.mealPlan = [];
-		s.state.groceryItems = [];
+		await setAllGroceryNoteChecks(this.app, checked, s);
+		for (const item of this.items) item.checked = checked;
+		// Clear collapsed sections so groups don't stay hidden after unchecking.
 		s.state.collapsedSections = {};
 		await this.sink.save();
+		this.trigger("change");
+	}
 
-		await writeNote(this.app, s.mealPlanPath, "# Meal Plan\n");
+	/** Clears the grocery list (items, contributions, note) without touching the meal plan. */
+	async clearGroceryOnly(): Promise<void> {
+		const s = this.sink.getSettings();
+		s.state.groceryItems = [];
+		s.state.groceryContributions = {};
+		s.state.collapsedSections = {};
+		await this.sink.save();
 		await writeNote(this.app, s.groceryListPath, "# Grocery List\n");
-
 		this.items = [];
 		this.trigger("change");
-
-		const meals = mealPlanCount === 1 ? "meal" : "meals";
-		const items = groceryItemCount === 1 ? "item" : "items";
-		new Notice(`Cleared ${mealPlanCount} ${meals} and ${groceryItemCount} grocery ${items}.`);
-		return { mealPlanCount, groceryItemCount };
 	}
 
 	async resetChecks(): Promise<void> {

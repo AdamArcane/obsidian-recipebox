@@ -61,3 +61,13 @@ export async function resetGroceryNoteChecks(app: App, settings: RecipeBoxSettin
 	if (!text) return;
 	await writeNote(app, path, text.replace(/^- \[x\]/gim, "- [ ]"));
 }
+
+/** Reads the grocery note once and rewrites all checkboxes to `checked` in a single write. */
+export async function setAllGroceryNoteChecks(app: App, checked: boolean, settings: RecipeBoxSettings): Promise<void> {
+	const path = settings.groceryListPath;
+	const text = await readNoteOrEmpty(app, path);
+	if (!text) return;
+	const from = checked ? /^- \[ \]/gim : /^- \[x\]/gim;
+	const to = checked ? "- [x]" : "- [ ]";
+	await writeNote(app, path, text.replace(from, to));
+}
