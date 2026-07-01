@@ -2,6 +2,7 @@
  * Shows a small floating popover for selecting or entering a meal type
  * (Breakfast, Lunch, Dinner, Snack, or a custom value) after a recipe is dropped.
  */
+import { Platform } from "obsidian";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 
 const MEAL_CHIPS = ["Breakfast", "Lunch", "Dinner", "Snack"];
@@ -59,7 +60,9 @@ export function showMealTypePopover(
 	});
 
 	positionPopover(popover, anchor);
-	window.requestAnimationFrame(() => input.focus());
+	// Skip auto-focus on mobile — it triggers the onscreen keyboard, which
+	// shifts the layout and disorients the user right after a drag drop.
+	if (!Platform.isMobile) window.requestAnimationFrame(() => input.focus());
 
 	function outsideHandler(e: PointerEvent): void {
 		if (!popover.contains(e.target as Node)) dismiss();

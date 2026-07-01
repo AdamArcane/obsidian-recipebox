@@ -4,7 +4,7 @@
  * determines weight (first = highest influence). No weight number, no threshold.
  * Built-in modes show a "Reset to default" button that restores shipped defaults.
  */
-import { App, setIcon } from "obsidian";
+import { App, Platform, setIcon } from "obsidian";
 import type { SuggesterMode, ScoringRule, ScoringDirection } from "../../suggester/strategy-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
 import { FieldFilter, OPERATORS, FilterableType } from "../../discovery/filter-types";
@@ -237,7 +237,12 @@ export class ModeEditorModal extends BaseModal {
 		const section = bodyEl.createDiv({ cls: "rb-modal-section" });
 		const header = section.createDiv({ cls: "rb-modal-section-header" });
 		header.createEl("span", { cls: "rb-modal-section-heading", text: "Scoring rules" });
-		header.createEl("span", { cls: "rb-modal-section-hint", text: "Drag to reorder — top rule matters most" });
+		header.createEl("span", {
+			cls: "rb-modal-section-hint",
+			text: Platform.isMobile
+				? "Use arrows to reorder — top rule matters most"
+				: "Drag to reorder — top rule matters most",
+		});
 
 		const listEl = section.createDiv({ cls: "rb-rule-list" });
 		const renderAll = (): void => {
@@ -266,15 +271,16 @@ export class ModeEditorModal extends BaseModal {
 		renderAll: () => void,
 	): void {
 		const row = listEl.createDiv({ cls: "rb-rule-row rb-rule-row--draggable" });
-		row.setAttribute("draggable", "true");
 
 		const discovery = this.deps.getDiscovery();
 		const settings = this.deps.getSettings();
 		const fields = buildPickerFieldList(settings, discovery);
 
-		// Drag handle
-		const handle = row.createDiv({ cls: "rb-rule-drag-handle" });
-		setIcon(handle, "grip-vertical");
+		if (!Platform.isMobile) {
+			row.setAttribute("draggable", "true");
+			const handle = row.createDiv({ cls: "rb-rule-drag-handle" });
+			setIcon(handle, "grip-vertical");
+		}
 
 		const inferType = (): FilterableType | null => {
 			return fields.find(f => f.key === rule.field)?.type ?? null;
@@ -320,28 +326,53 @@ export class ModeEditorModal extends BaseModal {
 			renderAll();
 		});
 
-		// Drag-and-drop: stores the dragged rule's index, drops onto a target rule's position
-		row.addEventListener("dragstart", (e) => {
-			e.dataTransfer?.setData("text/plain", String(this.draft.rules.indexOf(rule)));
-			row.addClass("rb-dragging");
-		});
-		row.addEventListener("dragend", () => row.removeClass("rb-dragging"));
-		row.addEventListener("dragover", (e) => {
-			e.preventDefault();
-			row.addClass("rb-drag-over");
-		});
-		row.addEventListener("dragleave", () => row.removeClass("rb-drag-over"));
-		row.addEventListener("drop", (e) => {
-			e.preventDefault();
-			row.removeClass("rb-drag-over");
-			const fromIdx = parseInt(e.dataTransfer?.getData("text/plain") ?? "-1", 10);
-			const toIdx = this.draft.rules.indexOf(rule);
-			if (fromIdx >= 0 && fromIdx !== toIdx) {
-				const [moved] = this.draft.rules.splice(fromIdx, 1);
-				this.draft.rules.splice(toIdx, 0, moved);
-				renderAll();
-			}
-		});
+		if (Platform.isMobile) {
+			// ↑/↓ buttons replace drag on mobile — HTML5 drag-and-drop freezes the touch UI
+			const ruleIndex = () => this.draft.rules.indexOf(rule);
+			const up = row.createEl("button", { cls: "rb-rule-delete-btn" });
+			setIcon(up.createSpan(), "chevron-up");
+			up.addEventListener("click", () => {
+				const idx = ruleIndex();
+				if (idx > 0) {
+					[this.draft.rules[idx - 1], this.draft.rules[idx]] =
+						[this.draft.rules[idx], this.draft.rules[idx - 1]];
+					renderAll();
+				}
+			});
+			const dn = row.createEl("button", { cls: "rb-rule-delete-btn" });
+			setIcon(dn.createSpan(), "chevron-down");
+			dn.addEventListener("click", () => {
+				const idx = ruleIndex();
+				if (idx < this.draft.rules.length - 1) {
+					[this.draft.rules[idx], this.draft.rules[idx + 1]] =
+						[this.draft.rules[idx + 1], this.draft.rules[idx]];
+					renderAll();
+				}
+			});
+		} else {
+			// Desktop: HTML5 drag-and-drop reorder
+			row.addEventListener("dragstart", (e) => {
+				e.dataTransfer?.setData("text/plain", String(this.draft.rules.indexOf(rule)));
+				row.addClass("rb-dragging");
+			});
+			row.addEventListener("dragend", () => row.removeClass("rb-dragging"));
+			row.addEventListener("dragover", (e) => {
+				e.preventDefault();
+				row.addClass("rb-drag-over");
+			});
+			row.addEventListener("dragleave", () => row.removeClass("rb-drag-over"));
+			row.addEventListener("drop", (e) => {
+				e.preventDefault();
+				row.removeClass("rb-drag-over");
+				const fromIdx = parseInt(e.dataTransfer?.getData("text/plain") ?? "-1", 10);
+				const toIdx = this.draft.rules.indexOf(rule);
+				if (fromIdx >= 0 && fromIdx !== toIdx) {
+					const [moved] = this.draft.rules.splice(fromIdx, 1);
+					this.draft.rules.splice(toIdx, 0, moved);
+					renderAll();
+				}
+			});
+		}
 	}
 
 	renderFooter(footerEl: HTMLElement): void {

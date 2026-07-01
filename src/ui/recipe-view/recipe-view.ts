@@ -2,7 +2,7 @@
  * The recipe view — an Obsidian TextFileView that renders a recipe note as a
  * structured cooking card with ingredients, instructions, metadata, and timers.
  */
-import { EventRef, MarkdownRenderer, Menu, Platform, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
+import { EventRef, MarkdownRenderer, Menu, Notice, Platform, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { findOrOpenLeaf } from "../../utils/open-leaf";
 import { GroceryItem, IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -35,6 +35,11 @@ export class RecipeView extends TextFileView {
 	private unsubscribe: (() => void) | null = null;
 	private metaRef: EventRef | null = null;
 
+	// Cook mode / wake lock — view-local state, intentionally not persisted
+	private wakeLock: WakeLockSentinel | null = null;
+	private cookModeActive = false;
+	private cookModeActionEl: HTMLElement | null = null;
+
 	constructor(leaf: WorkspaceLeaf, deps: RecipeViewDeps) {
 		super(leaf);
 		this.deps = deps;
@@ -56,13 +61,30 @@ export class RecipeView extends TextFileView {
 	}
 
 	async onOpen(): Promise<void> {
+		// Cook mode sits left of the pencil so it's easy to reach while cooking.
+		// sun-dim = off (screen may sleep), sun = on (screen stays awake).
+		this.cookModeActionEl = this.addAction("sun-dim", "Cook mode: off", () => {
+			void this.toggleCookMode();
+		});
+
 		this.addAction("pencil", "Edit as Markdown", () => {
 			if (this.file) this.deps.editAsMarkdown(this.file.path);
 		});
+
+		// Re-request the wake lock if the user returns to the app while cook mode is still on.
+		// The OS releases the sentinel whenever the page is hidden, so we need to re-acquire it.
+		this.registerDomEvent(activeDocument, "visibilitychange", () => {
+			if (activeDocument.visibilityState === "visible" && this.cookModeActive && !this.wakeLock) {
+				void this.requestWakeLock();
+			}
+		});
+
 		this.unsubscribe = this.deps.subscribeToChanges(() => void this.render());
 	}
 
 	async onClose(): Promise<void> {
+		this.releaseWakeLock();
+		this.cookModeActive = false;
 		this.unsubscribe?.();
 		this.unsubscribe = null;
 	}
@@ -122,6 +144,48 @@ export class RecipeView extends TextFileView {
 			menu.addSeparator();
 		}
 		super.onPaneMenu(menu, source);
+	}
+
+	private async toggleCookMode(): Promise<void> {
+		this.cookModeActive = !this.cookModeActive;
+		if (this.cookModeActive) {
+			await this.requestWakeLock();
+			new Notice("Cook mode on · screen will stay awake");
+		} else {
+			this.releaseWakeLock();
+			new Notice("Cook mode off");
+		}
+		this.updateCookModeButton();
+	}
+
+	private async requestWakeLock(): Promise<void> {
+		if (!("wakeLock" in navigator)) {
+			new Notice("Screen wake lock is not supported on this device.");
+			return;
+		}
+		try {
+			this.wakeLock = await navigator.wakeLock.request("screen");
+			this.wakeLock.addEventListener("release", () => {
+				// OS released the lock (app backgrounded etc.) — update button but keep
+				// cookModeActive so we can re-acquire on visibility return.
+				this.updateCookModeButton();
+			});
+		} catch {
+			new Notice("Could not activate screen wake lock.");
+			this.cookModeActive = false;
+		}
+	}
+
+	private releaseWakeLock(): void {
+		void this.wakeLock?.release();
+		this.wakeLock = null;
+	}
+
+	private updateCookModeButton(): void {
+		if (!this.cookModeActionEl) return;
+		setIcon(this.cookModeActionEl, this.cookModeActive ? "sun" : "sun-dim");
+		this.cookModeActionEl.setAttribute("aria-label", this.cookModeActive ? "Cook mode: on" : "Cook mode: off");
+		this.cookModeActionEl.toggleClass("rb-cook-mode-active", this.cookModeActive);
 	}
 
 	private async render(): Promise<void> {

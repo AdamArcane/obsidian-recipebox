@@ -2,7 +2,7 @@
  * Settings section for library configuration — recipe folders, type property
  * name, and recipe type value used to identify recipe files.
  */
-import { App, Setting, TFolder } from "obsidian";
+import { App, setIcon, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";
 
@@ -15,51 +15,53 @@ export function renderSectionLibrary(
 ): void {
 	new Setting(container).setName("Recipe library").setHeading();
 
+	// The folder list is appended directly inside this card so it stays one visual unit.
 	const folderSetting = new Setting(container)
 		.setName("Recipe folders")
 		.setDesc("Folders the plugin scans for recipe notes. Leave empty to scan the entire vault.");
+	folderSetting.settingEl.addClass("rb-settings-folder-setting");
 
-	const folderList = folderSetting.settingEl.createDiv("rb-settings-folder-list");
+	const folderList = folderSetting.settingEl.createDiv({ cls: "rb-settings-folder-list" });
 
 	function renderFolderRows(): void {
 		folderList.empty();
 
 		settings.recipeFolders.forEach((folder, i) => {
-			const row = folderList.createDiv("rb-settings-folder-row");
+			const row = folderList.createDiv({ cls: "rb-settings-folder-row" });
 			row.createSpan({ cls: "rb-settings-folder-label", text: folder });
-			const del = row.createEl("button", { cls: "rb-settings-folder-delete", text: "×" });
+			const del = row.createEl("button", { cls: "rb-settings-folder-delete clickable-icon", attr: { title: "Remove" } });
+			setIcon(del, "trash-2");
 			del.addEventListener("click", () => {
 				settings.recipeFolders.splice(i, 1);
 				void save().then(() => renderFolderRows());
 			});
 		});
 
-		const addBtn = folderList.createEl("button", { cls: "rb-settings-folder-add", text: "+ add" });
-		addBtn.addEventListener("click", () => {
-			addBtn.remove();
-			const row = folderList.createDiv("rb-settings-folder-row rb-settings-folder-row--input");
-			const input = row.createEl("input", { type: "text", placeholder: "e.g. Recipes/" });
-			new FolderSuggest(app, input);
-			input.focus();
-
-			async function tryCommit(): Promise<void> {
-				const raw = input.value.trim().replace(/\/$/, "");
-				const lookupPath = raw === "" ? "/" : raw;
-				const node = lookupPath === "/"
-					? app.vault.getRoot()
-					: app.vault.getAbstractFileByPath(lookupPath);
-				if (!(node instanceof TFolder)) return;
-				const savePath = node.path === "" ? "/" : node.path;
-				if (!settings.recipeFolders.includes(savePath)) {
-					settings.recipeFolders.push(savePath);
-					await save();
-				}
-				renderFolderRows();
-			}
-
-			input.addEventListener("input", () => { void tryCommit(); });
-			input.addEventListener("keydown", (e) => { if (e.key === "Enter") void tryCommit(); });
+		// Add-folder row: text input wired to FolderSuggest; commits on valid folder pick or Enter.
+		const addRow = folderList.createDiv({ cls: "rb-settings-folder-add-row" });
+		const input = addRow.createEl("input", {
+			cls: "rb-settings-folder-input",
+			attr: { type: "text", placeholder: "Add a folder..." },
 		});
+		new FolderSuggest(app, input);
+
+		async function tryCommit(): Promise<void> {
+			const raw = input.value.trim().replace(/\/$/, "");
+			const lookupPath = raw === "" ? "/" : raw;
+			const node = lookupPath === "/"
+				? app.vault.getRoot()
+				: app.vault.getAbstractFileByPath(lookupPath);
+			if (!(node instanceof TFolder)) return;
+			const savePath = node.path === "" ? "/" : node.path;
+			if (!settings.recipeFolders.includes(savePath)) {
+				settings.recipeFolders.push(savePath);
+				await save();
+			}
+			renderFolderRows();
+		}
+
+		input.addEventListener("input", () => { void tryCommit(); });
+		input.addEventListener("keydown", (e) => { if (e.key === "Enter") void tryCommit(); });
 	}
 	renderFolderRows();
 

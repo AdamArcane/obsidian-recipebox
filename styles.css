@@ -1930,17 +1930,17 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   background: var(--background-modifier-border);
 }
 
-/* Sliding accent indicator — moves via --rb-tab-index CSS var set in JS */
+/* Sliding accent indicator — left and width are set in JS to match each tab's
+   actual measured dimensions, so it works with mixed-width tabs (text vs icon). */
 .rb-tab-bar::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: calc(100% / 3);
+  left: var(--rb-tab-indicator-left, 0px);
+  width: var(--rb-tab-indicator-width, 0px);
   height: 2px;
   background: var(--interactive-accent);
-  transform: translateX(calc(var(--rb-tab-index, 0) * 100%));
-  transition: transform 0.2s ease;
+  transition: left 0.2s ease, width 0.2s ease;
 }
 
 .rb-tab-btn {
@@ -1966,7 +1966,38 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-weight: 600;
 }
 
-/* Tab panel visibility is controlled by Obsidian's panel.toggle() — no CSS hide needed */
+/* Icon-only tab (cook history clock): compact width, no text label */
+.rb-tab-btn--icon {
+  flex: 0 0 auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  min-width: 0;
+}
+
+.rb-tab-btn--icon svg {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+}
+
+/* All panels share one grid cell so the wrapper height = the tallest panel.
+   Inactive panels are hidden via visibility so they still contribute to layout height. */
+.rb-tab-panels-wrapper {
+  display: grid;
+}
+
+.rb-tab-panel {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.rb-tab-panel.rb-tab-panel--active {
+  visibility: visible;
+  pointer-events: auto;
+  user-select: auto;
+}
 
 .rb-step-times {
   margin-bottom: 0.5rem;
@@ -4234,6 +4265,35 @@ body.is-mobile .rb-gv-group-header {
   opacity: 1;
 }
 
+/* Mobile: 2-column grid so day labels and drop zones are usable on ~390px screens */
+body.is-mobile .rb-mpv-days-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Mobile: no hover state on touch, so the remove button must always be visible */
+body.is-mobile .rb-mpv-card-remove {
+  opacity: 1;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Ghost card during touch drag */
+.rb-mpv-card--ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.85;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-m);
+  transform: scale(1.04);
+  transition: none;
+}
+
+/* Original card dims while its ghost is being dragged */
+.rb-mpv-card--dragging {
+  opacity: 0.35;
+}
+
 /* ── Settings notices ────────────────────────────────────────────────────── */
 
 .rb-settings-mobile-note {
@@ -4301,57 +4361,53 @@ body.is-mobile .rb-gv-group-header {
 
 /* ── Folder chips (Recipe library setting) ───────────────────────────────── */
 
-.rb-settings-folder-list {
-  display: flex;
+/* Allow the folder list to span the full width of its parent setting card */
+.rb-settings-folder-setting {
   flex-wrap: wrap;
+}
+
+.rb-settings-folder-list {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+/* Each selected folder: label takes all available space, trash pinned right */
+.rb-settings-folder-row {
+  display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding-top: 0.5rem;
-}
-
-.rb-settings-folder-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: var(--background-secondary);
+  padding: 0.3rem 0.4rem 0.3rem 0.6rem;
+  background: var(--background-modifier-form-field);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-s);
-  padding: 0.15rem 0.15rem 0.15rem 0.5rem;
+}
+
+.rb-settings-folder-label {
+  flex: 1;
   font-size: var(--font-ui-small);
-}
-
-.rb-settings-folder-row--input {
-  background: var(--background-primary);
-  padding: 0;
-  border: none;
-}
-
-.rb-settings-folder-row--input input {
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border-focus);
-  border-radius: var(--radius-s);
   color: var(--text-normal);
-  font-size: var(--font-ui-small);
-  padding: 0.15rem 0.5rem;
-  outline: none;
-  width: 14rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rb-settings-folder-delete {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.4rem;
+  height: 1.4rem;
   padding: 0;
   background: transparent;
   border: none;
   border-radius: var(--radius-s);
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 0.75rem;
-  line-height: 1;
-  flex-shrink: 0;
 }
 
 .rb-settings-folder-delete:hover {
@@ -4359,24 +4415,14 @@ body.is-mobile .rb-gv-group-header {
   color: var(--text-error);
 }
 
-.rb-settings-folder-add {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.55rem;
-  background: transparent;
-  border: 1px dashed var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-ui-small);
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
+/* Add-folder row: full-width input matching the row style */
+.rb-settings-folder-add-row {
+  display: flex;
 }
 
-.rb-settings-folder-add:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-  border-color: var(--background-modifier-border-hover);
-  border-style: solid;
+.rb-settings-folder-input {
+  width: 100%;
+  font-size: var(--font-ui-small);
 }
 
 /* ── Allergen tag chips ───────────────────────────────────────────────────── */

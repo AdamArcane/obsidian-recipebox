@@ -24,14 +24,22 @@ import { fmStr } from "./frontmatter-read-helpers";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { ALIASES } from "../../parser/recipe-meta-aliases";
-import { CookHistoryModal } from "../modals/cook-history-modal";
+import { renderCookHistoryList } from "../../recipe-history/cook-history-render";
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
 function activateTab(panels: HTMLElement[], tabs: HTMLElement[], tabBar: HTMLElement, index: number): void {
-	panels.forEach((p, i) => p.toggle(i === index));
+	// Use class-based visibility (not display:none) so all panels stay in the
+	// layout and the grid wrapper holds the height of the tallest panel.
+	panels.forEach((p, i) => p.toggleClass("rb-tab-panel--active", i === index));
 	tabs.forEach((t, i) => t.toggleClass("rb-tab-active", i === index));
-	tabBar.style.setProperty("--rb-tab-index", String(index));
+	// Measure the actual tab position so the underline works even when tabs have
+	// mixed widths (text tabs flex:1, icon tab flex:0).
+	const activeTab = tabs[index];
+	if (activeTab) {
+		tabBar.style.setProperty("--rb-tab-indicator-left", `${activeTab.offsetLeft}px`);
+		tabBar.style.setProperty("--rb-tab-indicator-width", `${activeTab.offsetWidth}px`);
+	}
 }
 
 function extractPlainText(markdown: string): string {
@@ -286,35 +294,72 @@ function renderMobileNutritionStrip(
 	}
 }
 
-// ── Info tab: cook history preview ───────────────────────────────────────────
+// ── Swipe gesture ─────────────────────────────────────────────────────────────
 
-function renderMobileCookHistoryRow(
+/**
+ * Attaches horizontal swipe detection to `container` so the user can swipe
+ * left/right to change tabs. Vertical scrolling within panels is not affected:
+ * we only lock and prevent default once the gesture is confirmed horizontal
+ * (dx > dy * 1.5 and at least 8px of movement).
+ */
+function attachSwipeGesture(
 	container: HTMLElement,
-	app: App,
-	file: TFile,
-	meta: RecipeMeta,
-	settings: RecipeBoxSettings,
+	component: Component,
+	panels: HTMLElement[],
+	tabs: HTMLElement[],
+	tabBar: HTMLElement,
 ): void {
-	if (!settings.cookHistoryEnabled) return;
+	let startX = 0;
+	let startY = 0;
+	let startTime = 0;
+	let locked: "horizontal" | "vertical" | null = null;
 
-	const row = container.createDiv({ cls: "rb-ch-preview-row" });
-	const iconEl = row.createSpan({ cls: "rb-ch-preview-icon" });
-	setIcon(iconEl, "clock");
+	const onStart = (e: TouchEvent): void => {
+		const t = e.touches[0];
+		startX = t.clientX;
+		startY = t.clientY;
+		startTime = Date.now();
+		locked = null;
+	};
 
-	const textEl = row.createSpan({ cls: "rb-ch-preview-text" });
-	if (meta.cookedCount === 0) {
-		textEl.textContent = "No cook history yet";
-		row.addClass("rb-ch-preview-empty");
-	} else {
-		const countText = meta.cookedCount === 1 ? "Cooked once" : `Cooked ${meta.cookedCount} times`;
-		const dateText = meta.lastMade ? ` · ${formatDateValue(meta.lastMade)}` : "";
-		textEl.textContent = countText + dateText;
-		const chevronEl = row.createSpan({ cls: "rb-ch-preview-chevron" });
-		setIcon(chevronEl, "chevron-right");
-	}
+	const onMove = (e: TouchEvent): void => {
+		if (locked === "vertical") return;
+		const t = e.touches[0];
+		const dx = Math.abs(t.clientX - startX);
+		const dy = Math.abs(t.clientY - startY);
+		if (locked === null && (dx > 8 || dy > 8)) {
+			locked = dx >= dy * 1.5 ? "horizontal" : "vertical";
+		}
+		if (locked === "horizontal") {
+			// Prevent vertical scroll and Obsidian's sidebar gesture while swiping between tabs
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	};
 
-	row.addEventListener("click", () => {
-		new CookHistoryModal(app, file, settings).open();
+	const onEnd = (e: TouchEvent): void => {
+		if (locked !== "horizontal") return;
+		const t = e.changedTouches[0];
+		const dx = t.clientX - startX;
+		if (Math.abs(dx) < 40 || Date.now() - startTime > 400) return;
+
+		const currentIdx = tabs.findIndex(tab => tab.hasClass("rb-tab-active"));
+		if (currentIdx < 0) return;
+		const nextIdx = dx < 0
+			? Math.min(currentIdx + 1, tabs.length - 1)
+			: Math.max(currentIdx - 1, 0);
+		if (nextIdx !== currentIdx) activateTab(panels, tabs, tabBar, nextIdx);
+	};
+
+	container.addEventListener("touchstart", onStart, { passive: true });
+	container.addEventListener("touchmove", onMove, { passive: false });
+	container.addEventListener("touchend", onEnd, { passive: true });
+
+	// Clean up when the view unloads so the listeners don't outlive the element
+	component.register(() => {
+		container.removeEventListener("touchstart", onStart);
+		container.removeEventListener("touchmove", onMove);
+		container.removeEventListener("touchend", onEnd);
 	});
 }
 
@@ -341,6 +386,7 @@ export async function renderMobileLayout(
 	let _panels: HTMLElement[] = [];
 	let _tabs: HTMLElement[] = [];
 	let _tabBar: HTMLElement = container; // forward-declared; replaced when tabs are built
+	let _panelsWrapper: HTMLElement | null = null;
 
 	// Description snippet
 	const descriptionText = extractPlainText(beforeContent);
@@ -350,7 +396,8 @@ export async function renderMobileLayout(
 		const moreLink = descWrap.createEl("a", { cls: "rb-mobile-desc-more", text: "More" });
 		moreLink.addEventListener("click", () => {
 			activateTab(_panels, _tabs, _tabBar, 2);
-			_panels[2]?.scrollIntoView({ behavior: "smooth", block: "start" });
+			// _panelsWrapper is set once tabs are built; scroll there so content is in view
+			_panelsWrapper?.scrollIntoView({ behavior: "smooth", block: "start" });
 		});
 		window.requestAnimationFrame(() => {
 			if (descWrap.scrollHeight <= descWrap.clientHeight + 2) moreLink.hide();
@@ -388,11 +435,42 @@ export async function renderMobileLayout(
 	const tabSteps = tabBar.createEl("button", { cls: "rb-tab-btn", text: "Steps" });
 	const tabInfo = tabBar.createEl("button", { cls: "rb-tab-btn", text: "Info" });
 
-	const panelIngr = container.createDiv({ cls: "rb-tab-panel" });
-	const panelSteps = container.createDiv({ cls: "rb-tab-panel" });
-	const panelInfo = container.createDiv({ cls: "rb-tab-panel" });
+	// All panels live inside this wrapper. display:grid with grid-area:1/1 makes them
+	// stack in the same cell so the wrapper height always equals the tallest panel.
+	// Swipe is also scoped here so it doesn't fire on the recipe header or action rows.
+	const panelsWrapper = container.createDiv({ cls: "rb-tab-panels-wrapper" });
+	_panelsWrapper = panelsWrapper;
+
+	const panelIngr = panelsWrapper.createDiv({ cls: "rb-tab-panel" });
+	const panelSteps = panelsWrapper.createDiv({ cls: "rb-tab-panel" });
+	const panelInfo = panelsWrapper.createDiv({ cls: "rb-tab-panel" });
 	_panels = [panelIngr, panelSteps, panelInfo];
 	_tabs = [tabIngr, tabSteps, tabInfo];
+
+	// 4th tab: cook history (icon-only to keep tab bar compact)
+	if (settings.cookHistoryEnabled) {
+		const tabHistory = tabBar.createEl("button", { cls: "rb-tab-btn rb-tab-btn--icon", attr: { "aria-label": "Cook history" } });
+		setIcon(tabHistory, "clock");
+		const panelHistory = panelsWrapper.createDiv({ cls: "rb-tab-panel" });
+		_panels.push(panelHistory);
+		_tabs.push(tabHistory);
+
+		let historyRendered = false;
+		function renderHistory(): void {
+			panelHistory.empty();
+			void renderCookHistoryList(panelHistory, app, file, settings, renderHistory);
+		}
+
+		const histIdx = _panels.length - 1;
+		tabHistory.addEventListener("click", () => {
+			activateTab(_panels, _tabs, tabBar, histIdx);
+			// Lazy-render on first open so inactive recipes don't read disk on load
+			if (!historyRendered) {
+				historyRendered = true;
+				renderHistory();
+			}
+		});
+	}
 
 	// Ingredients tab
 	await renderIngredientsSection(
@@ -405,8 +483,7 @@ export async function renderMobileLayout(
 	// Steps tab
 	await renderInstructionsSection(panelSteps, app, component, file.path, instructionGroups, settings);
 
-	// Info tab — cook history preview + nutrition + source URL + notes content
-	renderMobileCookHistoryRow(panelInfo, app, file, meta, settings);
+	// Info tab — nutrition + source URL + notes content
 	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
 
 	const sourceUrl = fmStr(fm, ["source", "url", "sourceUrl", "source_url"]);
@@ -426,8 +503,13 @@ export async function renderMobileLayout(
 		await MarkdownRenderer.render(app, afterContent, panelInfo, file.path, component);
 	}
 
+	// Wire click handlers for the first 3 tabs; the optional history tab wires its
+	// own handler above (it needs to trigger lazy rendering on first activation).
 	[tabIngr, tabSteps, tabInfo].forEach((tab, i) => {
 		tab.addEventListener("click", () => activateTab(_panels, _tabs, tabBar, i));
 	});
 	activateTab(_panels, _tabs, tabBar, 0);
+
+	// Scope swipe to the panels wrapper so it doesn't fire on the header/action rows above
+	attachSwipeGesture(panelsWrapper, component, _panels, _tabs, tabBar);
 }

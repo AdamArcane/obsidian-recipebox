@@ -2,7 +2,7 @@
  * Recipe view settings section. Owns view toggles, tag display,
  * rating property, and the inline header-badge list.
  */
-import { App, setIcon, Setting } from "obsidian";
+import { App, Platform, setIcon, Setting } from "obsidian";
 import { CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
@@ -144,10 +144,12 @@ function renderBadgeList(
 
 	settings.headerBadges.forEach((badge, i) => {
 		const row = listEl.createDiv({ cls: "recipe-box-badge-row" });
-		row.setAttribute("draggable", "true");
 
-		const handle = row.createSpan({ cls: "recipe-box-badge-drag-handle", text: "⠿" });
-		handle.setAttribute("aria-hidden", "true");
+		if (!Platform.isMobile) {
+			row.setAttribute("draggable", "true");
+			const handle = row.createSpan({ cls: "recipe-box-badge-drag-handle", text: "⠿" });
+			handle.setAttribute("aria-hidden", "true");
+		}
 
 		const isFormula = !!badge.formula;
 		const info = row.createDiv({ cls: "recipe-box-badge-info" });
@@ -193,29 +195,49 @@ function renderBadgeList(
 			});
 		}
 
-		// Drag-and-drop reorder
-		row.addEventListener("dragstart", (e) => {
-			dragFromIndex = i;
-			e.dataTransfer!.effectAllowed = "move";
-			row.addClass("is-dragging");
-		});
-		row.addEventListener("dragend", () => row.removeClass("is-dragging"));
-		row.addEventListener("dragover", (e) => {
-			e.preventDefault();
-			e.dataTransfer!.dropEffect = "move";
-			listEl.querySelectorAll(".recipe-box-badge-row").forEach((r) => r.removeClass("drop-target"));
-			row.addClass("drop-target");
-		});
-		row.addEventListener("dragleave", () => row.removeClass("drop-target"));
-		row.addEventListener("drop", (e) => {
-			e.preventDefault();
-			row.removeClass("drop-target");
-			if (dragFromIndex < 0 || dragFromIndex === i) return;
-			const [moved] = settings.headerBadges.splice(dragFromIndex, 1);
-			settings.headerBadges.splice(i, 0, moved);
-			dragFromIndex = -1;
-			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
-		});
+		if (Platform.isMobile) {
+			// ↑/↓ buttons replace drag on mobile — HTML5 drag-and-drop freezes the touch UI
+			const up = row.createEl("button", { cls: "recipe-box-badge-delete clickable-icon", text: "↑" });
+			const dn = row.createEl("button", { cls: "recipe-box-badge-delete clickable-icon", text: "↓" });
+			up.disabled = i === 0;
+			dn.disabled = i === settings.headerBadges.length - 1;
+			up.addEventListener("click", (e) => {
+				e.stopPropagation();
+				[settings.headerBadges[i - 1], settings.headerBadges[i]] =
+					[settings.headerBadges[i], settings.headerBadges[i - 1]];
+				void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
+			});
+			dn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				[settings.headerBadges[i], settings.headerBadges[i + 1]] =
+					[settings.headerBadges[i + 1], settings.headerBadges[i]];
+				void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
+			});
+		} else {
+			// Desktop: HTML5 drag-and-drop reorder
+			row.addEventListener("dragstart", (e) => {
+				dragFromIndex = i;
+				e.dataTransfer!.effectAllowed = "move";
+				row.addClass("is-dragging");
+			});
+			row.addEventListener("dragend", () => row.removeClass("is-dragging"));
+			row.addEventListener("dragover", (e) => {
+				e.preventDefault();
+				e.dataTransfer!.dropEffect = "move";
+				listEl.querySelectorAll(".recipe-box-badge-row").forEach((r) => r.removeClass("drop-target"));
+				row.addClass("drop-target");
+			});
+			row.addEventListener("dragleave", () => row.removeClass("drop-target"));
+			row.addEventListener("drop", (e) => {
+				e.preventDefault();
+				row.removeClass("drop-target");
+				if (dragFromIndex < 0 || dragFromIndex === i) return;
+				const [moved] = settings.headerBadges.splice(dragFromIndex, 1);
+				settings.headerBadges.splice(i, 0, moved);
+				dragFromIndex = -1;
+				void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
+			});
+		}
 	});
 
 	// Footer actions
