@@ -4,6 +4,8 @@ Plan meals, build grocery lists, and view recipes as interactive cards, all stor
 
 Recipe Box treats recipes the same way Obsidian treats everything else: as notes you own. Meal plans and grocery lists are markdown files too, so you can edit them by hand, query them with Dataview or Bases, and sync them with whatever sync solution you already use.
 
+<img width="800"  alt="device-mockup" src="https://github.com/user-attachments/assets/f71bde46-511a-41e9-9a60-3bde915a4748" />
+
 ## Features
 
 ### Recipe view
