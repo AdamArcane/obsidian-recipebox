@@ -59,7 +59,6 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 
 	cookHistoryEnabled: true,
 	cookHistoryHeading: "Cook History",
-	cookHistoryStorage: "both",
 	cookHistoryFrontmatterProperty: "cookHistory",
 
 	trackLastMade: true,
@@ -156,7 +155,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 			builtin: true,
 		},
 	],
-	showTagsInHeader: false,
+	showTagsInHeader: true,
 	prefixTagsWithHash: true,
 	showFullTagPath: false,
 

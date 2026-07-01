@@ -14,7 +14,6 @@ import {
 import type { SuggesterMode } from "../suggester/strategy-types";
 
 export type NutritionDisplay = "per-serving" | "total";
-export type CookHistoryStorage = "note" | "frontmatter" | "both";
 export type MealTypeNotation = "tag" | "dataview" | "text";
 export type { CategorySource } from "../types";
 export type NutritionSource = "recipe-total" | "per-serving";
@@ -49,7 +48,6 @@ export interface RecipeBoxSettings {
 	// Cook history tracking
 	cookHistoryEnabled: boolean;
 	cookHistoryHeading: string;
-	cookHistoryStorage: CookHistoryStorage;
 	cookHistoryFrontmatterProperty: string;
 
 	// Cooked stats

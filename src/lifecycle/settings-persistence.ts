@@ -222,7 +222,6 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 		cookHistoryEnabled: bool(r.cookHistoryEnabled, d.cookHistoryEnabled),
 		cookHistoryHeading: str(r.cookHistoryHeading, d.cookHistoryHeading),
-		cookHistoryStorage: oneOf<"note" | "frontmatter" | "both">(r.cookHistoryStorage, ["note", "frontmatter", "both"], d.cookHistoryStorage),
 		cookHistoryFrontmatterProperty: str(r.cookHistoryFrontmatterProperty, d.cookHistoryFrontmatterProperty),
 		trackLastMade: bool(r.trackLastMade, d.trackLastMade),
 		lastMadeProperty: str(r.lastMadeProperty, d.lastMadeProperty),

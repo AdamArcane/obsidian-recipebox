@@ -31,7 +31,7 @@ export function renderSectionHealthSafety(
 
 	new Setting(container)
 		.setName("My allergens")
-		.setDesc(`${settings.myAllergens.length > 0 ? settings.myAllergens.join(", ") : "None configured"} — warn when a recipe contains any of these.`)
+		.setDesc(`Warn when a recipe contains any of these: ${settings.myAllergens.length > 0 ? settings.myAllergens.join(", ") : "None configured"}`)
 		.addButton((btn) =>
 			btn.setButtonText("Edit allergens…").onClick(() => {
 				new AllergensModal(app, settings, save).open();

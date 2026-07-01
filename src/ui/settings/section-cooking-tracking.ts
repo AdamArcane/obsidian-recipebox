@@ -3,14 +3,9 @@
  * heading name, frontmatter property, last-made, and cooked count.
  */
 import { Setting } from "obsidian";
-import { RecipeBoxSettings, CookHistoryStorage } from "../../settings/settings-types";
+import { RecipeBoxSettings } from "../../settings/settings-types";
 import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 
-const STORAGE_OPTIONS: Record<CookHistoryStorage, string> = {
-	note: "Note body only",
-	frontmatter: "Frontmatter array only",
-	both: "Both",
-};
 
 export function renderSectionCookingTracking(
 	container: HTMLElement,
@@ -76,38 +71,25 @@ export function renderSectionCookingTracking(
 
 	if (settings.cookHistoryEnabled) {
 		new Setting(container)
-			.setName("Storage")
-			.setDesc("Where cook history entries are stored. Note body appends to a heading section; frontmatter stores a flat date array queryable by dataview and bases.")
-			.addDropdown((dd) =>
-				dd.addOptions(STORAGE_OPTIONS).setValue(settings.cookHistoryStorage).onChange(async (v) => {
-					settings.cookHistoryStorage = v as CookHistoryStorage;
+			.setName("Cook history heading name")
+			.setDesc("The heading under which note-body entries are appended. Created automatically if it doesn't exist.")
+			.addText((t) =>
+				t.setValue(settings.cookHistoryHeading).onChange(async (v) => {
+					settings.cookHistoryHeading = v;
 					await save();
-					rerender();
 				})
 			);
 
-		if (settings.cookHistoryStorage !== "frontmatter") {
-			new Setting(container)
-				.setName("Cook history heading name")
-				.setDesc("The heading under which note-body entries are appended.")
-				.addText((t) =>
-					t.setValue(settings.cookHistoryHeading).onChange(async (v) => {
-						settings.cookHistoryHeading = v;
-						await save();
-					})
-				);
-		}
 
-		if (settings.cookHistoryStorage !== "note") {
-			new Setting(container)
-				.setName("Frontmatter property")
-				.setDesc('The frontmatter property that stores the date array, e.g. "cookhistory".')
-				.addText((t) =>
-					t.setValue(settings.cookHistoryFrontmatterProperty).onChange(async (v) => {
-						settings.cookHistoryFrontmatterProperty = v.trim() || "cookHistory";
-						await save();
-					})
-				);
-		}
+		new Setting(container)
+			.setName("Frontmatter property")
+			.setDesc("The frontmatter property that stores the date array.")
+			.addText((t) =>
+				t.setValue(settings.cookHistoryFrontmatterProperty).onChange(async (v) => {
+					settings.cookHistoryFrontmatterProperty = v.trim() || "cookHistory";
+					await save();
+				})
+			);
+
 	}
 }
