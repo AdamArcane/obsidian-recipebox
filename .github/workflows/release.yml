@@ -29,15 +29,19 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          # Mark as pre-release if the tag contains a pre-release identifier
-          # e.g. 0.1.0-beta.1, 0.1.0-alpha.2, 0.2.0-rc.1
-          if [[ "$tag" =~ -(beta|alpha|rc) ]]; then
+          # Strip leading 'v' from title so release shows '0.1.2' not 'v0.1.2'
+          title="${tag#v}"
+
+          # Treat anything below 1.0.0 as a pre-release (early beta builds).
+          # Once the plugin is in the community directory, tags will start at
+          # 1.0.0 and this condition will no longer match.
+          if [[ "$title" =~ ^0\. ]]; then
             prerelease="--prerelease"
           else
             prerelease=""
           fi
 
           gh release create "$tag" \
-            --title="$tag" \
+            --title="$title" \
             $prerelease \
             main.js manifest.json styles.css
