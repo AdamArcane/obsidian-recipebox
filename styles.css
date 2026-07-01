@@ -633,7 +633,7 @@
   display: grid;
   grid-template-columns: max-content max-content max-content max-content;
   row-gap: 0.3rem;
-  column-gap: 0.35rem;
+  gap: 0.3rem 0.35rem;
   align-items: baseline;
 }
 
@@ -689,16 +689,16 @@
   border-color: var(--interactive-accent);
 }
 
-.rb-favorite-active {
-  color: var(--color-red) !important;
-  border-color: var(--color-red) !important;
-  background: rgba(var(--color-red-rgb), 0.1) !important;
+.rb-action-btn.rb-favorite-active {
+  color: var(--color-red);
+  border-color: var(--color-red);
+  background: rgba(var(--color-red-rgb), 0.1);
 }
 
-.rb-meal-plan-active {
-  color: var(--interactive-accent) !important;
-  border-color: var(--interactive-accent) !important;
-  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent) !important;
+.rb-action-btn.rb-meal-plan-active {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent);
 }
 
 /* ── Two-column body row ─────────────────────────────────────────────────── */
@@ -963,7 +963,7 @@ button:not(.clickable-icon).rb-grocery-add-btn {
 
 /* MarkdownRenderer.render() wraps output in a <p>; strip the block margin
    so the rendered name sits inline within the ingredient row layout. */
-.rb-ingredient-name > p {
+.rb-ingredient-name>p {
   margin: 0;
   display: inline;
 }
@@ -2038,7 +2038,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  column-gap: 0.5rem;
+  gap: 0.5rem;
   padding-bottom: 0.5rem;
 }
 
@@ -2864,18 +2864,21 @@ body.is-mobile .rb-step::before {
   font-size: 0.8rem;
 }
 
-/* Tab bar — force transparent background that Obsidian mobile applies to buttons */
-body.is-mobile .rb-tab-bar {
-  background: transparent !important;
-  box-shadow: none !important;
+/* Tab bar — override Obsidian mobile's button container styles using
+   higher specificity rather than !important */
+body.is-mobile .workspace-leaf-content .rb-tab-bar,
+body.is-mobile .view-content .rb-tab-bar {
+  background: transparent;
+  box-shadow: none;
 }
 
-body.is-mobile .rb-tab-btn {
+body.is-mobile .workspace-leaf-content .rb-tab-btn,
+body.is-mobile .view-content .rb-tab-btn {
   padding: 0.7rem 0.5rem;
   font-size: 0.9rem;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Scale col: match action button height exactly */
@@ -3501,8 +3504,8 @@ body.is-mobile .rb-duration-btn {
   color: var(--text-normal);
   line-height: 1.25;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -3560,7 +3563,10 @@ body.is-mobile .rb-duration-btn {
 .rb-gv-empty-hint {
   font-size: var(--font-ui-small);
   color: var(--text-faint);
-  margin-top: 0.5rem !important;
+}
+
+.rb-gv-empty .rb-gv-empty-hint {
+  margin-top: 0.5rem;
 }
 
 /* ── Group sections ──────────────────────────────────────────────────────── */
@@ -3741,10 +3747,10 @@ body.is-mobile .rb-duration-btn {
   gap: 0.6rem;
 }
 
-.rb-modal-field-row {
-  flex-direction: row !important;
+.rb-export-modal .rb-modal-field-row {
+  flex-direction: row;
   align-items: center;
-  gap: 0.5rem !important;
+  gap: 0.5rem;
 }
 
 .rb-modal-field-hint {
