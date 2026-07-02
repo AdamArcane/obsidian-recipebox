@@ -1822,7 +1822,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 
-/* ── Modal shell (section 55): sticky header/footer, scrollable body ──────── */
+/* ── Modal classes - sticky header/footer, scrollable body ──────── */
 
 .rb-modal-shell {
   display: flex;
@@ -1875,11 +1875,12 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   padding: 0.25rem 0;
 }
 
+
 .rb-modal-footer {
   flex-shrink: 0;
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
-  align-items: center;
   gap: 0.5rem;
   padding-top: 0.75rem;
   margin-top: 0.5rem;
@@ -1894,27 +1895,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   display: none;
 }
 
-/* Use a more specific selector to beat Obsidian's .mod-cta rule on mobile
-   without !important, keeping footer buttons square with rounded corners. */
-.rb-modal-footer .mod-cta,
-.rb-modal-footer .mod-warning {
-  border-radius: var(--radius-m);
-}
-
-.rb-modal-cancel-btn {
-  background: transparent;
-  color: var(--text-muted);
-  border: none;
-  cursor: pointer;
-  font-size: var(--font-ui-small);
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius-m);
-}
-
-.rb-modal-cancel-btn:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
 
 
 .rb-modal-message {
@@ -1930,6 +1910,48 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   letter-spacing: 0.08em;
   color: var(--text-faint);
   margin: 1rem 0 0.4rem;
+}
+
+/* modal buttons */
+
+
+.rb-modal-btn {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-m);
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  transition: background 0.1s, color 0.1s;
+}
+
+.rb-modal-btn-icon {
+  display: flex;
+}
+
+.rb-modal-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.rb-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.rb-modal-btn-danger {
+  background: rgba(var(--color-red-rgb), 0.1);
+  color: var(--color-red);
+  border-color: rgba(var(--color-red-rgb), 0.3);
+}
+
+.rb-modal-btn-danger:hover {
+  background: rgba(var(--color-red-rgb), 0.2);
 }
 
 /* Ingredient checklist */
@@ -2120,55 +2142,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-top: auto;
 }
 
-/* Modal footer + buttons */
 
-.rb-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1.25rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--background-modifier-border);
-}
-
-.rb-modal-btn {
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-m);
-  font-size: var(--font-ui-small);
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  transition: background 0.1s, color 0.1s;
-}
-
-.rb-modal-btn-icon {
-  display: flex;
-}
-
-.rb-modal-btn:hover {
-  background: var(--background-modifier-hover);
-}
-
-.rb-modal-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-
-.rb-modal-btn-danger {
-  background: rgba(var(--color-red-rgb), 0.1);
-  color: var(--color-red);
-  border-color: rgba(var(--color-red-rgb), 0.3);
-}
-
-.rb-modal-btn-danger:hover {
-  background: rgba(var(--color-red-rgb), 0.2);
-}
 
 /* ── Import recipe modal ────────────────────────────────────────────────── */
 
@@ -2465,9 +2439,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 /* Confirm modal */
 
-.rb-confirm-modal .rb-modal-footer {
-  justify-content: flex-end;
-}
 
 .rb-confirm-checkbox-row {
   display: flex;
@@ -2523,11 +2494,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
     gap: 0.6rem;
   }
 
-  /* Full-width stacked footer buttons */
-  .rb-modal-footer {
-    flex-direction: column-reverse;
-    gap: 0.4rem;
-  }
 
   .rb-modal-btn {
     width: 100%;
@@ -2699,10 +2665,6 @@ body.is-mobile .rb-modal-btn {
   justify-content: center;
 }
 
-body.is-mobile .rb-modal-footer {
-  flex-direction: column-reverse;
-  gap: 0.5rem;
-}
 
 body.is-mobile .rb-mark-cooked-date-field,
 body.is-mobile .rb-mark-cooked-notes-field {
