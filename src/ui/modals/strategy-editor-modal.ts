@@ -164,7 +164,7 @@ export class ModeEditorModal extends BaseModal {
 
 		rebuildOperators();
 
-		const delBtn = row.createEl("button", { cls: "rb-rule-delete-btn" });
+		const delBtn = row.createEl("button", { cls: "rb-icon-btn rb-icon-btn--md rb-icon-btn--danger" });
 		setIcon(delBtn.createSpan(), "x");
 		delBtn.addEventListener("click", () => {
 			this.draft.filters.splice(this.draft.filters.indexOf(filter), 1);
@@ -329,7 +329,7 @@ export class ModeEditorModal extends BaseModal {
 		if (Platform.isMobile) {
 			// ↑/↓ buttons replace drag on mobile — HTML5 drag-and-drop freezes the touch UI
 			const ruleIndex = () => this.draft.rules.indexOf(rule);
-			const up = row.createEl("button", { cls: "rb-rule-delete-btn" });
+			const up = row.createEl("button", { cls: "rb-icon-btn rb-icon-btn--md" });
 			setIcon(up.createSpan(), "chevron-up");
 			up.addEventListener("click", () => {
 				const idx = ruleIndex();
@@ -339,7 +339,7 @@ export class ModeEditorModal extends BaseModal {
 					renderAll();
 				}
 			});
-			const dn = row.createEl("button", { cls: "rb-rule-delete-btn" });
+			const dn = row.createEl("button", { cls: "rb-icon-btn rb-icon-btn--md" });
 			setIcon(dn.createSpan(), "chevron-down");
 			dn.addEventListener("click", () => {
 				const idx = ruleIndex();

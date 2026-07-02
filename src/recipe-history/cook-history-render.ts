@@ -75,7 +75,7 @@ function renderEntryRow(
 
 	const actions = row.createDiv({ cls: "rb-ch-entry-actions" });
 
-	const editBtn = actions.createEl("button", { cls: "rb-ch-icon-btn", title: "Edit" });
+	const editBtn = actions.createEl("button", { cls: "rb-icon-btn", title: "Edit" });
 	setIcon(editBtn, "pencil");
 	editBtn.addEventListener("click", () => {
 		new EntryEditorModal(app, recipeFile, settings, entry, async (date, note, image) => {
@@ -84,7 +84,7 @@ function renderEntryRow(
 		}).open();
 	});
 
-	const deleteBtn = actions.createEl("button", { cls: "rb-ch-icon-btn rb-ch-icon-btn-danger", title: "Delete" });
+	const deleteBtn = actions.createEl("button", { cls: "rb-icon-btn rb-icon-btn--danger", title: "Delete" });
 	setIcon(deleteBtn, "trash-2");
 	deleteBtn.addEventListener("click", () => {
 		new ConfirmModal(

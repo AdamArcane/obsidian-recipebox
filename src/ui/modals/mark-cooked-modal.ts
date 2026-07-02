@@ -54,7 +54,8 @@ export class MarkCookedModal extends BaseModal {
 			});
 			notesInput.addEventListener("input", () => { this.notes = notesInput.value; });
 
-			window.requestAnimationFrame(() => notesInput.focus());
+			// don't autofocus the notes field on mobile, because it will pop up the keyboard and hide the image buttons
+			if (!Platform.isMobile) window.requestAnimationFrame(() => notesInput.focus());
 
 			this.buildImageSection(bodyEl);
 		}

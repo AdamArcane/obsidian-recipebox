@@ -20,17 +20,17 @@ export class GiDictionaryModal extends BaseModal {
 
 	renderBody(bodyEl: HTMLElement): void {
 		const textarea = bodyEl.createEl("textarea", {
-			cls: "recipe-box-gi-textarea recipe-box-gi-textarea--modal",
+			cls: "rb-gi-textarea rb-gi-textarea--modal",
 			text: this.settings.giDictionary,
 		});
 		textarea.rows = 24;
 
-		const errorEl = bodyEl.createDiv({ cls: "recipe-box-gi-errors" });
+		const errorEl = bodyEl.createDiv({ cls: "rb-gi-errors" });
 		const showErrors = (text: string): void => {
 			const { errors } = compileGiDictionary(text);
 			errorEl.empty();
 			if (errors.length === 0) return;
-			errorEl.createEl("p", { text: `${errors.length} invalid pattern(s):`, cls: "recipe-box-error-label" });
+			errorEl.createEl("p", { text: `${errors.length} invalid pattern(s):`, cls: "rb-error-label" });
 			errors.forEach((e) => errorEl.createEl("code", { text: e }));
 		};
 
@@ -45,7 +45,7 @@ export class GiDictionaryModal extends BaseModal {
 
 		let resetPending = false;
 		let resetTimer: number | null = null;
-		const resetBtn = bodyEl.createEl("button", { cls: "recipe-box-reset-btn", text: "Reset to defaults" });
+		const resetBtn = bodyEl.createEl("button", { cls: "rb-reset-btn", text: "Reset to defaults" });
 		resetBtn.addEventListener("click", () => {
 			if (!resetPending) {
 				resetPending = true;

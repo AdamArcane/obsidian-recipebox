@@ -17,7 +17,7 @@ export class AllergensModal extends BaseModal {
 	getSubtitle(): string { return "Warn when a recipe contains any of these allergens."; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		const wrapper = bodyEl.createDiv("recipe-box-tag-editor");
+		const wrapper = bodyEl.createDiv("rb-tag-editor");
 		this.renderEditor(wrapper);
 	}
 
@@ -25,9 +25,9 @@ export class AllergensModal extends BaseModal {
 
 	private renderEditor(wrapper: HTMLElement): void {
 		wrapper.empty();
-		const tagRow = wrapper.createDiv("recipe-box-tag-row");
+		const tagRow = wrapper.createDiv("rb-tag-row");
 		this.settings.myAllergens.forEach((tag, i) => {
-			const chip = tagRow.createSpan({ cls: "recipe-box-tag-chip", text: tag });
+			const chip = tagRow.createSpan({ cls: "rb-tag-chip", text: tag });
 			const del = chip.createEl("button", { text: "✕" });
 			del.addEventListener("click", () => {
 				this.settings.myAllergens.splice(i, 1);

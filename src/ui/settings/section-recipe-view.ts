@@ -109,9 +109,9 @@ export function renderSectionRecipeView(
 
 	const badgeSetting = new Setting(container)
 		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder. The last made badge property should match the tracking setting in the cooking & tracking section.");
-	badgeSetting.settingEl.addClass("recipe-box-badge-setting");
+	badgeSetting.settingEl.addClass("rb-badge-setting");
 
-	const listEl = badgeSetting.settingEl.createDiv({ cls: "recipe-box-badge-list" });
+	const listEl = badgeSetting.settingEl.createDiv({ cls: "rb-badge-list" });
 	renderBadgeList(listEl, settings, save, app, getDiscovery);
 }
 
@@ -143,21 +143,21 @@ function renderBadgeList(
 	let dragFromIndex = -1;
 
 	settings.headerBadges.forEach((badge, i) => {
-		const row = listEl.createDiv({ cls: "recipe-box-badge-row" });
+		const row = listEl.createDiv({ cls: "rb-badge-row" });
 
 		if (!Platform.isMobile) {
 			row.setAttribute("draggable", "true");
-			const handle = row.createSpan({ cls: "recipe-box-badge-drag-handle", text: "⠿" });
+			const handle = row.createSpan({ cls: "rb-badge-drag-handle", text: "⠿" });
 			handle.setAttribute("aria-hidden", "true");
 		}
 
 		const isFormula = !!badge.formula;
-		const info = row.createDiv({ cls: "recipe-box-badge-info" });
-		if (isFormula) info.createSpan({ cls: "recipe-box-badge-formula-tag", text: "f" });
-		const textWrap = info.createDiv({ cls: "recipe-box-badge-text" });
-		textWrap.createSpan({ cls: "recipe-box-badge-primary", text: badgePrimary(badge) });
+		const info = row.createDiv({ cls: "rb-badge-info" });
+		if (isFormula) info.createSpan({ cls: "rb-badge-formula-tag", text: "f" });
+		const textWrap = info.createDiv({ cls: "rb-badge-text" });
+		textWrap.createSpan({ cls: "rb-badge-primary", text: badgePrimary(badge) });
 		const sub = badgeSecondary(badge);
-		if (sub) textWrap.createSpan({ cls: "recipe-box-badge-secondary", text: sub });
+		if (sub) textWrap.createSpan({ cls: "rb-badge-secondary", text: sub });
 
 		// Enabled checkbox
 		const checkbox = row.createEl("input", { type: "checkbox" });
@@ -168,7 +168,7 @@ function renderBadgeList(
 		});
 
 		// Delete button — available for all badges
-		const del = row.createEl("button", { cls: "recipe-box-badge-delete clickable-icon" });
+		const del = row.createEl("button", { cls: "rb-badge-delete clickable-icon" });
 		del.setAttribute("aria-label", "Remove badge");
 		setIcon(del, "trash-2");
 		del.addEventListener("click", (e) => {
@@ -197,8 +197,8 @@ function renderBadgeList(
 
 		if (Platform.isMobile) {
 			// ↑/↓ buttons replace drag on mobile — HTML5 drag-and-drop freezes the touch UI
-			const up = row.createEl("button", { cls: "recipe-box-badge-delete clickable-icon", text: "↑" });
-			const dn = row.createEl("button", { cls: "recipe-box-badge-delete clickable-icon", text: "↓" });
+			const up = row.createEl("button", { cls: "rb-badge-delete clickable-icon", text: "↑" });
+			const dn = row.createEl("button", { cls: "rb-badge-delete clickable-icon", text: "↓" });
 			up.disabled = i === 0;
 			dn.disabled = i === settings.headerBadges.length - 1;
 			up.addEventListener("click", (e) => {
@@ -224,7 +224,7 @@ function renderBadgeList(
 			row.addEventListener("dragover", (e) => {
 				e.preventDefault();
 				e.dataTransfer!.dropEffect = "move";
-				listEl.querySelectorAll(".recipe-box-badge-row").forEach((r) => r.removeClass("drop-target"));
+				listEl.querySelectorAll(".rb-badge-row").forEach((r) => r.removeClass("drop-target"));
 				row.addClass("drop-target");
 			});
 			row.addEventListener("dragleave", () => row.removeClass("drop-target"));
@@ -241,7 +241,7 @@ function renderBadgeList(
 	});
 
 	// Footer actions
-	const footer = listEl.createDiv({ cls: "recipe-box-badge-footer" });
+	const footer = listEl.createDiv({ cls: "rb-badge-footer" });
 
 	footer.createEl("button", { text: "+ add badge" }).addEventListener("click", () => {
 		const blank: CustomBadge = {

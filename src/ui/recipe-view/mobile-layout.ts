@@ -132,12 +132,12 @@ function renderNativeCard(
 	const metaCol = card.createDiv({ cls: "rb-mobile-native-meta" });
 
 	const ratingGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
-	ratingGroup.createDiv({ cls: "rb-mobile-native-label", text: "Rating" });
+	ratingGroup.createDiv({ cls: "rb-label-caps", text: "Rating" });
 	renderStarRating(ratingGroup, app, file, fm, settings.ratingProperty, false);
 
 	if (settings.trackLastMade) {
 		const lastGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
-		lastGroup.createDiv({ cls: "rb-mobile-native-label", text: "Last prepared" });
+		lastGroup.createDiv({ cls: "rb-label-caps", text: "Last prepared" });
 		const dateText = meta.lastMade ? formatDateValue(meta.lastMade) : "–";
 		lastGroup.createDiv({ cls: "rb-mobile-native-value", text: dateText });
 	}
@@ -163,7 +163,7 @@ function renderMobileStatRow(
 	const row = container.createDiv({ cls: "rb-mobile-stat-row" });
 	for (const { label, value } of cells) {
 		const cell = row.createDiv({ cls: "rb-mobile-stat-cell" });
-		cell.createDiv({ cls: "rb-mobile-stat-label", text: label });
+		cell.createDiv({ cls: "rb-label-caps rb-mobile-stat-label", text: label });
 		cell.createDiv({ cls: "rb-mobile-stat-value", text: value });
 	}
 }
@@ -224,14 +224,14 @@ function renderScaleActionsRow(
 
 	// Scale cell
 	const scaleCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
-	scaleCell.createDiv({ cls: "rb-mobile-scale-label", text: "Scale" });
+	scaleCell.createDiv({ cls: "rb-label-caps", text: "Scale" });
 	const scaleValue = scaleCell.createDiv({ cls: "rb-mobile-scale-value", text: `${current}×` });
 
 	// Servings cell (only if the recipe has a servings value)
 	if (servings !== null) {
 		scaleCol.createDiv({ cls: "rb-mobile-scale-divider" });
 		const servingsCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
-		servingsCell.createDiv({ cls: "rb-mobile-scale-label", text: "Serves" });
+		servingsCell.createDiv({ cls: "rb-label-caps", text: "Serves" });
 		const servingsValue = servingsCell.createDiv({ cls: "rb-mobile-scale-value" });
 		const updateServings = (mult: number): void => {
 			const scaled = Math.round(servings * mult * 10) / 10;
@@ -290,7 +290,7 @@ function renderMobileNutritionStrip(
 		const cell = strip.createDiv({ cls: "rb-mobile-nutrition-cell" });
 		const value = resolveNutritionDisplay(fm, field, settings, servings, multiplier);
 		cell.createSpan({ cls: "rb-mobile-nutrition-value", text: value });
-		cell.createSpan({ cls: "rb-mobile-nutrition-label", text: field.label });
+		cell.createSpan({ cls: "rb-label-caps", text: field.label });
 	}
 }
 

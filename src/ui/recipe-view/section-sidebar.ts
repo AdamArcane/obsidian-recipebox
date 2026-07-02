@@ -57,7 +57,7 @@ export function renderSectionSidebar(
 
 	for (const section of sections) {
 		const btn = sidebar.createEl("button", { cls: "rb-sidebar-btn" });
-		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon" });
+		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
 		setIcon(iconSpan, "file-text");
 		btn.createSpan({ cls: "rb-sidebar-btn-label", text: section.heading });
 		btn.addEventListener("click", () => {
@@ -70,7 +70,7 @@ export function renderSectionSidebar(
 
 	if (hasCookHistory) {
 		const btn = sidebar.createEl("button", { cls: "rb-sidebar-btn rb-sidebar-btn--history" });
-		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon" });
+		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
 		setIcon(iconSpan, "history");
 		btn.createSpan({ cls: "rb-sidebar-btn-label", text: "Cook history" });
 		if (cookedCount > 0) {

@@ -21,12 +21,12 @@ export function renderSectionRecipeLocation(
 		.setName("Recipe folders")
 		.setDesc("Scan only these folders for recipe notes. Leave empty to search the whole vault.");
 
-	const folderList = folderSetting.settingEl.createDiv("recipe-box-folder-list");
+	const folderList = folderSetting.settingEl.createDiv("rb-folder-list");
 
 	function renderFolderList(): void {
 		folderList.empty();
 		settings.recipeFolders.forEach((folder, i) => {
-			const row = folderList.createDiv("recipe-box-list-row");
+			const row = folderList.createDiv("rb-list-row");
 			row.createSpan({ text: folder });
 			const del = row.createEl("button", { text: "✕" });
 			del.addEventListener("click", () => {
@@ -35,7 +35,7 @@ export function renderSectionRecipeLocation(
 			});
 		});
 
-		const addRow = folderList.createDiv("recipe-box-list-row");
+		const addRow = folderList.createDiv("rb-list-row");
 		const input = addRow.createEl("input", { type: "text", placeholder: "Folder path" });
 		new FolderSuggest(app, input);
 		const addBtn = addRow.createEl("button", { text: "Add" });

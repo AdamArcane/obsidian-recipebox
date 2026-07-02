@@ -34,17 +34,17 @@ export abstract class BaseModal extends Modal {
 
 	onOpen(): void {
 		const { contentEl } = this;
-		contentEl.addClass("rb-modal", "rb-shell", ...this.getContentClasses());
+		contentEl.addClass("rb-modal-shell", ...this.getContentClasses());
 
-		const headerEl = contentEl.createDiv({ cls: "rb-shell-header" });
+		const headerEl = contentEl.createDiv({ cls: "rb-modal-header" });
 		const icon = this.getIcon();
-		if (icon) setIcon(headerEl.createSpan({ cls: "rb-shell-icon" }), icon);
-		this.shellTitleEl = headerEl.createEl("h2", { cls: "rb-shell-title", text: this.getTitle() });
+		if (icon) setIcon(headerEl.createSpan({ cls: "rb-modal-icon" }), icon);
+		this.shellTitleEl = headerEl.createEl("h2", { cls: "rb-modal-title", text: this.getTitle() });
 		const subtitle = this.getSubtitle();
-		if (subtitle) headerEl.createEl("p", { cls: "rb-shell-subtitle", text: subtitle });
+		if (subtitle) headerEl.createEl("p", { cls: "rb-modal-subtitle", text: subtitle });
 
-		const bodyEl = contentEl.createDiv({ cls: "rb-shell-body" });
-		const footerEl = contentEl.createDiv({ cls: "rb-shell-footer" });
+		const bodyEl = contentEl.createDiv({ cls: "rb-modal-body" });
+		const footerEl = contentEl.createDiv({ cls: "rb-modal-footer" });
 
 		// renderFooter is always synchronous; renderBody may be async.
 		// Footer is set up immediately so Cancel is always reachable.
@@ -71,7 +71,7 @@ export function addFooterButtons(
 		onConfirm: () => void;
 	},
 ): HTMLButtonElement {
-	footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: opts.cancelLabel ?? "Cancel" })
+	footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: opts.cancelLabel ?? "Cancel" })
 		.addEventListener("click", opts.onCancel);
 	const btn = footerEl.createEl("button", {
 		cls: opts.destructive ? "mod-warning" : "mod-cta",

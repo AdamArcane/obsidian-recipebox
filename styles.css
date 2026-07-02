@@ -1,20 +1,79 @@
 /* ── Recipe Box ───────────────────────────────────────────────────────────── */
 
+/* ── Shared utilities ──────────────────────────────────────────────────────── */
+
+/* Flex container for a single icon SVG. Use in place of the many
+   per-component icon wrapper classes that all do the same thing. */
+.rb-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Small square icon-only button. Size variants via modifier classes. */
+.rb-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.rb-icon-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+
+.rb-icon-btn--md {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+
+
+.rb-icon-btn--danger:hover {
+  color: var(--text-error);
+  background: color-mix(in srgb, var(--text-error) 12%, transparent);
+}
+
+.rb-icon-btn svg,
+.rb-icon-btn span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Uppercase micro-label used for stat cell headings, carousel titles, etc. */
+.rb-label-caps {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+
 
 
 /* ── Settings tab ────────────────────────────────────────────────────────── */
 
 /* Badge list — inside a setting-item */
 
-.recipe-box-badge-setting.setting-item {
+.rb-badge-setting.setting-item {
   display: block;
 }
 
-.recipe-box-badge-list {
+.rb-badge-list {
   margin-top: 0.5rem;
 }
 
-.recipe-box-badge-row {
+.rb-badge-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -26,20 +85,20 @@
   border-top: 2px solid transparent;
 }
 
-.recipe-box-badge-row:hover {
+.rb-badge-row:hover {
   background: var(--background-modifier-hover);
 }
 
-.recipe-box-badge-row.is-dragging {
+.rb-badge-row.is-dragging {
   opacity: 0.35;
 }
 
-.recipe-box-badge-row.drop-target {
+.rb-badge-row.drop-target {
   border-top: 2px solid var(--interactive-accent);
   background: color-mix(in srgb, var(--interactive-accent) 6%, var(--background-primary));
 }
 
-.recipe-box-badge-drag-handle {
+.rb-badge-drag-handle {
   color: var(--text-faint);
   cursor: grab;
   font-size: 1rem;
@@ -48,11 +107,11 @@
   padding: 0 0.1rem;
 }
 
-.recipe-box-badge-drag-handle:active {
+.rb-badge-drag-handle:active {
   cursor: grabbing;
 }
 
-.recipe-box-badge-info {
+.rb-badge-info {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -60,7 +119,7 @@
   min-width: 0;
 }
 
-.recipe-box-badge-formula-tag {
+.rb-badge-formula-tag {
   font-family: var(--font-monospace);
   font-size: var(--font-ui-smaller);
   background: color-mix(in srgb, var(--color-purple, #9b59b6) 15%, var(--background-secondary));
@@ -69,7 +128,7 @@
   padding: 1px 5px;
 }
 
-.recipe-box-badge-text {
+.rb-badge-text {
   display: flex;
   flex-direction: row;
   align-items: baseline;
@@ -78,14 +137,14 @@
   overflow: hidden;
 }
 
-.recipe-box-badge-primary {
+.rb-badge-primary {
   font-size: var(--font-ui-small);
   color: var(--text-normal);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.recipe-box-badge-secondary {
+.rb-badge-secondary {
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   white-space: nowrap;
@@ -93,7 +152,7 @@
   text-overflow: ellipsis;
 }
 
-.recipe-box-badge-delete {
+.rb-badge-delete {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -109,19 +168,19 @@
   transition: color 0.1s, background 0.1s;
 }
 
-.recipe-box-badge-delete:hover {
+.rb-badge-delete:hover {
   color: var(--text-error);
   background: color-mix(in srgb, var(--text-error) 12%, transparent);
 }
 
-.recipe-box-badge-footer {
+.rb-badge-footer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   padding: 0.5rem 0.25rem 0.25rem;
 }
 
-.recipe-box-badge-footer button {
+.rb-badge-footer button {
   font-size: var(--font-ui-small);
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-s);
@@ -132,7 +191,7 @@
   transition: background 0.1s, color 0.1s;
 }
 
-.recipe-box-badge-footer button:hover {
+.rb-badge-footer button:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
@@ -232,7 +291,7 @@
 }
 
 /* Reset button shared style */
-.recipe-box-reset-btn {
+.rb-reset-btn {
   font-size: var(--font-ui-small);
   color: var(--text-faint);
   background: transparent;
@@ -242,23 +301,15 @@
   cursor: pointer;
 }
 
-.recipe-box-reset-btn:hover {
+.rb-reset-btn:hover {
   color: var(--text-error);
   border-color: var(--text-error);
 }
 
 /* Formula error feedback */
-.recipe-box-formula-error {
-  font-size: var(--font-ui-small);
-  color: var(--text-error);
-  padding: 0.25rem 0.5rem;
-  background: color-mix(in srgb, var(--text-error) 10%, transparent);
-  border-radius: var(--radius-s);
-  margin-top: 0.25rem;
-}
 
 /* GI dictionary textarea */
-.recipe-box-gi-textarea {
+.rb-gi-textarea {
   width: 100%;
   font-family: var(--font-monospace);
   font-size: var(--font-ui-small);
@@ -270,21 +321,21 @@
   color: var(--text-normal);
 }
 
-.recipe-box-gi-textarea--modal {
+.rb-gi-textarea--modal {
   min-height: 20rem;
 }
 
-.recipe-box-gi-errors {
+.rb-gi-errors {
   margin-top: 0.5rem;
 }
 
-.recipe-box-error-label {
+.rb-error-label {
   font-size: var(--font-ui-small);
   color: var(--text-error);
   margin: 0 0 0.25rem;
 }
 
-.recipe-box-gi-errors code {
+.rb-gi-errors code {
   display: block;
   font-size: 0.75rem;
   color: var(--text-error);
@@ -302,16 +353,6 @@
   padding: 1.5rem 1.75rem 3rem;
   font-size: var(--font-ui-medium);
   color: var(--text-normal);
-}
-
-/* ── Card primitive ──────────────────────────────────────────────────────── */
-
-.rb-card {
-  background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-l);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
 }
 
 /* ── Title block ─────────────────────────────────────────────────────────── */
@@ -524,31 +565,11 @@
   border-left: 1px solid var(--background-modifier-border);
 }
 
-.rb-cell-label {
-  font-size: 0.65rem;
-  color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-.rb-cell-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--interactive-accent);
-}
-
 
 /* Multiplier stepper */
 .rb-multiplier-cell {
   display: flex;
   align-items: center;
-}
-
-.rb-stepper-entry {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
 }
 
 .rb-stepper {
@@ -604,28 +625,9 @@
   -webkit-appearance: none;
 }
 
-.rb-step-display {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-left: 1px solid var(--background-modifier-border);
-  border-right: 1px solid var(--background-modifier-border);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-normal);
-  min-width: 2.5rem;
-  user-select: none;
-}
 
 /* Inline label+value pair (used for Serves and standalone entries) */
 
-.rb-nutrition-entry {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-}
 
 /* Nutrition grid — 4-col: label | value | label | value */
 
@@ -1130,8 +1132,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 .rb-sidebar-btn {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   width: 100%;
   padding: 0.4rem 0.65rem;
@@ -1241,11 +1241,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   padding: 0.25rem 0;
 }
 
-.rb-ch-loading {
-  color: var(--text-muted);
-  padding: 1rem 0;
-}
-
 .rb-ch-empty {
   color: var(--text-muted);
   padding: 1rem 0;
@@ -1317,89 +1312,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-top: 0.5rem;
 }
 
-.rb-ch-icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  background: var(--background-secondary);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-}
 
-.rb-ch-icon-btn svg,
-.rb-ch-icon-btn span svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.rb-ch-icon-btn:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-.rb-ch-icon-btn-danger:hover {
-  color: var(--color-red);
-  border-color: color-mix(in srgb, var(--color-red) 40%, transparent);
-}
-
-.rb-ch-btn-icon {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 0.3rem;
-}
-
-.rb-ch-fm-section {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--background-modifier-border);
-}
-
-.rb-ch-fm-title {
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-  margin-bottom: 0.4rem;
-}
-
-.rb-ch-fm-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.rb-ch-fm-chip {
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  background: var(--background-secondary);
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-}
-
-.rb-ch-footer {
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--background-modifier-border);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.rb-ch-edit-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: var(--font-ui-small);
-  cursor: pointer;
-}
-
-.rb-ch-edit-icon {
-  width: 1rem;
-  height: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* ── Heading level variants inside instruction groups ────────────────────── */
 
@@ -1466,13 +1379,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   gap: 0.15rem;
 }
 
-.rb-mobile-native-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
 
 .rb-mobile-native-value {
   font-size: var(--font-ui-small);
@@ -1514,13 +1420,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   border-right: none;
 }
 
-.rb-mobile-stat-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
 
 .rb-mobile-stat-value {
   font-size: 0.85rem;
@@ -1639,14 +1538,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 .rb-mp-entry-row:hover {
   background: var(--background-modifier-hover);
-}
-
-.rb-mobile-scale-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-faint);
 }
 
 .rb-mobile-scale-value {
@@ -1769,14 +1660,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-left: auto;
 }
 
-.rb-compact-times {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-  font-weight: 500;
-}
 
 .rb-servings-cell {
   display: flex;
@@ -1799,60 +1682,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   text-align: right;
 }
 
-.rb-compact-servings {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-}
 
-/* Cook history info-tab preview row */
-.rb-ch-preview-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--background-modifier-border);
-  cursor: pointer;
-}
-
-.rb-ch-preview-empty {
-  cursor: default;
-}
-
-.rb-ch-preview-icon {
-  display: flex;
-  align-items: center;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.rb-ch-preview-icon svg {
-  width: 0.85rem;
-  height: 0.85rem;
-}
-
-.rb-ch-preview-text {
-  flex: 1;
-  font-size: var(--font-ui-small);
-  color: var(--text-normal);
-}
-
-.rb-ch-preview-empty .rb-ch-preview-text {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.rb-ch-preview-chevron {
-  display: flex;
-  align-items: center;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.rb-ch-preview-chevron svg {
-  width: 0.75rem;
-  height: 0.75rem;
-}
 
 /* Mobile nutrition strip */
 
@@ -1887,29 +1717,10 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   line-height: 1.1;
 }
 
-.rb-mobile-nutrition-label {
-  font-size: 0.6rem;
-  color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  line-height: 1.1;
-}
 
 /* Info tab nutrition */
 
-.rb-mobile-info-nutrition {
-  margin-bottom: 0.75rem;
-}
 
-.rb-mobile-info-heading {
-  font-size: var(--font-ui-small);
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 0.4rem;
-}
 
 /* Tabs */
 
@@ -1999,9 +1810,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   user-select: auto;
 }
 
-.rb-step-times {
-  margin-bottom: 0.5rem;
-}
 
 .rb-info-url {
   margin-bottom: 0.75rem;
@@ -2013,15 +1821,10 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--interactive-accent);
 }
 
-/* ── Modals ──────────────────────────────────────────────────────────────── */
-
-.rb-modal {
-  padding: 0.25rem 0;
-}
 
 /* ── Modal shell (section 55): sticky header/footer, scrollable body ──────── */
 
-.rb-shell {
+.rb-modal-shell {
   display: flex;
   flex-direction: column;
   /* Override Obsidian's overflow-y: auto on .modal-content so only
@@ -2034,7 +1837,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   max-height: 75vh;
 }
 
-.rb-shell-header {
+.rb-modal-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2042,7 +1845,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   padding-bottom: 0.5rem;
 }
 
-.rb-shell-title {
+.rb-modal-title {
   font-size: 1.2rem;
   font-weight: 700;
   margin: 0 0 0.15rem;
@@ -2051,19 +1854,19 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   min-width: 0;
 }
 
-.rb-shell-subtitle {
+.rb-modal-subtitle {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
   margin: 0;
   width: 100%;
 }
 
-.rb-shell-icon {
+.rb-modal-icon {
   color: var(--interactive-accent);
   flex: 0 0 auto;
 }
 
-.rb-shell-body {
+.rb-modal-body {
   flex: 1;
   overflow-y: auto;
   /* min-height: 0 is required for flex children to actually scroll in
@@ -2072,7 +1875,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   padding: 0.25rem 0;
 }
 
-.rb-shell-footer {
+.rb-modal-footer {
   flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
@@ -2087,18 +1890,18 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   white-space: nowrap;
 }
 
-.rb-shell-footer:empty {
+.rb-modal-footer:empty {
   display: none;
 }
 
 /* Use a more specific selector to beat Obsidian's .mod-cta rule on mobile
    without !important, keeping footer buttons square with rounded corners. */
-.rb-shell-footer .mod-cta,
-.rb-shell-footer .mod-warning {
+.rb-modal-footer .mod-cta,
+.rb-modal-footer .mod-warning {
   border-radius: var(--radius-m);
 }
 
-.rb-shell-cancel-btn {
+.rb-modal-cancel-btn {
   background: transparent;
   color: var(--text-muted);
   border: none;
@@ -2108,23 +1911,11 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   border-radius: var(--radius-m);
 }
 
-.rb-shell-cancel-btn:hover {
+.rb-modal-cancel-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.rb-modal-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 0 0 0.2rem;
-  color: var(--text-normal);
-}
-
-.rb-modal-subtitle {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-  margin: 0 0 1.25rem;
-}
 
 .rb-modal-message {
   color: var(--text-muted);
@@ -2368,28 +2159,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   cursor: not-allowed;
 }
 
-.rb-modal-btn-primary {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-}
-
-.rb-modal-btn-primary:hover {
-  background: var(--interactive-accent-hover);
-  border-color: var(--interactive-accent-hover);
-  color: var(--text-on-accent);
-}
-
-.rb-modal-btn-cancel {
-  background: transparent;
-  color: var(--text-muted);
-  border-color: transparent;
-}
-
-.rb-modal-btn-cancel:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
 
 .rb-modal-btn-danger {
   background: rgba(var(--color-red-rgb), 0.1);
@@ -2552,14 +2321,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 /* Footer */
-.rb-import-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--background-modifier-border);
-}
 
 /* Two-section modal layout */
 
@@ -2629,12 +2390,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--text-muted);
 }
 
-.rb-modal-recipe-name {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-normal);
-  margin: 0.2rem 0 0.15rem;
-}
 
 .rb-modal-section-desc {
   font-size: var(--font-ui-small);
@@ -2939,17 +2694,14 @@ body.is-mobile .rb-checklist-row input[type="checkbox"] {
 body.is-mobile .rb-modal-btn {
   padding: 0.6rem 1rem;
   font-size: var(--font-ui-medium);
+  width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 body.is-mobile .rb-modal-footer {
   flex-direction: column-reverse;
   gap: 0.5rem;
-}
-
-body.is-mobile .rb-modal-btn {
-  width: 100%;
-  text-align: center;
-  justify-content: center;
 }
 
 body.is-mobile .rb-mark-cooked-date-field,
@@ -3027,11 +2779,7 @@ body.is-mobile .rb-jump-btn {
   display: block;
 }
 
-/* .rb-duration-btn--active {
-  background: color-mix(in srgb, var(--interactive-accent) 36%, transparent);
-} */
-
-/* Floating tray — bottom-right corner, stacks widgets vertically */
+/* Floating tray - bottom-right corner, stacks widgets vertically */
 .rb-timer-tray {
   position: fixed;
   bottom: 1.25rem;
@@ -3384,13 +3132,6 @@ body.is-mobile .rb-duration-btn {
   margin-bottom: 0.5rem;
 }
 
-.rb-gv-carousel-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-faint);
-}
 
 .rb-gv-carousel-empty {
   font-size: var(--font-ui-small);
@@ -3432,14 +3173,7 @@ body.is-mobile .rb-duration-btn {
   gap: 0.35rem;
 }
 
-.rb-gv-carousel-group-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-faint);
-  padding-left: 0.1rem;
-}
+
 
 .rb-gv-carousel-cards {
   display: flex;
@@ -3525,28 +3259,7 @@ body.is-mobile .rb-duration-btn {
 
 /* ── Summary rows ────────────────────────────────────────────────────────── */
 
-.rb-gv-summary-row {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-}
 
-.rb-gv-grocery-row {
-  margin-bottom: 0.75rem;
-}
-
-.rb-gv-summary-label {
-  font-weight: 500;
-}
-
-.rb-gv-summary-link {
-  color: var(--interactive-accent);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.rb-gv-summary-link:hover {
-  text-decoration: underline;
-}
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 
@@ -3604,10 +3317,7 @@ body.is-mobile .rb-duration-btn {
 }
 
 .rb-gv-chevron {
-  display: flex;
-  align-items: center;
   color: var(--text-faint);
-  flex-shrink: 0;
   transition: transform 0.15s;
 }
 
@@ -4302,37 +4012,10 @@ body.is-mobile .rb-mpv-card-remove {
 
 /* ── Settings notices ────────────────────────────────────────────────────── */
 
-.rb-settings-mobile-note {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-  background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  padding: 0.4rem 0.65rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
-}
 
 /* ── Settings UI components ──────────────────────────────────────────────── */
 
 /* Small icon-action button used for ×, ↑, ↓ throughout settings */
-.rb-settings-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-s);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.8rem;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.1s, color 0.1s;
-}
 
 .rb-settings-icon-btn:hover {
   background: var(--background-modifier-hover);
@@ -4346,18 +4029,6 @@ body.is-mobile .rb-mpv-card-remove {
 }
 
 /* "+ add" text button */
-.rb-settings-add-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.55rem;
-  background: transparent;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-ui-small);
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-}
 
 .rb-settings-add-btn:hover {
   background: var(--background-modifier-hover);
@@ -4433,21 +4104,21 @@ body.is-mobile .rb-mpv-card-remove {
 
 /* ── Allergen tag chips ───────────────────────────────────────────────────── */
 
-.recipe-box-tag-editor {
+.rb-tag-editor {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding-top: 0.5rem;
 }
 
-.recipe-box-tag-row {
+.rb-tag-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   align-items: center;
 }
 
-.recipe-box-tag-chip {
+.rb-tag-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
@@ -4459,7 +4130,7 @@ body.is-mobile .rb-mpv-card-remove {
   color: var(--text-normal);
 }
 
-.recipe-box-tag-chip button {
+.rb-tag-chip button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4475,12 +4146,12 @@ body.is-mobile .rb-mpv-card-remove {
   line-height: 1;
 }
 
-.recipe-box-tag-chip button:hover {
+.rb-tag-chip button:hover {
   background: var(--background-modifier-hover);
   color: var(--text-error);
 }
 
-.recipe-box-tag-editor input[type="text"] {
+.rb-tag-editor input[type="text"] {
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-s);
@@ -4492,33 +4163,33 @@ body.is-mobile .rb-mpv-card-remove {
   box-sizing: border-box;
 }
 
-.recipe-box-tag-editor input[type="text"]:focus {
+.rb-tag-editor input[type="text"]:focus {
   border-color: var(--background-modifier-border-focus);
 }
 
 /* ── Category order list ─────────────────────────────────────────────────── */
 
-.recipe-box-order-list {
+.rb-order-list {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
   padding-top: 0.5rem;
 }
 
-.recipe-box-list-row {
+.rb-list-row {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   padding: 0.15rem 0;
 }
 
-.recipe-box-list-row>span:first-child {
+.rb-list-row>span:first-child {
   flex: 1;
   font-size: var(--font-ui-small);
   color: var(--text-normal);
 }
 
-.recipe-box-list-row>button {
+.rb-list-row>button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4536,30 +4207,30 @@ body.is-mobile .rb-mpv-card-remove {
   transition: background 0.1s, color 0.1s;
 }
 
-.recipe-box-list-row>button:hover:not(:disabled) {
+.rb-list-row>button:hover:not(:disabled) {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.recipe-box-list-row>button:disabled {
+.rb-list-row>button:disabled {
   opacity: 0.25;
   cursor: default;
 }
 
 /* ── Category overrides list ─────────────────────────────────────────────── */
 
-.recipe-box-override-list {
+.rb-override-list {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
   padding-top: 0.5rem;
 }
 
-.recipe-box-override-list .recipe-box-list-row {
+.rb-override-list .rb-list-row {
   gap: 0.4rem;
 }
 
-.recipe-box-override-list .recipe-box-list-row input[type="text"] {
+.rb-override-list .rb-list-row input[type="text"] {
   flex: 1;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
@@ -4571,22 +4242,22 @@ body.is-mobile .rb-mpv-card-remove {
   min-width: 0;
 }
 
-.recipe-box-override-list .recipe-box-list-row input[type="text"]:focus {
+.rb-override-list .rb-list-row input[type="text"]:focus {
   border-color: var(--background-modifier-border-focus);
 }
 
-.recipe-box-override-list .recipe-box-list-row>button {
+.rb-override-list .rb-list-row>button {
   border: none;
   width: 1.5rem;
   height: 1.5rem;
 }
 
-.recipe-box-override-list .recipe-box-list-row>button:hover {
+.rb-override-list .rb-list-row>button:hover {
   color: var(--text-error);
 }
 
 /* "+ Add override" button at the bottom of the overrides list */
-.recipe-box-override-list>button:last-child {
+.rb-override-list>button:last-child {
   align-self: flex-start;
   padding: 0.15rem 0.55rem;
   background: transparent;
@@ -4598,7 +4269,7 @@ body.is-mobile .rb-mpv-card-remove {
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 
-.recipe-box-override-list>button:last-child:hover {
+.rb-override-list>button:last-child:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
   border-color: var(--background-modifier-border-hover);
@@ -4651,15 +4322,7 @@ body.is-mobile .rb-mpv-card-remove {
   margin: 0.5rem 0;
 }
 
-.rb-suggest-partial {
-  color: var(--text-accent);
-}
 
-.rb-suggest-list {
-  list-style: decimal;
-  padding-left: 1.5rem;
-  margin: 0;
-}
 
 .rb-suggest-add-btn {
   padding: 0.35rem 0.75rem;
@@ -4693,35 +4356,17 @@ body.is-mobile .rb-mpv-card-remove {
   accent-color: var(--interactive-accent);
 }
 
-.rb-suggest-item {
-  display: flex;
-  align-items: center;
-  gap: var(--size-2-3);
-  padding: 0.35rem 0;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
 
 .rb-suggest-item:last-child {
   border-bottom: none;
 }
 
-.rb-suggest-recipe-link {
-  flex: 1;
-  cursor: pointer;
-  color: var(--text-normal);
-  text-decoration: none;
-}
 
 .rb-suggest-recipe-link:hover {
   color: var(--text-accent);
   text-decoration: underline;
 }
 
-.rb-suggest-score {
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-  white-space: nowrap;
-}
 
 .rb-suggest-results {
   display: flex;
@@ -4960,31 +4605,6 @@ body.is-mobile .rb-mpv-card-remove {
 .rb-rule-row--draggable.rb-drag-over {
   outline: 2px solid var(--interactive-accent);
   border-radius: var(--radius-s);
-}
-
-.rb-rule-delete-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: var(--radius-s);
-  flex-shrink: 0;
-}
-
-.rb-rule-delete-btn svg,
-.rb-rule-delete-btn span svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.rb-rule-delete-btn:hover {
-  color: var(--text-error);
-  background: var(--background-modifier-hover);
 }
 
 .rb-rule-label {

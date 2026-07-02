@@ -86,12 +86,12 @@ function renderCategoryOrder(
 		.setName("Category order")
 		.setDesc("Drag or use buttons to reorder.");
 
-	const list = setting.settingEl.createDiv("recipe-box-order-list");
+	const list = setting.settingEl.createDiv("rb-order-list");
 
 	function render(): void {
 		list.empty();
 		settings.manualCategoryOrder.forEach((cat, i) => {
-			const row = list.createDiv("recipe-box-list-row");
+			const row = list.createDiv("rb-list-row");
 			row.createSpan({ text: cat });
 			const up = row.createEl("button", { text: "↑" });
 			const down = row.createEl("button", { text: "↓" });
@@ -125,12 +125,12 @@ function renderCategoryOverrides(
 		.setName("Category overrides")
 		.setDesc("Map ingredient name substrings to specific categories.");
 
-	const list = setting.settingEl.createDiv("recipe-box-override-list");
+	const list = setting.settingEl.createDiv("rb-override-list");
 
 	function render(): void {
 		list.empty();
 		settings.categoryOverrides.forEach((override: CategoryOverride, i: number) => {
-			const row = list.createDiv("recipe-box-list-row");
+			const row = list.createDiv("rb-list-row");
 			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: "Ingredient substring" });
 			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: "Category" });
 			const del = row.createEl("button", { text: "✕" });

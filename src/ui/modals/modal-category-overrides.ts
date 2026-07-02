@@ -19,7 +19,7 @@ export class CategoryOverridesModal extends BaseModal {
 	getSubtitle(): string { return "Map ingredient name substrings to specific categories."; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		const list = bodyEl.createDiv("recipe-box-override-list");
+		const list = bodyEl.createDiv("rb-override-list");
 		this.renderList(list);
 	}
 
@@ -30,7 +30,7 @@ export class CategoryOverridesModal extends BaseModal {
 		const knownCategories = this.getKnownCategories();
 
 		this.settings.categoryOverrides.forEach((override: CategoryOverride, i: number) => {
-			const row = list.createDiv("recipe-box-list-row");
+			const row = list.createDiv("rb-list-row");
 			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: "Ingredient substring" });
 			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: "Category" });
 

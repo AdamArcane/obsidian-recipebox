@@ -96,7 +96,7 @@ export function renderMealPlanCarousel(
 	const section = container.createDiv({ cls: "rb-gv-carousel-section" });
 
 	const header = section.createDiv({ cls: "rb-gv-carousel-header" });
-	header.createSpan({ cls: "rb-gv-carousel-title", text: "Meal plan" });
+	header.createSpan({ cls: "rb-label-caps rb-gv-carousel-title", text: "Meal plan" });
 	const link = header.createEl("a", { cls: "rb-gv-summary-link", text: "View →" });
 	link.addEventListener("click", () => deps.openMealPlanView());
 
@@ -110,7 +110,7 @@ export function renderMealPlanCarousel(
 
 	for (const group of groups) {
 		const groupEl = track.createDiv({ cls: "rb-gv-carousel-group" });
-		groupEl.createDiv({ cls: "rb-gv-carousel-group-label", text: group.day });
+		groupEl.createDiv({ cls: "rb-label-caps rb-gv-carousel-group-label", text: group.day });
 		const cards = groupEl.createDiv({ cls: "rb-gv-carousel-cards" });
 		for (const entry of group.entries) {
 			renderRecipeCard(cards, entry, group.day, app, deps);

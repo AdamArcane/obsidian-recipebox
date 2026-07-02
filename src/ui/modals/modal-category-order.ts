@@ -18,7 +18,7 @@ export class CategoryOrderModal extends BaseModal {
 	getSubtitle(): string { return "Drag or use buttons to set the display order when auto-sort is off."; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		const list = bodyEl.createDiv("recipe-box-order-list");
+		const list = bodyEl.createDiv("rb-order-list");
 		this.renderList(list);
 	}
 
@@ -27,7 +27,7 @@ export class CategoryOrderModal extends BaseModal {
 	private renderList(list: HTMLElement): void {
 		list.empty();
 		this.settings.manualCategoryOrder.forEach((cat, i) => {
-			const row = list.createDiv("recipe-box-list-row");
+			const row = list.createDiv("rb-list-row");
 			row.createSpan({ text: cat });
 			const up = row.createEl("button", { text: "↑" });
 			const down = row.createEl("button", { text: "↓" });
@@ -48,7 +48,7 @@ export class CategoryOrderModal extends BaseModal {
 
 		let resetPending = false;
 		let resetTimer: number | null = null;
-		const resetBtn = list.createEl("button", { cls: "recipe-box-reset-btn", text: "Reset to defaults" });
+		const resetBtn = list.createEl("button", { cls: "rb-reset-btn", text: "Reset to defaults" });
 		resetBtn.addEventListener("click", () => {
 			if (!resetPending) {
 				resetPending = true;

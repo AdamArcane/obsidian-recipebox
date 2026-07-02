@@ -25,7 +25,7 @@ export function renderGroupSection(
 
 	if (group.name) {
 		const header = section.createDiv({ cls: "rb-gv-group-header" });
-		const chevron = header.createSpan({ cls: "rb-gv-chevron" });
+		const chevron = header.createSpan({ cls: "rb-gv-chevron rb-icon" });
 		setIcon(chevron, isCollapsed ? "chevron-right" : "chevron-down");
 
 		header.createSpan({ cls: "rb-gv-group-name", text: group.name });
