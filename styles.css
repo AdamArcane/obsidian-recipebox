@@ -10,18 +10,7 @@
   flex-shrink: 0;
 }
 
-/* Small square icon-only button. Size variants via modifier classes. */
 .rb-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-s);
-  color: var(--text-muted);
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 0;
   transition: background 0.1s, color 0.1s;
 }
 

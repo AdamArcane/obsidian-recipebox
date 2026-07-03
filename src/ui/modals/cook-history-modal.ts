@@ -4,7 +4,7 @@
  * modal only owns the "Add entry" footer button and the self-referencing
  * refresh callback that re-renders the body after any mutation.
  */
-import { App, setIcon, TFile } from "obsidian";
+import { App, EventRef, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { BaseModal } from "./modal-shell";
 import { EntryEditorModal } from "./entry-editor-modal";
@@ -13,6 +13,7 @@ import { addCookHistoryEntry } from "../../recipe-history/cook-history";
 
 export class CookHistoryModal extends BaseModal {
 	private shellBody!: HTMLElement;
+	private metaRef: EventRef | null = null;
 
 	constructor(
 		app: App,
@@ -46,6 +47,25 @@ export class CookHistoryModal extends BaseModal {
 		const closeBtn = footerEl.createEl("button", { cls: "rb-shell-cancel-btn" });
 		closeBtn.createSpan({ text: "Close" });
 		closeBtn.addEventListener("click", () => this.close());
+	}
+
+	override onOpen(): void {
+		super.onOpen();
+		// "Mark as cooked" writes a new entry through a separate MarkCookedModal
+		// instance with no reference back to this one, so listen for the file
+		// change itself rather than trying to thread a refresh callback through
+		// that flow.
+		this.metaRef = this.app.metadataCache.on("changed", changedFile => {
+			if (changedFile === this.recipeFile) this.refresh();
+		});
+	}
+
+	override onClose(): void {
+		if (this.metaRef) {
+			this.app.metadataCache.offref(this.metaRef);
+			this.metaRef = null;
+		}
+		super.onClose();
 	}
 
 	private refresh(): void {

@@ -41,11 +41,23 @@ Recipe Box doesn't include its own collection or index view. Obsidian's Bases an
 
 ## Installation
 
-Not yet available in the community plugin directory. To install manually:
+Recipe Box is not yet listed in the Obsidian community plugin directory. Install via BRAT (recommended for beta testing) or manually.
 
-1. Download the latest release
-2. Extract `main.js`, `manifest.json`, and `styles.css` into `<your vault>/.obsidian/plugins/recipe-box/`
-3. Reload Obsidian and enable Recipe Box in Settings → Community plugins
+### BRAT (recommended)
+
+1. Install the [BRAT plugin](https://github.com/TfTHacker/obsidian42-brat) from the Obsidian community plugins directory and enable it.
+2. Open BRAT settings and click **Add Beta Plugin**.
+3. Enter `AdamArcane/obsidian-recipebox` and click **Add Plugin**.
+4. Enable Recipe Box in Settings → Community plugins.
+
+BRAT will notify you when new releases are available and can update the plugin automatically.
+
+### Manual
+
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/AdamArcane/obsidian-recipebox/releases/latest).
+2. Create the folder `<your vault>/.obsidian/plugins/recipe-box/` if it does not exist.
+3. Copy the three files into that folder.
+4. Reload Obsidian and enable Recipe Box in Settings → Community plugins.
 
 ## Getting started
 

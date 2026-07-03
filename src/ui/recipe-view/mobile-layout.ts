@@ -20,6 +20,8 @@ import { renderStarRating } from "./rating";
 import { renderBadgeRow } from "./badges";
 import { renderIngredientsSection } from "./ingredients-section";
 import { renderInstructionsSection } from "./instructions-section";
+import { findOrOpenLeaf } from "../../utils/open-leaf";
+import { RECIPE_VIEW_TYPE } from "./recipe-view";
 import { fmStr } from "./frontmatter-read-helpers";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
@@ -481,7 +483,17 @@ export async function renderMobileLayout(
 	);
 
 	// Steps tab
-	await renderInstructionsSection(panelSteps, app, component, file.path, instructionGroups, settings);
+	const timerOpts = settings.timersEnabled ? {
+		autoStart: settings.timerAutoStart,
+		compactByDefault: settings.timerCompactDisplay,
+		incrementSeconds: settings.timerMinuteIncrement * 60,
+		rangeDefault: settings.timerRangeDefault,
+		recipeName: file.basename,
+		onNavigate: () => {
+			void findOrOpenLeaf(app, RECIPE_VIEW_TYPE, file.path);
+		},
+	} : undefined;
+	await renderInstructionsSection(panelSteps, app, component, file.path, instructionGroups, settings, timerOpts);
 
 	// Info tab — nutrition + source URL + notes content
 	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
