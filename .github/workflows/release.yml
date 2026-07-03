@@ -32,15 +32,6 @@ jobs:
           # Strip leading 'v' from title so release shows '0.1.2' not 'v0.1.2'
           title="${tag#v}"
 
-          # Treat anything below 1.0.0 as a pre-release (early beta builds).
-          # Once the plugin is in the community directory, tags will start at
-          # 1.0.0 and this condition will no longer match.
-          if [[ "$title" =~ ^0\. ]]; then
-            prerelease="--prerelease"
-          else
-            prerelease=""
-          fi
-
           gh release create "$tag" \
             --title="$title" \
             $prerelease \
