@@ -2,7 +2,7 @@
  * Renders a single recipe card within the meal plan week grid, including the
  * thumbnail, name, meal type, and drag handle.
  */
-import { App, TFile } from "obsidian";
+import { App, TFile, setIcon } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { makeDraggable } from "./drag-reschedule";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
@@ -35,6 +35,7 @@ export function renderRecipeCard(
 	deps: MealPlanViewDeps
 ): void {
 	const card = container.createDiv({ cls: "rb-mpv-card" });
+	if (entry.isLeftovers) card.addClass("rb-mpv-card--leftovers");
 	makeDraggable(card, entry.id);
 
 	// thumbnail
@@ -51,16 +52,16 @@ export function renderRecipeCard(
 	const name = entry.recipePath.split("/").pop()?.replace(/\.md$/i, "") ?? entry.recipePath;
 	const body = card.createDiv({ cls: "rb-mpv-card-body" });
 	body.createDiv({ cls: "rb-mpv-card-name", text: name });
-	if (entry.meal) {
-		body.createDiv({ cls: "rb-mpv-card-meal", text: entry.meal });
-	}
+	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: entry.meal });
+	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: "(Leftovers)" });
 
-	// remove button
-	const removeBtn = card.createEl("button", { cls: "rb-mpv-card-remove", text: "×", attr: { title: "Remove" } });
-	removeBtn.addEventListener("click", (e) => {
-		e.stopPropagation();
-		void deps.removeFromMealPlan(entry.id);
-	});
+	const actions = card.createDiv({ cls: "rb-mpv-card-actions" });
+	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: "Edit" } });
+	setIcon(editBtn, "pencil");
+	editBtn.addEventListener("click", (e) => { e.stopPropagation(); deps.openEditEntryModal(entry); });
+	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: "Remove" } });
+	setIcon(removeBtn, "trash-2");
+	removeBtn.addEventListener("click", (e) => { e.stopPropagation(); void deps.removeFromMealPlan(entry.id); });
 
 	// click to open recipe (not on drag)
 	card.addEventListener("click", () => deps.openRecipe(entry.recipePath));

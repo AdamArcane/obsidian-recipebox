@@ -31,11 +31,16 @@ function formatMealTypeSuffix(meal: string, settings: RecipeBoxSettings): string
 
 export function renderMealPlanLine(entry: MealPlanEntry, recipeName: string, settings: RecipeBoxSettings): string {
 	const suffix = entry.meal ? formatMealTypeSuffix(entry.meal, settings) : "";
-	return `- [ ] [[${recipeName}]]${suffix}`;
+	// #leftovers tag persists the isLeftovers flag in the note for both recipe and custom entries.
+	const leftoverTag = entry.isLeftovers ? " #leftovers" : "";
+	if (!entry.recipePath) {
+		return `- [ ] ${entry.label ?? recipeName}${suffix}${leftoverTag}`;
+	}
+	return `- [ ] [[${recipeName}]]${suffix}${leftoverTag}`;
 }
 
 export function insertMealPlanEntryIntoText(noteText: string, entry: MealPlanEntry, recipeName: string, settings: RecipeBoxSettings): string {
-	if (!entry.recipePath) return noteText; // leftovers are state-only
+	// Both recipe and custom meal entries write to the note
 	const targetHeader = entry.day ?? "Meal Plan Queue";
 	const newLine = renderMealPlanLine(entry, recipeName, settings);
 	const lines = noteText.split("\n");

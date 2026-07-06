@@ -14,32 +14,34 @@ function resolveRecipeName(app: App, filePath: string): string {
 }
 
 export async function insertMealPlanEntry(app: App, entry: MealPlanEntry, settings: RecipeBoxSettings): Promise<void> {
-	const name = resolveRecipeName(app, entry.recipePath);
+	const name = entry.recipePath ? resolveRecipeName(app, entry.recipePath) : (entry.label ?? "");
 	const text = await readNoteOrEmpty(app, settings.mealPlanPath) || "# Meal Plan\n";
 	await writeNote(app, settings.mealPlanPath, insertMealPlanEntryIntoText(text, entry, name, settings));
 }
 
 export async function removeMealPlanEntry(
 	app: App,
-	recipePath: string,
+	entry: MealPlanEntry,
 	settings: RecipeBoxSettings,
-	targetDay?: string,
 ): Promise<void> {
-	if (!recipePath) return; // leftovers entries are state-only, not in the note
 	const text = await readNoteOrEmpty(app, settings.mealPlanPath);
 	if (!text) return;
 
-	const name = resolveRecipeName(app, recipePath).toLowerCase();
 	const sections = parseMealPlanNote(text, settings.mealTypeFieldName);
-	const sectionTarget = targetDay?.trim() || "Meal Plan Queue";
+	const sectionTarget = entry.day?.trim() || "Meal Plan Queue";
 	let removed = false;
+
+	// Match by wikilink for recipe entries, by label text for custom meal entries
+	const isMatch = entry.recipePath
+		? (wikilink: string) => wikilink.toLowerCase() === resolveRecipeName(app, entry.recipePath).toLowerCase()
+		: (wikilink: string, label?: string) => !wikilink && (label ?? "").toLowerCase() === (entry.label ?? "").toLowerCase();
 
 	for (const section of sections) {
 		const sectionLabel = section.header ?? "Meal Plan Queue";
-		const isTarget = !targetDay || sectionLabel.toLowerCase() === sectionTarget.toLowerCase();
+		const isTarget = !entry.day || sectionLabel.toLowerCase() === sectionTarget.toLowerCase();
 		if (isTarget) {
 			section.lines = section.lines.filter(
-				(l) => removed || l.kind !== "entry" || l.wikilink.toLowerCase() !== name
+				(l) => removed || l.kind !== "entry" || !isMatch(l.wikilink, l.label)
 					? true
 					: (removed = true, false) // remove first match only in the target section
 			);

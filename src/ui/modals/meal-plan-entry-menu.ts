@@ -25,9 +25,9 @@ export function openMealPlanEntryMenu(
 		item.setTitle("Change day / meal type")
 			.setIcon("pencil")
 			.onClick(() => {
-				deps.openEditMealPlanEntry(file, entry, async (day, meal) => {
+				deps.openEditMealPlanEntry(file, entry, async (day, meal, isLeftovers) => {
 					await deps.removeFromMealPlanById(entry.id);
-					await deps.addToMealPlan(file.path, day, meal, entry.contributions);
+					await deps.addToMealPlan(file.path, day, meal, entry.contributions, isLeftovers);
 				});
 			})
 	);

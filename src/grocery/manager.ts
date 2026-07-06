@@ -11,7 +11,7 @@ import { ContributionMap, GroceryContributionSource, GroceryItem, GroceryItemEnt
 import { writeNote } from "../utils/vault-notes";
 import { rebuildGroceryItems } from "./grocery-rebuild";
 import { isGroupCollapsed, setGroupCollapsed, autoCollapseGroups } from "./group-collapse";
-import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addLeftoversEntry, setMealPlanEntryMealType, clearMealPlan } from "../meal-plan/meal-plan-actions";
+import { addToMealPlan, addToGroceryOnly, removeFromMealPlan, rescheduleMealPlanEntry, addMealPlanEntry, addCustomMealEntry, editCustomMealEntry, setMealPlanEntryMealType, clearMealPlan } from "../meal-plan/meal-plan-actions";
 import { addGroceryItem, updateGroceryItem, removeGroceryItem, removeFromGroceryByKey } from "./grocery-item-actions";
 import { syncMealPlanNote, GroceryManagerSink } from "../meal-plan/meal-plan-note-sync";
 import { toggleGroceryNoteItemChecked, resetGroceryNoteChecks, setAllGroceryNoteChecks } from "./grocery-note/read";
@@ -47,9 +47,9 @@ export class GroceryManager extends Events {
 
 	// ── Meal plan ─────────────────────────────────────────────────────────────
 
-	async addToMealPlan(recipePath: string, day?: string, mealType?: string, contributions: ContributionMap = {}): Promise<void> {
+	async addToMealPlan(recipePath: string, day?: string, mealType?: string, contributions: ContributionMap = {}, isLeftovers = false): Promise<void> {
 		const s = this.sink.getSettings();
-		await addToMealPlan(this.app, recipePath, day, mealType, contributions, s, () => this.sink.save());
+		await addToMealPlan(this.app, recipePath, day, mealType, contributions, s, () => this.sink.save(), isLeftovers);
 		await this.refresh();
 	}
 
@@ -70,10 +70,15 @@ export class GroceryManager extends Events {
 		this.trigger("change");
 	}
 
-	async addLeftoversEntry(day?: string, label = "Leftovers"): Promise<string> {
-		const id = await addLeftoversEntry(day, label, this.sink.getSettings(), () => this.sink.save());
+	async addCustomMealEntry(label: string, day?: string, meal?: string, isLeftovers = false): Promise<string> {
+		const id = await addCustomMealEntry(this.app, label, day, meal, isLeftovers, this.sink.getSettings(), () => this.sink.save());
 		this.trigger("change");
 		return id;
+	}
+
+	async editCustomMealEntry(id: string, updates: { day?: string; meal?: string; label?: string; isLeftovers?: boolean }): Promise<void> {
+		await editCustomMealEntry(this.app, id, updates, this.sink.getSettings(), () => this.sink.save());
+		this.trigger("change");
 	}
 
 	async removeFromMealPlan(id: string): Promise<void> {

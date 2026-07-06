@@ -58,7 +58,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 			} else {
 				new AddToMealPlanModal(
 					plugin.app,
-					file,
+					{ kind: "recipe", file },
 					plugin.settings,
 					(day, meal, contributions) => {
 						void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {});

@@ -45,9 +45,11 @@ export class MealPlanView extends ItemView {
 		setIcon(addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-icon" }), "plus");
 		addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-label", text: "Add recipe" });
 		addRecipeBtn.addEventListener("click", () => {
-			new RecipePickerModal(this.app, this.deps.getSettings(), undefined, (file) => {
-				this.deps.openAddToMealPlanModal(file);
-			}).open();
+			new RecipePickerModal(
+				this.app, this.deps.getSettings(), undefined,
+				(file) => { this.deps.openAddToMealPlanModal(file); },
+				(label) => { this.deps.openAddCustomMealModal(label, undefined); },
+			).open();
 		});
 
 		const clearBtn = topBar.createEl("button", { cls: "rb-mpv-clear-btn" });

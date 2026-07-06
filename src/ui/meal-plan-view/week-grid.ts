@@ -22,16 +22,31 @@ const DAY_COLUMNS: Array<{ label: string; dayKey: string }> = [
 
 const KNOWN_DAY_KEYS = new Set(DAY_COLUMNS.map(c => c.dayKey));
 
-function renderLeftoversCard(container: HTMLElement, entry: MealPlanEntry, deps: MealPlanViewDeps): void {
-	const card = container.createDiv({ cls: "rb-mpv-card rb-mpv-card--leftovers" });
+function renderCustomMealCard(container: HTMLElement, entry: MealPlanEntry, deps: MealPlanViewDeps): void {
+	const card = container.createDiv({ cls: "rb-mpv-card rb-mpv-card--custom" });
+	if (entry.isLeftovers) card.addClass("rb-mpv-card--leftovers");
 	makeDraggable(card, entry.id);
+
+	// Thumbnail placeholder: same block as recipe cards, but with a lighter tint
+	// and a centered icon so the card shape is identical.
+	const thumb = card.createDiv({ cls: "rb-mpv-card-thumb rb-mpv-card-thumb--empty rb-mpv-card-thumb--custom" });
+	setIcon(thumb, entry.isLeftovers ? "utensils-crossed" : "utensils");
+
 	const body = card.createDiv({ cls: "rb-mpv-card-body" });
-	const nameRow = body.createDiv({ cls: "rb-mpv-card-name-row" });
-	const iconEl = nameRow.createSpan({ cls: "rb-mpv-card-leftovers-icon" });
-	setIcon(iconEl, "archive");
-	nameRow.createSpan({ cls: "rb-mpv-card-name", text: entry.label ?? "Leftovers" });
+	body.createDiv({ cls: "rb-mpv-card-name", text: entry.label ?? "Custom meal" });
 	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: entry.meal });
-	const removeBtn = card.createEl("button", { cls: "rb-mpv-card-remove", text: "×", attr: { title: "Remove" } });
+	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: "(Leftovers)" });
+
+	card.addEventListener("click", () => {
+		deps.openEditEntryModal(entry);
+	});
+
+	const actions = card.createDiv({ cls: "rb-mpv-card-actions" });
+	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: "Edit" } });
+	setIcon(editBtn, "pencil");
+	editBtn.addEventListener("click", (e) => { e.stopPropagation(); deps.openEditEntryModal(entry); });
+	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: "Remove" } });
+	setIcon(removeBtn, "trash-2");
 	removeBtn.addEventListener("click", (e) => { e.stopPropagation(); void deps.removeFromMealPlan(entry.id); });
 }
 
@@ -53,19 +68,11 @@ function renderColumn(
 	addBtn.setText("+");
 	addBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
-		new RecipePickerModal(app, deps.getSettings(), dayKey, (file) => {
-			deps.openAddToMealPlanModal(file, { day: dayKey });
-		}).open();
-	});
-
-	const leftoversBtn = header.createEl("button", { cls: "rb-mpv-col-leftovers", attr: { title: `Mark leftovers for ${label}`, "aria-label": `Mark leftovers for ${label}` } });
-	leftoversBtn.setText("↩");
-	leftoversBtn.addEventListener("click", (e) => {
-		e.stopPropagation();
-		const alreadyHasLeftovers = deps.getMealPlan().some(
-			(en) => !en.recipePath && en.day?.toLowerCase() === dayKey?.toLowerCase()
-		);
-		if (!alreadyHasLeftovers) void deps.addLeftoversEntry(dayKey, "Leftovers");
+		new RecipePickerModal(
+			app, deps.getSettings(), dayKey,
+			(file) => { deps.openAddToMealPlanModal(file, { day: dayKey }); },
+			(label) => { deps.openAddCustomMealModal(label, dayKey); },
+		).open();
 	});
 
 	const body = colEl.createDiv({ cls: "rb-mpv-col-body" });
@@ -77,7 +84,7 @@ function renderColumn(
 			if (entry.recipePath) {
 				renderRecipeCard(body, entry, app, deps);
 			} else {
-				renderLeftoversCard(body, entry, deps);
+				renderCustomMealCard(body, entry, deps);
 			}
 		}
 	}

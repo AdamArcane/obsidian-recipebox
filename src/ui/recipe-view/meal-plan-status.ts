@@ -14,10 +14,16 @@ export function resolveStatusText(entries: MealPlanEntry[]): string {
 	if (entries.length > 2) return `Scheduled ${entries.length} times this week`;
 
 	const entry = entries[0];
-	if (entry.day && entry.meal) return `${entry.meal} on ${entry.day}`;
-	if (entry.day && !entry.meal) return `Scheduled for ${entry.day}`;
-	if (!entry.day && entry.meal) return `${entry.meal}, in queue`;
-	return "In queue";
+	let statusText = "";
+
+	if (entry.day && entry.meal) statusText = `${entry.meal} on ${entry.day}`;
+	if (entry.day && !entry.meal) statusText = `Scheduled for ${entry.day}`;
+	if (!entry.day && entry.meal) statusText = `${entry.meal}, in queue`;
+	if (!entry.day && !entry.meal) statusText = "In queue";
+	
+	if (entry.isLeftovers) statusText += " as leftovers";
+
+	return statusText;
 }
 
 export function renderMealPlanStatus(

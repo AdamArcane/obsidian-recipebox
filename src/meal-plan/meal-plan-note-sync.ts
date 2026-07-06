@@ -113,42 +113,47 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 	if (!text) return false;
 
 	const sections = parseMealPlanNote(text, s.mealTypeFieldName);
-	const noteEntries = new Map<string, { day: string | undefined; mealType: string | undefined }>();
+
+	// Separate recipe entries (wikilink) from custom meal entries (no wikilink)
+	const noteRecipes = new Map<string, { day: string | undefined; mealType: string | undefined; isLeftovers: boolean }>();
+	const noteCustom: Array<{ label: string; day: string | undefined; mealType: string | undefined; isLeftovers: boolean }> = [];
 	const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
 
 	for (const section of sections) {
 		for (const line of section.lines) {
-			if (line.kind === "entry") {
+			if (line.kind === "entry" && line.wikilink) {
 				const path = resolveWikilink(app, line.wikilink);
-				if (path) noteEntries.set(path, { day: line.day, mealType: line.mealType });
-			} else {
+				if (path) noteRecipes.set(path, { day: line.day, mealType: line.mealType, isLeftovers: line.isLeftovers ?? false });
+			} else if (line.kind === "entry" && !line.wikilink && line.label) {
+				noteCustom.push({ label: line.label, day: line.day, mealType: line.mealType, isLeftovers: line.isLeftovers ?? false });
+			} else if (line.kind === "raw") {
 				for (const m of line.raw.matchAll(WIKILINK_RE)) {
 					const path = resolveWikilink(app, m[1].split("|")[0].trim());
 					if (path && hasRecipeType(app, path, s)) {
-						noteEntries.set(path, { day: section.header, mealType: undefined });
+						noteRecipes.set(path, { day: section.header, mealType: undefined, isLeftovers: false });
 					}
 				}
 			}
 		}
 	}
 
-	const existingByPath = new Map(s.state.mealPlan.map((e) => [e.recipePath, e]));
+	const existingByPath = new Map(s.state.mealPlan.filter(e => e.recipePath).map((e) => [e.recipePath, e]));
 	let changed = false;
 
-	// Removals
-	const toRemove = s.state.mealPlan.filter((e) => !noteEntries.has(e.recipePath));
+	// Recipe entry removals (only touch recipe entries, not custom meals)
+	const toRemove = s.state.mealPlan.filter((e) => e.recipePath && !noteRecipes.has(e.recipePath));
 	for (const entry of toRemove) {
 		if (Object.keys(entry.contributions).length > 0) {
 			await removeFromGroceryNote(app, entry.contributions, s);
 		}
 	}
 	if (toRemove.length > 0) {
-		s.state.mealPlan = s.state.mealPlan.filter((e) => noteEntries.has(e.recipePath));
+		s.state.mealPlan = s.state.mealPlan.filter((e) => !e.recipePath || noteRecipes.has(e.recipePath));
 		changed = true;
 	}
 
-	// Additions / updates
-	for (const [path, { day, mealType }] of noteEntries) {
+	// Recipe entry additions / updates
+	for (const [path, { day, mealType, isLeftovers }] of noteRecipes) {
 		const existing = existingByPath.get(path);
 		if (!existing) {
 			const entry: MealPlanEntry = {
@@ -156,6 +161,7 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 				recipePath: path,
 				day,
 				meal: mealType,
+				isLeftovers: isLeftovers || undefined,
 				addedDate: localDateISO(),
 				contributions: {},
 				autoAddProcessed: false,
@@ -163,10 +169,55 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 			if (s.autoAddOnSync) await tryAutoAdd(app, entry, s);
 			s.state.mealPlan.push(entry);
 			changed = true;
-		} else if (!existing.autoAddProcessed && Object.keys(existing.contributions).length === 0 && s.autoAddOnSync) {
-			await tryAutoAdd(app, existing, s);
+		} else {
+			// Sync isLeftovers from note in case it was toggled externally
+			if (!!existing.isLeftovers !== isLeftovers) {
+				existing.isLeftovers = isLeftovers || undefined;
+				changed = true;
+			}
+			if (!existing.autoAddProcessed && Object.keys(existing.contributions).length === 0 && s.autoAddOnSync) {
+				await tryAutoAdd(app, existing, s);
+				changed = true;
+			}
+		}
+	}
+
+	// Custom meal sync: match by label+day, add missing, remove stale
+	const existingCustom = s.state.mealPlan.filter(e => !e.recipePath);
+	const matchedCustomIds = new Set<string>();
+	for (const noted of noteCustom) {
+		const match = existingCustom.find(
+			(e) => !matchedCustomIds.has(e.id) &&
+				(e.label ?? "").toLowerCase() === noted.label.toLowerCase() &&
+				(e.day ?? "").toLowerCase() === (noted.day ?? "").toLowerCase()
+		);
+		if (match) {
+			matchedCustomIds.add(match.id);
+			// Update isLeftovers if the note changed it
+			if (!!match.isLeftovers !== noted.isLeftovers) {
+				match.isLeftovers = noted.isLeftovers || undefined;
+				changed = true;
+			}
+		} else {
+			s.state.mealPlan.push({
+				id: generateEntryId(),
+				recipePath: "",
+				label: noted.label,
+				day: noted.day,
+				meal: noted.mealType,
+				isLeftovers: noted.isLeftovers || undefined,
+				addedDate: localDateISO(),
+				contributions: {},
+			});
 			changed = true;
 		}
+	}
+	// Remove custom entries no longer in the note
+	const staleCustom = existingCustom.filter(e => !matchedCustomIds.has(e.id));
+	if (staleCustom.length > 0) {
+		const staleIds = new Set(staleCustom.map(e => e.id));
+		s.state.mealPlan = s.state.mealPlan.filter(e => !staleIds.has(e.id));
+		changed = true;
 	}
 
 	if (changed) await sink.save();

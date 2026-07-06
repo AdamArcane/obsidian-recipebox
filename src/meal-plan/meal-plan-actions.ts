@@ -21,7 +21,8 @@ export async function addToMealPlan(
 	mealType: string | undefined,
 	contributions: ContributionMap,
 	settings: RecipeBoxSettings,
-	save: () => Promise<void>
+	save: () => Promise<void>,
+	isLeftovers = false,
 ): Promise<void> {
 	if (!recipePath.trim()) return;
 
@@ -41,6 +42,7 @@ export async function addToMealPlan(
 		recipePath: recipePath.trim(),
 		day: day?.trim() || undefined,
 		meal: mealType?.trim() || undefined,
+		isLeftovers: isLeftovers || undefined,
 		addedDate: localDateISO(),
 		contributions,
 		autoAddProcessed: Object.keys(contributions).length > 0,
@@ -105,30 +107,60 @@ export async function setMealPlanEntryMealType(
 
 	const entry = settings.state.mealPlan[idx];
 	// Rewrite the note line: remove old, insert updated
-	await removeMealPlanEntry(app, entry.recipePath, settings, entry.day);
+	await removeMealPlanEntry(app, entry, settings);
 	settings.state.mealPlan[idx] = { ...entry, meal: mealType?.trim() || undefined };
 	await save();
 	await insertMealPlanEntry(app, settings.state.mealPlan[idx], settings);
 }
 
-/** Creates a leftovers planning marker — no recipe, no grocery contribution, state-only. Returns the new entry ID. */
-export async function addLeftoversEntry(
-	day: string | undefined,
+/** Creates a custom meal entry (no recipe note). `isLeftovers` flags it as a leftovers marker. Returns the new entry ID. */
+export async function addCustomMealEntry(
+	app: App,
 	label: string,
+	day: string | undefined,
+	meal: string | undefined,
+	isLeftovers: boolean,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>
 ): Promise<string> {
 	const entry: MealPlanEntry = {
 		id: generateEntryId(),
 		recipePath: "",
-		label: label.trim() || "Leftovers",
+		label: label.trim() || "Custom meal",
 		day: day?.trim() || undefined,
+		meal: meal?.trim() || undefined,
+		isLeftovers: isLeftovers || undefined,
 		addedDate: localDateISO(),
 		contributions: {},
 	};
 	settings.state.mealPlan.push(entry);
 	await save();
+	await insertMealPlanEntry(app, entry, settings);
 	return entry.id;
+}
+
+/** Edits an existing custom meal entry: updates state and rewrites the note line. */
+export async function editCustomMealEntry(
+	app: App,
+	id: string,
+	updates: { day?: string; meal?: string; label?: string; isLeftovers?: boolean },
+	settings: RecipeBoxSettings,
+	save: () => Promise<void>
+): Promise<void> {
+	const idx = settings.state.mealPlan.findIndex(e => e.id === id);
+	if (idx < 0) return;
+	const entry = settings.state.mealPlan[idx];
+	await removeMealPlanEntry(app, entry, settings);
+	const updated: MealPlanEntry = {
+		...entry,
+		label: updates.label?.trim() ?? entry.label,
+		day: updates.day ?? entry.day,
+		meal: updates.meal ?? entry.meal,
+		isLeftovers: updates.isLeftovers ?? entry.isLeftovers,
+	};
+	settings.state.mealPlan[idx] = updated;
+	await save();
+	await insertMealPlanEntry(app, updated, settings);
 }
 
 export async function addToGroceryOnly(
@@ -159,7 +191,7 @@ export async function rescheduleMealPlanEntry(
 
 	const entry = settings.state.mealPlan[idx];
 	// Remove from old day section in note (pass old day so we target the right section when duplicates exist)
-	await removeMealPlanEntry(app, entry.recipePath, settings, entry.day);
+	await removeMealPlanEntry(app, entry, settings);
 
 	// Update day in state
 	settings.state.mealPlan[idx] = { ...entry, day: newDay };
@@ -170,7 +202,7 @@ export async function rescheduleMealPlanEntry(
 }
 
 async function reverseContributions(app: App, entry: MealPlanEntry, settings: RecipeBoxSettings): Promise<void> {
-	await removeMealPlanEntry(app, entry.recipePath, settings, entry.day);
+	await removeMealPlanEntry(app, entry, settings);
 	if (Object.keys(entry.contributions).length > 0) {
 		unrecordContributions(entry.contributions, { kind: "recipe", path: entry.recipePath, day: entry.day, mealType: entry.meal }, settings);
 		await removeFromGroceryNote(app, entry.contributions, settings);

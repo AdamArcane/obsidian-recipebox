@@ -65,6 +65,7 @@ export interface MealPlanEntry {
 	day?: string;
 	meal?: string;
 	addedDate: string;
+	isLeftovers?: boolean;
 	contributions: Record<string, { name: string; unit: string; quantity: number | null }>;
 	autoAddProcessed?: boolean;
 }

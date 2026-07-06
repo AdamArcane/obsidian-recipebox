@@ -7,6 +7,8 @@ import { deslugifyMealType } from "../../utils/text-case";
 export interface MealPlanLine {
 	kind: "entry" | "raw";
 	wikilink: string;
+	label?: string;       // set for custom meal lines (no wikilink), undefined for recipe lines
+	isLeftovers?: boolean;
 	day: string | undefined;
 	mealType: string | undefined;
 	checked: boolean;
@@ -18,13 +20,13 @@ export interface MealPlanSection {
 	lines: MealPlanLine[];
 }
 
-// Matches both formats:
-//   - [ ] [[Target|Alias]]   (plugin-written, with checkbox)
-//   - [[Target|Alias]]       (manually written, no checkbox)
-// Group 1: checkbox char (x / space), undefined when absent
-// Group 2: wikilink target
-// Group 3: everything after the wikilink (for meal-type suffix extraction)
+// Matches recipe lines: - [ ] [[Target|Alias]] ...
+// Group 1: checkbox char, Group 2: wikilink target, Group 3: suffix
 const RECIPE_LINE_RE = /^[-*+]\s+(?:\[([x ])\]\s+)?\[\[([^\]|]+)(?:\|[^\]]+)?\]\](.*)?$/i;
+
+// Matches custom meal lines (no wikilink): - [ ] Grilled Cheese #meal/lunch
+// Group 1: checkbox char, Group 2: meal name, Group 3: trailing tags/suffix
+const CUSTOM_LINE_RE = /^[-*+]\s+(?:\[([x ])\]\s+)?([^[].+?)\s*(#\S.*)?$/i;
 
 function extractMealType(suffix: string, fieldName: string): string | undefined {
 	const trimmed = suffix.trim();
@@ -67,19 +69,44 @@ export function parseMealPlanNote(body: string, fieldName = "meal"): MealPlanSec
 			continue;
 		}
 
-		const m = raw.match(RECIPE_LINE_RE);
-		if (m) {
+		const recipeMatch = raw.match(RECIPE_LINE_RE);
+		if (recipeMatch) {
+			const recipeSuffix = recipeMatch[3] ?? "";
+			const recipeIsLeftovers = /#leftovers\b/i.test(recipeSuffix);
+			const recipeMealSuffix = recipeSuffix.replace(/#leftovers\b/gi, "").trim();
 			current.lines.push({
 				kind: "entry",
-				wikilink: m[2].trim(),
+				wikilink: recipeMatch[2].trim(),
+				isLeftovers: recipeIsLeftovers || undefined,
 				day: current.header,
-				mealType: extractMealType(m[3] ?? "", fieldName),
-				checked: m[1]?.toLowerCase() === "x",
+				mealType: extractMealType(recipeMealSuffix, fieldName),
+				checked: recipeMatch[1]?.toLowerCase() === "x",
 				raw,
 			});
-		} else {
-			current.lines.push({ kind: "raw", wikilink: "", day: undefined, mealType: undefined, checked: false, raw });
+			continue;
 		}
+
+		const customMatch = raw.match(CUSTOM_LINE_RE);
+		if (customMatch) {
+			const suffix = customMatch[3] ?? "";
+			const isLeftovers = /#leftovers\b/i.test(suffix);
+			// Strip #leftovers from the suffix before extracting meal type so it
+			// doesn't get misinterpreted as an unknown field value.
+			const mealSuffix = suffix.replace(/#leftovers\b/gi, "").trim();
+			current.lines.push({
+				kind: "entry",
+				wikilink: "",
+				label: customMatch[2].trim(),
+				isLeftovers: isLeftovers || undefined,
+				day: current.header,
+				mealType: extractMealType(mealSuffix, fieldName),
+				checked: customMatch[1]?.toLowerCase() === "x",
+				raw,
+			});
+			continue;
+		}
+
+		current.lines.push({ kind: "raw", wikilink: "", day: undefined, mealType: undefined, checked: false, raw });
 	}
 
 	sections.push(current);

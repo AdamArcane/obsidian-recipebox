@@ -2382,6 +2382,16 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   margin-bottom: 0.25rem;
 }
 
+/* Full-width row: single field that spans the whole row */
+.rb-modal-fields--full {
+  flex-wrap: nowrap;
+}
+
+.rb-modal-field--grow {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
 .rb-modal-field {
   display: flex;
   flex-direction: column;
@@ -3643,28 +3653,25 @@ body.is-mobile .rb-gv-group-header {
   color: var(--text-muted);
 }
 
-.rb-mpv-card--leftovers {
-  background: var(--background-secondary);
-  border-style: dashed;
+.rb-mpv-card.rb-mpv-card--leftovers {
   opacity: 0.85;
 }
 
-.rb-mpv-card-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
+.rb-mpv-card-thumb--custom {
+  background: var(--background-modifier-hover);
+  color: var(--text-faint);
 }
 
-.rb-mpv-card-leftovers-icon {
-  display: flex;
-  align-items: center;
+.rb-mpv-card-thumb--custom svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.rb-mpv-card-leftovers-badge {
+  font-size: 0.7rem;
   color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.rb-mpv-card-leftovers-icon svg {
-  width: 0.9rem;
-  height: 0.9rem;
+  font-weight: 500;
+  margin-top: 0.1rem;
 }
 
 /* Recipe picker modal */
@@ -3715,6 +3722,43 @@ body.is-mobile .rb-gv-group-header {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.rb-recipe-picker-item {
+  cursor: pointer;
+  border-radius: var(--radius-s);
+}
+
+.rb-recipe-picker-item--highlighted {
+  background: var(--background-modifier-hover);
+}
+
+/* Custom meal row: icon centered in the thumbnail placeholder */
+.rb-recipe-picker-thumb--custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.rb-recipe-picker-thumb--custom svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rb-recipe-picker-modal .rb-shell-body {
+  padding: 0.5rem 0;
+}
+
+.rb-recipe-picker-input {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.rb-recipe-picker-results {
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 /* ── Meal type popover ──────────────────────────────────────────────────── */
@@ -3908,28 +3952,42 @@ body.is-mobile .rb-gv-group-header {
   margin-top: 0.15rem;
 }
 
-.rb-mpv-card-remove {
+.rb-mpv-card-actions {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45);
-  border: none;
-  color: #fff;
-  font-size: 0.9rem;
-  line-height: 1;
-  cursor: pointer;
+  top: 0.3rem;
+  right: 0.3rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 0.2rem;
   opacity: 0;
   transition: opacity 0.12s;
 }
 
-.rb-mpv-card:hover .rb-mpv-card-remove {
+.rb-mpv-card:hover .rb-mpv-card-actions {
   opacity: 1;
+}
+
+.rb-mpv-card-action-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.rb-mpv-card-action-btn svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.rb-mpv-card-action-btn--danger:hover {
+  background: var(--color-red);
 }
 
 /* Mobile: 2-column grid so day labels and drop zones are usable on ~390px screens */
@@ -3937,9 +3995,12 @@ body.is-mobile .rb-mpv-days-row {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* Mobile: no hover state on touch, so the remove button must always be visible */
-body.is-mobile .rb-mpv-card-remove {
+/* Mobile: no hover state on touch, so action buttons must always be visible */
+body.is-mobile .rb-mpv-card-actions {
   opacity: 1;
+}
+
+body.is-mobile .rb-mpv-card-action-btn {
   width: 1.75rem;
   height: 1.75rem;
 }

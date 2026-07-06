@@ -128,8 +128,8 @@ export class RecipeView extends TextFileView {
 						if (inPlan) {
 							for (const entry of planEntries) void this.deps.removeFromMealPlanById(entry.id);
 						} else {
-							this.deps.openAddToMealPlanModal(file, (day, meal, contributions) => {
-								void this.deps.addToMealPlan(file.path, day, meal, contributions);
+							this.deps.openAddToMealPlanModal(file, (day, meal, contributions, isLeftovers) => {
+								void this.deps.addToMealPlan(file.path, day, meal, contributions, isLeftovers);
 							});
 						}
 					})

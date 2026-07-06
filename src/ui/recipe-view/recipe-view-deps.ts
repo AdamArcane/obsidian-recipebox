@@ -14,7 +14,7 @@ export interface RecipeViewDeps {
 	getSettings: () => RecipeBoxSettings;
 	saveSettings: () => Promise<void>;
 	getMealPlan: () => MealPlanEntry[];
-	addToMealPlan: (recipePath: string, day?: string, meal?: string, contributions?: ContributionMap) => Promise<void>;
+	addToMealPlan: (recipePath: string, day?: string, meal?: string, contributions?: ContributionMap, isLeftovers?: boolean) => Promise<void>;
 	removeFromMealPlan: (path: string) => Promise<void>;
 	getGroceryItems: () => GroceryItem[];
 	removeGroceryByKey: (key: string) => Promise<void>;
@@ -23,10 +23,10 @@ export interface RecipeViewDeps {
 	subscribeToChanges: (cb: () => void) => () => void;
 	navigateToGroceryCategory: (category: string) => Promise<void>;
 	editAsMarkdown: (path: string) => void;
-	openAddToMealPlanModal: (file: TFile, onConfirm: (day?: string, meal?: string, contributions?: ContributionMap) => void) => void;
+	openAddToMealPlanModal: (file: TFile, onConfirm: (day?: string, meal?: string, contributions?: ContributionMap, isLeftovers?: boolean) => void) => void;
 	openAddToGroceryModal: (file: TFile) => void;
 	openMarkCookedModal: (file: TFile, onStamp: (date: string, notes: string, image: CookedImageResult | null) => void) => void;
 	openMealPlanView: () => void;
 	removeFromMealPlanById: (id: string) => Promise<void>;
-	openEditMealPlanEntry: (file: TFile, entry: MealPlanEntry, onUpdate: (day?: string, meal?: string) => Promise<void>) => void;
+	openEditMealPlanEntry: (file: TFile, entry: MealPlanEntry, onUpdate: (day?: string, meal?: string, isLeftovers?: boolean) => Promise<void>) => void;
 }

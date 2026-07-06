@@ -2,7 +2,7 @@
  * Renders the add-to / remove-from meal plan toggle button in the recipe view header.
  */
 import { App, setIcon, TFile } from "obsidian";
-import { ContributionMap, MealPlanEntry } from "../../types";
+import { MealPlanEntry } from "../../types";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { openMealPlanEntryMenu } from "../modals/meal-plan-entry-menu";
 import { MealPlanMultiEntryMenu } from "../modals/meal-plan-multientry-menu";
@@ -34,8 +34,8 @@ export function renderMealPlanToggle(
 				new MealPlanMultiEntryMenu(app, file, entries, deps).open();
 			}
 		} else {
-			deps.openAddToMealPlanModal(file, (day, meal, contributions?: ContributionMap) => {
-				void deps.addToMealPlan(file.path, day, meal, contributions);
+			deps.openAddToMealPlanModal(file, (day, meal, contributions, isLeftovers) => {
+				void deps.addToMealPlan(file.path, day, meal, contributions, isLeftovers);
 			});
 		}
 	});

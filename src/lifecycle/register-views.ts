@@ -75,7 +75,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				getSettings: () => plugin.settings,
 				getMealPlan: () => plugin.manager.mealPlan,
 				addToMealPlan: (path, day) => plugin.manager.addMealPlanEntry(path, day),
-				addLeftoversEntry: (day, label) => plugin.manager.addLeftoversEntry(day, label),
+				addCustomMealEntry: (label, day, meal, isLeftovers) => plugin.manager.addCustomMealEntry(label, day, meal, isLeftovers),
+				editCustomMealEntry: (id, updates) => plugin.manager.editCustomMealEntry(id, updates),
 				removeFromMealPlan: (id) => plugin.manager.removeFromMealPlan(id),
 				rescheduleMealPlanEntry: (id, day) => plugin.manager.rescheduleMealPlanEntry(id, day),
 				setMealType: (id, mealType) => plugin.manager.setMealType(id, mealType),
@@ -99,12 +100,54 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				},
 				openAddToMealPlanModal: (file, prefill) => {
 					new AddToMealPlanModal(
-						plugin.app, file, plugin.settings,
-						(day, meal, contributions) => {
-							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {});
+						plugin.app,
+						{ kind: "recipe", file },
+						plugin.settings,
+						(day, meal, contributions, isLeftovers) => {
+							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
 						},
 						prefill,
 					).open();
+				},
+				openAddCustomMealModal: (label, day, editingEntry) => {
+					new AddToMealPlanModal(
+						plugin.app,
+						{ kind: "custom", label: editingEntry?.label ?? label },
+						plugin.settings,
+						(d, meal, _contributions, isLeftovers, updatedLabel) => {
+							// Editing an existing card must update that entry in place, not create
+							// a second one alongside it (see: editMode/duplicate-entry bug fix).
+							if (editingEntry) void plugin.manager.editCustomMealEntry(editingEntry.id, { label: updatedLabel, day: d, meal, isLeftovers });
+							else void plugin.manager.addCustomMealEntry(updatedLabel ?? label, d, meal, isLeftovers);
+						},
+						{ day: editingEntry?.day ?? day, meal: editingEntry?.meal, isLeftovers: editingEntry?.isLeftovers, isEdit: !!editingEntry },
+					).open();
+				},
+				openEditEntryModal: (entry) => {
+					if (entry.recipePath) {
+						const file = plugin.app.vault.getFileByPath(entry.recipePath);
+						if (!file) return;
+						new AddToMealPlanModal(
+							plugin.app,
+							{ kind: "recipe", file },
+							plugin.settings,
+							(day, meal, contributions, isLeftovers) => {
+								void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
+							},
+							{ day: entry.day, meal: entry.meal, isLeftovers: entry.isLeftovers, isEdit: true },
+						).open();
+					} else {
+						// Custom meal: re-use the existing path which handles label editing
+						new AddToMealPlanModal(
+							plugin.app,
+							{ kind: "custom", label: entry.label ?? "" },
+							plugin.settings,
+							(d, meal, _contributions, isLeftovers, updatedLabel) => {
+								void plugin.manager.editCustomMealEntry(entry.id, { label: updatedLabel, day: d, meal, isLeftovers });
+							},
+							{ day: entry.day, meal: entry.meal, isLeftovers: entry.isLeftovers, isEdit: true },
+						).open();
+					}
 				},
 			}),
 	);
@@ -116,8 +159,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				getSettings: () => plugin.settings,
 				saveSettings: () => plugin.saveSettings(),
 				getMealPlan: () => plugin.manager.mealPlan,
-				addToMealPlan: (path, day, meal, contributions) =>
-					plugin.manager.addToMealPlan(path, day, meal, contributions),
+				addToMealPlan: (path, day, meal, contributions, isLeftovers) =>
+					plugin.manager.addToMealPlan(path, day, meal, contributions, isLeftovers),
 				removeFromMealPlan: (path) => plugin.manager.removeFromMealPlan(path),
 				getGroceryItems: () => plugin.manager.groceryItems,
 				removeGroceryByKey: (key) => plugin.manager.removeFromGroceryByKey(key),
@@ -133,7 +176,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					if (leaf2) void leaf2.setViewState({ type: "markdown", state: { file: path }, active: true });
 				},
 				openAddToMealPlanModal: (file: TFile, onConfirm) => {
-					new AddToMealPlanModal(plugin.app, file, plugin.settings, onConfirm).open();
+					new AddToMealPlanModal(plugin.app, { kind: "recipe", file }, plugin.settings, onConfirm).open();
 				},
 				openAddToGroceryModal: (file: TFile) => {
 					new AddToGroceryModal(
@@ -158,9 +201,12 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				openMealPlanView: () => { void plugin.activateMealPlanView(); },
 				removeFromMealPlanById: (id) => plugin.manager.removeFromMealPlan(id),
 				openEditMealPlanEntry: (file, entry, onUpdate) => {
-					new AddToMealPlanModal(plugin.app, file, plugin.settings,
-						(day, meal) => { void onUpdate(day, meal); },
-						{ day: entry.day, meal: entry.meal }
+					new AddToMealPlanModal(
+						plugin.app,
+						{ kind: "recipe", file },
+						plugin.settings,
+						(day, meal, _contributions, isLeftovers) => { void onUpdate(day, meal, isLeftovers); },
+						{ day: entry.day, meal: entry.meal, isLeftovers: entry.isLeftovers, isEdit: true }
 					).open();
 				},
 			}),

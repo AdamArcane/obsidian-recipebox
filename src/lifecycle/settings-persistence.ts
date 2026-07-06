@@ -80,6 +80,7 @@ function validateMealPlanEntry(raw: unknown): MealPlanEntry | null {
 		addedDate: str(e.addedDate, new Date().toISOString()),
 		contributions,
 		autoAddProcessed: typeof e.autoAddProcessed === "boolean" ? e.autoAddProcessed : undefined,
+		isLeftovers: e.isLeftovers === true ? true : undefined,
 	};
 }
 
