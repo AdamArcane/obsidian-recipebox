@@ -5,6 +5,7 @@
 import { App, Setting } from "obsidian";
 import { MealTypeNotation, RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";
+import { renderNotePathPreview } from "../components/note-path-preview";
 
 
 export function renderSectionMealPlan(
@@ -16,16 +17,20 @@ export function renderSectionMealPlan(
 ): void {
 	new Setting(container).setName("Meal plan").setHeading();
 
-	new Setting(container)
+	const mealPlanPathSetting = new Setting(container)
 		.setName("Meal plan note path")
-		.setDesc("Path to the note used as your meal plan. Created automatically if it doesn't exist.")
-		.addText((t) => {
-			t.setValue(settings.mealPlanPath).onChange(async (v) => {
-				settings.mealPlanPath = v;
-				await save();
-			});
-			new NotePathSuggest(app, t.inputEl);
+		.setDesc("Path to the note used as your meal plan. Created automatically if it doesn't exist. Supports {token} date patterns, e.g. \"Meal Plans/{YYYY}/Week {ww}.md\".");
+
+	const mealPlanPathPreview = renderNotePathPreview(mealPlanPathSetting.descEl, settings.mealPlanPath);
+
+	mealPlanPathSetting.addText((t) => {
+		t.setValue(settings.mealPlanPath).onChange(async (v) => {
+			settings.mealPlanPath = v;
+			mealPlanPathPreview.update(v);
+			await save();
 		});
+		new NotePathSuggest(app, t.inputEl);
+	});
 
 	let fieldNameSetting: Setting | null = null;
 

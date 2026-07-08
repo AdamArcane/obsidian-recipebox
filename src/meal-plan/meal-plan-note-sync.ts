@@ -10,7 +10,7 @@ import { parseIngredientLine } from "../parser/ingredient-parse";
 import { ingredientKey, hasIgnoreTag } from "../parser/ingredient-clean";
 import { generateEntryId } from "../utils/date";
 import { localDateISO } from "../utils/date";
-import { readNoteOrEmpty } from "../utils/vault-notes";
+import { readNoteOrEmpty, resolveNotePath } from "../utils/vault-notes";
 import { parseMealPlanNote } from "./meal-plan-note/parse";
 import { addToGroceryNote, removeFromGroceryNote } from "../grocery/grocery-note/write";
 import { recordContributions } from "../grocery/contribution-history";
@@ -109,7 +109,7 @@ async function tryAutoAdd(app: App, entry: MealPlanEntry, settings: RecipeBoxSet
 
 export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Promise<boolean> {
 	const s = sink.getSettings();
-	const text = await readNoteOrEmpty(app, s.mealPlanPath);
+	const text = await readNoteOrEmpty(app, resolveNotePath(s.mealPlanPath));
 	if (!text) return false;
 
 	const sections = parseMealPlanNote(text, s.mealTypeFieldName);

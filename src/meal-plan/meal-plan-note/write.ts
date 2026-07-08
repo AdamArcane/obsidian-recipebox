@@ -5,7 +5,7 @@
 import { App } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { readNoteOrEmpty, writeNote } from "../../utils/vault-notes";
+import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseMealPlanNote } from "./parse";
 import { insertMealPlanEntryIntoText } from "./render";
 
@@ -15,8 +15,19 @@ function resolveRecipeName(app: App, filePath: string): string {
 
 export async function insertMealPlanEntry(app: App, entry: MealPlanEntry, settings: RecipeBoxSettings): Promise<void> {
 	const name = entry.recipePath ? resolveRecipeName(app, entry.recipePath) : (entry.label ?? "");
-	const text = await readNoteOrEmpty(app, settings.mealPlanPath) || "# Meal Plan\n";
-	await writeNote(app, settings.mealPlanPath, insertMealPlanEntryIntoText(text, entry, name, settings));
+	const path = resolveNotePath(settings.mealPlanPath);
+
+	// The path template (e.g. "Meal Plans/{YYYY}/Week {ww}.md") rolls over to a
+	// new note on a date boundary. A missing note at the resolved path is the
+	// rollover signal: drop stale entries from the previous period, keeping
+	// only the entry being written here (callers already push it into
+	// state.mealPlan before calling this function, so a plain [] would drop it too).
+	if (!app.vault.getFileByPath(path)) {
+		settings.state.mealPlan = settings.state.mealPlan.filter((e) => e.id === entry.id);
+	}
+
+	const text = await readNoteOrEmpty(app, path) || "# Meal Plan\n";
+	await writeNote(app, path, insertMealPlanEntryIntoText(text, entry, name, settings));
 }
 
 export async function removeMealPlanEntry(
@@ -24,7 +35,8 @@ export async function removeMealPlanEntry(
 	entry: MealPlanEntry,
 	settings: RecipeBoxSettings,
 ): Promise<void> {
-	const text = await readNoteOrEmpty(app, settings.mealPlanPath);
+	const path = resolveNotePath(settings.mealPlanPath);
+	const text = await readNoteOrEmpty(app, path);
 	if (!text) return;
 
 	const sections = parseMealPlanNote(text, settings.mealTypeFieldName);
@@ -53,5 +65,5 @@ export async function removeMealPlanEntry(
 		if (section.header) lines.push(`## ${section.header}`);
 		for (const l of section.lines) lines.push(l.raw);
 	}
-	await writeNote(app, settings.mealPlanPath, lines.join("\n").trimEnd());
+	await writeNote(app, path, lines.join("\n").trimEnd());
 }

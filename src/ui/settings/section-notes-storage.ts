@@ -5,6 +5,7 @@
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";
+import { renderNotePathPreview } from "../components/note-path-preview";
 
 export function renderSectionNotesStorage(
 	container: HTMLElement,
@@ -16,16 +17,20 @@ export function renderSectionNotesStorage(
 	new Setting(container).setName("Notes & storage").setHeading();
 
 
-	new Setting(container)
+	const groceryListPathSetting = new Setting(container)
 		.setName("Grocery list note path")
-		.setDesc("Path to the note used as your grocery list. Created automatically if it doesn't exist.")
-		.addText((t) => {
-			t.setValue(settings.groceryListPath).onChange(async (v) => {
-				settings.groceryListPath = v;
-				await save();
-			});
-			new NotePathSuggest(app, t.inputEl);
+		.setDesc("Path to the note used as your grocery list. Created automatically if it doesn't exist. Supports {token} date patterns, e.g. \"Groceries/{YYYY}/Week {ww}.md\".");
+
+	const groceryListPathPreview = renderNotePathPreview(groceryListPathSetting.descEl, settings.groceryListPath);
+
+	groceryListPathSetting.addText((t) => {
+		t.setValue(settings.groceryListPath).onChange(async (v) => {
+			settings.groceryListPath = v;
+			groceryListPathPreview.update(v);
+			await save();
 		});
+		new NotePathSuggest(app, t.inputEl);
+	});
 
 	new Setting(container)
 		.setName("Ingredients heading")

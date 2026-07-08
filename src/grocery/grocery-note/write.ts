@@ -6,7 +6,7 @@ import { App } from "obsidian";
 import { ContributionMap } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { categorize } from "../category-match";
-import { readNoteOrEmpty, writeNote } from "../../utils/vault-notes";
+import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText, GrocerySection } from "./parse";
 import { renderGroceryLine, renderGrocerySections } from "./render";
 
@@ -69,13 +69,15 @@ export function removeFromGroceryText(noteText: string, contributions: Contribut
 
 export async function addToGroceryNote(app: App, contributions: ContributionMap, settings: RecipeBoxSettings): Promise<void> {
 	if (Object.keys(contributions).length === 0) return;
-	const text = await readNoteOrEmpty(app, settings.groceryListPath) || "# Grocery List\n";
-	await writeNote(app, settings.groceryListPath, mergeIntoGroceryText(text, contributions, settings));
+	const path = resolveNotePath(settings.groceryListPath);
+	const text = await readNoteOrEmpty(app, path) || "# Grocery List\n";
+	await writeNote(app, path, mergeIntoGroceryText(text, contributions, settings));
 }
 
 export async function removeFromGroceryNote(app: App, contributions: ContributionMap, settings: RecipeBoxSettings): Promise<void> {
 	if (Object.keys(contributions).length === 0) return;
-	const text = await readNoteOrEmpty(app, settings.groceryListPath);
+	const path = resolveNotePath(settings.groceryListPath);
+	const text = await readNoteOrEmpty(app, path);
 	if (!text) return;
-	await writeNote(app, settings.groceryListPath, removeFromGroceryText(text, contributions, settings));
+	await writeNote(app, path, removeFromGroceryText(text, contributions, settings));
 }

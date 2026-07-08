@@ -6,7 +6,7 @@ import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
 import { ingredientKey } from "../../parser/ingredient-clean";
-import { readNoteOrEmpty, writeNote } from "../../utils/vault-notes";
+import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText } from "./parse";
 import { renderGroceryLine } from "./render";
 
@@ -19,7 +19,7 @@ export interface GroceryNoteItem {
 }
 
 export async function readGroceryNoteItems(app: App, settings: RecipeBoxSettings): Promise<Map<string, GroceryNoteItem>> {
-	const text = await readNoteOrEmpty(app, settings.groceryListPath);
+	const text = await readNoteOrEmpty(app, resolveNotePath(settings.groceryListPath));
 	if (!text) return new Map();
 
 	const result = new Map<string, GroceryNoteItem>();
@@ -33,7 +33,7 @@ export async function readGroceryNoteItems(app: App, settings: RecipeBoxSettings
 }
 
 export async function toggleGroceryNoteItemChecked(app: App, key: string, checked: boolean, settings: RecipeBoxSettings): Promise<void> {
-	const path = settings.groceryListPath;
+	const path = resolveNotePath(settings.groceryListPath);
 	const text = await readNoteOrEmpty(app, path);
 	if (!text) return;
 
@@ -56,7 +56,7 @@ export async function toggleGroceryNoteItemChecked(app: App, key: string, checke
 }
 
 export async function resetGroceryNoteChecks(app: App, settings: RecipeBoxSettings): Promise<void> {
-	const path = settings.groceryListPath;
+	const path = resolveNotePath(settings.groceryListPath);
 	const text = await readNoteOrEmpty(app, path);
 	if (!text) return;
 	await writeNote(app, path, text.replace(/^- \[x\]/gim, "- [ ]"));
@@ -64,7 +64,7 @@ export async function resetGroceryNoteChecks(app: App, settings: RecipeBoxSettin
 
 /** Reads the grocery note once and rewrites all checkboxes to `checked` in a single write. */
 export async function setAllGroceryNoteChecks(app: App, checked: boolean, settings: RecipeBoxSettings): Promise<void> {
-	const path = settings.groceryListPath;
+	const path = resolveNotePath(settings.groceryListPath);
 	const text = await readNoteOrEmpty(app, path);
 	if (!text) return;
 	const from = checked ? /^- \[ \]/gim : /^- \[x\]/gim;

@@ -12,6 +12,7 @@ import { AddToGroceryModal } from "../ui/modals/add-to-grocery-modal";
 import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { ExportModal } from "../ui/modals/export-modal";
+import { resolveNotePath } from "../utils/vault-notes";
 
 export function registerViews(plugin: RecipeBoxPlugin): void {
 	plugin.registerView(
@@ -92,7 +93,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
 				},
 				editAsMarkdown: () => {
-					const path = plugin.settings.mealPlanPath;
+					const path = resolveNotePath(plugin.settings.mealPlanPath);
 					const file = plugin.app.vault.getFileByPath(path);
 					if (!file) return;
 					const leaf2 = plugin.app.workspace.getLeaf(false);

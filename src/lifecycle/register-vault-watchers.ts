@@ -5,6 +5,7 @@
 import { TFile } from "obsidian";
 import RecipeBoxPlugin from "../main";
 import { debounce } from "../utils/debounce";
+import { resolveNotePath } from "../utils/vault-notes";
 
 export function registerVaultWatchers(plugin: RecipeBoxPlugin): void {
 	const syncMealPlan = debounce(() => { void plugin.manager.refresh(); }, 500, true);
@@ -13,9 +14,9 @@ export function registerVaultWatchers(plugin: RecipeBoxPlugin): void {
 	plugin.registerEvent(
 		plugin.app.vault.on("modify", (file) => {
 			if (!(file instanceof TFile)) return;
-			if (file.path === plugin.settings.mealPlanPath) {
+			if (file.path === resolveNotePath(plugin.settings.mealPlanPath)) {
 				syncMealPlan();
-			} else if (file.path === plugin.settings.groceryListPath) {
+			} else if (file.path === resolveNotePath(plugin.settings.groceryListPath)) {
 				refreshGrocery();
 			}
 		})

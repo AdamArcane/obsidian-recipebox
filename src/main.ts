@@ -8,6 +8,7 @@ import { RecipeBoxSettings } from "./settings/settings-types";
 import { GroceryManager } from "./grocery/manager";
 import { DiscoveryCache } from "./discovery/discovery-cache";
 import { mergeSettings } from "./lifecycle/settings-persistence";
+import { resolveNotePath } from "./utils/vault-notes";
 import { registerViews } from "./lifecycle/register-views";
 import { registerVaultWatchers } from "./lifecycle/register-vault-watchers";
 import { registerAutoOpen, registerContextMenu } from "./lifecycle/recipe-file-detection";
@@ -99,7 +100,7 @@ export default class RecipeBoxPlugin extends Plugin {
 	}
 
 	async openMealPlanNote(): Promise<void> {
-		const path = this.settings.mealPlanPath;
+		const path = resolveNotePath(this.settings.mealPlanPath);
 		let file = this.app.vault.getFileByPath(path);
 		if (!file) {
 			file = await this.app.vault.create(path, "");
@@ -109,7 +110,7 @@ export default class RecipeBoxPlugin extends Plugin {
 	}
 
 	async navigateToGroceryCategory(category: string): Promise<void> {
-		const path = this.settings.groceryListPath;
+		const path = resolveNotePath(this.settings.groceryListPath);
 		let file = this.app.vault.getFileByPath(path);
 		if (!file) file = await this.app.vault.create(path, "# Grocery List\n");
 		const leaf = this.app.workspace.getLeaf("tab");
