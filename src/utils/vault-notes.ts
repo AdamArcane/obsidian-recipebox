@@ -1,13 +1,23 @@
 /** Vault I/O helpers: read note text (returning empty string if absent), ensure parent folders exist, and write note content atomically. */
 import { App, TFile, moment } from "obsidian";
 
+type MomentFormatter = {
+	format: (pattern: string) => string;
+};
+
+function formatWithMoment(date: Date, pattern: string): string {
+	// Obsidian's exported moment value can be loosely typed in some tooling setups.
+	// Narrowing through unknown keeps strict lint rules from treating this as implicit any.
+	const createMoment = moment as unknown as (input: Date) => MomentFormatter;
+	return createMoment(date).format(pattern);
+}
+
 // Resolves {token} date patterns in a note path using moment.js.
 // Example: "Meal Plans/{YYYY}/Week {ww}.md" -> "Meal Plans/2026/Week 28.md"
 // Curly braces (not bare tokens) avoid collisions with folder/file names that
 // happen to contain format letters like M, D, or Y.
 export function resolveNotePath(template: string, date: Date = new Date()): string {
-	const m = moment(date);
-	return template.replace(/\{([^}]+)\}/g, (_, fmt: string) => m.format(fmt));
+	return template.replace(/\{([^}]+)\}/g, (_match: string, fmt: string) => formatWithMoment(date, fmt));
 }
 
 export async function readNoteOrEmpty(app: App, path: string): Promise<string> {
