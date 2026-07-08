@@ -1,36 +1,17 @@
 /**
- * Settings section for meal plan configuration — note path, auto-add on sync,
- * tag filter, and meal type notation format.
+ * Settings section for meal plan configuration — meal type notation format,
+ * auto-add on sync, and tag filter. The note path lives in the Notes section.
  */
-import { App, Setting } from "obsidian";
+import { Setting } from "obsidian";
 import { MealTypeNotation, RecipeBoxSettings } from "../../settings/settings-types";
-import { NotePathSuggest } from "../components/note-path-suggest";
-import { renderNotePathPreview } from "../components/note-path-preview";
-
 
 export function renderSectionMealPlan(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
-	rerender: () => void,
-	app: App
+	rerender: () => void
 ): void {
 	new Setting(container).setName("Meal plan").setHeading();
-
-	const mealPlanPathSetting = new Setting(container)
-		.setName("Meal plan note path")
-		.setDesc("Path to the note used as your meal plan. Created automatically if it doesn't exist. Supports {token} date patterns, e.g. \"Meal Plans/{YYYY}/Week {ww}.md\".");
-
-	const mealPlanPathPreview = renderNotePathPreview(mealPlanPathSetting.descEl, settings.mealPlanPath);
-
-	mealPlanPathSetting.addText((t) => {
-		t.setValue(settings.mealPlanPath).onChange(async (v) => {
-			settings.mealPlanPath = v;
-			mealPlanPathPreview.update(v);
-			await save();
-		});
-		new NotePathSuggest(app, t.inputEl);
-	});
 
 	let fieldNameSetting: Setting | null = null;
 
@@ -62,7 +43,7 @@ export function renderSectionMealPlan(
 
 	new Setting(container)
 		.setName("Auto-add ingredients on sync")
-		.setDesc("Automatically add ingredients to the grocery list when syncing newly added meal plan entries.")
+		.setDesc("Automatically add ingredients to the grocery list when manually added entries are added to the meal plan.")
 		.addToggle((t) =>
 			t.setValue(settings.autoAddOnSync).onChange(async (v) => {
 				settings.autoAddOnSync = v;
@@ -75,7 +56,7 @@ export function renderSectionMealPlan(
 
 	new Setting(container)
 		.setName("Required tag filter")
-		.setDesc("Only auto-add recipes carrying this tag. Leave empty to include all recipes.")
+		.setDesc("Only auto-add ingredients from recipes carrying this tag. Leave empty to include all recipes.")
 		.addText((t) =>
 			t.setValue(settings.autoAddTagFilter).onChange(async (v) => {
 				settings.autoAddTagFilter = v;

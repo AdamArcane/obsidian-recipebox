@@ -1,5 +1,5 @@
 /**
- * Settings section for the meal recommender -- suggestion count and per-mode
+ * Settings section for the meal suggester -- suggestion count and per-mode
  * management (list, edit, duplicate, delete, isDefault, reset all).
  * The old global "Exclusion window" setting lives in each mode's filters now.
  */
@@ -11,7 +11,7 @@ import { ModeEditorModal } from "../modals/strategy-editor-modal";
 import { ConfirmModal } from "../modals/confirm-modal";
 import { BUILTIN_MODES } from "../../suggester/built-in-strategies";
 
-export function renderSectionRecommender(
+export function renderSectionSuggester(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
@@ -19,7 +19,7 @@ export function renderSectionRecommender(
 	app: App,
 	getDiscovery: () => DiscoveryResult | null,
 ): void {
-	new Setting(container).setName("Meal recommender").setHeading();
+	new Setting(container).setName("Meal suggester").setHeading();
 
 	new Setting(container)
 		.setName("Number of suggestions")

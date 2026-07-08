@@ -1,6 +1,6 @@
 /**
- * Settings section for library configuration — recipe folders, type property
- * name, and recipe type value used to identify recipe files.
+ * Settings section for library configuration — recipe folders, auto-open
+ * behavior, and the recipe type value used to identify recipe files.
  */
 import { App, setIcon, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -65,15 +65,7 @@ export function renderSectionLibrary(
 	}
 	renderFolderRows();
 
-	new Setting(container)
-		.setName("Recipe type property")
-		.setDesc("Which frontmatter property holds the note-type value (default: type).")
-		.addText((t) =>
-			t.setPlaceholder("Type").setValue(settings.recipeTypePropertyName).onChange(async (v) => {
-				settings.recipeTypePropertyName = v.trim() || "type";
-				await save();
-			})
-		);
+
 
 	new Setting(container)
 		.setName("Recipe type value")

@@ -5,8 +5,7 @@
 import { findHeadingIndex } from "./recipe-heading-search";
 
 export interface BodyCleanOptions {
-	stripTitle: boolean;
-	stripImage: boolean;
+	cleanNoteBody: boolean;
 	title?: string;
 	imageValue?: string;
 }
@@ -23,14 +22,14 @@ const EXCESS_BLANK_RE = /\n{3,}/g;
 export function stripRedundantBodyContent(body: string, options: BodyCleanOptions): string {
 	let lines = body.split("\n");
 
-	if (options.stripTitle && options.title) {
+	if (options.cleanNoteBody && options.title) {
 		const { index } = findHeadingIndex(lines, options.title);
 		if (index >= 0 && lines[index].startsWith("# ")) {
 			lines.splice(index, 1);
 		}
 	}
 
-	if (options.stripImage && options.imageValue) {
+	if (options.cleanNoteBody && options.imageValue) {
 		const target = resolveImageTarget(options.imageValue);
 		const escapedTarget = target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 		// Obsidian wikilink embed: ![[target]] or ![[target|alias]] or ![[target#anchor]]

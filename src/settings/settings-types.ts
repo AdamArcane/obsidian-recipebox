@@ -41,19 +41,14 @@ export interface RecipeBoxSettings {
 	nutritionDisplay: NutritionDisplay;
 	nutritionSource: NutritionSource;
 	crossOffWhileCooking: boolean;
-	showMarkCookedButton: boolean;
-	stripBodyTitle: boolean;
-	stripHeroImage: boolean;
+	cleanNoteBody: boolean;
 
 	// Cook history tracking
 	cookHistoryEnabled: boolean;
 	cookHistoryHeading: string;
 	cookHistoryFrontmatterProperty: string;
-
-	// Cooked stats
-	trackLastMade: boolean;
 	lastMadeProperty: string;
-	trackCookedCount: boolean;
+	cookedCountProperty: string;
 
 	// Allergens
 	allergensProperty: string;
@@ -69,7 +64,7 @@ export interface RecipeBoxSettings {
 	fatProperty: string;
 	carbsProperty: string;
 
-	// Meal recommender
+	// Meal suggester
 	suggestionCount: number;
 	suggesterModes: SuggesterMode[];
 
@@ -82,7 +77,6 @@ export interface RecipeBoxSettings {
 	timerAutoStart: boolean;
 	timerCompactDisplay: boolean;
 	timerRangeDefault: "min" | "max";
-	timerMinuteIncrement: number;
 
 	// Meal-plan-to-grocery sync
 	autoAddOnSync: boolean;

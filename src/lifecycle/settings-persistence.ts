@@ -14,7 +14,7 @@ import {
 	GroceryItemEntry,
 } from "../types";
 import type { SuggesterMode, FieldFilter, ScoringRule } from "../suggester/strategy-types";
-import { BUILTIN_MODES, BUILTIN_MODE_IDS } from "../suggester/built-in-strategies";
+import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
 import {
 	CategorySource,
@@ -217,16 +217,13 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		nutritionDisplay: oneOf<NutritionDisplay>(r.nutritionDisplay, ["per-serving", "total"], d.nutritionDisplay),
 		nutritionSource: oneOf<NutritionSource>(r.nutritionSource, ["recipe-total", "per-serving"], d.nutritionSource),
 		crossOffWhileCooking: bool(r.crossOffWhileCooking, d.crossOffWhileCooking),
-		showMarkCookedButton: bool(r.showMarkCookedButton, d.showMarkCookedButton),
-		stripBodyTitle: bool(r.stripBodyTitle, d.stripBodyTitle),
-		stripHeroImage: bool(r.stripHeroImage, d.stripHeroImage),
+		cleanNoteBody: bool(r.cleanNoteBody, d.cleanNoteBody),
 
 		cookHistoryEnabled: bool(r.cookHistoryEnabled, d.cookHistoryEnabled),
 		cookHistoryHeading: str(r.cookHistoryHeading, d.cookHistoryHeading),
 		cookHistoryFrontmatterProperty: str(r.cookHistoryFrontmatterProperty, d.cookHistoryFrontmatterProperty),
-		trackLastMade: bool(r.trackLastMade, d.trackLastMade),
 		lastMadeProperty: str(r.lastMadeProperty, d.lastMadeProperty),
-		trackCookedCount: bool(r.trackCookedCount, d.trackCookedCount),
+		cookedCountProperty: str(r.cookedCountProperty, d.cookedCountProperty),
 
 		allergensProperty: str(r.allergensProperty, d.allergensProperty),
 		myAllergens: strArr(r.myAllergens, d.myAllergens),
@@ -250,7 +247,6 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		timerAutoStart: bool(r.timerAutoStart, d.timerAutoStart),
 		timerCompactDisplay: bool(r.timerCompactDisplay, d.timerCompactDisplay),
 		timerRangeDefault: oneOf<"min" | "max">(r.timerRangeDefault, ["min", "max"], d.timerRangeDefault),
-		timerMinuteIncrement: num(r.timerMinuteIncrement, d.timerMinuteIncrement, 1),
 
 		autoAddOnSync: bool(r.autoAddOnSync, d.autoAddOnSync),
 		autoAddTagFilter: str(r.autoAddTagFilter, d.autoAddTagFilter),
@@ -283,21 +279,6 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		},
 	};
 
-	// Section 65 migration: if the old global exclusion-window setting was in use
-	// and we haven't yet saved modes (first load after upgrade), fold its value
-	// into the Rediscover mode's filters so the user's old behaviour is preserved.
-	if (
-		typeof r.suggestionDayWindow === "number" &&
-		r.suggestionDayWindow > 0 &&
-		!Array.isArray(r.suggesterModes) &&
-		!Array.isArray(r.suggesterStrategies)
-	) {
-		const rediscover = merged.suggesterModes.find(s => s.id === BUILTIN_MODE_IDS.rediscover);
-		if (rediscover && !rediscover.filters.some(f => f.operator === "not-within-last")) {
-			const lastMadeProp = merged.lastMadeProperty;
-			rediscover.filters.push({ field: lastMadeProp, operator: "not-within-last", value: r.suggestionDayWindow });
-		}
-	}
 
 	return merged;
 }

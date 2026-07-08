@@ -4712,3 +4712,32 @@ body.is-mobile .rb-mpv-card-action-btn {
   color: var(--text-error);
   background: color-mix(in srgb, var(--text-error) 12%, transparent);
 }
+
+/* ── Collapsible settings sections (Property names, Header badges, etc.) ─── */
+
+.rb-settings-collapsed {
+  display: none;
+}
+
+.rb-settings-section-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.rb-settings-section-toggle::after {
+  content: " ›";
+}
+
+.rb-settings-section-toggle.rb-settings-open::after {
+  content: " ⌄";
+}
+
+/* ── Info hint separating tracking levels (Cooking & tracking section) ───── */
+
+.rb-settings-info-hint {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+}

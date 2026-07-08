@@ -11,11 +11,13 @@ import { makeDraggable } from "./timer-drag";
 export interface TimerOptions {
 	autoStart: boolean;
 	compactByDefault: boolean;
-	incrementSeconds: number;
 	rangeDefault: "min" | "max";
 	recipeName: string;
 	onNavigate: () => void;
 }
+
+// Stepper increment is fixed at one minute — not worth exposing as a setting.
+const STEP_INCREMENT_SECONDS = 60;
 
 export class TimerWidget {
 	private el: HTMLElement;
@@ -59,8 +61,8 @@ export class TimerWidget {
 		this.displayEl.addEventListener("click", () => this.startEdit());
 
 		const steppers = timeRow.createDiv({ cls: "rb-timer-steppers" });
-		this.makeStepBtn(steppers, "chevron-up", +this.opts.incrementSeconds);
-		this.makeStepBtn(steppers, "chevron-down", -this.opts.incrementSeconds);
+		this.makeStepBtn(steppers, "chevron-up", +STEP_INCREMENT_SECONDS);
+		this.makeStepBtn(steppers, "chevron-down", -STEP_INCREMENT_SECONDS);
 
 		const controls = this.el.createDiv({ cls: "rb-timer-controls" });
 		this.playBtn = this.makeIconBtn(controls, "play", "Start", () => this.togglePlay(), "rb-timer-btn rb-timer-btn--play");

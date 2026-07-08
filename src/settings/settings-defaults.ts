@@ -53,17 +53,13 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	nutritionDisplay: "per-serving",
 	nutritionSource: "per-serving",
 	crossOffWhileCooking: true,
-	showMarkCookedButton: true,
-	stripBodyTitle: true,
-	stripHeroImage: true,
+	cleanNoteBody: true,
 
 	cookHistoryEnabled: true,
 	cookHistoryHeading: "Cook History",
 	cookHistoryFrontmatterProperty: "cookHistory",
-
-	trackLastMade: true,
 	lastMadeProperty: "lastMade",
-	trackCookedCount: true,
+	cookedCountProperty: "cookedCount",
 
 	allergensProperty: "allergens",
 	myAllergens: [],
@@ -86,7 +82,6 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	timerAutoStart: false,
 	timerCompactDisplay: false,
 	timerRangeDefault: "max",
-	timerMinuteIncrement: 1,
 
 	autoAddOnSync: false,
 	autoAddTagFilter: "",

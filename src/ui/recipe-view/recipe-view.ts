@@ -203,8 +203,7 @@ export class RecipeView extends TextFileView {
 
 		const rawBody = stripFrontmatter(this.data);
 		const body = stripRedundantBodyContent(rawBody, {
-			stripTitle: settings.stripBodyTitle,
-			stripImage: settings.stripHeroImage,
+			cleanNoteBody: settings.cleanNoteBody,
 			title: this.file.basename,
 			imageValue: fmStr(fm, ["image"]) ?? undefined,
 		});
@@ -316,7 +315,6 @@ export class RecipeView extends TextFileView {
 			const timerOpts = settings.timersEnabled ? {
 				autoStart: settings.timerAutoStart,
 				compactByDefault: settings.timerCompactDisplay,
-				incrementSeconds: settings.timerMinuteIncrement * 60,
 				rangeDefault: settings.timerRangeDefault,
 				recipeName: this.file!.basename,
 				onNavigate: () => {

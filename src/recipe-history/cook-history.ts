@@ -237,11 +237,7 @@ async function replaceNoteBodySection(
  * also derives and writes lastMade/cookedCount from that same array, so the
  * two summary fields never go stale when entries are added, edited, or
  * deleted directly through the cook history modal rather than through the
- * "Mark as cooked" button. Gated on settings.trackLastMade/trackCookedCount,
- * matching mark-cooked-button.ts's stampCooked so both write paths agree on
- * whether these fields are tracked at all. Only meaningful while cook history
- * is the active write path; when cook history is off, stampCooked's
- * independent increment/set logic is the sole writer, unchanged.
+ * "Mark as cooked" button. 
  */
 async function writeFrontmatterEntries(
 	app: App,
@@ -249,25 +245,25 @@ async function writeFrontmatterEntries(
 	settings: RecipeBoxSettings,
 	entries: CookHistoryEntry[],
 ): Promise<void> {
+	if (!settings.cookHistoryEnabled) return;
+
 	const prop = settings.cookHistoryFrontmatterProperty;
 	await app.fileManager.processFrontMatter(file, (fm) => {
 		const f = fm as Record<string, unknown>;
 		f[prop] = entries.map(e => ({ id: e.id, date: e.date, note: e.note }));
 
-		if (settings.trackLastMade) {
-			// Entries are already sorted newest-first by the caller, but derive
-			// defensively by max rather than assuming index 0, in case that changes.
-			const latest = entries.reduce<string | null>(
-				(max, e) => (max === null || e.date > max ? e.date : max),
-				null,
-			);
-			if (latest !== null) f[settings.lastMadeProperty] = latest;
-			else delete f[settings.lastMadeProperty];
-		}
-		if (settings.trackCookedCount) {
-			if (entries.length > 0) f[RECIPE_FRONTMATTER.cookedCount] = entries.length;
-			else delete f[RECIPE_FRONTMATTER.cookedCount];
-		}
+		// Entries are already sorted newest-first by the caller, but derive
+		// defensively by max rather than assuming index 0, in case that changes.
+		const latest = entries.reduce<string | null>(
+			(max, e) => (max === null || e.date > max ? e.date : max),
+			null,
+		);
+		if (latest !== null) f[settings.lastMadeProperty] = latest;
+		else delete f[settings.lastMadeProperty];
+
+		if (entries.length > 0) f[RECIPE_FRONTMATTER.cookedCount] = entries.length;
+		else delete f[RECIPE_FRONTMATTER.cookedCount];
+
 	});
 }
 

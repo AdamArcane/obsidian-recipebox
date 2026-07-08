@@ -1,6 +1,6 @@
 /**
  * Settings section for in-recipe timers — enable/disable, auto-start, compact
- * display, range default, and minute increment.
+ * display, and range default.
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -56,17 +56,4 @@ export function renderSectionTimers(
 					await save();
 				})
 		);
-
-	new Setting(container)
-		.setName("Stepper increment (minutes)")
-		.addText((t) => {
-			t.inputEl.type = "number";
-			t.setValue(String(settings.timerMinuteIncrement)).onChange(async (v) => {
-				const n = parseInt(v, 10);
-				if (n >= 1) {
-					settings.timerMinuteIncrement = n;
-					await save();
-				}
-			});
-		});
 }

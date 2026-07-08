@@ -29,7 +29,7 @@ export function renderSectionShopping(
 	new Setting(container).setName("Shopping assistant").setHeading();
 
 	new Setting(container)
-		.setName("Grouping mode")
+		.setName("Default grouping")
 		.addDropdown((dd) =>
 			dd.addOptions(GROUPING_OPTIONS).setValue(settings.groupingMode)
 				.onChange(async (v) => { settings.groupingMode = v as GroupingMode; await save(); })

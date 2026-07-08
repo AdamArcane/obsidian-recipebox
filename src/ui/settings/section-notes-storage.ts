@@ -1,6 +1,6 @@
 /**
- * Settings section for note storage paths — grocery list note path and meal
- * plan note path.
+ * Settings section for note storage — meal plan note path, grocery list note
+ * path, and the ingredients/instructions heading names.
  */
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -14,8 +14,22 @@ export function renderSectionNotesStorage(
 	rerender: () => void,
 	app: App
 ): void {
-	new Setting(container).setName("Notes & storage").setHeading();
+	new Setting(container).setName("Notes").setHeading();
 
+	const mealPlanPathSetting = new Setting(container)
+		.setName("Meal plan note path")
+		.setDesc("Path to the note used as your meal plan. Created automatically if it doesn't exist. Supports {token} date patterns, e.g. \"Meal Plans/{YYYY}/Week {ww}.md\".");
+
+	const mealPlanPathPreview = renderNotePathPreview(mealPlanPathSetting.descEl, settings.mealPlanPath);
+
+	mealPlanPathSetting.addText((t) => {
+		t.setValue(settings.mealPlanPath).onChange(async (v) => {
+			settings.mealPlanPath = v;
+			mealPlanPathPreview.update(v);
+			await save();
+		});
+		new NotePathSuggest(app, t.inputEl);
+	});
 
 	const groceryListPathSetting = new Setting(container)
 		.setName("Grocery list note path")

@@ -137,7 +137,7 @@ function renderNativeCard(
 	ratingGroup.createDiv({ cls: "rb-label-caps", text: "Rating" });
 	renderStarRating(ratingGroup, app, file, fm, settings.ratingProperty, false);
 
-	if (settings.trackLastMade) {
+	if (settings.cookHistoryEnabled) {
 		const lastGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
 		lastGroup.createDiv({ cls: "rb-label-caps", text: "Last prepared" });
 		const dateText = meta.lastMade ? formatDateValue(meta.lastMade) : "–";
@@ -486,7 +486,6 @@ export async function renderMobileLayout(
 	const timerOpts = settings.timersEnabled ? {
 		autoStart: settings.timerAutoStart,
 		compactByDefault: settings.timerCompactDisplay,
-		incrementSeconds: settings.timerMinuteIncrement * 60,
 		rangeDefault: settings.timerRangeDefault,
 		recipeName: file.basename,
 		onNavigate: () => {

@@ -1,15 +1,15 @@
 /**
  * Recipe view settings section. Owns view toggles, tag display,
- * rating property, and the inline header-badge list.
+ * and the collapsible header-badge list.
  */
 import { App, Platform, setIcon, Setting } from "obsidian";
 import { CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
 import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";
 import { BadgeEditModal } from "../modals/modal-badge-edit";
 import { SeparatorEditModal } from "../modals/modal-separator-edit";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
+import { createCollapsibleSection } from "../components/collapsible-section";
 
 export function renderSectionRecipeView(
 	container: HTMLElement,
@@ -30,38 +30,6 @@ export function renderSectionRecipeView(
 				await save();
 			})
 		);
-
-	new Setting(container)
-		.setName("Strip duplicate title from body")
-		.setDesc("Remove a leading h1 from the note body if it matches the note title.")
-		.addToggle((t) =>
-			t.setValue(settings.stripBodyTitle).onChange(async (v) => {
-				settings.stripBodyTitle = v;
-				await save();
-			})
-		);
-
-	new Setting(container)
-		.setName("Strip duplicate hero image from body")
-		.setDesc("Remove an inline image from the body if it matches the frontmatter image property.")
-		.addToggle((t) =>
-			t.setValue(settings.stripHeroImage).onChange(async (v) => {
-				settings.stripHeroImage = v;
-				await save();
-			})
-		);
-
-	new Setting(container)
-		.setName("Rating frontmatter property")
-		.setDesc("The property name used to store star ratings (1–5).")
-		.addText((t) => {
-			t.setValue(settings.ratingProperty).onChange(async (v) => {
-				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.ratingProperty, v);
-				settings.ratingProperty = v;
-				await save();
-			});
-			t.inputEl.addEventListener("blur", () => rerender());
-		});
 
 	new Setting(container)
 		.setName("Show tags in header")
@@ -91,31 +59,42 @@ export function renderSectionRecipeView(
 					await save();
 				})
 			);
-
-		new Setting(container)
-			.setName("Cross off while cooking")
-			.setDesc("Clicking an ingredient or instruction step marks it as done for the current session.")
-			.addToggle((t) =>
-				t.setValue(settings.crossOffWhileCooking).onChange(async (v) => {
-					settings.crossOffWhileCooking = v;
-					await save();
-				})
-			);
-
 	}
+	new Setting(container)
+		.setName("Cross off while cooking")
+		.setDesc("Clicking an ingredient or instruction step marks it as done for the current session.")
+		.addToggle((t) =>
+			t.setValue(settings.crossOffWhileCooking).onChange(async (v) => {
+				settings.crossOffWhileCooking = v;
+				await save();
+			})
+		);
+
+	new Setting(container)
+		.setName("Strip duplicate title and hero image from body")
+		.setDesc("Remove a leading h1 from the note body if it matches the note title.\nRemove an inline image from the body if it matches the frontmatter image property.")
+		.addToggle((t) =>
+			t.setValue(settings.cleanNoteBody).onChange(async (v) => {
+				settings.cleanNoteBody = v;
+				await save();
+			})
+		);
+
+
+
 
 	// ── Inline badge list ────────────────────────────────────────────────────
-	new Setting(container).setName("Header badges").setHeading();
+	createCollapsibleSection(container, "Header badges", (body) => {
+		const badgeSetting = new Setting(body)
+			.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
 
-	const badgeSetting = new Setting(container)
-		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
+		badgeSetting.settingEl.addClass("rb-badge-setting");
 
-	badgeSetting.settingEl.addClass("rb-badge-setting");
+		badgeSetting.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
 
-	badgeSetting.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
-
-	const listEl = badgeSetting.settingEl.createDiv({ cls: "rb-badge-list" });
-	renderBadgeList(listEl, settings, save, app, getDiscovery);
+		const listEl = badgeSetting.settingEl.createDiv({ cls: "rb-badge-list" });
+		renderBadgeList(listEl, settings, save, app, getDiscovery);
+	});
 }
 
 function badgePrimary(badge: CustomBadge): string {

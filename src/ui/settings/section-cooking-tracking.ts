@@ -1,11 +1,11 @@
 /**
- * Settings section for cook history and tracking options — storage mode,
- * heading name, frontmatter property, last-made, and cooked count.
+ * Settings section for cook history and tracking options. Two levels of
+ * tracking are offered: simple stat toggles (last made date, cooked count),
+ * and full cook history which supersedes them with a detailed log. Property/
+ * heading names live in the consolidated "Property names" section.
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
-
 
 export function renderSectionCookingTracking(
 	container: HTMLElement,
@@ -16,51 +16,8 @@ export function renderSectionCookingTracking(
 	new Setting(container).setName("Cooking & tracking").setHeading();
 
 	new Setting(container)
-		.setName("Show 'mark as cooked' button")
-		.addToggle((t) =>
-			t.setValue(settings.showMarkCookedButton).onChange(async (v) => {
-				settings.showMarkCookedButton = v;
-				await save();
-			})
-		);
-
-
-	new Setting(container)
-		.setName("Track last made date")
-		.setDesc("Stamp a last-made date into frontmatter when a recipe is marked cooked.")
-		.addToggle((t) =>
-			t.setValue(settings.trackLastMade).onChange(async (v) => {
-				settings.trackLastMade = v;
-				await save();
-			})
-		);
-
-	if (settings.trackLastMade) {
-		new Setting(container)
-			.setName("Last made property name")
-			.addText((t) => {
-				t.setValue(settings.lastMadeProperty).onChange(async (v) => {
-					settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.lastMadeProperty, v);
-					settings.lastMadeProperty = v;
-					await save();
-				});
-				t.inputEl.addEventListener("blur", () => rerender());
-			});
-	}
-
-	new Setting(container)
-		.setName("Track cooked count")
-		.setDesc("Increment a counter in frontmatter each time the last-made date changes to a new day.")
-		.addToggle((t) =>
-			t.setValue(settings.trackCookedCount).onChange(async (v) => {
-				settings.trackCookedCount = v;
-				await save();
-			})
-		);
-
-	new Setting(container)
-		.setName("Enable cook history")
-		.setDesc("Append a dated entry to a cook-history section each time a recipe is marked cooked.")
+		.setName("Track cook history")
+		.setDesc("Record each cook as a dated entry with optional notes and photo.\nEnables the cook history tab on mobile and the history modal on desktop. Updates last made and cooked count properties automatically.\nThis setting will write cook history meta to the configured frontmatter property, as well as notes and a photo to the recipe note under the heading below.")
 		.addToggle((t) =>
 			t.setValue(settings.cookHistoryEnabled).onChange(async (v) => {
 				settings.cookHistoryEnabled = v;
@@ -79,17 +36,6 @@ export function renderSectionCookingTracking(
 					await save();
 				})
 			);
-
-
-		new Setting(container)
-			.setName("Frontmatter property")
-			.setDesc("The frontmatter property that stores the date array.")
-			.addText((t) =>
-				t.setValue(settings.cookHistoryFrontmatterProperty).onChange(async (v) => {
-					settings.cookHistoryFrontmatterProperty = v.trim() || "cookHistory";
-					await save();
-				})
-			);
-
 	}
+
 }
