@@ -108,8 +108,11 @@ export function renderSectionRecipeView(
 	new Setting(container).setName("Header badges").setHeading();
 
 	const badgeSetting = new Setting(container)
-		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder. The last made badge property should match the tracking setting in the cooking & tracking section.");
+		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
+
 	badgeSetting.settingEl.addClass("rb-badge-setting");
+
+	badgeSetting.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
 
 	const listEl = badgeSetting.settingEl.createDiv({ cls: "rb-badge-list" });
 	renderBadgeList(listEl, settings, save, app, getDiscovery);

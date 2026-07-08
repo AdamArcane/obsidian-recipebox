@@ -122,7 +122,7 @@ export class BadgeEditModal extends BaseModal {
 		new Setting(body)
 			.setName("Formula")
 			.setDesc(
-				"JavaScript expression evaluated with all frontmatter properties in scope. Return a string or number.",
+				"Simple arithmetic expression using frontmatter properties as variables: + - * /, parentheses, and || as a fallback for missing values (ex: prepTime || 0)."
 			)
 			.addTextArea((t) =>
 				t
