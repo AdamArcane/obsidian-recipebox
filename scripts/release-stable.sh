@@ -53,7 +53,10 @@ manifest.version = '$stable_version';
 fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, '\t'));
 "
 
-git add package.json manifest.json
+# Build release notes after bumping package version so changelog headings use the new tag version.
+npm run changelog
+
+git add package.json manifest.json CHANGELOG.md
 git commit -m "chore: release $stable_version"
 
 echo "→ Tagging $stable_version..."

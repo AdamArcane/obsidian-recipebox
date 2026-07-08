@@ -8,7 +8,9 @@
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production && eslint src/",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "version": "node -e \"const fs=require('fs'); const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=process.env.npm_new_version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && git add manifest.json",
+    "changelog:first": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s --first-release",
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s",
+    "version": "node -e \"const fs=require('fs'); const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=process.env.npm_new_version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && npm run changelog && git add manifest.json CHANGELOG.md",
     "postversion": "git push && git push --tags",
     "release:beta": "npm version prerelease --preid=beta",
     "release:stable": "bash scripts/release-stable.sh"
@@ -16,6 +18,8 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/node": "^16.11.6",
+    "conventional-changelog": "^8.0.1",
+    "conventional-changelog-conventionalcommits": "^10.2.1",
     "esbuild": "^0.25.0",
     "eslint": "^9.39.4",
     "eslint-plugin-obsidianmd": "^0.3.0",

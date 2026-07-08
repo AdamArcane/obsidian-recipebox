@@ -40,7 +40,35 @@ jobs:
             prerelease=""
           fi
 
+          # Use the matching CHANGELOG section as release notes so GitHub and repository history stay aligned.
+          notes_file="release-notes.md"
+          awk -v version="$title" '
+            BEGIN {
+              in_target = 0
+            }
+            /^## \[/ {
+              if (in_target) {
+                exit
+              }
+              heading = $0
+              gsub(/^## \[/, "", heading)
+              gsub(/\].*$/, "", heading)
+              if (heading == version || heading == "v" version) {
+                in_target = 1
+              }
+            }
+            in_target {
+              print
+            }
+          ' CHANGELOG.md > "$notes_file"
+
+          if [[ ! -s "$notes_file" ]]; then
+            echo "Release notes for $title were not found in CHANGELOG.md"
+            exit 1
+          fi
+
           gh release create "$tag" \
             --title="$title" \
+            --notes-file "$notes_file" \
             $prerelease \
             main.js manifest.json styles.css
