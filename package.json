@@ -9,7 +9,8 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "version": "node -e \"const fs=require('fs'); const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=process.env.npm_new_version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && git add manifest.json",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "release:stable": "bash scripts/release-stable.sh"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {

@@ -29,8 +29,18 @@ jobs:
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          # Strip leading 'v' from title so release shows '0.1.2' not 'v0.1.2'
+          # Strip leading 'v' from title so release shows '0.1.3' not 'v0.1.3'
           title="${tag#v}"
+
+          # Determine the branch this tag was pushed from.
+          # Tags on dev branch = pre-release. Tags on main = stable.
+          branch=$(git branch -r --contains "$tag" | grep -v HEAD | sed 's|origin/||' | tr -d ' ' | head -1)
+
+          if [[ "$branch" == "dev" ]]; then
+            prerelease="--prerelease"
+          else
+            prerelease=""
+          fi
 
           gh release create "$tag" \
             --title="$title" \
