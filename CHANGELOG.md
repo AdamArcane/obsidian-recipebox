@@ -1,3 +1,8 @@
+## [0.1.5-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.1...0.1.5-beta.2) (2026-07-08)
+
+### Features
+
+* enhance release process with changelog integration and new dependencies ([d125e31](https://github.com/AdamArcane/obsidian-recipebox/commit/d125e31f78cb3ac9732016ab787c69eaa3e55b08))
 
 ## [0.1.5-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.4...0.1.5-beta.1) (2026-07-08)
 
