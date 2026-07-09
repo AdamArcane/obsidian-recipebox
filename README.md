@@ -6,51 +6,55 @@ Recipe Box treats recipes the same way Obsidian treats everything else: as notes
 
 <img width="800"  alt="device-mockup" src="https://github.com/user-attachments/assets/f71bde46-511a-41e9-9a60-3bde915a4748" />
 
-## Features
+## Feature Highlights
 
 ### Recipe view
-Open any recipe note and Recipe Box renders it as an interactive card: a scalable ingredient list, step-by-step instructions, nutrition info, and configurable header badges (prep time, cook time, diet tags, or any frontmatter property you want surfaced). Scale a recipe up or down and every ingredient amount updates automatically.
+
+Open any recipe note and Recipe Box renders it as an interactive card with a scalable ingredient list, step-by-step instructions with inline timers, and nutrition at a glance. The header is fully configurable, allowing you to surface any frontmatter property as a badge, write custom formula expressions, or stick with the defaults. Scale a recipe up or down and every ingredient amount updates automatically.
 
 ### Meal planning
-Drag recipes onto a weekly planner, including straight from the file explorer. A queue holds anything you haven't scheduled yet. Mark a day as leftovers without attaching a recipe. The plan itself lives in a single markdown note you can read and edit directly.
+
+Drag recipes onto a weekly planner, drop files straight from the file explorer, or add custom meals without a recipe note attached. A queue holds anything unscheduled. The plan lives in a plain markdown note you can read and edit directly, there's no hidden database.
+
+### Meal suggester
+
+The suggester does more than shuffle your recipe list. Build named modes with custom filters (cuisine, prep time, allergens, any frontmatter field) and scoring rules (favor highest rated, least recently cooked, never made, or any combination). Run a mode for dinner, run another for lunch. Select results and schedule them across the week in one step.
 
 ### Grocery list
-Ingredients from your meal plan are automatically consolidated into a grocery list, grouped by category, recipe, or source. Add one-off items, check things off as you shop, and export the list in a few formats. The list is a markdown note, so it's just as editable by hand as it is through the plugin.
 
-### Recipe import
-Paste a URL from most recipe sites and Recipe Box extracts the ingredients, instructions, and metadata into a new note. Plain text and pasted captions work too, for recipes that don't come from a structured webpage.
+Ingredients from your meal plan are consolidated automatically... quantities summed, duplicates merged... and then grouped by category, recipe, or source. Add ad-hoc items easily, check things off as you shop, and export in multiple formats. The list is a markdown note, editable by hand or through the plugin.
 
 ### Cook history
-Mark a recipe as cooked and Recipe Box can log the date, notes, and a photo to the note, store a queryable date array in frontmatter (for Dataview or Bases), or both.
+
+Mark a recipe as cooked and Recipe Box logs the date, optional notes, and a photo. History is stored as a structured array in frontmatter, making it queryable with Dataview or Obsidian Bases. Find every recipe you cooked last month, your most-made meals, or anything you haven't made in over a month -- all from a standard Dataview query.
+
+### Recipe import
+
+Paste a URL from most recipe sites and Recipe Box extracts ingredients, instructions, and metadata into a new note using the built in recipe template, or you can set your own template to use. Plain text and pasted captions work too, for recipes that don't come from a structured page.
+
+### Mobile
+
+A tab-based layout with swipe navigation keeps the recipe view clean on small screens. Cook History gets its own tab. Long-press to drag recipes on the meal plan. A cook mode toggle keeps your screen awake while you're at the stove.
 
 ### Timers
-Step instructions with a duration ("bake for 30 minutes") get a tappable timer inline, with support for running several at once.
 
-## Settings
-
-Recipe Box is built to adapt to how you already organize your vault rather than imposing its own structure:
-
-- Recipe detection works off folder location, a frontmatter property, or both
-- Frontmatter property names are configurable throughout (ratings, allergens, nutrition, cook history, and more)
-- Category rules for the grocery list can be based on a dictionary, tags, or your own overrides
-- Meal-type notation can be written as nested tags, a Dataview inline field, or plain text, so it works whether or not you use Dataview
-
-## Browsing and organizing recipes
-
-Recipe Box doesn't include its own collection or index view. Obsidian's Bases and the Dataview plugin already do this well, so a tag or frontmatter property (`collection: weeknight`, for example) combined with a Base or Dataview query gives you sorting, filtering, and grouping without Recipe Box reinventing it. A starter Base is will be soon included if you want a working recipe browser without building one yourself.
+Duration phrases in your instructions ("bake for 30 minutes") become tappable timer buttons. Run several at once, drag them anywhere on screen, and get an audio alert when they finish.
 
 ## Installation
 
-Recipe Box is not yet listed in the Obsidian community plugin directory. Install via BRAT (recommended for beta testing) or manually.
+### Obsidian Community Direcotry
+Recipe Box is available in the Obsidian community plugin directory and can be installed through the in-app browser.
 
-### BRAT (recommended)
+You can also view the plugin directory listing by visiting https://community.obsidian.md/plugins/recipe-box
+
+### BRAT (for beta releases)
 
 1. Install the [BRAT plugin](https://github.com/TfTHacker/obsidian42-brat) from the Obsidian community plugins directory and enable it.
 2. Open BRAT settings and click **Add Beta Plugin**.
 3. Enter `AdamArcane/obsidian-recipebox` and click **Add Plugin**.
 4. Enable Recipe Box in Settings → Community plugins.
 
-BRAT will notify you when new releases are available and can update the plugin automatically.
+BRAT will notify you when new beta releases are available and can update the plugin automatically.
 
 ### Manual
 
