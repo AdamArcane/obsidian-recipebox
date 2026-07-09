@@ -6,6 +6,7 @@ import { ItemView, Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 import { renderWeekGrid } from "./week-grid";
 import { ConfirmModal } from "../modals/confirm-modal";
+import { SuggestMealModal } from "../modals/suggest-meal-modal";
 import { RecipePickerModal } from "../modals/recipe-picker-modal";
 
 export const MEAL_PLAN_VIEW_TYPE = "recipe-box-meal-plan-view";
@@ -41,7 +42,7 @@ export class MealPlanView extends ItemView {
 
 		const topBar = contentEl.createDiv({ cls: "rb-mpv-top-bar" });
 
-		const addRecipeBtn = topBar.createEl("button", { cls: "rb-mpv-add-recipe-btn" });
+		const addRecipeBtn = topBar.createEl("button", { cls: "rb-icon-btn rb-mpv-add-recipe-btn" });
 		setIcon(addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-icon" }), "plus");
 		addRecipeBtn.createSpan({ cls: "rb-mpv-add-recipe-btn-label", text: "Add recipe" });
 		addRecipeBtn.addEventListener("click", () => {
@@ -52,9 +53,27 @@ export class MealPlanView extends ItemView {
 			).open();
 		});
 
-		const clearBtn = topBar.createEl("button", { cls: "rb-mpv-clear-btn" });
-		setIcon(clearBtn.createSpan({ cls: "rb-mpv-clear-btn-icon" }), "trash-2");
-		clearBtn.createSpan({ cls: "rb-mpv-clear-btn-label", text: "Clear meal plan" });
+		const suggestMealBtn = topBar.createEl("button", { cls: "rb-icon-btn rb-mpv-suggest-meal-btn" });
+		setIcon(suggestMealBtn.createSpan({ cls: "rb-mpv-suggest-meal-btn-icon" }), "wand-sparkles");
+		suggestMealBtn.createSpan({ cls: "rb-mpv-suggest-meal-btn-label", text: "Suggest a meal" });
+
+		suggestMealBtn.addEventListener("click", () => {
+			new SuggestMealModal(this.app, {
+				getSettings: () => this.deps.getSettings(),
+				saveSettings: () => this.deps.saveSettings(),
+				getDiscovery: () => this.deps.getDiscovery(),
+				openFile: (file) => this.deps.openRecipe(file.path),
+				getMealPlan: () => this.deps.getMealPlan(),
+				addMealPlanEntry: (path, day) => this.deps.addToMealPlan(path, day),
+				setMealType: (id, mealType) => this.deps.setMealType(id, mealType),
+				clearMealPlan: (alsoRemove) => this.deps.clearMealPlan(alsoRemove),
+				openMealPlan: () => this.deps.openMealPlanView(),
+			}).open();
+		});
+
+		const clearBtn = topBar.createEl("button", { cls: "rb-icon-btn rb-mpv-clear-btn" });
+		setIcon(clearBtn.createSpan({ cls: "rb-mpv-clear-btn-icon" }), "eraser");
+		clearBtn.createSpan({ cls: "rb-mpv-clear-btn-label", text: "Clear all" });
 		clearBtn.addEventListener("click", () => {
 			new ConfirmModal(
 				this.app,

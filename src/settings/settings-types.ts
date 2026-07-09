@@ -65,7 +65,6 @@ export interface RecipeBoxSettings {
 	carbsProperty: string;
 
 	// Meal suggester
-	suggestionCount: number;
 	suggesterModes: SuggesterMode[];
 
 	// Diabetic mode

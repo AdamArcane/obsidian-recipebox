@@ -72,7 +72,6 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	fatProperty: "fat",
 	carbsProperty: "carbs",
 
-	suggestionCount: 5,
 	suggesterModes: BUILTIN_MODES,
 
 	showHighGIWarnings: false,

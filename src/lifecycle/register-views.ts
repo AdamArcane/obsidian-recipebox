@@ -74,6 +74,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 		(leaf) =>
 			new MealPlanView(leaf, {
 				getSettings: () => plugin.settings,
+				saveSettings: () => plugin.saveSettings(),
+				getDiscovery: () => plugin.discoveryCache.get(),
 				getMealPlan: () => plugin.manager.mealPlan,
 				addToMealPlan: (path, day) => plugin.manager.addMealPlanEntry(path, day),
 				addCustomMealEntry: (label, day, meal, isLeftovers) => plugin.manager.addCustomMealEntry(label, day, meal, isLeftovers),
@@ -92,6 +94,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					const leaf2 = plugin.app.workspace.getLeaf(false);
 					void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
 				},
+				openMealPlanView: () => { void plugin.activateMealPlanView(); },
 				editAsMarkdown: () => {
 					const path = resolveNotePath(plugin.settings.mealPlanPath);
 					const file = plugin.app.vault.getFileByPath(path);

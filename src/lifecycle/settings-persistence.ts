@@ -30,13 +30,6 @@ function str(val: unknown, fallback: string): string {
 	return typeof val === "string" ? val : fallback;
 }
 
-function num(val: unknown, fallback: number, min?: number, max?: number): number {
-	if (typeof val !== "number" || !isFinite(val)) return fallback;
-	if (min !== undefined && val < min) return fallback;
-	if (max !== undefined && val > max) return fallback;
-	return val;
-}
-
 function bool(val: unknown, fallback: boolean): boolean {
 	return typeof val === "boolean" ? val : fallback;
 }
@@ -236,7 +229,6 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		fatProperty: str(r.fatProperty, d.fatProperty),
 		carbsProperty: str(r.carbsProperty, d.carbsProperty),
 
-		suggestionCount: num(r.suggestionCount, d.suggestionCount, 1),
 		// Support migration from the old "suggesterStrategies" key (renamed to "suggesterModes")
 		suggesterModes: mergeModes(r.suggesterModes ?? r.suggesterStrategies),
 

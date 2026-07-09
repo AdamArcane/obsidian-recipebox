@@ -15,7 +15,7 @@ import {
 import { BaseModal } from "./modal-shell";
 
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const MEAL_SUGGESTIONS = ["Breakfast", "Lunch", "Dinner", "Snack"];
+export const MEAL_SUGGESTIONS = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 export type MealPlanEntryTarget =
 	| { kind: "recipe"; file: TFile }

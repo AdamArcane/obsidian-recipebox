@@ -108,11 +108,10 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 					const leaf = plugin.app.workspace.getLeaf(false);
 					void leaf.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: file.path }, active: true });
 				},
-				addToQueue: async (files) => {
-					for (const file of files) {
-						await plugin.manager.addToMealPlan(file.path, undefined, undefined, {});
-					}
-				},
+				getMealPlan: () => plugin.manager.mealPlan,
+				addMealPlanEntry: (path, day) => plugin.manager.addMealPlanEntry(path, day),
+				setMealType: (id, mealType) => plugin.manager.setMealType(id, mealType),
+				clearMealPlan: (alsoRemove) => plugin.manager.clearMealPlan(alsoRemove),
 				openMealPlan: () => { void plugin.activateMealPlanView(); },
 			}).open();
 		},

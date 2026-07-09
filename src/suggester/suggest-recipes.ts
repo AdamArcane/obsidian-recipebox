@@ -20,16 +20,18 @@ export interface SuggestionResult {
 /**
  * Runs the full filter-then-score pipeline for a mode.
  *
- * @param app       Obsidian app instance (for vault + metadata cache access).
- * @param settings  Plugin settings (for recipe scope and property names).
- * @param strategy  The active mode, containing filters and scoring rules.
- * @param discovery Current discovery cache result; null falls back to "string" type for all fields.
+ * @param app        Obsidian app instance (for vault + metadata cache access).
+ * @param settings   Plugin settings (for recipe scope and property names).
+ * @param strategy   The active mode, containing filters and scoring rules.
+ * @param discovery  Current discovery cache result; null falls back to "string" type for all fields.
+ * @param maxResults How many top-scoring recipes to return; chosen per-run in the suggester modal.
  */
 export function suggestRecipes(
 	app: App,
 	settings: RecipeBoxSettings,
 	strategy: SuggesterMode,
 	discovery: DiscoveryResult | null,
+	maxResults: number,
 ): SuggestionResult[] {
 	// Build a field-type lookup from discovery so normalization is accurate.
 	const fieldTypes: Record<string, FieldType> = {};
@@ -67,7 +69,7 @@ export function suggestRecipes(
 	scored.sort((a, b) => b.score - a.score || b.tiebreak - a.tiebreak);
 
 	return scored
-		.slice(0, settings.suggestionCount)
+		.slice(0, maxResults)
 		.map(r => ({ file: r.file, score: r.score }));
 }
 

@@ -5,9 +5,12 @@
 import { TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { DiscoveryResult } from "../../discovery/discovery-cache";
 
 export interface MealPlanViewDeps {
 	getSettings: () => RecipeBoxSettings;
+	saveSettings: () => Promise<void>;
+	getDiscovery: () => DiscoveryResult | null;
 	getMealPlan: () => MealPlanEntry[];
 	addToMealPlan: (path: string, day?: string) => Promise<string>;
 	addCustomMealEntry: (label: string, day?: string, meal?: string, isLeftovers?: boolean) => Promise<string>;
@@ -21,5 +24,6 @@ export interface MealPlanViewDeps {
 	clearMealPlan: (alsoRemoveFromGrocery: boolean) => Promise<number>;
 	subscribeToChanges: (cb: () => void) => () => void;
 	openRecipe: (path: string) => void;
+	openMealPlanView: () => void;
 	editAsMarkdown: () => void;
 }

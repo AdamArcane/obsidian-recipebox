@@ -4,10 +4,12 @@
  */
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
+import { MealPlanEntry } from "../../types";
 import type { SuggesterMode } from "../../suggester/strategy-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
 import { suggestRecipes, resolveActiveMode } from "../../suggester/suggest-recipes";
 import { ModeEditorModal } from "./strategy-editor-modal";
+import { ScheduleRecipesModal } from "./schedule-recipes-modal";
 import { BaseModal } from "./modal-shell";
 import { resolveImagePath } from "../recipe-view/image-resolve";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
@@ -18,16 +20,23 @@ export interface SuggestMealDeps {
 	saveSettings: () => Promise<void>;
 	getDiscovery: () => DiscoveryResult | null;
 	openFile: (file: TFile) => void;
-	addToQueue: (files: TFile[]) => Promise<void>;
+	getMealPlan: () => MealPlanEntry[];
+	addMealPlanEntry: (recipePath: string, day?: string) => Promise<string>;
+	setMealType: (id: string, mealType: string | undefined) => Promise<void>;
+	clearMealPlan: (alsoRemoveFromGrocery: boolean) => Promise<number>;
 	openMealPlan: () => void;
 }
+
+const MAX_RESULTS_OPTIONS = [5, 7, 10, 14];
+const DEFAULT_MAX_RESULTS = 7;
 
 export class SuggestMealModal extends BaseModal {
 	private resultsEl!: HTMLElement;
 	private activeModeId: string;
 	private selectedFiles = new Set<string>();
-	private addToQueueBtn!: HTMLButtonElement;
+	private scheduleBtn!: HTMLButtonElement;
 	private lastResults: Array<{ file: TFile }> = [];
+	private maxResults = DEFAULT_MAX_RESULTS;
 
 	constructor(app: App, private readonly deps: SuggestMealDeps) {
 		super(app);
@@ -153,7 +162,7 @@ export class SuggestMealModal extends BaseModal {
 		}
 
 		settings.state.lastUsedModeId = mode.id;
-		const results = suggestRecipes(this.app, settings, mode, this.deps.getDiscovery());
+		const results = suggestRecipes(this.app, settings, mode, this.deps.getDiscovery(), this.maxResults);
 
 		if (results.length === 0) {
 			this.resultsEl.createEl("p", { cls: "rb-suggest-hint", text: "No recipes matched the current filters." });
@@ -198,31 +207,60 @@ export class SuggestMealModal extends BaseModal {
 				infoEl.textContent = tokens.join(" · ");
 			}
 		}
+
+		this.updateAddBtn();
 	}
 
 	private updateAddBtn(): void {
-		if (!this.addToQueueBtn) return;
-		const count = this.selectedFiles.size;
-		this.addToQueueBtn.toggleClass("rb-hidden", count === 0);
-		this.addToQueueBtn.textContent = count > 0 ? `Add to meal plan (${count})` : "Add to plan";
+		if (!this.scheduleBtn) return;
+		const selectedCount = this.selectedFiles.size;
+		const totalCount = this.lastResults.length;
+
+		if (totalCount === 0) {
+			this.scheduleBtn.addClass("rb-hidden");
+			this.scheduleBtn.textContent = "Schedule recipes";
+			return;
+		}
+
+		this.scheduleBtn.removeClass("rb-hidden");
+		this.scheduleBtn.textContent = selectedCount > 0
+			? `Schedule selected (${selectedCount})`
+			: `Schedule all (${totalCount})`;
 	}
 
-	private addSelectedToQueue(): void {
-		const files = this.lastResults
-			.map(r => r.file)
-			.filter(f => this.selectedFiles.has(f.path));
+	private openScheduleModal(): void {
+		const files = this.selectedFiles.size > 0
+			? this.lastResults.map(r => r.file).filter(f => this.selectedFiles.has(f.path))
+			: this.lastResults.map(r => r.file);
 		if (!files.length) return;
-		void this.deps.addToQueue(files).then(() => {
-			this.deps.openMealPlan();
-			this.close();
-		});
+		new ScheduleRecipesModal(this.app, files, this.deps).open();
+		this.close();
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
+		const refreshBtn = footerEl.createEl("button", { cls: "rb-suggest-icon-btn" });
+		setIcon(refreshBtn.createSpan(), "refresh-cw");
+		refreshBtn.setAttribute("aria-label", "Refresh suggestions");
+		refreshBtn.addEventListener("click", () => this.runSuggestion());
+
+		const maxResultsSelect = footerEl.createEl("select", { cls: "rb-modal-select rb-suggest-max-results-select" });
+		maxResultsSelect.setAttribute("aria-label", "Number of suggestions");
+		for (const n of MAX_RESULTS_OPTIONS) {
+			maxResultsSelect.createEl("option", { attr: { value: String(n) }, text: String(n) });
+		}
+		maxResultsSelect.value = String(this.maxResults);
+		maxResultsSelect.addEventListener("change", () => {
+			this.maxResults = parseInt(maxResultsSelect.value, 10);
+			this.runSuggestion();
+		});
+
+		footerEl.createDiv({ cls: "rb-modal-footer-spacer" });
+
 		const closeBtn = footerEl.createEl("button", { text: "Close" });
 		closeBtn.addEventListener("click", () => this.close());
 
-		this.addToQueueBtn = footerEl.createEl("button", { cls: "rb-suggest-add-btn mod-cta rb-hidden", text: "Add to meal plan" });
-		this.addToQueueBtn.addEventListener("click", () => this.addSelectedToQueue());
+		this.scheduleBtn = footerEl.createEl("button", { cls: "rb-suggest-add-btn mod-cta", text: "Schedule recipes" });
+		this.scheduleBtn.addEventListener("click", () => this.openScheduleModal());
+		this.updateAddBtn();
 	}
 }

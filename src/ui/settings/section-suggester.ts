@@ -1,6 +1,7 @@
 /**
- * Settings section for the meal suggester -- suggestion count and per-mode
- * management (list, edit, duplicate, delete, isDefault, reset all).
+ * Settings section for the meal suggester -- per-mode management (list, edit,
+ * duplicate, delete, isDefault, reset all). How many suggestions to show is
+ * chosen per-run from the suggester modal itself, not configured here.
  * The old global "Exclusion window" setting lives in each mode's filters now.
  */
 import { App, setIcon, Setting } from "obsidian";
@@ -20,20 +21,6 @@ export function renderSectionSuggester(
 	getDiscovery: () => DiscoveryResult | null,
 ): void {
 	new Setting(container).setName("Meal suggester").setHeading();
-
-	new Setting(container)
-		.setName("Number of suggestions")
-		.setDesc("How many recipes to show per suggestion run.")
-		.addText((t) => {
-			t.inputEl.type = "number";
-			t.setValue(String(settings.suggestionCount)).onChange(async (v) => {
-				const n = parseInt(v, 10);
-				if (n >= 1) {
-					settings.suggestionCount = n;
-					await save();
-				}
-			});
-		});
 
 	// Modes list lives inside a single Setting, matching the badge-list pattern
 	const modesSetting = new Setting(container)

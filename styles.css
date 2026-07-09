@@ -1884,6 +1884,10 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   display: none;
 }
 
+.rb-modal-footer-spacer {
+  flex: 1;
+}
+
 
 
 .rb-modal-message {
@@ -2330,10 +2334,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   display: none;
 }
 
-.rb-hidden {
-  display: none;
-}
-
 
 
 .rb-modal-section-icon.rb-icon-green {
@@ -2450,6 +2450,28 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 .rb-confirm-checkbox-row input[type="checkbox"] {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ── Radio group (Schedule recipes modal: day fill mode) ─────────────────── */
+
+.rb-modal-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rb-modal-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.rb-modal-radio-row input[type="radio"] {
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -3509,7 +3531,8 @@ body.is-mobile .rb-gv-group-header {
 }
 
 .rb-mpv-add-recipe-btn,
-.rb-mpv-clear-btn {
+.rb-mpv-clear-btn,
+.rb-mpv-suggest-meal-btn {
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -4301,6 +4324,13 @@ body.is-mobile .rb-mpv-card-action-btn {
   width: auto;
 }
 
+.rb-suggest-max-results-select {
+  flex-shrink: 0;
+  width: auto;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
 .rb-suggest-icon-btn {
   display: inline-flex;
   align-items: center;
@@ -4740,4 +4770,14 @@ body.is-mobile .rb-mpv-card-action-btn {
   padding: 0.5rem 0;
   margin-top: 0.5rem;
   border-top: 1px solid var(--background-modifier-border);
+}
+
+/* ── Force-hidden utility ──────────────────────────────────────────────────
+   Keep this rule last in the file. It's applied alongside other layout
+   classes (e.g. .rb-modal-fields sets display: flex) to force-hide an
+   element regardless of what else is on it. With equal specificity, the
+   last rule in source order wins the cascade — so this only reliably beats
+   every other display-setting class as long as nothing is added below it. */
+.rb-hidden {
+  display: none;
 }
