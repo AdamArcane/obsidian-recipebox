@@ -43,6 +43,7 @@ export interface RecipeBoxSettings {
 	nutritionSource: NutritionSource;
 	crossOffWhileCooking: boolean;
 	cleanNoteBody: boolean;
+	useFirstBodyImageWhenFrontmatterEmpty: boolean;
 	desktopRecipeLayout: DesktopRecipeLayout;
 	desktopTwoColumnSplitRatio: number;
 
@@ -61,6 +62,7 @@ export interface RecipeBoxSettings {
 	showMeatTempWarnings: boolean;
 
 	// Nutrition property names
+	imageProperty: string;
 	ratingProperty: string;
 	caloriesProperty: string;
 	proteinProperty: string;

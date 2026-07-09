@@ -54,6 +54,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	nutritionSource: "per-serving",
 	crossOffWhileCooking: true,
 	cleanNoteBody: true,
+	useFirstBodyImageWhenFrontmatterEmpty: true,
 	desktopRecipeLayout: "two-column",
 	desktopTwoColumnSplitRatio: 0.5,
 
@@ -68,6 +69,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 
 	showMeatTempWarnings: true,
 
+	imageProperty: "image",
 	ratingProperty: "rating",
 	caloriesProperty: "calories",
 	proteinProperty: "protein",

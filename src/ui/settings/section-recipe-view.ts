@@ -107,6 +107,17 @@ export function renderSectionRecipeView(
 			})
 		);
 
+	new Setting(container)
+		.setName("Use first image in note when frontmatter image is empty")
+		.setDesc("When enabled, recipe view uses the first image found in the note body if the image frontmatter property is not set.")
+		.addToggle((t) =>
+			t.setValue(settings.useFirstBodyImageWhenFrontmatterEmpty).onChange(async (v) => {
+				settings.useFirstBodyImageWhenFrontmatterEmpty = v;
+				await save();
+				rerender();
+			})
+		);
+
 
 
 

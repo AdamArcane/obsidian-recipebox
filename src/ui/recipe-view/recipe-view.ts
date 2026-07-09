@@ -5,12 +5,12 @@
 import { EventRef, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
-import { stripRedundantBodyContent } from "../../parser/recipe-body-clean";
+import { findFirstImageInBody, stripRedundantBodyContent } from "../../parser/recipe-body-clean";
 import { splitBodyAroundIngredients } from "../../parser/recipe-ingredient-groups";
 import { splitBodyAroundInstructions } from "../../parser/recipe-instruction-groups";
 import { readRecipeMultiplier } from "../../parser/recipe-multiplier";
 import { readRecipeMeta, matchingAllergens } from "../../parser/recipe-meta-read";
-import { fmNum, fmStr } from "./frontmatter-read-helpers";
+import { fmNum } from "./frontmatter-read-helpers";
 import { renderStarRating } from "./rating";
 import { renderBadgeRow, renderTagRow } from "./badges";
 import { clearAllTimers } from "../timer/timer-tray";
@@ -18,10 +18,20 @@ import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
+import { findValue } from "../../parser/frontmatter-lookup";
+import { ALIASES } from "../../parser/recipe-meta-aliases";
+import { makeLightboxable } from "../components/lightbox";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
 
 const SERVINGS_KEYS = ["servings", "serves", "serving", "yield", "portions"];
+
+function frontmatterString(frontmatter: Record<string, unknown>, candidateKeys: string[]): string | null {
+	const raw = findValue(frontmatter, candidateKeys);
+	if (typeof raw !== "string") return null;
+	const trimmed = raw.trim();
+	return trimmed.length > 0 ? trimmed : null;
+}
 
 export class RecipeView extends TextFileView {
 	private deps: RecipeViewDeps;
@@ -219,6 +229,18 @@ export class RecipeView extends TextFileView {
 			deps: this.deps,
 			context,
 		});
+
+		this.attachLightboxToInlineImages(wrap);
+	}
+
+	private attachLightboxToInlineImages(wrap: HTMLElement): void {
+		// Hero images are already wired in image-resolve; this handles markdown
+		// body images so they can stay thumbnail-sized but still open full-screen.
+		const images = wrap.querySelectorAll<HTMLImageElement>("img:not(.rb-recipe-image):not(.rb-lightbox-img)");
+		images.forEach((img) => {
+			if (img.hasClass("rb-lightbox-trigger")) return;
+			makeLightboxable(img);
+		});
 	}
 
 	private buildLayoutContext(): RecipeLayoutContext | null {
@@ -234,10 +256,16 @@ export class RecipeView extends TextFileView {
 		// Normalize to an empty string so parser helpers that call startsWith do not crash.
 		const rawData = typeof this.data === "string" ? this.data : "";
 		const rawBody = stripFrontmatter(rawData);
+		const imageKeys = [settings.imageProperty, ...ALIASES.image];
+		const frontmatterImage = frontmatterString(frontmatter, imageKeys);
+		const fallbackBodyImage = settings.useFirstBodyImageWhenFrontmatterEmpty
+			? findFirstImageInBody(rawBody)
+			: null;
+		const resolvedImage = frontmatterImage ?? fallbackBodyImage;
 		const body = stripRedundantBodyContent(rawBody, {
 			cleanNoteBody: settings.cleanNoteBody,
 			title: file.basename,
-			imageValue: fmStr(frontmatter, ["image"]) ?? undefined,
+			imageValue: resolvedImage ?? undefined,
 		});
 
 		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
@@ -259,7 +287,7 @@ export class RecipeView extends TextFileView {
 			afterContent: instructionSplit.after,
 			ingredientGroups,
 			instructionGroups: instructionSplit.groups,
-			imageValue: fmStr(frontmatter, ["image"]),
+			imageValue: resolvedImage,
 			trailingSections,
 			hasExtraSections: trailingSections.length > 0 || settings.cookHistoryEnabled,
 		};

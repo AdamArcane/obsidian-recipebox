@@ -5,6 +5,7 @@
 import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 
 export const ALIASES: Record<string, string[]> = {
+	image: [RECIPE_FRONTMATTER.image, "cover", "heroImage", "hero_image", "thumbnail", "thumb"],
 	diet: [RECIPE_FRONTMATTER.diet, "diets", "dietary"],
 	allergens: [RECIPE_FRONTMATTER.allergens, "allergen", "allergies"],
 	prepTime: [RECIPE_FRONTMATTER.prepTime, "prepTime", "prep_time", "preparation_time", "prep"],

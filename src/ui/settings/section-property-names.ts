@@ -49,6 +49,17 @@ function renderBody(
 			t.inputEl.addEventListener("blur", () => rerender());
 		});
 
+	new Setting(body)
+		.setName("Recipe image")
+		.setDesc("Property name used for the recipe hero image.")
+		.addText((t) => {
+			t.setValue(settings.imageProperty).onChange(async (v) => {
+				settings.imageProperty = v.trim() || "image";
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
 	if (settings.cookHistoryEnabled) {
 		new Setting(body)
 			.setName("Stores the date recipe was last made")

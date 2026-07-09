@@ -219,6 +219,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		nutritionSource: oneOf<NutritionSource>(r.nutritionSource, ["recipe-total", "per-serving"], d.nutritionSource),
 		crossOffWhileCooking: bool(r.crossOffWhileCooking, d.crossOffWhileCooking),
 		cleanNoteBody: bool(r.cleanNoteBody, d.cleanNoteBody),
+		useFirstBodyImageWhenFrontmatterEmpty: bool(r.useFirstBodyImageWhenFrontmatterEmpty, d.useFirstBodyImageWhenFrontmatterEmpty),
 		desktopRecipeLayout: oneOf<DesktopRecipeLayout>(r.desktopRecipeLayout, ["classic", "two-column"], d.desktopRecipeLayout),
 		desktopTwoColumnSplitRatio: numInRange(r.desktopTwoColumnSplitRatio, d.desktopTwoColumnSplitRatio, 0.25, 0.75),
 
@@ -233,6 +234,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 		showMeatTempWarnings: bool(r.showMeatTempWarnings, d.showMeatTempWarnings),
 
+		imageProperty: str(r.imageProperty, d.imageProperty),
 		ratingProperty: str(r.ratingProperty, d.ratingProperty),
 		caloriesProperty: str(r.caloriesProperty, d.caloriesProperty),
 		proteinProperty: str(r.proteinProperty, d.proteinProperty),
