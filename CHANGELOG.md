@@ -1,3 +1,11 @@
+## [0.1.5-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.2...0.1.5-beta.3) (2026-07-09)
+
+### Features
+
+* add asset attestation step in release workflow ([e8835ae](https://github.com/AdamArcane/obsidian-recipebox/commit/e8835aeb2027d7f1eb4c30667c42f69ae35ed32d))
+* easily schedule suggested recipes across days to the meal plan using the meal suggester, which is now a dedicated button in the meal plan view. ([961bd05](https://github.com/AdamArcane/obsidian-recipebox/commit/961bd054d73090dcb06dc410f62356cac5484c23))
+* refactor date formatting in resolveNotePath function to use a dedicated formatter ([dbcf1a6](https://github.com/AdamArcane/obsidian-recipebox/commit/dbcf1a630b3f7238c86b72090598b1a81ebbc98e))
+
 ## [0.1.5-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.1...0.1.5-beta.2) (2026-07-08)
 
 ### Features
