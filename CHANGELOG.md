@@ -1,3 +1,10 @@
+## [0.1.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.3...0.1.5) (2026-07-09)
+
+### Features
+
+* add option to use the first image in the recipe note as the hero image if nothing found in the frontmatter property. ([96f5464](https://github.com/AdamArcane/obsidian-recipebox/commit/96f54648d740e1abe4d13b763c1917323a85f6e2))
+* add responsive two-column layout for desktop recipe view ([9a16940](https://github.com/AdamArcane/obsidian-recipebox/commit/9a16940304cc08a1f7a3053e4abd641bd6c2bca1))
+
 ## [0.1.5-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.2...0.1.5-beta.3) (2026-07-09)
 
 ### Features
