@@ -344,6 +344,10 @@
   color: var(--text-normal);
 }
 
+.rb-recipe-view.rb-layout-desktop-two-column {
+  max-width: 1180px;
+}
+
 /* ── Title block ─────────────────────────────────────────────────────────── */
 
 .rb-title-block {
@@ -606,6 +610,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0;
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -700,6 +705,142 @@
   gap: 1.25rem;
   align-items: start;
   margin-bottom: 1rem;
+}
+
+/* ── Responsive desktop two-column layout ──────────────────────────────── */
+
+.rb-desktop-two-col-main {
+  display: grid;
+  --rb-two-col-split: 50%;
+  grid-template-columns: minmax(0, var(--rb-two-col-split)) 12px minmax(0, calc(100% - var(--rb-two-col-split)));
+  gap: 0.625rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.rb-desktop-two-col-col {
+  min-width: 0;
+  position: sticky;
+  top: 0.75rem;
+  align-self: start;
+}
+
+.rb-desktop-two-col-divider {
+  position: relative;
+  width: 12px;
+  min-height: 14rem;
+  cursor: col-resize;
+  border-radius: 999px;
+  touch-action: none;
+}
+
+.rb-desktop-two-col-divider::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-muted) 28%, transparent);
+  transition: background 0.12s, box-shadow 0.12s;
+}
+
+.rb-desktop-two-col-divider:hover::before,
+.rb-desktop-two-col-divider.is-active::before,
+.rb-desktop-two-col-main.is-resizing .rb-desktop-two-col-divider::before,
+.rb-desktop-two-col-divider:focus-visible::before {
+  background: var(--interactive-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--interactive-accent) 18%, transparent);
+}
+
+.rb-desktop-two-col-divider:focus-visible {
+  outline: none;
+}
+
+.rb-desktop-two-col-secondary {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rb-desktop-two-col-aside {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rb-desktop-two-col-aside .rb-image-card {
+  width: 220px;
+}
+
+.rb-desktop-two-col-top-jump-nav .rb-section-sidebar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+
+}
+
+.rb-desktop-two-col-top-jump-nav .rb-sidebar-btn {
+  width: auto;
+}
+
+.rb-desktop-two-col-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 1.25rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.rb-desktop-two-col-top-main {
+  min-width: 0;
+}
+
+.rb-desktop-two-col-top-aside {
+  width: 220px;
+}
+
+.rb-desktop-two-col-top-aside .rb-image-card {
+  width: 220px;
+}
+
+
+.rb-desktop-two-col-cards {
+  margin-top: 0;
+}
+
+@media (max-width: 1100px) {
+  .rb-desktop-two-col-secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-desktop-two-col-aside {
+    width: 100%;
+  }
+
+  .rb-desktop-two-col-aside .rb-image-card {
+    width: 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .rb-desktop-two-col-main {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-desktop-two-col-divider {
+    display: none;
+  }
+
+  .rb-desktop-two-col-col {
+    position: static;
+  }
 }
 
 /* ── Image card ──────────────────────────────────────────────────────────── */

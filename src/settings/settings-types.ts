@@ -17,6 +17,7 @@ export type NutritionDisplay = "per-serving" | "total";
 export type MealTypeNotation = "tag" | "dataview" | "text";
 export type { CategorySource } from "../types";
 export type NutritionSource = "recipe-total" | "per-serving";
+export type DesktopRecipeLayout = "classic" | "two-column";
 
 export interface RecipeBoxSettings {
 	// Recipe location & structure
@@ -42,6 +43,8 @@ export interface RecipeBoxSettings {
 	nutritionSource: NutritionSource;
 	crossOffWhileCooking: boolean;
 	cleanNoteBody: boolean;
+	desktopRecipeLayout: DesktopRecipeLayout;
+	desktopTwoColumnSplitRatio: number;
 
 	// Cook history tracking
 	cookHistoryEnabled: boolean;

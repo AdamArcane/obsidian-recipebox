@@ -54,6 +54,8 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	nutritionSource: "per-serving",
 	crossOffWhileCooking: true,
 	cleanNoteBody: true,
+	desktopRecipeLayout: "two-column",
+	desktopTwoColumnSplitRatio: 0.5,
 
 	cookHistoryEnabled: true,
 	cookHistoryHeading: "Cook History",

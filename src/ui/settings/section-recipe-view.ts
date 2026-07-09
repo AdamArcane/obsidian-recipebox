@@ -32,6 +32,33 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
+		.setName("Desktop recipe layout")
+		.setDesc("Choose the layout style for the desktop recipe view. Mobile view is not affected by this setting. In two-column mode, you can drag the center divider to resize columns.")
+		.addDropdown((d) =>
+			d
+				.addOption("two-column", "Two column")
+				.addOption("classic", "Classic single column")
+				.setValue(settings.desktopRecipeLayout)
+				.onChange(async (value) => {
+					settings.desktopRecipeLayout = value === "classic" ? "classic" : "two-column";
+					await save();
+					rerender();
+				})
+		);
+
+	new Setting(container)
+		.setName("Reset two-column split")
+		.setDesc("Restore the default 50/50 split for the resizable two-column layout.")
+		.addButton((b) =>
+			b.setButtonText("Reset")
+				.setDisabled(settings.desktopTwoColumnSplitRatio === DEFAULT_SETTINGS.desktopTwoColumnSplitRatio)
+				.onClick(() => {
+					settings.desktopTwoColumnSplitRatio = DEFAULT_SETTINGS.desktopTwoColumnSplitRatio;
+					void save().then(() => rerender());
+				})
+		);
+
+	new Setting(container)
 		.setName("Show tags in header")
 		.addToggle((t) =>
 			t.setValue(settings.showTagsInHeader).onChange(async (v) => {

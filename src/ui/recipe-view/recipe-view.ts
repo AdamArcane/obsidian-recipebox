@@ -2,10 +2,7 @@
  * The recipe view — an Obsidian TextFileView that renders a recipe note as a
  * structured cooking card with ingredients, instructions, metadata, and timers.
  */
-import { EventRef, MarkdownRenderer, Menu, Notice, Platform, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
-import { findOrOpenLeaf } from "../../utils/open-leaf";
-import { GroceryItem, IngredientGroup } from "../../types";
-import { RecipeBoxSettings } from "../../settings/settings-types";
+import { EventRef, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
 import { stripRedundantBodyContent } from "../../parser/recipe-body-clean";
@@ -14,17 +11,13 @@ import { splitBodyAroundInstructions } from "../../parser/recipe-instruction-gro
 import { readRecipeMultiplier } from "../../parser/recipe-multiplier";
 import { readRecipeMeta, matchingAllergens } from "../../parser/recipe-meta-read";
 import { fmNum, fmStr } from "./frontmatter-read-helpers";
-import { renderMetaBanner } from "./meta-banner";
 import { renderStarRating } from "./rating";
 import { renderBadgeRow, renderTagRow } from "./badges";
-import { renderIngredientsSection } from "./ingredients-section";
-import { renderInstructionsSection } from "./instructions-section";
 import { clearAllTimers } from "../timer/timer-tray";
-import { renderMobileLayout } from "./mobile-layout";
-import { renderImageCard } from "./image-resolve";
-import { splitTrailingSections, renderSectionSidebar } from "./section-sidebar";
-import { renderMealPlanStatus } from "./meal-plan-status";
+import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
+import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
+import { RecipeLayoutContext } from "./layouts/types";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
 
@@ -193,36 +186,22 @@ export class RecipeView extends TextFileView {
 		this.contentEl.empty();
 		if (!this.file) return;
 
-		const settings = this.deps.getSettings();
-		const cache = this.app.metadataCache.getFileCache(this.file);
-		const fm: Record<string, unknown> = cache?.frontmatter ?? {};
+		const context = this.buildLayoutContext();
+		if (!context) return;
 
-		const multiplier = readRecipeMultiplier(cache);
-		const servings = fmNum(fm, SERVINGS_KEYS);
-		const inPlan = this.deps.getMealPlan().some(e => e.recipePath === this.file!.path);
-
-		const rawBody = stripFrontmatter(this.data);
-		const body = stripRedundantBodyContent(rawBody, {
-			cleanNoteBody: settings.cleanNoteBody,
-			title: this.file.basename,
-			imageValue: fmStr(fm, ["image"]) ?? undefined,
-		});
-
-		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
-		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);
-
-		const meta = readRecipeMeta(cache, settings.lastMadeProperty, settings.allergensProperty);
-		const allergenMatches = matchingAllergens(meta.allergens, settings.myAllergens);
+		const layoutId = resolveRecipeLayoutId(context.settings);
+		const allergenMatches = matchingAllergens(context.meta.allergens, context.settings.myAllergens);
 
 		const wrap = this.contentEl.createDiv({ cls: "rb-recipe-view" });
+		wrap.addClass(`rb-layout-${layoutId}`);
 
 		// Title block
 		const titleBlock = wrap.createDiv({ cls: "rb-title-block" });
-		titleBlock.createEl("h1", { cls: "rb-recipe-title", text: this.file.basename });
-		if (!Platform.isMobile) {
-			renderTagRow(titleBlock, this.app, this.file, settings);
-			renderStarRating(titleBlock, this.app, this.file, fm, settings.ratingProperty, true);
-			renderBadgeRow(titleBlock, settings, fm);
+		titleBlock.createEl("h1", { cls: "rb-recipe-title", text: context.file.basename });
+		if (layoutId !== "mobile-tabs") {
+			renderTagRow(titleBlock, this.app, context.file, context.settings);
+			renderStarRating(titleBlock, this.app, context.file, context.frontmatter, context.settings.ratingProperty, true);
+			renderBadgeRow(titleBlock, context.settings, context.frontmatter);
 		}
 
 		if (allergenMatches.length > 0) {
@@ -232,111 +211,57 @@ export class RecipeView extends TextFileView {
 			warning.createSpan({ text: `Contains: ${allergenMatches.join(", ")}` });
 		}
 
-		const groceryItems = this.deps.getGroceryItems();
-
-		if (Platform.isMobile) {
-			await renderMobileLayout(
-				wrap, this.app, this, this.file, fm, settings,
-				multiplier, servings, inPlan, meta,
-				ingredientGroups, instructionSplit.groups,
-				before, instructionSplit.after,
-				groceryItems, this.deps,
-			);
-		} else {
-			await this.renderDesktop(
-				wrap, fm, settings, multiplier, servings, inPlan,
-				before, ingredientGroups, instructionSplit,
-				groceryItems, meta.cookedCount,
-			);
-		}
+		const renderLayout = getRecipeLayoutRenderer(layoutId);
+		await renderLayout({
+			container: wrap,
+			app: this.app,
+			component: this,
+			deps: this.deps,
+			context,
+		});
 	}
 
-	private async renderDesktop(
-		wrap: HTMLElement,
-		fm: Record<string, unknown>,
-		settings: RecipeBoxSettings,
-		multiplier: number,
-		servings: number | null,
-		inPlan: boolean,
-		before: string,
-		ingredientGroups: IngredientGroup[],
-		instructionSplit: ReturnType<typeof splitBodyAroundInstructions>,
-		groceryItems: GroceryItem[],
-		cookedCount: number,
-	): Promise<void> {
-		const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === this.file!.path);
+	private buildLayoutContext(): RecipeLayoutContext | null {
+		if (!this.file) return null;
+		const file = this.file;
 
-		renderMetaBanner(
-			wrap, this.app, this.file!, fm, settings,
-			multiplier, servings, inPlan, planEntries, this.deps,
-		);
+		const settings = this.deps.getSettings();
+		const cache = this.app.metadataCache.getFileCache(file);
+		const frontmatter: Record<string, unknown> = cache?.frontmatter ?? {};
+		const mealPlanEntries = this.deps.getMealPlan().filter(entry => entry.recipePath === file.path);
 
-		renderMealPlanStatus(wrap, this.app, this.file!, planEntries, this.deps);
+		// TextFileView data can briefly be null/undefined during leaf/view transitions.
+		// Normalize to an empty string so parser helpers that call startsWith do not crash.
+		const rawData = typeof this.data === "string" ? this.data : "";
+		const rawBody = stripFrontmatter(rawData);
+		const body = stripRedundantBodyContent(rawBody, {
+			cleanNoteBody: settings.cleanNoteBody,
+			title: file.basename,
+			imageValue: fmStr(frontmatter, ["image"]) ?? undefined,
+		});
 
-		if (before.trim()) {
-			await MarkdownRenderer.render(this.app, before, wrap, this.file!.path, this);
-		}
-
-		// Pre-split trailing sections so we know whether a sidebar is needed
+		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
+		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);
 		const trailingSections = splitTrailingSections(instructionSplit.after, settings.cookHistoryHeading);
-		const hasSidebar = trailingSections.length > 0 || settings.cookHistoryEnabled;
 
-		const imageValue = fmStr(fm, ["image"]);
-		const hasIngredients = ingredientGroups.some(g => g.lines.length > 0);
-		const hasImage = !!imageValue;
-		const hasRightCol = hasImage || hasSidebar;
-
-		let rightCol: HTMLElement | null = null;
-
-		if (hasIngredients || hasRightCol) {
-			const bodyRow = wrap.createDiv({ cls: "rb-body-row" });
-			if (hasIngredients) {
-				void renderIngredientsSection(
-					bodyRow, this.app, this.file!, ingredientGroups,
-					settings, groceryItems, multiplier,
-					(key) => { void this.deps.removeGroceryByKey(key); },
-					() => { this.deps.openAddToGroceryModal(this.file!); },
-					this,
-				);
-			}
-			if (hasRightCol) {
-				rightCol = bodyRow.createDiv({ cls: "rb-right-col" });
-				if (hasImage) {
-					renderImageCard(rightCol, this.app, imageValue);
-				}
-			}
-		}
-
-		if (instructionSplit.before.trim()) {
-			await MarkdownRenderer.render(this.app, instructionSplit.before, wrap, this.file!.path, this);
-		}
-
-		if (instructionSplit.groups.length > 0) {
-			const timerOpts = settings.timersEnabled ? {
-				autoStart: settings.timerAutoStart,
-				compactByDefault: settings.timerCompactDisplay,
-				rangeDefault: settings.timerRangeDefault,
-				recipeName: this.file!.basename,
-				onNavigate: () => {
-					void findOrOpenLeaf(this.app, RECIPE_VIEW_TYPE, this.file!.path);
-				},
-			} : undefined;
-			await renderInstructionsSection(
-				wrap, this.app, this, this.file!.path,
-				instructionSplit.groups, settings, timerOpts,
-			);
-		}
-
-		// Extra sections as collapsible cards; sidebar nav lives in the right column
-		if (hasSidebar && rightCol) {
-			const cardsContainer = wrap.createDiv({ cls: "rb-extra-sections" });
-			renderSectionSidebar(
-				rightCol, cardsContainer,
-				trailingSections,
-				this.app, this, this.file!,
-				settings,
-				cookedCount,
-			);
-		}
+		return {
+			file,
+			settings,
+			frontmatter,
+			multiplier: readRecipeMultiplier(cache),
+			servings: fmNum(frontmatter, SERVINGS_KEYS),
+			inMealPlan: mealPlanEntries.length > 0,
+			mealPlanEntries,
+			meta: readRecipeMeta(cache, settings.lastMadeProperty, settings.allergensProperty),
+			groceryItems: this.deps.getGroceryItems(),
+			beforeContent: before,
+			beforeInstructionsContent: instructionSplit.before,
+			afterContent: instructionSplit.after,
+			ingredientGroups,
+			instructionGroups: instructionSplit.groups,
+			imageValue: fmStr(frontmatter, ["image"]),
+			trailingSections,
+			hasExtraSections: trailingSections.length > 0 || settings.cookHistoryEnabled,
+		};
 	}
 }

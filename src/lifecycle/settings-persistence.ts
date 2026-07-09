@@ -18,6 +18,7 @@ import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
 import {
 	CategorySource,
+	DesktopRecipeLayout,
 	NutritionDisplay,
 	NutritionSource,
 	RecipeBoxSettings,
@@ -41,6 +42,13 @@ function oneOf<T>(val: unknown, options: readonly T[], fallback: T): T {
 function strArr(val: unknown, fallback: string[]): string[] {
 	if (!Array.isArray(val)) return fallback;
 	return (val as unknown[]).filter((x): x is string => typeof x === "string");
+}
+
+function numInRange(val: unknown, fallback: number, min: number, max: number): number {
+	if (typeof val !== "number" || Number.isNaN(val)) return fallback;
+	if (val < min) return min;
+	if (val > max) return max;
+	return val;
 }
 
 // ── complex type validators ───────────────────────────────────────────────────
@@ -211,6 +219,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		nutritionSource: oneOf<NutritionSource>(r.nutritionSource, ["recipe-total", "per-serving"], d.nutritionSource),
 		crossOffWhileCooking: bool(r.crossOffWhileCooking, d.crossOffWhileCooking),
 		cleanNoteBody: bool(r.cleanNoteBody, d.cleanNoteBody),
+		desktopRecipeLayout: oneOf<DesktopRecipeLayout>(r.desktopRecipeLayout, ["classic", "two-column"], d.desktopRecipeLayout),
+		desktopTwoColumnSplitRatio: numInRange(r.desktopTwoColumnSplitRatio, d.desktopTwoColumnSplitRatio, 0.25, 0.75),
 
 		cookHistoryEnabled: bool(r.cookHistoryEnabled, d.cookHistoryEnabled),
 		cookHistoryHeading: str(r.cookHistoryHeading, d.cookHistoryHeading),
