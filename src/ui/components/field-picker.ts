@@ -6,7 +6,6 @@ import { Menu, setIcon } from "obsidian";
 import { FilterableType } from "../../discovery/filter-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 
 /** Maps a field type to the Lucide icon used by Obsidian's property panel. */
 export function typeIcon(type: FilterableType, hasArrayValues = false): string {
@@ -27,8 +26,8 @@ export function buildPickerFieldList(
 ): Array<{ key: string; type: FilterableType; hasArrayValues: boolean }> {
 	const builtins: Array<{ key: string; type: FilterableType; hasArrayValues: boolean }> = [
 		{ key: settings.lastMadeProperty, type: "date",    hasArrayValues: false },
-		{ key: RECIPE_FRONTMATTER.cookedCount, type: "number",  hasArrayValues: false },
-		{ key: RECIPE_FRONTMATTER.favorite,    type: "boolean", hasArrayValues: false },
+		{ key: settings.cookedCountProperty, type: "number",  hasArrayValues: false },
+		{ key: settings.favoriteProperty,    type: "boolean", hasArrayValues: false },
 	];
 	const builtinKeys = new Set(builtins.map(b => b.key));
 	const all = [...builtins];

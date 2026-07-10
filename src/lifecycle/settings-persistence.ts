@@ -228,8 +228,14 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		cookHistoryFrontmatterProperty: str(r.cookHistoryFrontmatterProperty, d.cookHistoryFrontmatterProperty),
 		lastMadeProperty: str(r.lastMadeProperty, d.lastMadeProperty),
 		cookedCountProperty: str(r.cookedCountProperty, d.cookedCountProperty),
+		favoriteProperty: str(r.favoriteProperty, d.favoriteProperty),
 
 		allergensProperty: str(r.allergensProperty, d.allergensProperty),
+		dietProperty: str(r.dietProperty, d.dietProperty),
+		servingsProperty: str(r.servingsProperty, d.servingsProperty),
+		prepTimeProperty: str(r.prepTimeProperty, d.prepTimeProperty),
+		cookTimeProperty: str(r.cookTimeProperty, d.cookTimeProperty),
+		totalTimeProperty: str(r.totalTimeProperty, d.totalTimeProperty),
 		myAllergens: strArr(r.myAllergens, d.myAllergens),
 
 		showMeatTempWarnings: bool(r.showMeatTempWarnings, d.showMeatTempWarnings),

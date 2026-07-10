@@ -74,8 +74,6 @@ function renderBody(
 	}
 
 	if (settings.cookHistoryEnabled) {
-
-
 		new Setting(body)
 			.setName("Cook history")
 			.setDesc("The frontmatter property that stores the cook history meta data.")
@@ -85,7 +83,31 @@ function renderBody(
 					await save();
 				})
 			);
+
+		new Setting(body)
+			.setName("Times cooked")
+			.setDesc("The property used for the derived cook count value.")
+			.addText((t) => {
+				t.setValue(settings.cookedCountProperty).onChange(async (v) => {
+					settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.cookedCountProperty, v);
+					settings.cookedCountProperty = v;
+					await save();
+				});
+				t.inputEl.addEventListener("blur", () => rerender());
+			});
 	}
+
+	new Setting(body)
+		.setName("Favorite")
+		.setDesc("Property name used by the recipe favorite toggle.")
+		.addText((t) => {
+			t.setValue(settings.favoriteProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.favoriteProperty, v);
+				settings.favoriteProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
 
 	new Setting(body)
 		.setName("Allergens")
@@ -94,6 +116,66 @@ function renderBody(
 			t.setValue(settings.allergensProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.allergensProperty, v);
 				settings.allergensProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
+	new Setting(body)
+		.setName("Diet")
+		.setDesc("Property name holding diet tags/labels.")
+		.addText((t) => {
+			t.setValue(settings.dietProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.dietProperty, v);
+				settings.dietProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
+	new Setting(body)
+		.setName("Servings")
+		.setDesc("Primary property name for serving count.")
+		.addText((t) => {
+			t.setValue(settings.servingsProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.servingsProperty, v);
+				settings.servingsProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
+	new Setting(body)
+		.setName("Prep time")
+		.setDesc("Primary property name for prep time in minutes.")
+		.addText((t) => {
+			t.setValue(settings.prepTimeProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.prepTimeProperty, v);
+				settings.prepTimeProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
+	new Setting(body)
+		.setName("Cook time")
+		.setDesc("Primary property name for cook time in minutes.")
+		.addText((t) => {
+			t.setValue(settings.cookTimeProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.cookTimeProperty, v);
+				settings.cookTimeProperty = v;
+				await save();
+			});
+			t.inputEl.addEventListener("blur", () => rerender());
+		});
+
+	new Setting(body)
+		.setName("Total time")
+		.setDesc("Primary property name for total time in minutes.")
+		.addText((t) => {
+			t.setValue(settings.totalTimeProperty).onChange(async (v) => {
+				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.totalTimeProperty, v);
+				settings.totalTimeProperty = v;
 				await save();
 			});
 			t.inputEl.addEventListener("blur", () => rerender());

@@ -63,8 +63,14 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	cookHistoryFrontmatterProperty: "cookHistory",
 	lastMadeProperty: "lastMade",
 	cookedCountProperty: "cookedCount",
+	favoriteProperty: "favorite",
 
 	allergensProperty: "allergens",
+	dietProperty: "diet",
+	servingsProperty: "servings",
+	prepTimeProperty: "prepTime",
+	cookTimeProperty: "cookTime",
+	totalTimeProperty: "totalTime",
 	myAllergens: [],
 
 	showMeatTempWarnings: true,

@@ -30,7 +30,6 @@
 import { App, TFile } from "obsidian";
 import { findValue } from "../parser/frontmatter-lookup";
 import { RecipeBoxSettings } from "../settings/settings-types";
-import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 import { CookedImageResult } from "../ui/recipe-view/recipe-view-deps";
 import { generateEntryId } from "../utils/date";
 
@@ -261,8 +260,8 @@ async function writeFrontmatterEntries(
 		if (latest !== null) f[settings.lastMadeProperty] = latest;
 		else delete f[settings.lastMadeProperty];
 
-		if (entries.length > 0) f[RECIPE_FRONTMATTER.cookedCount] = entries.length;
-		else delete f[RECIPE_FRONTMATTER.cookedCount];
+		if (entries.length > 0) f[settings.cookedCountProperty] = entries.length;
+		else delete f[settings.cookedCountProperty];
 
 	});
 }

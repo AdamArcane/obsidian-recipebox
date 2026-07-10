@@ -19,12 +19,10 @@ import { CookHistoryModal } from "../modals/cook-history-modal";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { findValue } from "../../parser/frontmatter-lookup";
-import { ALIASES } from "../../parser/recipe-meta-aliases";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { makeLightboxable } from "../components/lightbox";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
-
-const SERVINGS_KEYS = ["servings", "serves", "serving", "yield", "portions"];
 
 function frontmatterString(frontmatter: Record<string, unknown>, candidateKeys: string[]): string | null {
 	const raw = findValue(frontmatter, candidateKeys);
@@ -248,6 +246,7 @@ export class RecipeView extends TextFileView {
 		const file = this.file;
 
 		const settings = this.deps.getSettings();
+		const aliases = getRecipeMetaAliases(settings);
 		const cache = this.app.metadataCache.getFileCache(file);
 		const frontmatter: Record<string, unknown> = cache?.frontmatter ?? {};
 		const mealPlanEntries = this.deps.getMealPlan().filter(entry => entry.recipePath === file.path);
@@ -256,7 +255,7 @@ export class RecipeView extends TextFileView {
 		// Normalize to an empty string so parser helpers that call startsWith do not crash.
 		const rawData = typeof this.data === "string" ? this.data : "";
 		const rawBody = stripFrontmatter(rawData);
-		const imageKeys = [settings.imageProperty, ...ALIASES.image];
+		const imageKeys = aliases.image;
 		const frontmatterImage = frontmatterString(frontmatter, imageKeys);
 		const fallbackBodyImage = settings.useFirstBodyImageWhenFrontmatterEmpty
 			? findFirstImageInBody(rawBody)
@@ -277,10 +276,10 @@ export class RecipeView extends TextFileView {
 			settings,
 			frontmatter,
 			multiplier: readRecipeMultiplier(cache),
-			servings: fmNum(frontmatter, SERVINGS_KEYS),
+			servings: fmNum(frontmatter, aliases.servings),
 			inMealPlan: mealPlanEntries.length > 0,
 			mealPlanEntries,
-			meta: readRecipeMeta(cache, settings.lastMadeProperty, settings.allergensProperty),
+			meta: readRecipeMeta(cache, settings),
 			groceryItems: this.deps.getGroceryItems(),
 			beforeContent: before,
 			beforeInstructionsContent: instructionSplit.before,

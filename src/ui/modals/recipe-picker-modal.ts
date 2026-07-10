@@ -7,11 +7,14 @@ import { App, TFile, prepareFuzzySearch, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { isRecipeFile } from "../../lifecycle/recipe-file-detection";
 import { BaseModal } from "./modal-shell";
+import { findValue } from "../../parser/frontmatter-lookup";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 
 const MAX_RESULTS = 7;
 
-function getThumbnailSrc(app: App, file: TFile): string | null {
-	const imageValue: unknown = app.metadataCache.getFileCache(file)?.frontmatter?.["image"];
+function getThumbnailSrc(app: App, file: TFile, settings: RecipeBoxSettings): string | null {
+	const fm = (app.metadataCache.getFileCache(file)?.frontmatter ?? {}) as Record<string, unknown>;
+	const imageValue = findValue(fm, getRecipeMetaAliases(settings).image);
 	if (typeof imageValue !== "string" || !imageValue) return null;
 
 	if (/^https?:\/\//i.test(imageValue)) return imageValue;
@@ -109,7 +112,7 @@ export class RecipePickerModal extends BaseModal {
 			const row = this.resultsEl.createDiv({ cls: "rb-recipe-picker-item" });
 
 			const thumb = row.createDiv({ cls: "rb-recipe-picker-thumb" });
-			const src = getThumbnailSrc(this.app, file);
+			const src = getThumbnailSrc(this.app, file, this.settings);
 			if (src) {
 				const img = thumb.createEl("img", { attr: { src, loading: "lazy" } });
 				img.onerror = () => { img.remove(); thumb.addClass("rb-recipe-picker-thumb--empty"); };

@@ -9,7 +9,7 @@ import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 import { daysSince } from "../utils/date-distance";
 import { formatMinutes } from "../parser/recipe-meta-read";
 import { findValue } from "../parser/frontmatter-lookup";
-import { ALIASES } from "../parser/recipe-meta-aliases";
+import { getRecipeMetaAliases } from "../parser/recipe-meta-aliases";
 
 const MAX_RULE_TOKENS = 3;
 
@@ -20,6 +20,7 @@ function ruleToken(
 	settings: RecipeBoxSettings,
 ): string | null {
 	const lastMadeKey = settings.lastMadeProperty;
+	const aliases = getRecipeMetaAliases(settings);
 
 	// lastMade: date-distance display
 	if (field === lastMadeKey || field === "lastMade") {
@@ -33,14 +34,14 @@ function ruleToken(
 	}
 
 	// favorite: only show when true — omit when false to avoid clutter
-	if (field === RECIPE_FRONTMATTER.favorite) {
-		const val = fm[field];
+	if (field === settings.favoriteProperty || field === RECIPE_FRONTMATTER.favorite) {
+		const val = findValue(fm, aliases.favorite);
 		return val === true || val === "true" ? "Favorited" : null;
 	}
 
 	// cookedCount: show as "Made N times"
-	if (field === RECIPE_FRONTMATTER.cookedCount) {
-		const raw = fm[field];
+	if (field === settings.cookedCountProperty || field === RECIPE_FRONTMATTER.cookedCount) {
+		const raw = findValue(fm, aliases.cookedCount);
 		const n = typeof raw === "number" ? raw : null;
 		if (n === null || n === 0) return "Never cooked";
 		return `Made ${n}x`;
@@ -54,11 +55,12 @@ function ruleToken(
 }
 
 /** Returns tokens for prep and cook times, omitting each if unset. */
-function timingTokens(fm: Record<string, unknown>): string[] {
+function timingTokens(fm: Record<string, unknown>, settings: RecipeBoxSettings): string[] {
+	const aliases = getRecipeMetaAliases(settings);
 	const tokens: string[] = [];
-	const prep = findValue(fm, ALIASES.prepTime);
+	const prep = findValue(fm, aliases.prepTime);
 	if (typeof prep === "number" && prep > 0) tokens.push(`Prep ${formatMinutes(prep)}`);
-	const cook = findValue(fm, ALIASES.cookTime);
+	const cook = findValue(fm, aliases.cookTime);
 	if (typeof cook === "number" && cook > 0) tokens.push(`Cook ${formatMinutes(cook)}`);
 	return tokens;
 }
@@ -79,6 +81,6 @@ export function buildInfoTokens(
 		if (t !== null) tokens.push(t);
 	}
 
-	tokens.push(...timingTokens(fm));
+	tokens.push(...timingTokens(fm, settings));
 	return tokens;
 }

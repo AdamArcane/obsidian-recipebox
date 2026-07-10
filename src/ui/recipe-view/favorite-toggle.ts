@@ -3,16 +3,19 @@
  * and persists its state to the "favorite" frontmatter property.
  */
 import { App, setIcon, TFile } from "obsidian";
-import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
+import { RecipeBoxSettings } from "../../settings/settings-types";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { toBoolean } from "../../parser/frontmatter-coerce";
+import { findValue } from "../../parser/frontmatter-lookup";
 
-async function setFavorite(app: App, file: TFile, value: boolean): Promise<void> {
+async function setFavorite(app: App, file: TFile, settings: RecipeBoxSettings, value: boolean): Promise<void> {
 	await app.fileManager.processFrontMatter(file, (fm) => {
 		const f = fm as Record<string, unknown>;
+		const key = settings.favoriteProperty;
 		if (value) {
-			f[RECIPE_FRONTMATTER.favorite] = true;
+			f[key] = true;
 		} else {
-			delete f[RECIPE_FRONTMATTER.favorite];
+			delete f[key];
 		}
 	});
 }
@@ -22,8 +25,9 @@ export function renderFavoriteToggle(
 	app: App,
 	file: TFile,
 	fm: Record<string, unknown>,
+	settings: RecipeBoxSettings,
 ): void {
-	let active = toBoolean(fm[RECIPE_FRONTMATTER.favorite]);
+	let active = toBoolean(findValue(fm, getRecipeMetaAliases(settings).favorite));
 	const btn = container.createEl("button", {
 		cls: ["rb-action-btn", active ? "rb-favorite-active" : ""],
 		attr: { "aria-pressed": String(active), "aria-label": "Toggle favorite" },
@@ -35,6 +39,6 @@ export function renderFavoriteToggle(
 		active = !active;
 		btn.setAttribute("aria-pressed", String(active));
 		btn.toggleClass("rb-favorite-active", active);
-		void setFavorite(app, file, active);
+		void setFavorite(app, file, settings, active);
 	});
 }

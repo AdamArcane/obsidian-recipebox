@@ -53,9 +53,15 @@ export interface RecipeBoxSettings {
 	cookHistoryFrontmatterProperty: string;
 	lastMadeProperty: string;
 	cookedCountProperty: string;
+	favoriteProperty: string;
 
 	// Allergens
 	allergensProperty: string;
+	dietProperty: string;
+	servingsProperty: string;
+	prepTimeProperty: string;
+	cookTimeProperty: string;
+	totalTimeProperty: string;
 	myAllergens: string[];
 
 	// Food safety
