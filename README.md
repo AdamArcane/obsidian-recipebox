@@ -61,7 +61,9 @@ BRAT will notify you when new releases are available and can update the plugin a
 
 ## Getting started
 
-Tag a note with `type: recipe` (configurable) in its frontmatter, structure ingredients and instructions under headings of your choice, and open it. Recipe Box will detect it and offer to switch into recipe view.
+Drop a note into the `Recipes` folder (created automatically the first time you enable the plugin), structure ingredients and instructions under headings of your choice, and open it. Recipe Box detects any note in that folder as a recipe and offers to switch into recipe view, no frontmatter required.
+
+Want recipes somewhere else, or mixed in with other notes? Change the recipe folder, or set a recipe type value (`recipe`, for example, matched against a frontmatter property) to narrow detection further, under **Settings → Recipe Box → Recipe library**.
 
 ## License
 

@@ -5,6 +5,9 @@
 import { App, setIcon, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";
+import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";
+
+const FALLBACK_RECIPE_FOLDER = DEFAULT_SETTINGS.recipeFolders[0] ?? "Recipes";
 
 export function renderSectionLibrary(
 	container: HTMLElement,
@@ -16,9 +19,14 @@ export function renderSectionLibrary(
 	new Setting(container).setName("Recipe library").setHeading();
 
 	// The folder list is appended directly inside this card so it stays one visual unit.
+	const folderDesc = document.createDocumentFragment();
+	folderDesc.appendText("Folders the plugin scans for recipe notes. ");
+	folderDesc.createEl("strong", { text: "At least one is required" });
+	folderDesc.appendText("; add \"/\" to scan the entire vault instead of a specific folder.");
+
 	const folderSetting = new Setting(container)
 		.setName("Recipe folders")
-		.setDesc("Folders the plugin scans for recipe notes. Leave empty to scan the entire vault.");
+		.setDesc(folderDesc);
 	folderSetting.settingEl.addClass("rb-settings-folder-setting");
 
 	const folderList = folderSetting.settingEl.createDiv({ cls: "rb-settings-folder-list" });
@@ -28,12 +36,22 @@ export function renderSectionLibrary(
 
 		settings.recipeFolders.forEach((folder, i) => {
 			const row = folderList.createDiv({ cls: "rb-settings-folder-row" });
-			row.createSpan({ cls: "rb-settings-folder-label", text: folder });
-			const del = row.createEl("button", { cls: "rb-settings-folder-delete clickable-icon", attr: { title: "Remove" } });
+			row.createSpan({ cls: "rb-settings-folder-label", text: folder === "/" ? "/ (entire vault)" : folder });
+			const del = row.createEl("button", {
+				cls: "rb-settings-folder-delete clickable-icon",
+				attr: { title: "Remove" },
+			});
 			setIcon(del, "trash-2");
 			del.addEventListener("click", () => {
 				settings.recipeFolders.splice(i, 1);
-				void save().then(() => renderFolderRows());
+				// Removing the last folder would silently fall back to scanning the
+				// entire vault (the underlying scope check treats an empty list that
+				// way). Restore the default folder instead, so "scan everything" only
+				// ever happens when someone explicitly adds "/".
+				if (settings.recipeFolders.length === 0) {
+					settings.recipeFolders.push(FALLBACK_RECIPE_FOLDER);
+				}
+				void save().then(() => { renderFolderRows(); updateWarning(); });
 			});
 		});
 
@@ -58,6 +76,7 @@ export function renderSectionLibrary(
 				await save();
 			}
 			renderFolderRows();
+			updateWarning();
 		}
 
 		input.addEventListener("input", () => { void tryCommit(); });
@@ -65,7 +84,26 @@ export function renderSectionLibrary(
 	}
 	renderFolderRows();
 
+	const warningEl = container.createDiv({ cls: "rb-settings-warning rb-hidden" });
 
+	function updateWarning(): void {
+		warningEl.empty();
+		const wholeVault = settings.recipeFolders.includes("/");
+		const noType = !settings.recipeType.trim();
+		if (!wholeVault || !noType) {
+			warningEl.addClass("rb-hidden");
+			return;
+		}
+		warningEl.removeClass("rb-hidden");
+
+		const icon = warningEl.createSpan({ cls: "rb-settings-warning-icon" });
+		setIcon(icon, "alert-triangle");
+		warningEl.createSpan({
+			cls: "rb-settings-warning-text",
+			text: "Scanning the entire vault (\"/\") with no recipe type value set means every note in your vault will be treated as a recipe. Set a recipe type value below to narrow this, or replace \"/\" with a specific folder.",
+		});
+	}
+	updateWarning();
 
 	new Setting(container)
 		.setName("Recipe type value")
@@ -74,6 +112,7 @@ export function renderSectionLibrary(
 			t.setValue(settings.recipeType).onChange(async (v) => {
 				settings.recipeType = v;
 				await save();
+				updateWarning();
 			})
 		);
 }

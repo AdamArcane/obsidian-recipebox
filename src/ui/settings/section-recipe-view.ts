@@ -127,7 +127,7 @@ export function renderSectionRecipeView(
 
 	badgeSettings.settingEl.addClass("rb-badge-stack");
 
-	badgeSettings.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
+	badgeSettings.settingEl.createDiv({ cls: "rb-settings-warning-text", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
 
 	const listEl = badgeSettings.settingEl.createDiv({ cls: "rb-badge-list" });
 	renderBadgeList(listEl, settings, save, app, getDiscovery);

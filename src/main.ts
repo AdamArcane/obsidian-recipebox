@@ -71,7 +71,28 @@ export default class RecipeBoxPlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = mergeSettings(await this.loadData());
+		const raw = await this.loadData();
+		this.settings = mergeSettings(raw);
+
+		// Fresh install (no saved data yet): create the default recipe folder so
+		// the recipeFolders scope set in DEFAULT_SETTINGS actually exists on disk.
+		// Only runs once, existing installs (raw !== null) never hit this.
+		if (raw === null || raw === undefined) {
+			await this.ensureDefaultRecipeFolderExists();
+		}
+	}
+
+	private async ensureDefaultRecipeFolderExists(): Promise<void> {
+		for (const folderPath of this.settings.recipeFolders) {
+			const existing = this.app.vault.getAbstractFileByPath(folderPath);
+			if (existing) continue; // already exists as a folder (or a same-named file, left alone either way)
+			try {
+				await this.app.vault.createFolder(folderPath);
+			} catch {
+				// Non-fatal: if creation fails (e.g. a race, or an invalid path), the
+				// user can still create the folder manually or adjust the setting.
+			}
+		}
 	}
 
 	async saveSettings(): Promise<void> {

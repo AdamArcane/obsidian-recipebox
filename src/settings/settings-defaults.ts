@@ -34,7 +34,7 @@ export const DEFAULT_CATEGORY_ORDER: string[] = [
 ];
 
 export const DEFAULT_SETTINGS: RecipeBoxSettings = {
-	recipeFolders: [],
+	recipeFolders: ["Recipes"],
 	mealPlanPath: "Meal Plan.md",
 	groceryListPath: "Grocery List.md",
 	ingredientsHeading: "Ingredients",
@@ -48,7 +48,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	autoCollapseCompletedSections: false,
 
 	autoOpenRecipeView: true,
-	recipeType: "recipe",
+	recipeType: "",
 	recipeTypePropertyName: "type",
 	nutritionDisplay: "per-serving",
 	nutritionSource: "per-serving",
@@ -99,7 +99,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	mealTypeFieldName: "meal",
 
 	importerTemplatePath: "",
-	importerDefaultFolder: "",
+	importerDefaultFolder: "Recipes",
 
 	headerBadges: [
 		{

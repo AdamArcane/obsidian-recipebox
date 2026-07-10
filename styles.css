@@ -4936,6 +4936,33 @@ body.is-mobile .rb-mpv-card-action-btn {
   border-top: 1px solid var(--background-modifier-border);
 }
 
+/* ── Recipe folder scope warning (Recipe library settings section) ──────── */
+
+.rb-settings-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-s);
+  background-color: rgba(var(--background-modifier-error-rgb), 0.1);
+  border: 1px solid var(--text-warning);
+}
+
+.rb-settings-warning-icon {
+  color: var(--text-warning);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-top: 0.15rem;
+}
+
+.rb-settings-warning-text {
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  line-height: 1.4;
+}
+
 /* ── Force-hidden utility ──────────────────────────────────────────────────
    Keep this rule last in the file. It's applied alongside other layout
    classes (e.g. .rb-modal-fields sets display: flex) to force-hide an

@@ -5,7 +5,7 @@
  */
 import { App, getAllTags } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
-import { isRecipeFile } from "../lifecycle/recipe-file-detection";
+import { getAllRecipeNotes } from "../lifecycle/recipe-file-detection";
 import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
 
 /**
@@ -38,9 +38,7 @@ export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): Raw
 	const tags = new Set<string>();
 	const skipKeys = buildSkipKeys(settings);
 
-	for (const file of app.vault.getMarkdownFiles()) {
-		if (!isRecipeFile(app, file, settings)) continue;
-
+	for (const file of getAllRecipeNotes(app, settings)) {
 		const cache = app.metadataCache.getFileCache(file);
 		if (!cache) continue;
 

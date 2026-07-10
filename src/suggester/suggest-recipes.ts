@@ -9,7 +9,7 @@ import type { SuggesterMode } from "./strategy-types";
 import { DiscoveryResult } from "../discovery/discovery-cache";
 import { FieldType } from "../discovery/filter-types";
 import { matchesFilters } from "../discovery/filter-evaluate";
-import { isRecipeFile } from "../lifecycle/recipe-file-detection";
+import { getAllRecipeNotes } from "../lifecycle/recipe-file-detection";
 import { scoreCandidate, computePoolRanges, CandidateMeta, extractTagsFromCache } from "./score-recipes";
 
 export interface SuggestionResult {
@@ -43,9 +43,7 @@ export function suggestRecipes(
 
 	// Collect all recipe files and their metadata in one pass.
 	const candidates: Array<{ file: TFile; meta: CandidateMeta }> = [];
-	for (const file of app.vault.getMarkdownFiles()) {
-		if (!isRecipeFile(app, file, settings)) continue;
-
+	for (const file of getAllRecipeNotes(app, settings)) {
 		const cache = app.metadataCache.getFileCache(file);
 		const frontmatter = ((cache?.frontmatter ?? {}) as Record<string, unknown>);
 		const tags = extractTagsFromCache(cache);
