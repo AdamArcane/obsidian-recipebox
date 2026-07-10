@@ -122,6 +122,7 @@ export function renderSectionRecipeView(
 
 	// ── Inline badge list ────────────────────────────────────────────────────
 	const badgeSettings = new Setting(container)
+		.setName("Header badges")
 		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
 
 	badgeSettings.settingEl.addClass("rb-badge-stack");
@@ -168,6 +169,15 @@ function renderBadgeList(
 			handle.setAttribute("aria-hidden", "true");
 		}
 
+		// Enabled checkbox
+		const checkbox = row.createEl("input", { type: "checkbox" });
+		checkbox.checked = badge.enabled;
+		checkbox.addEventListener("change", () => {
+			badge.enabled = checkbox.checked;
+			void save();
+		});
+
+
 		const isFormula = !!badge.formula;
 		const info = row.createDiv({ cls: "rb-badge-info" });
 		if (isFormula) info.createSpan({ cls: "rb-badge-formula-tag", text: "f" });
@@ -176,13 +186,7 @@ function renderBadgeList(
 		const sub = badgeSecondary(badge);
 		if (sub) textWrap.createSpan({ cls: "rb-badge-secondary", text: sub });
 
-		// Enabled checkbox
-		const checkbox = row.createEl("input", { type: "checkbox" });
-		checkbox.checked = badge.enabled;
-		checkbox.addEventListener("change", () => {
-			badge.enabled = checkbox.checked;
-			void save();
-		});
+
 
 		// Delete button — available for all badges
 		const del = row.createEl("button", { cls: "rb-badge-delete clickable-icon" });
