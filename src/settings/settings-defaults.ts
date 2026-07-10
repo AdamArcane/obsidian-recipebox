@@ -163,6 +163,11 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	prefixTagsWithHash: true,
 	showFullTagPath: false,
 
+	exportFolder: "Recipe Exports",
+	recipeExportDefaultFormat: "plain-markdown",
+	recipeExportIncludeCookHistoryDefault: false,
+	recipeExportIncludeImagesDefault: false,
+
 	state: {
 		mealPlan: [],
 		groceryItems: [],

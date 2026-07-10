@@ -54,8 +54,10 @@
 
 /* Badge list — inside a setting-item */
 
-.rb-badge-setting.setting-item {
-  display: block;
+.rb-badge-stack.setting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .rb-badge-list {
@@ -2128,6 +2130,7 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-weight: 500;
   padding: 0.2rem 0.5rem;
   transition: background 0.1s, color 0.1s;
+  margin-top: 0.25rem;
 }
 
 .rb-modal-link-btn:hover {
@@ -3599,12 +3602,14 @@ body.is-mobile .rb-duration-btn {
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .rb-modal-field-hint {
   color: var(--text-faint);
   font-size: 0.7rem;
   margin: 0;
+  flex: 0 0 100%;
 }
 
 .rb-export-preview {
@@ -3620,6 +3625,10 @@ body.is-mobile .rb-duration-btn {
   outline: none;
   box-sizing: border-box;
   line-height: 1.5;
+}
+
+.rb-export-preview-hidden {
+  display: none;
 }
 
 /* ── Grocery view responsive ─────────────────────────────────────────────── */

@@ -11,20 +11,26 @@ const ABSOLUTE_URL_RE = /^(?:https?|data|app|capacitor):\/\//i;
 export function resolveImagePath(app: App, imageValue: string): string | null {
 	if (ABSOLUTE_URL_RE.test(imageValue)) return imageValue;
 
+	const resolved = resolveImageFile(app, imageValue);
+	return resolved ? app.vault.getResourcePath(resolved) : null;
+}
+
+// Same resolution as resolveImagePath, but returns the TFile itself rather than
+// a display URL -- callers that need real bytes (export bundling) can pass this
+// to app.vault.readBinary(). Returns null for external URLs, which have no TFile.
+export function resolveImageFile(app: App, imageValue: string): TFile | null {
+	if (ABSOLUTE_URL_RE.test(imageValue)) return null;
+
 	// Unwrap wikilink/embed syntax to get bare path
 	const bare = stripWikilink(imageValue);
 
 	// Try Obsidian's link resolution first (handles shortened wikilinks)
 	const resolved = app.metadataCache.getFirstLinkpathDest(bare, "");
-	if (resolved instanceof TFile) {
-		return app.vault.getResourcePath(resolved);
-	}
+	if (resolved instanceof TFile) return resolved;
 
 	// Fallback: direct vault path lookup
 	const byPath = app.vault.getFileByPath(bare);
-	if (byPath instanceof TFile) {
-		return app.vault.getResourcePath(byPath);
-	}
+	if (byPath instanceof TFile) return byPath;
 
 	return null;
 }

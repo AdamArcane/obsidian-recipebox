@@ -16,6 +16,7 @@ import { renderBadgeRow, renderTagRow } from "./badges";
 import { clearAllTimers } from "../timer/timer-tray";
 import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
+import { RecipeExportModal } from "../modals/recipe-export-modal";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { findValue } from "../../parser/frontmatter-lookup";
@@ -140,6 +141,12 @@ export class RecipeView extends TextFileView {
 				item.setTitle("Open as Markdown")
 					.setIcon("pencil")
 					.onClick(() => this.deps.editAsMarkdown(file.path))
+			);
+
+			menu.addItem(item =>
+				item.setTitle("Export recipe")
+					.setIcon("download")
+					.onClick(() => new RecipeExportModal(this.app, file, settings).open())
 			);
 
 			menu.addSeparator();

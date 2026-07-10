@@ -36,6 +36,10 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
 fi
 
 echo ""
+echo "→ Verifying dev builds cleanly before touching main..."
+npm run build
+
+echo ""
 echo "→ Switching to main..."
 git checkout main
 

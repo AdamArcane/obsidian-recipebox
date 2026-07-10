@@ -50,7 +50,10 @@ function resolvePropertyValue(
 	return findValue(fm, [property]);
 }
 
-function resolveBadgeValues(
+// Exported so recipe-export's text-based badge summary can resolve the same
+// values renderBadgeRow() renders as DOM chips, without duplicating the
+// formula/alias/array-handling logic here.
+export function resolveBadgeValues(
 	badge: CustomBadge,
 	fm: Record<string, unknown>,
 	settings: RecipeBoxSettings,
