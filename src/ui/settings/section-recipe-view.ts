@@ -9,7 +9,6 @@ import { DEFAULT_SETTINGS } from "../../settings/settings-defaults";
 import { BadgeEditModal } from "../modals/modal-badge-edit";
 import { SeparatorEditModal } from "../modals/modal-separator-edit";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
-import { createCollapsibleSection } from "../components/collapsible-section";
 
 export function renderSectionRecipeView(
 	container: HTMLElement,
@@ -122,17 +121,16 @@ export function renderSectionRecipeView(
 
 
 	// ── Inline badge list ────────────────────────────────────────────────────
-	createCollapsibleSection(container, "Header badges", (body) => {
-		const badgeSetting = new Setting(body)
-			.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
+	const badgeSettings = new Setting(container)
+		.setName("Header badges")
+		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
 
-		badgeSetting.settingEl.addClass("rb-badge-setting");
+	badgeSettings.settingEl.addClass("rb-badge-stack");
 
-		badgeSetting.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
+	badgeSettings.settingEl.createDiv({ cls: "rb-badge-setting mod-warning", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
 
-		const listEl = badgeSetting.settingEl.createDiv({ cls: "rb-badge-list" });
-		renderBadgeList(listEl, settings, save, app, getDiscovery);
-	});
+	const listEl = badgeSettings.settingEl.createDiv({ cls: "rb-badge-list" });
+	renderBadgeList(listEl, settings, save, app, getDiscovery);
 }
 
 function badgePrimary(badge: CustomBadge): string {
@@ -171,6 +169,15 @@ function renderBadgeList(
 			handle.setAttribute("aria-hidden", "true");
 		}
 
+		// Enabled checkbox
+		const checkbox = row.createEl("input", { type: "checkbox" });
+		checkbox.checked = badge.enabled;
+		checkbox.addEventListener("change", () => {
+			badge.enabled = checkbox.checked;
+			void save();
+		});
+
+
 		const isFormula = !!badge.formula;
 		const info = row.createDiv({ cls: "rb-badge-info" });
 		if (isFormula) info.createSpan({ cls: "rb-badge-formula-tag", text: "f" });
@@ -179,13 +186,7 @@ function renderBadgeList(
 		const sub = badgeSecondary(badge);
 		if (sub) textWrap.createSpan({ cls: "rb-badge-secondary", text: sub });
 
-		// Enabled checkbox
-		const checkbox = row.createEl("input", { type: "checkbox" });
-		checkbox.checked = badge.enabled;
-		checkbox.addEventListener("change", () => {
-			badge.enabled = checkbox.checked;
-			void save();
-		});
+
 
 		// Delete button — available for all badges
 		const del = row.createEl("button", { cls: "rb-badge-delete clickable-icon" });

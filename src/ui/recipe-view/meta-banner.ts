@@ -92,7 +92,7 @@ export function renderMetaBanner(
 	renderNutritionCell(cells, fm, settings, servings, multiplier);
 
 	const actions = banner.createDiv({ cls: "rb-header-actions" });
-	renderFavoriteToggle(actions, app, file, fm);
+	renderFavoriteToggle(actions, app, file, fm, settings);
 	renderMarkCookedButton(actions, app, file, settings, deps);
 	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
 }

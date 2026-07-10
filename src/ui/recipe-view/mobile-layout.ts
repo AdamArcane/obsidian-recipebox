@@ -25,7 +25,7 @@ import { RECIPE_VIEW_TYPE } from "./recipe-view";
 import { fmStr } from "./frontmatter-read-helpers";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
-import { ALIASES } from "../../parser/recipe-meta-aliases";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { renderCookHistoryList } from "../../recipe-history/cook-history-render";
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -70,29 +70,30 @@ function formatDateValue(raw: string): string {
 
 // ── Mobile-static badge detection ────────────────────────────────────────────
 
-function isMobilePrepBadge(badge: CustomBadge): boolean {
+function isMobilePrepBadge(badge: CustomBadge, settings: RecipeBoxSettings): boolean {
 	if (!badge.property) return false;
-	return ALIASES.prepTime.some(a => a.toLowerCase() === badge.property.toLowerCase());
+	return getRecipeMetaAliases(settings).prepTime.some(a => a.toLowerCase() === badge.property.toLowerCase());
 }
 
-function isMobileCookBadge(badge: CustomBadge): boolean {
+function isMobileCookBadge(badge: CustomBadge, settings: RecipeBoxSettings): boolean {
 	if (!badge.property) return false;
-	return ALIASES.cookTime.some(a => a.toLowerCase() === badge.property.toLowerCase());
+	return getRecipeMetaAliases(settings).cookTime.some(a => a.toLowerCase() === badge.property.toLowerCase());
 }
 
-function isMobileTotalBadge(badge: CustomBadge): boolean {
-	if (badge.property && ALIASES.totalTime.some(a => a.toLowerCase() === badge.property.toLowerCase())) return true;
+function isMobileTotalBadge(badge: CustomBadge, settings: RecipeBoxSettings): boolean {
+	const aliases = getRecipeMetaAliases(settings);
+	if (badge.property && aliases.totalTime.some(a => a.toLowerCase() === badge.property.toLowerCase())) return true;
 	if (badge.formula) {
 		const f = badge.formula.toLowerCase();
-		const hasPrepRef = ALIASES.prepTime.some(a => f.includes(a.toLowerCase()));
-		const hasCookRef = ALIASES.cookTime.some(a => f.includes(a.toLowerCase()));
+		const hasPrepRef = aliases.prepTime.some(a => f.includes(a.toLowerCase()));
+		const hasCookRef = aliases.cookTime.some(a => f.includes(a.toLowerCase()));
 		return hasPrepRef && hasCookRef;
 	}
 	return false;
 }
 
-function isMobileStaticBadge(badge: CustomBadge): boolean {
-	return isMobilePrepBadge(badge) || isMobileCookBadge(badge) || isMobileTotalBadge(badge);
+function isMobileStaticBadge(badge: CustomBadge, settings: RecipeBoxSettings): boolean {
+	return isMobilePrepBadge(badge, settings) || isMobileCookBadge(badge, settings) || isMobileTotalBadge(badge, settings);
 }
 
 // ── Header sections ───────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ function renderNativeCard(
 	settings: RecipeBoxSettings,
 	meta: RecipeMeta,
 ): void {
-	const imageValue = fmStr(fm, ["image"]);
+	const imageValue = fmStr(fm, getRecipeMetaAliases(settings).image);
 
 	const card = container.createDiv({ cls: "rb-mobile-native-card" });
 	if (imageValue) renderImageCard(card, app, imageValue);
@@ -153,11 +154,11 @@ function renderMobileStatRow(
 	const enabled = settings.headerBadges.filter(b => b.enabled);
 
 	const cells: { label: string; value: string }[] = [];
-	if (enabled.some(isMobilePrepBadge) && meta.times.prep !== null)
+	if (enabled.some((badge) => isMobilePrepBadge(badge, settings)) && meta.times.prep !== null)
 		cells.push({ label: "Prep time", value: formatMinutes(meta.times.prep) });
-	if (enabled.some(isMobileCookBadge) && meta.times.cook !== null)
+	if (enabled.some((badge) => isMobileCookBadge(badge, settings)) && meta.times.cook !== null)
 		cells.push({ label: "Cook time", value: formatMinutes(meta.times.cook) });
-	if (enabled.some(isMobileTotalBadge) && meta.times.total !== null)
+	if (enabled.some((badge) => isMobileTotalBadge(badge, settings)) && meta.times.total !== null)
 		cells.push({ label: "Total", value: formatMinutes(meta.times.total) });
 
 	if (cells.length === 0) return;
@@ -268,7 +269,7 @@ function renderScaleActionsRow(
 	}
 
 	const actions = row.createDiv({ cls: "rb-mobile-actions" });
-	renderFavoriteToggle(actions, app, file, fm);
+	renderFavoriteToggle(actions, app, file, fm, settings);
 	renderMarkCookedButton(actions, app, file, settings, deps);
 	const planEntries = deps.getMealPlan().filter(e => e.recipePath === file.path);
 	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
@@ -417,7 +418,7 @@ export async function renderMobileLayout(
 
 	// Remaining configurable badges (skip static time ones and lastMade, which appears in the native card)
 	const skipOnMobile = (badge: CustomBadge): boolean => {
-		if (isMobileStaticBadge(badge)) return true;
+		if (isMobileStaticBadge(badge, settings)) return true;
 		if (badge.property && badge.property.toLowerCase() === settings.lastMadeProperty.toLowerCase()) return true;
 		return false;
 	};
@@ -498,12 +499,14 @@ export async function renderMobileLayout(
 	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
 
 	const sourceUrl = fmStr(fm, ["source", "url", "sourceUrl", "source_url"]);
+	const sourceURLDisplay = sourceUrl ? new URL(sourceUrl).hostname : undefined;
 	if (sourceUrl) {
 		const urlRow = panelInfo.createDiv({ cls: "rb-info-url" });
+		urlRow.createSpan({ cls: "rb-info-url-label", text: "Source: " });
 		if (/^https?:\/\//.test(sourceUrl)) {
-			urlRow.createEl("a", { href: sourceUrl, text: sourceUrl, attr: { target: "_blank", rel: "noopener" } });
+			urlRow.createEl("a", { href: sourceUrl, text: sourceURLDisplay, attr: { target: "_blank", rel: "noopener" } });
 		} else {
-			urlRow.createSpan({ text: sourceUrl });
+			urlRow.createSpan({ text: sourceURLDisplay ?? sourceUrl });
 		}
 	}
 

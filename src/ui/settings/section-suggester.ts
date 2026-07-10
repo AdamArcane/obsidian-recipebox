@@ -120,12 +120,12 @@ function renderModeRow(
 		text: mode.name,
 	});
 
-	if (mode.filters.length || mode.rules.length) {
-		row.createEl("span", {
-			cls: "rb-strategy-meta",
-			text: `${mode.filters.length}F · ${mode.rules.length}R`,
-		});
-	}
+	// if (mode.filters.length || mode.rules.length) {
+	// 	row.createEl("span", {
+	// 		cls: "rb-strategy-meta",
+	// 		text: `${mode.filters.length}F · ${mode.rules.length}R`,
+	// 	});
+	// }
 
 	// Edit
 	const editBtn = row.createEl("button", { cls: "rb-strategy-action-btn" });

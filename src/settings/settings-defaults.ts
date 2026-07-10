@@ -63,8 +63,14 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	cookHistoryFrontmatterProperty: "cookHistory",
 	lastMadeProperty: "lastMade",
 	cookedCountProperty: "cookedCount",
+	favoriteProperty: "favorite",
 
 	allergensProperty: "allergens",
+	dietProperty: "diet",
+	servingsProperty: "servings",
+	prepTimeProperty: "prepTime",
+	cookTimeProperty: "cookTime",
+	totalTimeProperty: "totalTime",
 	myAllergens: [],
 
 	showMeatTempWarnings: true,
@@ -156,6 +162,11 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	showTagsInHeader: true,
 	prefixTagsWithHash: true,
 	showFullTagPath: false,
+
+	exportFolder: "Recipe Exports",
+	recipeExportDefaultFormat: "plain-markdown",
+	recipeExportIncludeCookHistoryDefault: false,
+	recipeExportIncludeImagesDefault: false,
 
 	state: {
 		mealPlan: [],

@@ -8,7 +8,7 @@ import { RecipeBoxSettings } from "../../settings/settings-types";
 import { stripWikilink } from "../../utils/wikilink-strip";
 import { formatMinutes } from "../../parser/recipe-meta-read";
 import { findValue } from "../../parser/frontmatter-lookup";
-import { ALIASES } from "../../parser/recipe-meta-aliases";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { evaluateExpr } from "../../utils/expr-eval";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -26,17 +26,38 @@ function normalizeValue(raw: unknown, valueType: string): string | null {
 	return stripWikilink(str);
 }
 
-function resolvePropertyValue(property: string, fm: Record<string, unknown>): unknown {
-	const aliasEntry = Object.entries(ALIASES).find(
-		([canonical, variants]) =>
-			canonical.toLowerCase() === property.toLowerCase() ||
-			variants.some((v) => v.toLowerCase() === property.toLowerCase()),
+function resolvePropertyValue(
+	property: string,
+	fm: Record<string, unknown>,
+	settings: RecipeBoxSettings,
+): unknown {
+	const aliases = getRecipeMetaAliases(settings);
+	const aliasGroups: string[][] = [
+		aliases.image,
+		aliases.diet,
+		aliases.allergens,
+		aliases.prepTime,
+		aliases.cookTime,
+		aliases.totalTime,
+		aliases.favorite,
+		aliases.cookedCount,
+		aliases.servings,
+	];
+	const aliasEntry = aliasGroups.find((variants) =>
+		variants.some((variant: string) => variant.toLowerCase() === property.toLowerCase()),
 	);
-	if (aliasEntry) return findValue(fm, [aliasEntry[0], ...aliasEntry[1]]);
+	if (aliasEntry) return findValue(fm, aliasEntry);
 	return findValue(fm, [property]);
 }
 
-function resolveBadgeValues(badge: CustomBadge, fm: Record<string, unknown>): string[] {
+// Exported so recipe-export's text-based badge summary can resolve the same
+// values renderBadgeRow() renders as DOM chips, without duplicating the
+// formula/alias/array-handling logic here.
+export function resolveBadgeValues(
+	badge: CustomBadge,
+	fm: Record<string, unknown>,
+	settings: RecipeBoxSettings,
+): string[] {
 	if (badge.formula) {
 		try {
 			const result = evaluateExpr(badge.formula, fm);
@@ -47,7 +68,7 @@ function resolveBadgeValues(badge: CustomBadge, fm: Record<string, unknown>): st
 			return [];
 		}
 	}
-	const raw = resolvePropertyValue(badge.property, fm);
+	const raw = resolvePropertyValue(badge.property, fm, settings);
 	if (raw === null || raw === undefined) return [];
 	if (typeof raw === "boolean") return raw ? [""] : [];
 
@@ -90,7 +111,7 @@ export function renderBadgeRow(
 			continue;
 		}
 		if (!badge.formula && !badge.property) continue;
-		const values = resolveBadgeValues(badge, fm);
+		const values = resolveBadgeValues(badge, fm, settings);
 		if (values.length === 0) continue;
 		chips.push({ badge, type, values });
 	}

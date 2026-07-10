@@ -12,8 +12,9 @@ import { ModeEditorModal } from "./strategy-editor-modal";
 import { ScheduleRecipesModal } from "./schedule-recipes-modal";
 import { BaseModal } from "./modal-shell";
 import { resolveImagePath } from "../recipe-view/image-resolve";
-import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { buildInfoTokens } from "../../suggester/result-info-line";
+import { findValue } from "../../parser/frontmatter-lookup";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 
 export interface SuggestMealDeps {
 	getSettings: () => RecipeBoxSettings;
@@ -184,8 +185,8 @@ export class SuggestMealModal extends BaseModal {
 			// Thumbnail from the image frontmatter field
 			const cache = this.app.metadataCache.getFileCache(r.file);
 			const fm = (cache?.frontmatter ?? {}) as Record<string, unknown>;
-			const imageValue = fm[RECIPE_FRONTMATTER.image] as string | undefined;
-			if (imageValue) {
+			const imageValue = findValue(fm, getRecipeMetaAliases(settings).image);
+			if (typeof imageValue === "string" && imageValue) {
 				const src = resolveImagePath(this.app, imageValue);
 				if (src) {
 					item.createEl("img", { cls: "rb-suggest-thumbnail", attr: { src } });

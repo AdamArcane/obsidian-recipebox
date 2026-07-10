@@ -10,6 +10,7 @@ import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
+import { RecipeExportModal } from "../ui/modals/recipe-export-modal";
 import { isRecipeFile } from "../lifecycle/recipe-file-detection";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 
@@ -93,6 +94,18 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 			const view = plugin.app.workspace.getActiveViewOfType(RecipeView);
 			if (checking) return !!view;
 			if (view) plugin.openCurrentFileAsMarkdown(view.leaf);
+		},
+	});
+
+	plugin.addCommand({
+		id: "export-current-recipe",
+		name: "Export current recipe",
+		checkCallback: (checking) => {
+			const file = plugin.app.workspace.getActiveFile();
+			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
+			if (checking) return true;
+			new RecipeExportModal(plugin.app, file, plugin.settings).open();
+			return true;
 		},
 	});
 

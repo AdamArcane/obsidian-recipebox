@@ -22,6 +22,7 @@ import {
 	NutritionDisplay,
 	NutritionSource,
 	RecipeBoxSettings,
+	RecipeExportFormat,
 } from "../settings/settings-types";
 import { DEFAULT_SETTINGS } from "../settings/settings-defaults";
 
@@ -228,8 +229,14 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		cookHistoryFrontmatterProperty: str(r.cookHistoryFrontmatterProperty, d.cookHistoryFrontmatterProperty),
 		lastMadeProperty: str(r.lastMadeProperty, d.lastMadeProperty),
 		cookedCountProperty: str(r.cookedCountProperty, d.cookedCountProperty),
+		favoriteProperty: str(r.favoriteProperty, d.favoriteProperty),
 
 		allergensProperty: str(r.allergensProperty, d.allergensProperty),
+		dietProperty: str(r.dietProperty, d.dietProperty),
+		servingsProperty: str(r.servingsProperty, d.servingsProperty),
+		prepTimeProperty: str(r.prepTimeProperty, d.prepTimeProperty),
+		cookTimeProperty: str(r.cookTimeProperty, d.cookTimeProperty),
+		totalTimeProperty: str(r.totalTimeProperty, d.totalTimeProperty),
 		myAllergens: strArr(r.myAllergens, d.myAllergens),
 
 		showMeatTempWarnings: bool(r.showMeatTempWarnings, d.showMeatTempWarnings),
@@ -267,6 +274,15 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		showTagsInHeader: bool(r.showTagsInHeader, d.showTagsInHeader),
 		prefixTagsWithHash: bool(r.prefixTagsWithHash, d.prefixTagsWithHash),
 		showFullTagPath: bool(r.showFullTagPath, d.showFullTagPath),
+
+		exportFolder: str(r.exportFolder, d.exportFolder),
+		recipeExportDefaultFormat: oneOf<RecipeExportFormat>(
+			r.recipeExportDefaultFormat,
+			["plain-markdown", "importable-markdown", "json", "json-ld"],
+			d.recipeExportDefaultFormat,
+		),
+		recipeExportIncludeCookHistoryDefault: bool(r.recipeExportIncludeCookHistoryDefault, d.recipeExportIncludeCookHistoryDefault),
+		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
 
 		state: {
 			mealPlan: Array.isArray(state.mealPlan)

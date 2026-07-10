@@ -68,10 +68,14 @@ export class ExportModal extends BaseModal {
 		appendSection.createDiv({ cls: "rb-modal-section-heading", text: "Append to note" });
 
 		const appendField = appendSection.createDiv({ cls: "rb-modal-field" });
+		const defaultPath = this.settings.exportFolder
+			? `${this.settings.exportFolder}/Grocery List`
+			: "";
 		this.appendInput = appendField.createEl("input", {
 			cls: "rb-modal-input",
 			type: "text",
 			placeholder: "Vault-relative path, e.g. Notes/Grocery Export",
+			value: defaultPath,
 		});
 		new NotePathSuggest(this.app, this.appendInput);
 	}

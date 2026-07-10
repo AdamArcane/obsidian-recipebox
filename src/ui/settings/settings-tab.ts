@@ -16,6 +16,7 @@ import { renderSectionSuggester } from "./section-suggester";
 import { renderSectionHealthSafety } from "./section-health-safety";
 import { renderSectionMealPlan as renderSectionMealPlan } from "./section-meal-plan";
 import { renderSectionPropertyNames } from "./section-property-names";
+import { renderSectionExport } from "./section-export";
 
 export class RecipeBoxSettingsTab extends PluginSettingTab {
 	private plugin: RecipeBoxPlugin;
@@ -47,6 +48,7 @@ export class RecipeBoxSettingsTab extends PluginSettingTab {
 		renderSectionHealthSafety(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionImporter(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionPropertyNames(this.containerEl, this.plugin.settings, save, rerender);
+		renderSectionExport(this.containerEl, this.plugin.settings, save, rerender, this.app);
 	}
 
 	private rerenderPreservingScroll(): void {

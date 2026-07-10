@@ -12,14 +12,16 @@ import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
  * Plugin-internal frontmatter keys that aren't meaningful filter criteria.
  * These drive recipe detection and rendering, not user-level metadata.
  */
-const SKIP_KEYS = new Set<string>([
-	RECIPE_FRONTMATTER.type,
-	RECIPE_FRONTMATTER.image,
-	RECIPE_FRONTMATTER.multiplier,
-	// Obsidian injects "position" into the parsed frontmatter object to record
-	// where in the file the frontmatter block appears. It is not a user field.
-	"position",
-]);
+function buildSkipKeys(settings: RecipeBoxSettings): Set<string> {
+	return new Set<string>([
+		settings.recipeTypePropertyName,
+		settings.imageProperty,
+		RECIPE_FRONTMATTER.multiplier,
+		// Obsidian injects "position" into the parsed frontmatter object to record
+		// where in the file the frontmatter block appears. It is not a user field.
+		"position",
+	]);
+}
 
 export interface RawDiscovery {
 	/** Frontmatter key -> distinct observed scalar values across all recipes. */
@@ -34,6 +36,7 @@ export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): Raw
 	const fields = new Map<string, Set<unknown>>();
 	const arrayFields = new Set<string>();
 	const tags = new Set<string>();
+	const skipKeys = buildSkipKeys(settings);
 
 	for (const file of app.vault.getMarkdownFiles()) {
 		if (!isRecipeFile(app, file, settings)) continue;
@@ -44,7 +47,7 @@ export function discoverRecipeFields(app: App, settings: RecipeBoxSettings): Raw
 		// Collect frontmatter fields
 		const fm = (cache.frontmatter ?? {}) as Record<string, unknown>;
 		for (const [key, value] of Object.entries(fm)) {
-			if (SKIP_KEYS.has(key) || value === null || value === undefined) continue;
+			if (skipKeys.has(key) || value === null || value === undefined) continue;
 
 			const set = fields.get(key) ?? new Set<unknown>();
 			// Array values (e.g. allergens: [nuts, dairy]) contribute each element

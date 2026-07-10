@@ -3,9 +3,10 @@
  * cooked count, last-made date) from a file's cached frontmatter.
  */
 import { CachedMetadata } from "obsidian";
+import { RecipeBoxSettings } from "../settings/settings-types";
 import { findValue } from "./frontmatter-lookup";
 import { toTagArray, toNumber, toBoolean } from "./frontmatter-coerce";
-import { ALIASES } from "./recipe-meta-aliases";
+import { getRecipeMetaAliases } from "./recipe-meta-aliases";
 
 export interface RecipeTimes {
 	prep: number | null;
@@ -42,33 +43,35 @@ export function matchingAllergens(recipeAllergens: string[], myAllergens: string
 	return recipeAllergens.filter(a => mySet.has(a.toLowerCase()));
 }
 
-function readDiet(fm: Record<string, unknown>): string[] {
-	return toTagArray(findValue(fm, ALIASES.diet));
+function readDiet(fm: Record<string, unknown>, settings: RecipeBoxSettings): string[] {
+	return toTagArray(findValue(fm, getRecipeMetaAliases(settings).diet));
 }
 
-function readAllergens(fm: Record<string, unknown>, primaryKey?: string): string[] {
+function readAllergens(fm: Record<string, unknown>, settings: RecipeBoxSettings, primaryKey?: string): string[] {
+	const aliases = getRecipeMetaAliases(settings);
 	const candidates = primaryKey
-		? [primaryKey, ...ALIASES.allergens.filter(k => k !== primaryKey)]
-		: ALIASES.allergens;
+		? [primaryKey, ...aliases.allergens.filter(k => k !== primaryKey)]
+		: aliases.allergens;
 	return toTagArray(findValue(fm, candidates));
 }
 
-function readTimes(fm: Record<string, unknown>): RecipeTimes {
-	const prep = toNumber(findValue(fm, ALIASES.prepTime));
-	const cook = toNumber(findValue(fm, ALIASES.cookTime));
-	let total = toNumber(findValue(fm, ALIASES.totalTime));
+function readTimes(fm: Record<string, unknown>, settings: RecipeBoxSettings): RecipeTimes {
+	const aliases = getRecipeMetaAliases(settings);
+	const prep = toNumber(findValue(fm, aliases.prepTime));
+	const cook = toNumber(findValue(fm, aliases.cookTime));
+	let total = toNumber(findValue(fm, aliases.totalTime));
 	if (total === null && prep !== null && cook !== null) {
 		total = prep + cook;
 	}
 	return { prep, cook, total };
 }
 
-function readFavorite(fm: Record<string, unknown>): boolean {
-	return toBoolean(findValue(fm, ALIASES.favorite));
+function readFavorite(fm: Record<string, unknown>, settings: RecipeBoxSettings): boolean {
+	return toBoolean(findValue(fm, getRecipeMetaAliases(settings).favorite));
 }
 
-function readCookedCount(fm: Record<string, unknown>): number {
-	const n = toNumber(findValue(fm, ALIASES.cookedCount));
+function readCookedCount(fm: Record<string, unknown>, settings: RecipeBoxSettings): number {
+	const n = toNumber(findValue(fm, getRecipeMetaAliases(settings).cookedCount));
 	if (n === null) return 0;
 	return Math.max(0, Math.floor(n));
 }
@@ -85,16 +88,15 @@ function readLastMade(fm: Record<string, unknown>, key: string): string | null {
 
 export function readRecipeMeta(
 	cache: CachedMetadata | null,
-	lastMadeKey: string,
-	allergensKey?: string,
+	settings: RecipeBoxSettings,
 ): RecipeMeta {
 	const fm: Record<string, unknown> = cache?.frontmatter ?? {};
 	return {
-		diet: readDiet(fm),
-		allergens: readAllergens(fm, allergensKey),
-		times: readTimes(fm),
-		favorite: readFavorite(fm),
-		cookedCount: readCookedCount(fm),
-		lastMade: readLastMade(fm, lastMadeKey),
+		diet: readDiet(fm, settings),
+		allergens: readAllergens(fm, settings, settings.allergensProperty),
+		times: readTimes(fm, settings),
+		favorite: readFavorite(fm, settings),
+		cookedCount: readCookedCount(fm, settings),
+		lastMade: readLastMade(fm, settings.lastMadeProperty),
 	};
 }

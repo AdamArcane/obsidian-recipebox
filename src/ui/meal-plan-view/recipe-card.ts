@@ -6,12 +6,16 @@ import { App, TFile, setIcon } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { makeDraggable } from "./drag-reschedule";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
+import { findValue } from "../../parser/frontmatter-lookup";
+import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
+import { RecipeBoxSettings } from "../../settings/settings-types";
 
-function getThumbnailSrc(app: App, recipePath: string): string | null {
+function getThumbnailSrc(app: App, recipePath: string, settings: RecipeBoxSettings): string | null {
 	const file = app.vault.getFileByPath(recipePath);
 	if (!(file instanceof TFile)) return null;
 
-	const imageValue: unknown = app.metadataCache.getFileCache(file)?.frontmatter?.["image"];
+	const fm = (app.metadataCache.getFileCache(file)?.frontmatter ?? {}) as Record<string, unknown>;
+	const imageValue = findValue(fm, getRecipeMetaAliases(settings).image);
 	if (typeof imageValue !== "string" || !imageValue) return null;
 
 	// Absolute URL (http/https)
@@ -40,7 +44,7 @@ export function renderRecipeCard(
 
 	// thumbnail
 	const thumb = card.createDiv({ cls: "rb-mpv-card-thumb" });
-	const src = getThumbnailSrc(app, entry.recipePath);
+	const src = getThumbnailSrc(app, entry.recipePath, deps.getSettings());
 	if (src) {
 		const img = thumb.createEl("img", { attr: { src, loading: "lazy", draggable: "false" } });
 		img.onerror = () => { img.remove(); thumb.addClass("rb-mpv-card-thumb--empty"); };

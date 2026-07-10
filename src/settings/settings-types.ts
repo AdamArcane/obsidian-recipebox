@@ -18,6 +18,8 @@ export type MealTypeNotation = "tag" | "dataview" | "text";
 export type { CategorySource } from "../types";
 export type NutritionSource = "recipe-total" | "per-serving";
 export type DesktopRecipeLayout = "classic" | "two-column";
+// PDF lands once its exporter is built.
+export type RecipeExportFormat = "plain-markdown" | "importable-markdown" | "json" | "json-ld";
 
 export interface RecipeBoxSettings {
 	// Recipe location & structure
@@ -53,9 +55,15 @@ export interface RecipeBoxSettings {
 	cookHistoryFrontmatterProperty: string;
 	lastMadeProperty: string;
 	cookedCountProperty: string;
+	favoriteProperty: string;
 
 	// Allergens
 	allergensProperty: string;
+	dietProperty: string;
+	servingsProperty: string;
+	prepTimeProperty: string;
+	cookTimeProperty: string;
+	totalTimeProperty: string;
 	myAllergens: string[];
 
 	// Food safety
@@ -99,6 +107,14 @@ export interface RecipeBoxSettings {
 	showTagsInHeader: boolean;
 	prefixTagsWithHash: boolean;
 	showFullTagPath: boolean;
+
+	// Export -- shared folder plus per-format defaults, so every export
+	// feature (recipe, grocery, future meal plan) configures "where things
+	// go" in one place instead of accumulating its own scattered setting.
+	exportFolder: string;
+	recipeExportDefaultFormat: RecipeExportFormat;
+	recipeExportIncludeCookHistoryDefault: boolean;
+	recipeExportIncludeImagesDefault: boolean;
 
 	// Persisted runtime state
 	state: {
