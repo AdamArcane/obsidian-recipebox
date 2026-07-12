@@ -13,6 +13,8 @@
     "version": "node -e \"const fs=require('fs'); const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=process.env.npm_new_version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && npm run changelog && git add manifest.json CHANGELOG.md",
     "postversion": "git push && git push --tags",
     "release:beta": "npm version prerelease --preid=beta",
+    "release:minor": "npm version minor --no-git-tag-version && git add package.json manifest.json && git commit -m \"chore: bump minor version\"",
+    "release:major": "npm version major --no-git-tag-version && git add package.json manifest.json && git commit -m \"chore: bump major version\"",
     "release:stable": "bash scripts/release-stable.sh"
   },
   "license": "GPL-3.0-or-later",
