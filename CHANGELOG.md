@@ -1,3 +1,21 @@
+## [0.1.6](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5...0.1.6) (2026-07-10)
+
+### Features
+
+* Enhance recipe metadata handling with user-configurable property names ([8d2020c](https://github.com/AdamArcane/obsidian-recipebox/commit/8d2020cdc35583c504996feb89d80a7cd0d2ab94))
+* export recipes in multiple formats including JSON, JSON-LD, and markdown variants ([bc80385](https://github.com/AdamArcane/obsidian-recipebox/commit/bc8038595fb174e5ac75ea645ae86c8adaae689c))
+
+### Bug Fixes
+
+* cleanup header badges settings ([830a759](https://github.com/AdamArcane/obsidian-recipebox/commit/830a75994493770f43616c75296d9443d3633025))
+
+## [0.1.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.3...0.1.5) (2026-07-09)
+
+### Features
+
+* add option to use the first image in the recipe note as the hero image if nothing found in the frontmatter property. ([96f5464](https://github.com/AdamArcane/obsidian-recipebox/commit/96f54648d740e1abe4d13b763c1917323a85f6e2))
+* add responsive two-column layout for desktop recipe view ([9a16940](https://github.com/AdamArcane/obsidian-recipebox/commit/9a16940304cc08a1f7a3053e4abd641bd6c2bca1))
+
 ## [0.1.5-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5-beta.2...0.1.5-beta.3) (2026-07-09)
 
 ### Features
