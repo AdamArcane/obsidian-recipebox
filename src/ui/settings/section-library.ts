@@ -19,7 +19,7 @@ export function renderSectionLibrary(
 	new Setting(container).setName("Recipe library").setHeading();
 
 	// The folder list is appended directly inside this card so it stays one visual unit.
-	const folderDesc = document.createDocumentFragment();
+	const folderDesc = activeDocument.createDocumentFragment();
 	folderDesc.appendText("Folders the plugin scans for recipe notes. ");
 	folderDesc.createEl("strong", { text: "At least one is required" });
 	folderDesc.appendText("; add \"/\" to scan the entire vault instead of a specific folder.");

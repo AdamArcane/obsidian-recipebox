@@ -11,6 +11,7 @@ import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { RecipeExportModal } from "../ui/modals/recipe-export-modal";
+import { ShareRecipeModal } from "../sharing/share-modal";
 import { isRecipeFile } from "../lifecycle/recipe-file-detection";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 
@@ -105,6 +106,18 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
 			if (checking) return true;
 			new RecipeExportModal(plugin.app, file, plugin.settings).open();
+			return true;
+		},
+	});
+
+	plugin.addCommand({
+		id: "share-current-recipe",
+		name: "Share this recipe",
+		checkCallback: (checking) => {
+			const file = plugin.app.workspace.getActiveFile();
+			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
+			if (checking) return true;
+			new ShareRecipeModal(plugin.app, file, plugin.settings, () => plugin.saveSettings()).open();
 			return true;
 		},
 	});

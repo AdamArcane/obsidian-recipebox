@@ -168,6 +168,11 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	recipeExportIncludeCookHistoryDefault: false,
 	recipeExportIncludeImagesDefault: false,
 
+	shareServerUrl: "https://share.recipebox.app",
+	shareDataProperty: "recipe-share",
+	userGuid: "",
+	userShortId: "",
+
 	state: {
 		mealPlan: [],
 		groceryItems: [],

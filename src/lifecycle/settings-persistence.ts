@@ -284,6 +284,11 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		recipeExportIncludeCookHistoryDefault: bool(r.recipeExportIncludeCookHistoryDefault, d.recipeExportIncludeCookHistoryDefault),
 		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
 
+		shareServerUrl: str(r.shareServerUrl, d.shareServerUrl),
+		shareDataProperty: str(r.shareDataProperty, d.shareDataProperty),
+		userGuid: str(r.userGuid, d.userGuid),
+		userShortId: str(r.userShortId, d.userShortId),
+
 		state: {
 			mealPlan: Array.isArray(state.mealPlan)
 				? (state.mealPlan as unknown[]).map(validateMealPlanEntry).filter((x): x is MealPlanEntry => x !== null)

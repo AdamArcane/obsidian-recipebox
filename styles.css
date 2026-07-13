@@ -3591,6 +3591,35 @@ body.is-mobile .rb-duration-btn {
   color: var(--color-red);
 }
 
+/* ── Share modal ─────────────────────────────────────────────────────────── */
+
+.rb-share-option-disabled {
+  opacity: 0.5;
+}
+
+.rb-share-option-disabled label {
+  cursor: default;
+}
+
+.rb-share-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rb-share-link-row .rb-modal-input {
+  flex: 1;
+}
+
+.rb-share-link-row .rb-modal-link-btn {
+  margin-top: 0;
+  flex: 0 0 auto;
+}
+
+.rb-share-warning {
+  color: var(--color-orange);
+}
+
 /* ── Export modal ────────────────────────────────────────────────────────── */
 
 .rb-export-modal .rb-modal-fields {

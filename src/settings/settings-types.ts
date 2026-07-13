@@ -116,6 +116,20 @@ export interface RecipeBoxSettings {
 	recipeExportIncludeCookHistoryDefault: boolean;
 	recipeExportIncludeImagesDefault: boolean;
 
+	// Recipe sharing -- shareServerUrl is the entire "self-host readiness"
+	// investment for v1 (see recipe-sharing-spec.md): every API call goes
+	// through this setting instead of a hardcoded hosted URL.
+	shareServerUrl: string;
+	// The four share values (slug/token/created/expires) are never read or
+	// written independently, so per convention ("settings that always travel
+	// together get one toggle") they live in a single nested frontmatter
+	// property rather than four flat ones.
+	shareDataProperty: string;
+	// Plugin-level identity, not per-recipe -- generated once on first share
+	// and reused for every share after. Never regenerated, never shown.
+	userGuid: string;
+	userShortId: string;
+
 	// Persisted runtime state
 	state: {
 		mealPlan: MealPlanEntry[];

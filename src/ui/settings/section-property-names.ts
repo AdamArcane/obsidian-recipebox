@@ -197,4 +197,14 @@ function renderBody(
 				})
 			);
 	}
+
+	new Setting(body)
+		.setName("Share data")
+		.setDesc("The frontmatter property that stores share state (slug, delete token, created/expires timestamps) as a nested object.")
+		.addText((t) =>
+			t.setValue(settings.shareDataProperty).onChange(async (v) => {
+				settings.shareDataProperty = v.trim() || "recipe-share";
+				await save();
+			})
+		);
 }

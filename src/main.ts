@@ -71,7 +71,7 @@ export default class RecipeBoxPlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		const raw = await this.loadData();
+		const raw = await this.loadData() as unknown;
 		this.settings = mergeSettings(raw);
 
 		// Fresh install (no saved data yet): create the default recipe folder so

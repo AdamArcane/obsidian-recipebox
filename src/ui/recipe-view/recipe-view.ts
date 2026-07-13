@@ -17,6 +17,7 @@ import { clearAllTimers } from "../timer/timer-tray";
 import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
 import { RecipeExportModal } from "../modals/recipe-export-modal";
+import { ShareRecipeModal } from "../../sharing/share-modal";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { findValue } from "../../parser/frontmatter-lookup";
@@ -71,6 +72,12 @@ export class RecipeView extends TextFileView {
 
 		this.addAction("pencil", "Edit as Markdown", () => {
 			if (this.file) this.deps.editAsMarkdown(this.file.path);
+		});
+
+		this.addAction("share-2", "Share recipe", () => {
+			if (this.file) {
+				new ShareRecipeModal(this.app, this.file, this.deps.getSettings(), this.deps.saveSettings).open();
+			}
 		});
 
 		// Re-request the wake lock if the user returns to the app while cook mode is still on.
@@ -147,6 +154,12 @@ export class RecipeView extends TextFileView {
 				item.setTitle("Export recipe")
 					.setIcon("download")
 					.onClick(() => new RecipeExportModal(this.app, file, settings).open())
+			);
+
+			menu.addItem(item =>
+				item.setTitle("Share recipe")
+					.setIcon("share-2")
+					.onClick(() => new ShareRecipeModal(this.app, file, settings, this.deps.saveSettings).open())
 			);
 
 			menu.addSeparator();
