@@ -7,13 +7,13 @@
  * one -- see unshare-recipe.ts / share-recipe.ts -- never updates in place.
  */
 import { App, Notice, TFile } from "obsidian";
-import { RecipeBoxSettings } from "../settings/settings-types";
-import { BaseModal, addFooterButtons } from "../ui/modals/modal-shell";
-import { getShareData, ShareData } from "./share-frontmatter";
-import { getShareStatus, ShareStatus } from "./share-status";
-import { shareRecipe } from "./share-recipe";
-import { unshareRecipe } from "./unshare-recipe";
-import { CreateShareResponse } from "./share-worker-client";
+import { RecipeBoxSettings } from "../../settings/settings-types";
+import { BaseModal } from "./modal-shell";
+import { getShareData, ShareData } from "../../sharing/share-frontmatter";
+import { getShareStatus, ShareStatus } from "../../sharing/share-status";
+import { shareRecipe } from "../../sharing/share-recipe";
+import { unshareRecipe } from "../../sharing/unshare-recipe";
+import { CreateShareResponse } from "../../sharing/share-worker-client";
 
 interface ShareResultView {
 	share: CreateShareResponse;
@@ -49,6 +49,7 @@ export class ShareRecipeModal extends BaseModal {
 	private bodyEl!: HTMLElement;
 	private footerEl!: HTMLElement;
 	private nameInput!: HTMLInputElement;
+	private visibilitySelect!: HTMLSelectElement;
 	private expiresSelect!: HTMLSelectElement;
 	private submitBtn!: HTMLButtonElement;
 
@@ -94,7 +95,8 @@ export class ShareRecipeModal extends BaseModal {
 	private renderFormView(bodyEl: HTMLElement): void {
 		const fields = bodyEl.createDiv({ cls: "rb-modal-fields" });
 
-		const nameField = fields.createDiv({ cls: "rb-modal-field" });
+		const nameRow = fields.createDiv({ cls: "rb-share-form-row rb-share-form-row--full" });
+		const nameField = nameRow.createDiv({ cls: "rb-modal-field rb-modal-field--grow" });
 		nameField.createEl("label", { text: "Name" });
 		this.nameInput = nameField.createEl("input", {
 			cls: "rb-modal-input",
@@ -102,20 +104,19 @@ export class ShareRecipeModal extends BaseModal {
 			value: this.file.basename,
 		});
 
-		const visField = fields.createDiv({ cls: "rb-modal-field" });
+		const optionsRow = fields.createDiv({ cls: "rb-share-form-row" });
+
+		const visField = optionsRow.createDiv({ cls: "rb-modal-field rb-share-form-visibility" });
 		visField.createEl("label", { text: "Visibility" });
+		this.visibilitySelect = visField.createEl("select", { cls: "rb-modal-select" });
+		this.visibilitySelect.createEl("option", { value: "anyone", text: "Anyone with the link" });
+		this.visibilitySelect.createEl("option", {
+			value: "specific-people",
+			text: "Specific people (coming soon)",
+			attr: { disabled: "true" },
+		});
 
-		const anyoneRow = visField.createDiv({ cls: "rb-modal-field-row" });
-		anyoneRow.createEl("input", { type: "radio", attr: { name: "rb-share-visibility", checked: "true" } });
-		anyoneRow.createEl("label", { text: "Anyone with the link" });
-
-		// Establishes the UI pattern for future visibility options without
-		// building the backing functionality yet, per spec.
-		const peopleRow = visField.createDiv({ cls: "rb-modal-field-row rb-share-option-disabled" });
-		peopleRow.createEl("input", { type: "radio", attr: { name: "rb-share-visibility", disabled: "true" } });
-		peopleRow.createEl("label", { text: "Specific people (coming soon)" });
-
-		const expiresField = fields.createDiv({ cls: "rb-modal-field" });
+		const expiresField = optionsRow.createDiv({ cls: "rb-modal-field rb-share-form-expiry" });
 		expiresField.createEl("label", { text: "Expires in" });
 		this.expiresSelect = expiresField.createEl("select", { cls: "rb-modal-select" });
 		for (const days of EXPIRY_OPTIONS) {
@@ -125,11 +126,10 @@ export class ShareRecipeModal extends BaseModal {
 	}
 
 	private renderFormFooter(footerEl: HTMLElement): void {
-		this.submitBtn = addFooterButtons(footerEl, {
-			confirmLabel: this.isReshare ? "Re-share" : "Create link",
-			onCancel: () => this.close(),
-			onConfirm: () => { void this.handleSubmit(); },
-		});
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+			.addEventListener("click", () => this.close());
+		this.submitBtn = footerEl.createEl("button", { cls: "mod-cta", text: this.isReshare ? "Re-share" : "Create link" });
+		this.submitBtn.addEventListener("click", () => { void this.handleSubmit(); });
 	}
 
 	private renderResultView(bodyEl: HTMLElement): void {
@@ -175,7 +175,7 @@ export class ShareRecipeModal extends BaseModal {
 	}
 
 	private renderSharedFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
 			.addEventListener("click", () => this.close());
 		footerEl.createEl("button", { cls: "mod-warning", text: "Unshare" })
 			.addEventListener("click", (e) => { void this.handleUnshare(e.currentTarget as HTMLButtonElement); });

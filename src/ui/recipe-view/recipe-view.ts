@@ -17,7 +17,7 @@ import { clearAllTimers } from "../timer/timer-tray";
 import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
 import { RecipeExportModal } from "../modals/recipe-export-modal";
-import { ShareRecipeModal } from "../../sharing/share-modal";
+import { ShareRecipeModal } from "../modals/share-recipe-modal";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { findValue } from "../../parser/frontmatter-lookup";

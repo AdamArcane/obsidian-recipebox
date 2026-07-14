@@ -11,7 +11,7 @@ import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { RecipeExportModal } from "../ui/modals/recipe-export-modal";
-import { ShareRecipeModal } from "../sharing/share-modal";
+import { ShareRecipeModal } from "../ui/modals/share-recipe-modal";
 import { isRecipeFile } from "../lifecycle/recipe-file-detection";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 

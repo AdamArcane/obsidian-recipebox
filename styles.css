@@ -3593,6 +3593,26 @@ body.is-mobile .rb-duration-btn {
 
 /* ── Share modal ─────────────────────────────────────────────────────────── */
 
+.rb-share-form-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.rb-share-form-row--full {
+  display: block;
+}
+
+.rb-share-form-visibility {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rb-share-form-expiry {
+  flex: 0 0 11rem;
+}
+
 .rb-share-option-disabled {
   opacity: 0.5;
 }
@@ -3618,6 +3638,16 @@ body.is-mobile .rb-duration-btn {
 
 .rb-share-warning {
   color: var(--color-orange);
+}
+
+@media (max-width: 480px) {
+  .rb-share-form-row {
+    flex-wrap: wrap;
+  }
+
+  .rb-share-form-expiry {
+    flex: 1 1 100%;
+  }
 }
 
 /* ── Export modal ────────────────────────────────────────────────────────── */
