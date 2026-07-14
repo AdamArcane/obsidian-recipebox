@@ -14,6 +14,7 @@ import { stripObsidianMarkdown } from "../recipe-export/obsidian-markdown-strip"
 import { resolveRawNutrition } from "../recipe-export/nutrition-raw";
 import { HowToStep, HowToSection, NutritionInformation, toIsoDuration, ingredientText, recipeAuthor } from "../recipe-export/exporters/json-ld-exporter";
 import { ShareableRecipeData } from "./share-export-data";
+import { ResolvedShareImage } from "./resolve-share-image";
 
 
 
@@ -37,6 +38,7 @@ export function buildShareRecipeJsonLd(
 	data: ShareableRecipeData,
 	frontmatter: Record<string, unknown>,
 	settings: RecipeBoxSettings,
+	resolvedImage: ResolvedShareImage | null,
 ): ShareRecipeJsonLd {
 	const recipe: ShareRecipeJsonLd = {
 		"@context": "https://schema.org",
@@ -53,7 +55,12 @@ export function buildShareRecipeJsonLd(
 		recipeInstructions: [],
 	};
 
-	if (data.image?.kind === "url") recipe.image = data.image.url;
+	// Vault-local images use VAULT_IMAGE_PLACEHOLDER (not a data: URI any more)
+	// which the Worker replaces with a real URL, so all non-null resolved images
+	// are safe to include here. Guard retained for any legacy data: strings.
+	if (resolvedImage && !resolvedImage.src.startsWith("data:")) {
+		recipe.image = resolvedImage.src;
+	}
 	if (data.servings !== null) recipe.recipeYield = String(data.servings);
 
 	const prepTime = toIsoDuration(data.times.prep);
@@ -100,6 +107,29 @@ export function stringifyShareRecipeJsonLd(
 	data: ShareableRecipeData,
 	frontmatter: Record<string, unknown>,
 	settings: RecipeBoxSettings,
+	resolvedImage: ResolvedShareImage | null,
 ): string {
-	return JSON.stringify(buildShareRecipeJsonLd(data, frontmatter, settings), null, 2);
+	return JSON.stringify(buildShareRecipeJsonLd(data, frontmatter, settings, resolvedImage), null, 2);
+}
+
+/**
+ * Returns human-readable warnings for JSON-LD fields that couldn't be
+ * populated, so the share modal can surface them to the user. These
+ * reflect genuine gaps in the recipe data -- no fabricated fallbacks.
+ */
+export function collectShareWarnings(
+	data: ShareableRecipeData,
+	resolvedImage: ResolvedShareImage | null,
+): string[] {
+	const warnings: string[] = [];
+
+	if (!stripObsidianMarkdown(data.introContent).trim()) {
+		warnings.push("The recipe has no description text. Adding an introduction improves how the recipe appears in structured data and search results.");
+	}
+
+	if (data.servings === null) {
+		warnings.push("The recipe has no serving size. Adding a servings count improves structured data completeness.");
+	}
+
+	return warnings;
 }

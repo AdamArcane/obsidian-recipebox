@@ -31,9 +31,19 @@ import { App, TFile } from "obsidian";
 import { RecipeExportData } from "../recipe-export/recipe-export-data";
 import { findSourceUrl } from "./find-source-url";
 
+/**
+ * Placeholder written into the HTML and JSON-LD when the image is a vault
+ * file. The Worker replaces every occurrence of this string with the real
+ * image URL after storing the bytes at {userShortId}/{recipeSlug}/image.
+ */
+export const VAULT_IMAGE_PLACEHOLDER = "__RB_IMAGE_URL__";
+
 export interface ResolvedShareImage {
 	src: string;
 	isScraperOrigin: boolean;
+	/** Raw JPEG bytes for vault-local images; absent for external URLs. */
+	bytes?: ArrayBuffer;
+	contentType?: string;
 }
 
 export interface ShareImageResolution {
@@ -61,7 +71,7 @@ const MAX_DIMENSION = 1200;
 const IMAGE_BUDGET_BYTES = 350 * 1024;
 const QUALITY_PASSES = [0.8, 0.5];
 
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
+export function arrayBufferToBase64(buffer: ArrayBuffer): string {
 	let binary = "";
 	const bytes = new Uint8Array(buffer);
 	const chunkSize = 0x8000;
@@ -91,12 +101,12 @@ async function decodeToCanvas(bytes: ArrayBuffer, mime: string): Promise<HTMLCan
 	}
 }
 
-function canvasToJpegDataUri(canvas: HTMLCanvasElement, quality: number): Promise<string> {
+function canvasToJpegBytes(canvas: HTMLCanvasElement, quality: number): Promise<ArrayBuffer> {
 	return new Promise((resolve, reject) => {
 		canvas.toBlob(
 			(blob) => {
 				if (!blob) { reject(new Error("Failed to encode image")); return; }
-				void blob.arrayBuffer().then((buf) => resolve(`data:image/jpeg;base64,${arrayBufferToBase64(buf)}`));
+				void blob.arrayBuffer().then(resolve);
 			},
 			"image/jpeg",
 			quality,
@@ -105,26 +115,28 @@ function canvasToJpegDataUri(canvas: HTMLCanvasElement, quality: number): Promis
 }
 
 /** Resizes, re-encodes, and budget-checks a vault image; drops quality once more if still over. */
-async function encodeVaultImage(app: App, file: TFile): Promise<{ src: string | null; omittedReason: string | null }> {
+async function encodeVaultImage(app: App, file: TFile): Promise<{ bytes: ArrayBuffer | null; omittedReason: string | null }> {
 	const mime = MIME_BY_EXTENSION[file.extension.toLowerCase()];
 	if (!mime) {
-		return { src: null, omittedReason: "This image format isn't supported for sharing, so the recipe was shared without an image." };
+		return { bytes: null, omittedReason: "This image format isn't supported for sharing, so the recipe was shared without an image." };
 	}
 
 	let canvas: HTMLCanvasElement;
 	try {
-		const bytes = await app.vault.readBinary(file);
-		canvas = await decodeToCanvas(bytes, mime);
+		const rawBytes = await app.vault.readBinary(file);
+		canvas = await decodeToCanvas(rawBytes, mime);
 	} catch {
-		return { src: null, omittedReason: "The recipe's image couldn't be processed, so the recipe was shared without an image." };
+		return { bytes: null, omittedReason: "The recipe's image couldn't be processed, so the recipe was shared without an image." };
 	}
 
 	for (const quality of QUALITY_PASSES) {
-		const dataUri = await canvasToJpegDataUri(canvas, quality);
-		if (dataUri.length <= IMAGE_BUDGET_BYTES) return { src: dataUri, omittedReason: null };
+		const buf = await canvasToJpegBytes(canvas, quality);
+		// Budget is checked against raw byte size (not base64 length) since the
+		// image now travels as a separate Worker KV key, not embedded in HTML.
+		if (buf.byteLength <= IMAGE_BUDGET_BYTES) return { bytes: buf, omittedReason: null };
 	}
 
-	return { src: null, omittedReason: "The recipe's image was too large to include even after compression, so the recipe was shared without it." };
+	return { bytes: null, omittedReason: "The recipe's image was too large to include even after compression, so the recipe was shared without it." };
 }
 
 export async function resolveShareImage(
@@ -140,7 +152,9 @@ export async function resolveShareImage(
 		return { image: { src: data.image.url, isScraperOrigin }, omittedReason: null };
 	}
 
-	const { src, omittedReason } = await encodeVaultImage(app, data.image.file);
-	if (!src) return { image: null, omittedReason };
-	return { image: { src, isScraperOrigin }, omittedReason: null };
+	const { bytes, omittedReason } = await encodeVaultImage(app, data.image.file);
+	if (!bytes) return { image: null, omittedReason };
+	// src is a placeholder: the Worker replaces it with the real image URL after
+	// storing the bytes at {userShortId}/{recipeSlug}/image.
+	return { image: { src: VAULT_IMAGE_PLACEHOLDER, isScraperOrigin, bytes, contentType: "image/jpeg" }, omittedReason: null };
 }

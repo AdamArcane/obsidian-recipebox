@@ -13,6 +13,7 @@ import { detectPlatform } from "../../importer/social-platform-detect";
 import { buildRecipeNote } from "../../importer/note-template-render";
 import { titleToFilename } from "../../importer/note-filename";
 import { ensureParentFolders } from "../../utils/vault-notes";
+import { downloadRecipeImage } from "../../importer/download-recipe-image";
 
 export type SubmitUrlResult =
 	| { kind: "success"; recipe: ExtractedRecipe; warning: string | null }
@@ -45,7 +46,7 @@ export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 	}
 
 	const { recipe, usedAuthorFallback } = await extractRecipe(html, trimmed);
-	if (!recipe || !recipe.title) {
+	if (!recipe) {
 		return { kind: "error", message: "No recipe found. The site may require login or render content via JavaScript." };
 	}
 	// The fallback author (this site's hostname) only exists to satisfy
@@ -53,7 +54,7 @@ export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 	// written into the saved note -- but a missing author byline can be a
 	// sign the page's structured data was thin elsewhere too, so it's worth
 	// flagging for a closer look before saving.
-	const warning = usedAuthorFallback
+	const warning: string | null = usedAuthorFallback
 		? "This site didn't list a recipe author. The import still worked, but double-check the details below since the page's structured data may be incomplete."
 		: null;
 	return { kind: "success", recipe, warning };
@@ -88,7 +89,16 @@ export async function saveRecipe(
 
 	const doWrite = async (): Promise<void> => {
 		try {
-			const content = await buildRecipeNote(app, recipe, settings);
+			// Attempt to download the hero image into the vault before rendering
+			// the note template, so the template sees the vault path instead of
+			// a raw URL. Best-effort: failure falls back to the original URL and
+			// never blocks the import.
+			let recipeToSave = recipe;
+			if (settings.downloadImagesOnImport && recipe.heroImage) {
+				const imagePath = await downloadRecipeImage(app, recipe.heroImage, recipe.title || "recipe", folderTrimmed);
+				if (imagePath) recipeToSave = { ...recipe, heroImage: imagePath };
+			}
+			const content = await buildRecipeNote(app, recipeToSave, settings);
 			await ensureParentFolders(app, filePath);
 			const existing = app.vault.getFileByPath(filePath);
 			if (existing) {

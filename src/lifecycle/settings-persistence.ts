@@ -267,6 +267,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 		importerTemplatePath: str(r.importerTemplatePath, d.importerTemplatePath),
 		importerDefaultFolder: str(r.importerDefaultFolder, d.importerDefaultFolder),
+		downloadImagesOnImport: bool(r.downloadImagesOnImport, d.downloadImagesOnImport),
 
 		headerBadges: Array.isArray(r.headerBadges)
 			? (r.headerBadges as unknown[]).map(validateBadge).filter((x): x is CustomBadge => x !== null)

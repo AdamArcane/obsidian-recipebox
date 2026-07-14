@@ -101,6 +101,7 @@ export interface RecipeBoxSettings {
 	// Importer
 	importerTemplatePath: string;
 	importerDefaultFolder: string;
+	downloadImagesOnImport: boolean;
 
 	// Header badges
 	headerBadges: CustomBadge[];

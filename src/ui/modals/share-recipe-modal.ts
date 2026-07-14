@@ -18,6 +18,7 @@ import { CreateShareResponse } from "../../sharing/share-worker-client";
 interface ShareResultView {
 	share: CreateShareResponse;
 	imageOmittedReason: string | null;
+	warnings: string[];
 }
 
 const EXPIRY_OPTIONS = [7, 30, 90] as const;
@@ -169,8 +170,12 @@ export class ShareRecipeModal extends BaseModal {
 
 		box.createEl("p", { cls: "rb-modal-section-desc", text: `Expires ${formatExpiry(result.share.expiresAt)}` });
 
-		if (result.imageOmittedReason) {
-			box.createEl("p", { cls: "rb-modal-section-desc rb-share-warning", text: result.imageOmittedReason });
+		const allWarnings = [
+			...(result.imageOmittedReason ? [result.imageOmittedReason] : []),
+			...result.warnings,
+		];
+		for (const w of allWarnings) {
+			box.createEl("p", { cls: "rb-modal-section-desc rb-share-warning", text: w });
 		}
 	}
 
@@ -220,8 +225,8 @@ export class ShareRecipeModal extends BaseModal {
 			if (this.isReshare) {
 				await unshareRecipe(this.app, this.file, this.settings, this.saveSettings);
 			}
-			const { share, imageOmittedReason } = await shareRecipe(this.app, this.file, this.settings, this.saveSettings, { name, expiresInDays });
-			this.resultData = { share, imageOmittedReason };
+			const { share, imageOmittedReason, warnings } = await shareRecipe(this.app, this.file, this.settings, this.saveSettings, { name, expiresInDays });
+			this.resultData = { share, imageOmittedReason, warnings };
 			this.view = "result";
 			this.renderCurrentView();
 			this.renderCurrentFooter();

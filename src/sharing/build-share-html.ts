@@ -107,7 +107,7 @@ export function buildShareHtml(
 	const title = escapeHtml(data.title);
 	const intro = stripObsidianMarkdown(data.introContent).trim();
 	const sourceUrl = findSourceUrl(frontmatter);
-	const jsonLd = stringifyShareRecipeJsonLd(data, frontmatter, settings);
+	const jsonLd = stringifyShareRecipeJsonLd(data, frontmatter, settings, image);
 	const accent = resolveShareAccentColors(sharerAccentColor);
 
 	// A second, low-emphasis mention in the footer only makes sense when the
@@ -124,6 +124,8 @@ export function buildShareHtml(
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title}</title>
+<link rel="icon" href="https://cdn.arcanerecipes.com/rb-logo.png">
+
 <script type="application/ld+json">${jsonLd}</script>
 <style>
 :root {
@@ -187,6 +189,7 @@ a { color: var(--rb-accent); }
 .rbs-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rb-border); color: var(--rb-text-muted); font-size: 0.85rem; }
 .rbs-footer a { color: inherit; }
 .rbs-footer-attribution { margin-bottom: 0.35rem; }
+.rbs-logo { width: 50px; vertical-align: text-bottom; margin-right: 0.3em; }
 </style>
 </head>
 <body>
@@ -201,7 +204,7 @@ ${renderInstructions(data)}
 ${renderNutrition(data)}
 <div class="rbs-footer">
 ${footerAttribution}
-Made with <a href="https://obsidian.md" target="_blank">Obsidian</a> and <a href="https://community.obsidian.md/plugins/recipe-box" target="_blank">Recipe Box</a>
+<img src="https://cdn.arcanerecipes.com/rb-logo.png" class="rbs-logo" /> Made with <a href="https://obsidian.md" target="_blank">Obsidian</a> and <a href="https://community.obsidian.md/plugins/recipe-box" target="_blank">Recipe Box</a>
 </div>
 </body>
 </html>

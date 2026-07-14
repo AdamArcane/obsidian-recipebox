@@ -14,6 +14,11 @@ export interface CreateShareRequest {
 	name: string;
 	html: string;
 	expiresInDays: 7 | 30 | 90;
+	/** Base64-encoded image bytes for vault-local images. The Worker stores these
+	 * at {userShortId}/{recipeSlug}/image and substitutes VAULT_IMAGE_PLACEHOLDER
+	 * in the HTML with the resulting public URL. Absent for external-URL images. */
+	imageBase64?: string;
+	imageContentType?: string;
 }
 
 export interface CreateShareResponse {

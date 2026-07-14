@@ -4,7 +4,7 @@
  */
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ExtractorPlugin, RecipeFields, scrapeRecipe } from "recipe-scrapers";
+import { ExtractorPlugin, RecipeFields, getScraper } from "recipe-scrapers";
 import { ExtractedRecipe, ImportedGroup } from "./recipe-extract-types";
 import { parseNutrient } from "./nutrient-parse";
 
@@ -17,34 +17,38 @@ function hostnameFromUrl(url: string): string {
 	}
 }
 
-/**
- * recipe-scrapers treats "author" as required on every RecipeData -- and
- * that requirement is enforced during extraction itself, not just
- * validation, so a generic/wild-mode (schema.org-only) site with no author
- * anywhere in its markup makes the whole scrape throw extractor_not_found
- * instead of just omitting the field. There's no built-in fallback for this
- * in wild mode, so we supply one: priority 0 (lowest) means every real
- * extractor -- JSON-LD, microdata, a site-specific scraper -- runs first and
- * wins if it can supply an author; this only fires as a last resort,
- * returning the site's hostname per the library's own documented fallback
- * contract ("if no author, return the site name").
- */
-class AuthorFallbackExtractor extends ExtractorPlugin {
-	name = "author-fallback";
+// recipe-scrapers treats these as required on every RecipeData -- and that
+// requirement is enforced during extraction itself, not just validation, so
+// a generic/wild-mode (schema.org-only) site missing any one of them
+// anywhere in its markup makes the whole scrape throw extractor_not_found
+// instead of just omitting the field. canonicalUrl/language have built-in
+// fallbacks baked into the base scraper; these four don't. "author" has a
+// documented fallback contract ("if no author, return the site name") that
+// just isn't implemented for wild mode, so we replicate it; the other three
+// have no such contract, so an empty value stands in -- our own mapping
+// below already treats an empty description/image/yields exactly like a
+// genuinely absent one.
+const FIELDS_WITHOUT_WILD_MODE_FALLBACK: ReadonlyArray<keyof RecipeFields> = ["author", "description", "image", "yields"];
+
+class RequiredFieldFallbackExtractor extends ExtractorPlugin {
+	name = "required-field-fallback";
 	priority = 0;
-	usedFallback = false;
+	usedAuthorFallback = false;
 
 	constructor($: CheerioAPI, private readonly url: string) {
 		super($);
 	}
 
 	supports(field: keyof RecipeFields): boolean {
-		return field === "author";
+		return FIELDS_WITHOUT_WILD_MODE_FALLBACK.includes(field);
 	}
 
-	extract<Key extends keyof RecipeFields>(_field: Key): RecipeFields[Key] {
-		this.usedFallback = true;
-		return hostnameFromUrl(this.url) as RecipeFields[Key];
+	extract<Key extends keyof RecipeFields>(field: Key): RecipeFields[Key] {
+		if (field === "author") {
+			this.usedAuthorFallback = true;
+			return hostnameFromUrl(this.url) as RecipeFields[Key];
+		}
+		return "" as RecipeFields[Key];
 	}
 }
 
@@ -74,9 +78,18 @@ export interface ExtractRecipeResult {
 export async function extractRecipe(html: string, url: string): Promise<ExtractRecipeResult> {
 	try {
 		const $ = cheerio.load(html);
-		const authorFallback = new AuthorFallbackExtractor($, url);
-		const data = await scrapeRecipe(html, url, { extraExtractors: [authorFallback] });
-		if (!data?.title) return { recipe: null, usedAuthorFallback: authorFallback.usedFallback };
+		const fallback = new RequiredFieldFallbackExtractor($, url);
+		const ScraperClass = getScraper(url, { wildMode: true });
+		const scraper = new ScraperClass(html, url, { extraExtractors: [fallback] });
+		// toRecipeObject() runs extraction (where the fallback above matters)
+		// but skips recipe-scrapers' own schema validation -- deliberately.
+		// That validation rejects an empty description or a non-URL image,
+		// but those are exactly the "we don't have this" states the fallback
+		// produces for a sparse page, and our own mapping below already
+		// treats them as absent, so there's nothing left for that validation
+		// to protect against here.
+		const data = await scraper.toRecipeObject();
+		if (!data?.title) return { recipe: null, usedAuthorFallback: fallback.usedAuthorFallback };
 
 		const nutrients: Record<string, string> = data.nutrients ?? {};
 
@@ -97,7 +110,7 @@ export async function extractRecipe(html: string, url: string): Promise<ExtractR
 				fat: nutrientValue(nutrients, "fatContent", "fat"),
 				carbs: nutrientValue(nutrients, "carbohydrateContent", "carbs"),
 			},
-			usedAuthorFallback: authorFallback.usedFallback,
+			usedAuthorFallback: fallback.usedAuthorFallback,
 		};
 	} catch {
 		return { recipe: null, usedAuthorFallback: false };
