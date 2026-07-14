@@ -11,15 +11,15 @@ const REQUEST_HEADERS = {
 	"Accept-Language": "en-US,en;q=0.5",
 };
 
-export async function fetchHtml(url: string): Promise<string | null> {
+export async function fetchHtml(url: string): Promise<{ html: string | null; error?: string }> {
 	try {
 		const response = await requestUrl({ url, headers: REQUEST_HEADERS });
 		const contentType = response.headers?.["content-type"] ?? "";
 		if (!contentType.includes("text/html") && !contentType.includes("text/plain")) {
-			return null;
+			return { html: null, error: `Unexpected content-type: ${contentType || "none"}` };
 		}
-		return response.text;
-	} catch {
-		return null;
+		return { html: response.text };
+	} catch (err) {
+		return { html: null, error: err instanceof Error ? err.message : String(err) };
 	}
 }

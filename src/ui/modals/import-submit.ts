@@ -28,13 +28,14 @@ export async function submitUrl(url: string): Promise<ExtractedRecipe | null> {
 		return null;
 	}
 
-	const html = await fetchHtml(trimmed);
+
+	const { html, error: errMessage } = await fetchHtml(trimmed);
 	if (!html) {
-		new Notice("Could not fetch that URL. The site may be unavailable or require login.");
+		new Notice(`Could not fetch that URL. ${errMessage ?? "The site may be unavailable or require login."}`);
 		return null;
 	}
-
-	if (platform === "youtube" || platform === "tiktok") {
+	
+	if (platform === "youtube" || platform === "tiktok") {	
 		const meta = extractSocialMeta(html);
 		const recipe = extractRecipeFromText(meta.description, meta.title || undefined);
 		if (platform === "tiktok" && meta.description.length < 200) {
