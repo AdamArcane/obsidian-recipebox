@@ -1,3 +1,16 @@
+## [0.1.7-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.6...0.1.7-beta.0) (2026-07-14)
+
+### Features
+
+* add cheerio dependency and implement author fallback in recipe extraction ([89828f2](https://github.com/AdamArcane/obsidian-recipebox/commit/89828f2e323e2511f21719c506ea322378138fc7))
+* add recipe sharing functionality ([3c1c416](https://github.com/AdamArcane/obsidian-recipebox/commit/3c1c416accb81e0d9ea936f8fc936ae34fd31394))
+* add release scripts for minor and major version bumps ([965f75d](https://github.com/AdamArcane/obsidian-recipebox/commit/965f75da7c7be7df9271e23231b14febe5f382c6))
+* better handle missing properties when importing recipes. ([63542ae](https://github.com/AdamArcane/obsidian-recipebox/commit/63542aea64118b350e19584a99e5f89c412bc572))
+* enhance privacy so that extra recipe note data cannot be shared inadvertantly ([f8a99b7](https://github.com/AdamArcane/obsidian-recipebox/commit/f8a99b7a2f5a9088d6f729ea8e8bf199f327893f))
+* scope recipe detection to configurable folders by default ([6e3ac09](https://github.com/AdamArcane/obsidian-recipebox/commit/6e3ac093df583bf9c67da0888703daf542ca2f30))
+* Show more useful error message when import from URL fails ([0abe6f1](https://github.com/AdamArcane/obsidian-recipebox/commit/0abe6f1e86adc6103f961a54e319c85fa670f212))
+* tweaks to the share modal and styles of the recipe output when sharing ([18d250a](https://github.com/AdamArcane/obsidian-recipebox/commit/18d250a8ca7ad4cd4599a56ebdfbdd4e4aaf0481))
+
 ## [0.1.6](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.5...0.1.6) (2026-07-10)
 
 ### Features
