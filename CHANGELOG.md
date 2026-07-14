@@ -1,3 +1,9 @@
+## [0.1.7-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.2...v0.1.7-beta.3) (2026-07-14)
+
+### Features
+
+* add support for optional notes section in recipe notes ([ba447f6](https://github.com/AdamArcane/obsidian-recipebox/commit/ba447f6bdf42c2ccebfdb039c5d02c84e95ef4de))
+
 ## [0.1.7-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.1...v0.1.7-beta.2) (2026-07-14)
 
 ### Bug Fixes
