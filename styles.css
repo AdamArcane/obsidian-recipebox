@@ -1300,6 +1300,11 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--text-accent);
 }
 
+.rb-sidebar-btn--shared {
+  border-color: color-mix(in srgb, var(--color-green) 60%, transparent);
+  color: var(--color-green);
+}
+
 .rb-sidebar-btn-icon {
   flex-shrink: 0;
   width: 1rem;
@@ -1529,6 +1534,11 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 .rb-mobile-native-value {
   font-size: var(--font-ui-small);
   color: var(--text-normal);
+}
+
+.rb-mobile-native-value--tappable {
+  color: var(--color-green);
+  cursor: pointer;
 }
 
 /* Tags row */
@@ -3638,6 +3648,21 @@ body.is-mobile .rb-duration-btn {
 
 .rb-share-warning {
   color: var(--color-orange);
+}
+
+.rb-share-scope-notice {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+}
+
+.rb-share-scope-notice p {
+
+  margin: 4px 0;
+  font-size: 0.85em;
+  color: var(--text-muted);
 }
 
 @media (max-width: 480px) {

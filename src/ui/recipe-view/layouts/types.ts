@@ -8,6 +8,7 @@ import { RecipeMeta } from "../../../parser/recipe-meta-read";
 import { RecipeBoxSettings } from "../../../settings/settings-types";
 import { RecipeViewDeps } from "../recipe-view-deps";
 import { TrailingSection } from "../section-extra-content";
+import { ShareStatus } from "../../../sharing/share-status";
 
 export type RecipeLayoutId = "mobile-tabs" | "desktop-classic" | "desktop-two-column";
 
@@ -29,6 +30,7 @@ export interface RecipeLayoutContext {
     imageValue: string | null;
     trailingSections: TrailingSection[];
     hasExtraSections: boolean;
+    shareStatus: ShareStatus;
 }
 
 export interface RecipeLayoutRenderArgs {

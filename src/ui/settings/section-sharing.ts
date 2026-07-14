@@ -19,8 +19,6 @@ export function renderSectionSharing(
 
 	createCollapsibleSection(container, "Recipe sharing", (body) => {
 
-		new Setting(body).setName("Recipe sharing").setHeading();
-
 		new Setting(body)
 			.setName("Share server URL")
 			.setDesc("The server that hosts shared recipe links. Only change this if you're self-hosting the recipe sharing worker.")

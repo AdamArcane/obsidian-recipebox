@@ -168,7 +168,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	recipeExportIncludeCookHistoryDefault: false,
 	recipeExportIncludeImagesDefault: false,
 
-	shareServerUrl: "https://share.recipebox.app",
+	shareServerUrl: "https://share.arcanerecipes.com",
 	shareDataProperty: "recipe-share",
 	userGuid: "",
 	userShortId: "",

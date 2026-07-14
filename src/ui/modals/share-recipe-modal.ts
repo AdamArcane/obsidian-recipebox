@@ -26,7 +26,10 @@ type ExpiryDays = (typeof EXPIRY_OPTIONS)[number];
 type ModalView = "form" | "result" | "shared";
 
 function buildShareUrl(settings: RecipeBoxSettings, slug: string): string {
-	return `${settings.shareServerUrl.replace(/\/$/, "")}/${settings.userShortId}/${slug}`;
+	if (!settings.shareServerUrl) {
+		throw new Error("shareServerUrl is not configured");
+	}
+	return `${(settings.shareServerUrl).replace(/\/$/, "")}/${settings.userShortId}/${slug}`;
 }
 
 function formatExpiry(iso: string): string {
@@ -95,6 +98,15 @@ export class ShareRecipeModal extends BaseModal {
 	private renderFormView(bodyEl: HTMLElement): void {
 		const fields = bodyEl.createDiv({ cls: "rb-modal-fields" });
 
+		// Explicit expectation-setting: a header photo often has faces, home
+		// interiors, or other identifying details in frame that the user never
+		// thought of as "public" -- this line exists so they get a real moment
+		// to reconsider before sharing, not just a generic "link" disclaimer.
+		fields.createEl("p", {
+			cls: "rb-modal-section-desc",
+			text: "Anyone with the link can view this recipe and its photo, if it has one.",
+		});
+
 		const nameRow = fields.createDiv({ cls: "rb-share-form-row rb-share-form-row--full" });
 		const nameField = nameRow.createDiv({ cls: "rb-modal-field rb-modal-field--grow" });
 		nameField.createEl("label", { text: "Name" });
@@ -123,6 +135,18 @@ export class ShareRecipeModal extends BaseModal {
 			const opt = this.expiresSelect.createEl("option", { value: String(days), text: `${days} days` });
 			if (days === 90) opt.selected = true;
 		}
+
+		const notice = bodyEl.createDiv({ cls: "rb-share-scope-notice" });
+
+		const includedLine = notice.createEl("p");
+		includedLine.createEl("strong", { text: "Included: " });
+		includedLine.appendText("ingredients, instructions, times, nutrition, and the recipe photo.");
+
+		const excludedLine = notice.createEl("p");
+		excludedLine.createEl("strong", { text: "Not included: " });
+		excludedLine.appendText("your personal notes, tags, or other vault content.");
+	
+
 	}
 
 	private renderFormFooter(footerEl: HTMLElement): void {

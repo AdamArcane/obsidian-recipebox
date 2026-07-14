@@ -11,6 +11,8 @@ import { resolveShareImage } from "./resolve-share-image";
 import { createShare, CreateShareResponse } from "./share-worker-client";
 import { setShareData } from "./share-frontmatter";
 import { getOrCreateUserIdentity } from "./user-identity";
+import { toShareableRecipeData } from "./share-export-data";
+import { getSharerAccentColor } from "./get-sharer-accent-color";
 
 export interface ShareRecipeOptions {
 	name: string;
@@ -43,7 +45,7 @@ export async function shareRecipe(
 		applyCurrentMultiplier: false,
 	});
 	const { image, omittedReason } = await resolveShareImage(app, data, frontmatter);
-	const html = buildShareHtml(data, frontmatter, settings, image);
+	const html = buildShareHtml(toShareableRecipeData(data), frontmatter, settings, image, getSharerAccentColor());
 
 	const share = await createShare(settings.shareServerUrl, {
 		userShortId,

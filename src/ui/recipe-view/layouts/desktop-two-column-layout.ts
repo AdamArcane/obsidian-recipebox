@@ -197,6 +197,8 @@ export const renderDesktopTwoColumnLayout: RecipeLayoutRenderer = async ({
             context.file,
             context.settings,
             context.meta.cookedCount,
+            context.shareStatus,
+            deps.saveSettings,
             (heading) => {
                 void openRecipeInEditorAtSectionHeading(app, context.file, heading, deps.editAsMarkdown);
             },

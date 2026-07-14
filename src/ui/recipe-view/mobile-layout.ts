@@ -27,6 +27,8 @@ import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { renderCookHistoryList } from "../../recipe-history/cook-history-render";
+import { ShareStatus } from "../../sharing/share-status";
+import { ShareRecipeModal } from "../modals/share-recipe-modal";
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
@@ -126,6 +128,8 @@ function renderNativeCard(
 	fm: Record<string, unknown>,
 	settings: RecipeBoxSettings,
 	meta: RecipeMeta,
+	shareStatus: ShareStatus,
+	saveSettings: () => Promise<void>,
 ): void {
 	const imageValue = fmStr(fm, getRecipeMetaAliases(settings).image);
 
@@ -143,6 +147,21 @@ function renderNativeCard(
 		lastGroup.createDiv({ cls: "rb-label-caps", text: "Last prepared" });
 		const dateText = meta.lastMade ? formatDateValue(meta.lastMade) : "–";
 		lastGroup.createDiv({ cls: "rb-mobile-native-value", text: dateText });
+	}
+
+	// Hidden entirely when not shared, matching "Last prepared" above -- this
+	// box only ever shows fields with real values, never an empty/dash state.
+	if (shareStatus.kind === "shared") {
+		const shareGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
+		shareGroup.createDiv({ cls: "rb-label-caps", text: "Shared" });
+		const days = shareStatus.daysLeft;
+		const value = shareGroup.createDiv({
+			cls: "rb-mobile-native-value rb-mobile-native-value--tappable",
+			text: `${days} day${days === 1 ? "" : "s"} left`,
+		});
+		value.addEventListener("click", () => {
+			new ShareRecipeModal(app, file, settings, saveSettings).open();
+		});
 	}
 }
 
@@ -385,6 +404,7 @@ export async function renderMobileLayout(
 	afterContent: string,
 	groceryItems: GroceryItem[],
 	deps: RecipeViewDeps,
+	shareStatus: ShareStatus,
 ): Promise<void> {
 	let _panels: HTMLElement[] = [];
 	let _tabs: HTMLElement[] = [];
@@ -407,8 +427,8 @@ export async function renderMobileLayout(
 		});
 	}
 
-	// Native card: image + rating + last-made
-	renderNativeCard(container, app, file, fm, settings, meta);
+	// Native card: image + rating + last-made + share status
+	renderNativeCard(container, app, file, fm, settings, meta, shareStatus, deps.saveSettings);
 
 	// Tags row
 	renderMobileTagRow(container, app, file, settings);

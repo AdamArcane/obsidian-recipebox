@@ -17,18 +17,18 @@ import { stripObsidianMarkdown } from "../obsidian-markdown-strip";
 import { resolveRawNutrition } from "../nutrition-raw";
 import { formatQuantity } from "../../parser/quantity-format";
 
-interface HowToStep {
+export interface HowToStep {
 	"@type": "HowToStep";
 	text: string;
 }
 
-interface HowToSection {
+export interface HowToSection {
 	"@type": "HowToSection";
 	name: string;
 	itemListElement: HowToStep[];
 }
 
-interface NutritionInformation {
+export interface NutritionInformation {
 	"@type": "NutritionInformation";
 	calories?: string;
 	proteinContent?: string;
@@ -82,14 +82,14 @@ function mapDietToSchemaOrg(diet: string[]): string[] {
 	});
 }
 
-function toIsoDuration(minutes: number | null): string | undefined {
+export function toIsoDuration(minutes: number | null): string | undefined {
 	if (minutes === null || minutes <= 0) return undefined;
 	const h = Math.floor(minutes / 60);
 	const m = minutes % 60;
 	return `PT${h > 0 ? `${h}H` : ""}${m > 0 ? `${m}M` : ""}`;
 }
 
-function ingredientText(ing: RecipeExportData["parsedIngredients"][number]): string {
+export function ingredientText(ing: RecipeExportData["parsedIngredients"][number]): string {
 	const qty = formatQuantity(ing.quantity);
 	const parts = [qty, ing.unit, stripObsidianMarkdown(ing.name)].filter(Boolean);
 	const note = ing.note ? ` (${stripObsidianMarkdown(ing.note)})` : "";

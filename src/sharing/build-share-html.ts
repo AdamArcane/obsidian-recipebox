@@ -12,13 +12,15 @@
  * for how isScraperOrigin is decided. This is a good-faith copyright
  * mitigation, not a legal shield.
  */
-import { RecipeExportData } from "../recipe-export/recipe-export-data";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { stripObsidianMarkdown } from "../recipe-export/obsidian-markdown-strip";
-import { stringifyRecipeJsonLd } from "../recipe-export/exporters/json-ld-exporter";
 import { formatMinutes } from "../parser/recipe-meta-read";
 import { findSourceUrl } from "./find-source-url";
 import { ResolvedShareImage } from "./resolve-share-image";
+import { ShareableRecipeData } from "./share-export-data";
+import { stringifyShareRecipeJsonLd } from "./share-json-ld";
+import { stripListMarkers } from "../parser/ingredient-clean";
+import { resolveShareAccentColors } from "./resolve-share-accent";
 
 function escapeHtml(value: string): string {
 	return value
@@ -34,12 +36,12 @@ interface MetaBadge {
 	value: string;
 }
 
-function buildMetaBadges(data: RecipeExportData): MetaBadge[] {
+function buildMetaBadges(data: ShareableRecipeData): MetaBadge[] {
 	const badges: MetaBadge[] = [];
 	if (data.servings !== null) badges.push({ label: "Servings", value: String(data.servings) });
-	if (data.meta.times.prep !== null) badges.push({ label: "Prep", value: formatMinutes(data.meta.times.prep) });
-	if (data.meta.times.cook !== null) badges.push({ label: "Cook", value: formatMinutes(data.meta.times.cook) });
-	if (data.meta.times.total !== null) badges.push({ label: "Total", value: formatMinutes(data.meta.times.total) });
+	if (data.times.prep !== null) badges.push({ label: "Prep", value: formatMinutes(data.times.prep) });
+	if (data.times.cook !== null) badges.push({ label: "Cook", value: formatMinutes(data.times.cook) });
+	if (data.times.total !== null) badges.push({ label: "Total", value: formatMinutes(data.times.total) });
 	return badges;
 }
 
@@ -59,30 +61,34 @@ function renderHeaderImage(image: ResolvedShareImage | null, title: string, sour
 	return `<div class="rbs-header-image"><img src="${escapeHtml(image.src)}" alt="${escapeHtml(title)}">${caption}</div>`;
 }
 
-function renderIngredients(data: RecipeExportData): string {
+function renderIngredients(data: ShareableRecipeData): string {
 	return data.ingredientGroups
 		.filter((g) => g.lines.length > 0)
 		.map((group) => {
 			const heading = group.heading ? `<h3>${escapeHtml(group.heading)}</h3>` : "";
+
 			const items = group.lines
-				.map((line) => `<li class="rbs-ingredient">${escapeHtml(stripObsidianMarkdown(line))}</li>`)
+				.map((line) => `<li class="rbs-ingredient">${escapeHtml(stripObsidianMarkdown(stripListMarkers(line)))}</li>`)
 				.join("");
 			return `${heading}<ul class="rbs-ingredient-list">${items}</ul>`;
 		})
 		.join("");
 }
 
-function renderInstructions(data: RecipeExportData): string {
+function renderInstructions(data: ShareableRecipeData): string {
 	return data.instructionGroups
 		.map((group) => {
 			const heading = group.heading ? `<h3>${escapeHtml(group.heading)}</h3>` : "";
-			const items = group.steps.map((step) => `<li>${escapeHtml(stripObsidianMarkdown(step))}</li>`).join("");
+			// A step written as "- [ ] Preheat oven" only has its "- " list marker
+			// stripped upstream (buildStep() in recipe-instruction-groups.ts), so a
+			// leading checkbox literal can still survive -- strip it here too.
+			const items = group.steps.map((step) => `<li>${escapeHtml(stripObsidianMarkdown(stripListMarkers(step)))}</li>`).join("");
 			return `${heading}<ol class="rbs-instruction-list">${items}</ol>`;
 		})
 		.join("");
 }
 
-function renderNutrition(data: RecipeExportData): string {
+function renderNutrition(data: ShareableRecipeData): string {
 	const entries = Object.entries(data.nutrition);
 	if (entries.length === 0) return "";
 	const rows = entries
@@ -92,15 +98,17 @@ function renderNutrition(data: RecipeExportData): string {
 }
 
 export function buildShareHtml(
-	data: RecipeExportData,
+	data: ShareableRecipeData,
 	frontmatter: Record<string, unknown>,
 	settings: RecipeBoxSettings,
 	image: ResolvedShareImage | null,
+	sharerAccentColor: string | null,
 ): string {
 	const title = escapeHtml(data.title);
 	const intro = stripObsidianMarkdown(data.introContent).trim();
 	const sourceUrl = findSourceUrl(frontmatter);
-	const jsonLd = stringifyRecipeJsonLd(data, frontmatter, settings);
+	const jsonLd = stringifyShareRecipeJsonLd(data, frontmatter, settings);
+	const accent = resolveShareAccentColors(sharerAccentColor);
 
 	// A second, low-emphasis mention in the footer only makes sense when the
 	// image attribution above isn't already carrying that job (no image, or
@@ -124,7 +132,7 @@ export function buildShareHtml(
 	--rb-text: #1a1a1a;
 	--rb-text-muted: #6e6e6e;
 	--rb-border: #e0e0e0;
-	--rb-accent: #7c5cff;
+	--rb-accent: ${accent.light};
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -133,7 +141,7 @@ export function buildShareHtml(
 		--rb-text: #dcdcdc;
 		--rb-text-muted: #9a9a9a;
 		--rb-border: #3a3a3a;
-		--rb-accent: #a48fff;
+		--rb-accent: ${accent.dark};
 	}
 }
 * { box-sizing: border-box; }
@@ -158,11 +166,11 @@ h1.rbs-title { margin: 0 0 0.5rem; font-size: 1.75rem; font-weight: 700; line-he
 .rbs-badge-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 1.25rem; }
 .rbs-badge {
 	display: inline-flex; align-items: center; gap: 0.3rem; height: 1.75rem; padding: 0 0.7rem;
-	border-radius: 999px; font-size: 0.75rem; background: var(--rb-bg-secondary); border: 1px solid var(--rb-border);
+	border-radius: 999px; font-size: 0.75rem; background: var(--rb-bg-secondary); border: 1px solid var(--rb-accent);
 }
 .rbs-badge-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rb-text-muted); }
 .rbs-badge-value { font-weight: 700; }
-h2 { font-size: 1.15rem; margin: 1.75rem 0 0.6rem; }
+h2 { font-size: 1.15rem; margin: 1.75rem 0 0.6rem; color: var(--rb-accent) }
 h3 { font-size: 0.95rem; margin: 1rem 0 0.4rem; color: var(--rb-text-muted); }
 .rbs-ingredient-list { list-style: none; margin: 0; padding: 0; }
 .rbs-ingredient { position: relative; padding: 0.3rem 0 0.3rem 1.6rem; }

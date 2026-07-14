@@ -116,9 +116,7 @@ export interface RecipeBoxSettings {
 	recipeExportIncludeCookHistoryDefault: boolean;
 	recipeExportIncludeImagesDefault: boolean;
 
-	// Recipe sharing -- shareServerUrl is the entire "self-host readiness"
-	// investment for v1 (see recipe-sharing-spec.md): every API call goes
-	// through this setting instead of a hardcoded hosted URL.
+	// Recipe sharing -- shareServerUrl is the base URL of the server used for sharing recipes. 
 	shareServerUrl: string;
 	// The four share values (slug/token/created/expires) are never read or
 	// written independently, so per convention ("settings that always travel

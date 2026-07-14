@@ -29,5 +29,6 @@ export const renderMobileTabsLayout: RecipeLayoutRenderer = async ({
         context.afterContent,
         context.groceryItems,
         deps,
+        context.shareStatus,
     );
 };

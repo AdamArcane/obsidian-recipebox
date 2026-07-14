@@ -6,6 +6,8 @@ import { App, Component, MarkdownView, setIcon, TFile, WorkspaceLeaf } from "obs
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { CookHistoryModal } from "../modals/cook-history-modal";
 import { SectionContentModal } from "../modals/section-content-modal";
+import { ShareRecipeModal } from "../modals/share-recipe-modal";
+import { ShareStatus } from "../../sharing/share-status";
 
 export interface TrailingSection {
 	heading: string;
@@ -43,10 +45,13 @@ export function renderExtraSectionsButtons(
 	recipeFile: TFile,
 	settings: RecipeBoxSettings,
 	cookedCount: number,
+	shareStatus: ShareStatus,
+	saveSettings: () => Promise<void>,
 	onEditSection?: (heading: string) => void,
 ): void {
 	const hasCookHistory = settings.cookHistoryEnabled;
-	if (sections.length === 0 && !hasCookHistory) return;
+	const isShared = shareStatus.kind === "shared";
+	if (sections.length === 0 && !hasCookHistory && !isShared) return;
 
 	const sectionButtons = buttonsContainer.createDiv({ cls: "rb-section-sidebar" });
 
@@ -60,6 +65,20 @@ export function renderExtraSectionsButtons(
 		}
 		btn.addEventListener("click", () => {
 			new CookHistoryModal(app, recipeFile, settings).open();
+		});
+	}
+
+	// Primary "actually visible" share status surface (the header toolbar icon
+	// swap in recipe-view.ts is the secondary, less-noticeable signal) -- same
+	// row and visual treatment as the cook history pill above.
+	if (isShared) {
+		const btn = sectionButtons.createEl("button", { cls: "rb-sidebar-btn rb-sidebar-btn--shared" });
+		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
+		setIcon(iconSpan, "link-2");
+		const days = shareStatus.daysLeft;
+		btn.createSpan({ cls: "rb-sidebar-btn-label", text: `Shared · expires in ${days} day${days === 1 ? "" : "s"}` });
+		btn.addEventListener("click", () => {
+			new ShareRecipeModal(app, recipeFile, settings, saveSettings).open();
 		});
 	}
 

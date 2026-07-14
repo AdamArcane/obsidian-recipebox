@@ -18,6 +18,8 @@ import { splitTrailingSections } from "./section-extra-content";
 import { CookHistoryModal } from "../modals/cook-history-modal";
 import { RecipeExportModal } from "../modals/recipe-export-modal";
 import { ShareRecipeModal } from "../modals/share-recipe-modal";
+import { getShareData } from "../../sharing/share-frontmatter";
+import { getShareStatus, ShareStatus } from "../../sharing/share-status";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { findValue } from "../../parser/frontmatter-lookup";
@@ -42,6 +44,7 @@ export class RecipeView extends TextFileView {
 	private wakeLock: WakeLockSentinel | null = null;
 	private cookModeActive = false;
 	private cookModeActionEl: HTMLElement | null = null;
+	private shareActionEl: HTMLElement | null = null;
 
 	constructor(leaf: WorkspaceLeaf, deps: RecipeViewDeps) {
 		super(leaf);
@@ -74,7 +77,7 @@ export class RecipeView extends TextFileView {
 			if (this.file) this.deps.editAsMarkdown(this.file.path);
 		});
 
-		this.addAction("share-2", "Share recipe", () => {
+		this.shareActionEl = this.addAction("share-2", "Share recipe", () => {
 			if (this.file) {
 				new ShareRecipeModal(this.app, this.file, this.deps.getSettings(), this.deps.saveSettings).open();
 			}
@@ -209,6 +212,22 @@ export class RecipeView extends TextFileView {
 		this.cookModeActionEl.toggleClass("rb-cook-mode-active", this.cookModeActive);
 	}
 
+	// Glyph swap rather than a recolor, mirroring cook mode's button above --
+	// icon-swap is the one approach that reliably reflects state on both
+	// desktop and Obsidian's mobile toolbar (see mobile-layout.ts's own
+	// icon-swap note), so using it here too avoids maintaining two different
+	// state-indication strategies for the same underlying share status.
+	private updateShareButton(status: ShareStatus): void {
+		if (!this.shareActionEl) return;
+		const isShared = status.kind === "shared";
+		// setIcon(this.shareActionEl, isShared ? "link-2" : "share-2");
+		this.shareActionEl.setAttribute(
+			"aria-label",
+			isShared ? `Recipe shared · expires in ${status.daysLeft} day${status.daysLeft === 1 ? "" : "s"}` : "Share recipe",
+		);
+		this.shareActionEl.toggleClass("rb-share-active", isShared);
+	}
+
 	private async render(): Promise<void> {
 		clearAllTimers();
 		this.contentEl.empty();
@@ -216,6 +235,7 @@ export class RecipeView extends TextFileView {
 
 		const context = this.buildLayoutContext();
 		if (!context) return;
+		this.updateShareButton(context.shareStatus);
 
 		const layoutId = resolveRecipeLayoutId(context.settings);
 		const allergenMatches = matchingAllergens(context.meta.allergens, context.settings.myAllergens);
@@ -290,6 +310,7 @@ export class RecipeView extends TextFileView {
 		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
 		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);
 		const trailingSections = splitTrailingSections(instructionSplit.after, settings.cookHistoryHeading);
+		const shareStatus = getShareStatus(getShareData(cache, settings));
 
 		return {
 			file,
@@ -308,7 +329,12 @@ export class RecipeView extends TextFileView {
 			instructionGroups: instructionSplit.groups,
 			imageValue: resolvedImage,
 			trailingSections,
-			hasExtraSections: trailingSections.length > 0 || settings.cookHistoryEnabled,
+			// A share pill (see section-extra-content.ts) needs the same sidebar
+			// row cook history uses, so an active share alone should be enough to
+			// render that row even when there's no cook history and no trailing
+			// sections.
+			hasExtraSections: trailingSections.length > 0 || settings.cookHistoryEnabled || shareStatus.kind === "shared",
+			shareStatus,
 		};
 	}
 }
