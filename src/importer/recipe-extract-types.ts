@@ -16,6 +16,7 @@ export interface ExtractedRecipe {
 	totalTime: number | null;
 	ingredientGroups: ImportedGroup[];
 	instructionGroups: ImportedGroup[];
+	notesGroups: ImportedGroup[];
 	sourceUrl: string;
 	calories: number | null;
 	protein: number | null;

@@ -181,6 +181,9 @@ export function extractRecipeFromText(rawText: string, titleOverride?: string): 
 		totalTime,
 		ingredientGroups: buildIngredientGroups(ingredientLines),
 		instructionGroups: buildInstructionGroups(instructionLines),
+		// Text-mode import (pasted captions/text) has no notes-block detection --
+		// always empty, same convention as "no notes found" from the URL path.
+		notesGroups: [],
 		sourceUrl: "",
 		calories: calories !== null ? Math.round(calories) : null,
 		protein: protein !== null ? Math.round(protein) : null,

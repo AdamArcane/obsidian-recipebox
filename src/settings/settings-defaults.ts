@@ -39,6 +39,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	groceryListPath: "Grocery List.md",
 	ingredientsHeading: "Ingredients",
 	instructionsHeading: "Instructions",
+	notesHeading: "Notes",
 
 	groupingMode: "category",
 	categorySource: "dictionary",

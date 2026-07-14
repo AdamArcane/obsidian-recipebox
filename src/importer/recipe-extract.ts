@@ -80,7 +80,11 @@ export async function extractRecipe(html: string, url: string): Promise<ExtractR
 		const $ = cheerio.load(html);
 		const fallback = new RequiredFieldFallbackExtractor($, url);
 		const ScraperClass = getScraper(url, { wildMode: true });
-		const scraper = new ScraperClass(html, url, { extraExtractors: [fallback] });
+		// parseNotes is opt-in in recipe-scrapers -- when the source page has a
+		// recognizable notes/tips block, this populates data.notes with the same
+		// ImportedGroup shape as ingredients/instructions; omitted (undefined)
+		// otherwise, which the ?? [] below treats identically to "no notes".
+		const scraper = new ScraperClass(html, url, { extraExtractors: [fallback], parseNotes: true });
 		// toRecipeObject() runs extraction (where the fallback above matters)
 		// but skips recipe-scrapers' own schema validation -- deliberately.
 		// That validation rejects an empty description or a non-URL image,
@@ -104,6 +108,7 @@ export async function extractRecipe(html: string, url: string): Promise<ExtractR
 				totalTime: data.totalTime ?? null,
 				ingredientGroups: toImportedGroups(data.ingredients ?? []),
 				instructionGroups: toImportedGroups(data.instructions ?? []),
+				notesGroups: toImportedGroups(data.notes ?? []),
 				sourceUrl: url,
 				calories: nutrientValue(nutrients, "calories", "calorieContent"),
 				protein: nutrientValue(nutrients, "proteinContent", "protein"),

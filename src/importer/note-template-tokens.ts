@@ -69,6 +69,7 @@ export function buildTokenTable(
 		// Config-name tokens
 		ingredientsHeading: settings.ingredientsHeading,
 		instructionsHeading: settings.instructionsHeading,
+		notesHeading: settings.notesHeading,
 		caloriesProperty: settings.caloriesProperty,
 		proteinProperty: settings.proteinProperty,
 		fatProperty: settings.fatProperty,

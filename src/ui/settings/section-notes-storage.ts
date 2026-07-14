@@ -65,4 +65,14 @@ export function renderSectionNotesStorage(
 				await save();
 			})
 		);
+
+	new Setting(container)
+		.setName("Notes heading")
+		.setDesc("The heading that marks the (optional) notes section in a recipe note.")
+		.addText((t) =>
+			t.setValue(settings.notesHeading).onChange(async (v) => {
+				settings.notesHeading = v;
+				await save();
+			})
+		);
 }

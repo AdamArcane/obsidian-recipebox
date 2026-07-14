@@ -96,6 +96,7 @@ export function renderReviewStage(
 	const recipe: ExtractedRecipe = { ...initial,
 		ingredientGroups: [...initial.ingredientGroups],
 		instructionGroups: [...initial.instructionGroups],
+		notesGroups: [...initial.notesGroups],
 	};
 
 	if (warning) {
@@ -174,6 +175,15 @@ export function renderReviewStage(
 	instrTa.value = groupsToTextarea(recipe.instructionGroups);
 	instrTa.addEventListener("input", () => { recipe.instructionGroups = textareaToGroups(instrTa.value); });
 	autosizeTextarea(instrTa);
+
+	// Notes: its own card, hide if no notes imported --
+	if (recipe.notesGroups.length > 0) {
+		const notesBody = importCard(bodyEl, "Notes", false);
+		const notesTa = notesBody.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--auto" });
+		notesTa.value = groupsToTextarea(recipe.notesGroups);
+		notesTa.addEventListener("input", () => { recipe.notesGroups = textareaToGroups(notesTa.value); });
+		autosizeTextarea(notesTa);
+	}
 
 	// Nutrition: its own card. Collapsed by default -- least essential field
 	// set, and often blank on a fresh import, so it's the one worth hiding

@@ -203,6 +203,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		groceryListPath: str(r.groceryListPath, d.groceryListPath),
 		ingredientsHeading: str(r.ingredientsHeading, d.ingredientsHeading),
 		instructionsHeading: str(r.instructionsHeading, d.instructionsHeading),
+		notesHeading: str(r.notesHeading, d.notesHeading),
 
 		groupingMode: oneOf<GroupingMode>(r.groupingMode, ["category", "recipe", "source", "none"], d.groupingMode),
 		categorySource: oneOf<CategorySource>(r.categorySource, ["dictionary", "tag", "tag-then-dictionary"], d.categorySource),

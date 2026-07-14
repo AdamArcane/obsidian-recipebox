@@ -28,6 +28,7 @@ export interface RecipeBoxSettings {
 	groceryListPath: string;
 	ingredientsHeading: string;
 	instructionsHeading: string;
+	notesHeading: string;
 
 	// Grocery list display
 	groupingMode: GroupingMode;
