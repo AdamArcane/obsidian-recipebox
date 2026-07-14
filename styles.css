@@ -2448,6 +2448,24 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   border-color: var(--interactive-accent);
 }
 
+.rb-import-error-box {
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-s);
+  background: rgba(var(--color-red-rgb), 0.08);
+  color: var(--color-red);
+  font-size: var(--font-ui-small);
+}
+
+.rb-import-warning-box {
+  margin-bottom: 0.85rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-s);
+  background: rgba(var(--color-orange-rgb), 0.08);
+  color: var(--color-orange);
+  font-size: var(--font-ui-small);
+}
+
 /* Folder row (input stage) */
 .rb-import-folder-row {
   margin-top: 0.5rem;

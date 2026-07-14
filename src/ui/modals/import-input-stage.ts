@@ -22,7 +22,7 @@ export function renderInputStage(
 	app: App,
 	settings: RecipeBoxSettings,
 	state: InputStageState,
-	onResult: (recipe: ExtractedRecipe, folder: string) => void,
+	onResult: (recipe: ExtractedRecipe, folder: string, warning: string | null) => void,
 ): void {
 	// Tab switcher
 	const tabs = bodyEl.createDiv({ cls: "rb-import-tabs" });
@@ -48,7 +48,13 @@ export function renderInputStage(
 		attr: { type: "url", placeholder: "HTTPS://…" },
 	});
 	urlInput.value = state.url;
-	urlInput.addEventListener("input", () => { state.url = urlInput.value; });
+	const urlErrorBox = urlPane.createDiv({ cls: "rb-import-error-box" });
+	urlErrorBox.hide();
+	urlInput.addEventListener("input", () => {
+		state.url = urlInput.value;
+		urlErrorBox.empty();
+		urlErrorBox.hide();
+	});
 
 	// Text pane
 	const textPane = bodyEl.createDiv({ cls: "rb-import-pane" });
@@ -83,14 +89,21 @@ export function renderInputStage(
 	importBtn.addEventListener("click", () => { void (async () => {
 		importBtn.disabled = true;
 		importBtn.setText("Importing…");
+		urlErrorBox.empty();
+		urlErrorBox.hide();
 		try {
-			let recipe: ExtractedRecipe | null = null;
 			if (state.tab === "url") {
-				recipe = await submitUrl(state.url);
+				const result = await submitUrl(state.url);
+				if (result.kind === "success") {
+					onResult(result.recipe, state.folder, result.warning);
+				} else {
+					urlErrorBox.setText(result.message);
+					urlErrorBox.show();
+				}
 			} else {
-				recipe = submitText(state.text, state.titleOverride);
+				const recipe = submitText(state.text, state.titleOverride);
+				if (recipe) onResult(recipe, state.folder, null);
 			}
-			if (recipe) onResult(recipe, state.folder);
 		} finally {
 			importBtn.disabled = false;
 			importBtn.setText("Import");

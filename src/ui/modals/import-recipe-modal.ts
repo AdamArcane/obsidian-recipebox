@@ -16,7 +16,7 @@ import { BaseModal } from "./modal-shell";
 export class ImportRecipeModal extends BaseModal {
 	private stage: "input" | "review" = "input";
 	private inputState: InputStageState;
-	private reviewData: { recipe: ExtractedRecipe; folder: string } | null = null;
+	private reviewData: { recipe: ExtractedRecipe; folder: string; warning: string | null } | null = null;
 
 	// Stored refs so renderStage() can repopulate them on stage transitions
 	private currentBodyEl!: HTMLElement;
@@ -64,8 +64,8 @@ export class ImportRecipeModal extends BaseModal {
 				this.app,
 				this.settings,
 				this.inputState,
-				(recipe, folder) => {
-					this.reviewData = { recipe, folder };
+				(recipe, folder, warning) => {
+					this.reviewData = { recipe, folder, warning };
 					this.stage = "review";
 					this.renderStage();
 				},
@@ -78,6 +78,7 @@ export class ImportRecipeModal extends BaseModal {
 				this.settings,
 				this.reviewData.recipe,
 				this.reviewData.folder,
+				this.reviewData.warning,
 				() => {
 					this.stage = "input";
 					this.renderStage();

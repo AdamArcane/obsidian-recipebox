@@ -45,6 +45,7 @@ export function renderReviewStage(
 	settings: RecipeBoxSettings,
 	initial: ExtractedRecipe,
 	folder: string,
+	warning: string | null,
 	onBack: () => void,
 ): void {
 	// Working copy — mutated by field inputs
@@ -52,6 +53,10 @@ export function renderReviewStage(
 		ingredientGroups: [...initial.ingredientGroups],
 		instructionGroups: [...initial.instructionGroups],
 	};
+
+	if (warning) {
+		bodyEl.createDiv({ cls: "rb-import-warning-box", text: warning });
+	}
 
 	function field(label: string, value: string, multiline: false, onInput: (v: string) => void): void;
 	function field(label: string, value: string, multiline: true, onInput: (v: string) => void, cls?: string): void;

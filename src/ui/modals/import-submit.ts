@@ -14,42 +14,49 @@ import { buildRecipeNote } from "../../importer/note-template-render";
 import { titleToFilename } from "../../importer/note-filename";
 import { ensureParentFolders } from "../../utils/vault-notes";
 
-export async function submitUrl(url: string): Promise<ExtractedRecipe | null> {
+export type SubmitUrlResult =
+	| { kind: "success"; recipe: ExtractedRecipe; warning: string | null }
+	| { kind: "error"; message: string };
+
+export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 	const trimmed = url.trim();
 	if (!trimmed) {
-		new Notice("Please enter a URL.");
-		return null;
+		return { kind: "error", message: "Please enter a URL." };
 	}
 
 	const platform = detectPlatform(trimmed);
 
 	if (platform === "instagram") {
-		new Notice("Instagram is not supported — copy the caption and use text mode instead.");
-		return null;
+		return { kind: "error", message: "Instagram is not supported — copy the caption and use text mode instead." };
 	}
-
 
 	const { html, error: errMessage } = await fetchHtml(trimmed);
 	if (!html) {
-		new Notice(`Could not fetch that URL. ${errMessage ?? "The site may be unavailable or require login."}`);
-		return null;
+		return { kind: "error", message: `Could not fetch that URL. ${errMessage ?? "The site may be unavailable or require login."}` };
 	}
-	
-	if (platform === "youtube" || platform === "tiktok") {	
+
+	if (platform === "youtube" || platform === "tiktok") {
 		const meta = extractSocialMeta(html);
 		const recipe = extractRecipeFromText(meta.description, meta.title || undefined);
 		if (platform === "tiktok" && meta.description.length < 200) {
 			new Notice("Tiktok captions may be truncated in page metadata — double-check ingredient completeness.");
 		}
-		return recipe;
+		return { kind: "success", recipe, warning: null };
 	}
 
-	const recipe = await extractRecipe(html, trimmed);
+	const { recipe, usedAuthorFallback } = await extractRecipe(html, trimmed);
 	if (!recipe || !recipe.title) {
-		new Notice("No recipe found. The site may require login or render content via JavaScript.");
-		return null;
+		return { kind: "error", message: "No recipe found. The site may require login or render content via JavaScript." };
 	}
-	return recipe;
+	// The fallback author (this site's hostname) only exists to satisfy
+	// recipe-scrapers' extraction requirements internally -- it's never
+	// written into the saved note -- but a missing author byline can be a
+	// sign the page's structured data was thin elsewhere too, so it's worth
+	// flagging for a closer look before saving.
+	const warning = usedAuthorFallback
+		? "This site didn't list a recipe author. The import still worked, but double-check the details below since the page's structured data may be incomplete."
+		: null;
+	return { kind: "success", recipe, warning };
 }
 
 export function submitText(text: string, titleOverride: string): ExtractedRecipe | null {
