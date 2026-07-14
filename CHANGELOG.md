@@ -1,3 +1,9 @@
+## [0.1.7-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.1...v0.1.7-beta.2) (2026-07-14)
+
+### Bug Fixes
+
+* textarea autosizing with ResizeObserver for better responsiveness ([2d81dbf](https://github.com/AdamArcane/obsidian-recipebox/commit/2d81dbf1c9c7739032894211d5568eff909b2b3f))
+
 ## [0.1.7-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2026-07-14)
 
 ### Features
