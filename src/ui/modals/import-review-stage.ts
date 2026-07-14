@@ -62,16 +62,23 @@ function importCard(parent: HTMLElement, title: string, expandedByDefault: boole
 }
 
 // Grows a textarea to fit its content instead of scrolling internally overflow stays hidden and
-// resize is disabled via the rb-import-textarea--auto CSS class; height is
-// recalculated on every input and once on initial render (content is set
-// before this runs, so the first measurement already reflects real content).
+// resize is disabled via the rb-import-textarea--auto CSS class. A
+// ResizeObserver (not a fixed rAF delay) drives the recalculation: a
+// collapsed rb-extra-card sets its body to display:none, which makes any
+// textarea inside it report scrollHeight 0 until the section is expanded, so
+// a one-time measurement at render time can't work once cards start
+// collapsed by default. The observer fires whenever the textarea's actual
+// box size changes for any reason -- expand/collapse, mobile layout settling
+// after the modal opens, orientation change -- so there's no timing to guess
+// at. Also still recalculates on input, since typed content can grow the
+// textarea without any external size change to trigger the observer.
 function autosizeTextarea(ta: HTMLTextAreaElement): void {
 	const resize = (): void => {
 		ta.setCssProps({ height: "auto" });
 		ta.setCssProps({ height: `${ta.scrollHeight}px` });
 	};
 	ta.addEventListener("input", resize);
-	window.requestAnimationFrame(resize);
+	new ResizeObserver(resize).observe(ta);
 }
 
 export function renderReviewStage(
