@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an idea or improvement
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the workflow or gap, not just the feature you have in mind. This helps me evaluate whether there's a simpler existing solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you want Recipe Box to do?
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Workarounds you've tried
+      description: Have you tried Dataview, Bases, or other plugins for this already?
+    validations:
+      required: false

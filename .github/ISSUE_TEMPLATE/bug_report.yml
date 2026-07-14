@@ -1,0 +1,73 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Fill in as much as you can, steps to reproduce is the single most useful thing you can give me.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps, starting from a clean vault if possible
+      placeholder: |
+        1. Create a recipe note with...
+        2. Open the recipe card view
+        3. Click...
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Recipe Box version
+      placeholder: e.g. 1.2.0
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian version
+      placeholder: e.g. 1.6.7
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Desktop (Windows)
+        - Desktop (Mac)
+        - Desktop (Linux)
+        - Mobile (iOS)
+        - Mobile (Android)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console errors (if any)
+      description: Open Developer Tools (Ctrl/Cmd+Shift+I) and paste anything relevant
+      render: shell
+
+  - type: textarea
+    id: sample-note
+    attributes:
+      label: Sample frontmatter/note (if relevant)
+      description: Strip anything private. Frontmatter is usually the fastest way for me to spot the issue.
+      render: yaml
