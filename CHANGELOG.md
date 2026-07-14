@@ -1,3 +1,9 @@
+## [0.1.7-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2026-07-14)
+
+### Features
+
+* redesigned the import recipe preview ([831786e](https://github.com/AdamArcane/obsidian-recipebox/commit/831786e05e28d2ff76b0db52a31e9f7c12e8d409))
+
 ## [0.1.7-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.6...0.1.7-beta.0) (2026-07-14)
 
 ### Features
