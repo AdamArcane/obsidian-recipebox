@@ -12,13 +12,16 @@
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { stripObsidianMarkdown } from "../recipe-export/obsidian-markdown-strip";
 import { resolveRawNutrition } from "../recipe-export/nutrition-raw";
-import { HowToStep, HowToSection, NutritionInformation, toIsoDuration, ingredientText } from "../recipe-export/exporters/json-ld-exporter";
+import { HowToStep, HowToSection, NutritionInformation, toIsoDuration, ingredientText, recipeAuthor } from "../recipe-export/exporters/json-ld-exporter";
 import { ShareableRecipeData } from "./share-export-data";
+
+
 
 export interface ShareRecipeJsonLd {
 	"@context": "https://schema.org";
 	"@type": "Recipe";
 	name: string;
+	author: recipeAuthor;
 	image?: string;
 	recipeYield?: string;
 	prepTime?: string;
@@ -39,6 +42,13 @@ export function buildShareRecipeJsonLd(
 		"@context": "https://schema.org",
 		"@type": "Recipe",
 		name: data.title,
+		// Required by some JSON-LD consumers (e.g. recipe-scrapers' wild-mode
+		// extractor validates a Recipe schema that expects "author" to be
+		// present). Deliberately generic, not the sharer's name -- there are
+		// no accounts in this system, and no other part of the share feature
+		// exposes who shared a recipe. Don't change this to a real identity
+		// without a real privacy review, same as the rest of the allowlist.
+		author: { "@type": "Organization", name: "Recipe Box" },
 		recipeIngredient: [],
 		recipeInstructions: [],
 	};

@@ -36,6 +36,11 @@ export interface NutritionInformation {
 	carbohydrateContent?: string;
 }
 
+export interface recipeAuthor {
+	"@type": "Organization";
+	name: string;
+}
+
 export interface RecipeJsonLd {
 	"@context": "https://schema.org";
 	"@type": "Recipe";
