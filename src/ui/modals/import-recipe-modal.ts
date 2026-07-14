@@ -83,6 +83,7 @@ export class ImportRecipeModal extends BaseModal {
 					this.stage = "input";
 					this.renderStage();
 				},
+				() => { this.close(); },
 			);
 		}
 	}

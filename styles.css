@@ -2312,6 +2312,21 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   overflow-x: hidden;
 }
 
+.rb-import-image-preview {
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius-l);
+  overflow: hidden;
+}
+
+.rb-import-image-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--background-modifier-border);
+}
+
 /* Tab switcher */
 .rb-import-tabs {
   display: flex;
@@ -2404,6 +2419,15 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 .rb-import-textarea--tall {
   min-height: 10rem;
+}
+
+/* Auto-growing textareas (Description/Ingredients/Steps in the import review
+   modal): height is set from JS to match content, so the browser's own
+   textarea scrollbar and resize handle would just be visual noise sitting on
+   top of an element that's already sized to fit everything. */
+.rb-import-textarea--auto {
+  overflow: hidden;
+  resize: none;
 }
 
 /* Side-by-side ingredient / instruction textareas */
