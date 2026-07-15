@@ -1,3 +1,9 @@
+## [0.1.8-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.7...0.1.8-beta.0) (2026-07-15)
+
+### Features
+
+* Add comprehensive test coverage ([bafbc0e](https://github.com/AdamArcane/obsidian-recipebox/commit/bafbc0e7ffdf3f20e45745a4ca4ffc6b24cc9474))
+
 ## [0.1.7](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.3...v0.1.7) (2026-07-14)
 
 ## [0.1.7-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.7-beta.2...v0.1.7-beta.3) (2026-07-14)
