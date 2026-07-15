@@ -107,7 +107,12 @@ export function buildShareHtml(
 	const title = escapeHtml(data.title);
 	const intro = stripObsidianMarkdown(data.introContent).trim();
 	const sourceUrl = findSourceUrl(frontmatter);
-	const jsonLd = stringifyShareRecipeJsonLd(data, frontmatter, settings, image);
+	// "<" is escaped to its unicode form so a "</script>" inside any field
+	// (title, ingredient/instruction text, or a scraped source's data) can't
+	// break out of this <script type="application/ld+json"> tag and inject a
+	// new, executable <script> into the page -- recipe data can originate
+	// from a scraped third-party site, so this string isn't fully trusted.
+	const jsonLd = stringifyShareRecipeJsonLd(data, frontmatter, settings, image).replace(/</g, "\\u003c");
 	const accent = resolveShareAccentColors(sharerAccentColor);
 
 	// A second, low-emphasis mention in the footer only makes sense when the

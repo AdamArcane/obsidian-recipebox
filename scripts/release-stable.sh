@@ -26,6 +26,15 @@ if [[ -n $(git status --porcelain) ]]; then
   exit 1
 fi
 
+# Guard against releasing on top of a broken dev. PRs into dev are already
+# gated by CI, but this catches drift from anything committed straight to
+# dev (hotfixes, manual pushes) since the last PR merge.
+echo "→ Running tests before release..."
+if ! npm run test; then
+  echo "Error: tests are failing on dev. Fix them before releasing."
+  exit 1
+fi
+
 # Read current version and strip pre-release suffix
 current_version=$(node -e "process.stdout.write(require('./package.json').version)")
 stable_version=$(echo "$current_version" | sed 's/-.*$//')

@@ -31,7 +31,13 @@ function extractLooseTime(text: string, label: string): number | null {
 }
 
 function extractLooseNumber(text: string, label: string): number | null {
-	const re = new RegExp(`${label}[^\\d]{0,15}(\\d+)`, "i");
+	// The label wraps in a non-capturing group because callers like the
+	// calories/carbs labels below contain a top-level "|" alternation
+	// (e.g. "calories?|cal(?:ories?)?\\b") -- without grouping, the
+	// [^\d]{0,15}(\d+) suffix only binds to the last alternative, so a
+	// match against an earlier alternative leaves the digit-capturing
+	// group unmatched and Number(undefined) silently returns NaN.
+	const re = new RegExp(`(?:${label})[^\\d]{0,15}(\\d+)`, "i");
 	const m = re.exec(text);
 	return m ? Number(m[1]) : null;
 }
