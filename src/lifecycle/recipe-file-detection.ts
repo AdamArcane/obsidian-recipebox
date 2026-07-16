@@ -50,22 +50,25 @@ export function registerAutoOpen(
 	settings: () => RecipeBoxSettings,
 	openAsRecipe: (leaf: WorkspaceLeaf, file: TFile) => void
 ): void {
-	plugin.registerEvent(
-		plugin.app.workspace.on("file-open", (file) => {
-			if (!file || !settings().autoOpenRecipeView) return;
-			if (!isRecipeFile(plugin.app, file, settings())) return;
+	const tryConvert = (): void => {
+		if (!settings().autoOpenRecipeView) return;
 
-			window.setTimeout(() => {
-				const markdownLeaves = plugin.app.workspace
-					.getLeavesOfType("markdown")
-					.filter((l) => (l.view as MarkdownView).file?.path === file.path);
+		const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!view?.file) return;
+		if (!isRecipeFile(plugin.app, view.file, settings())) return;
 
-				for (const leaf of markdownLeaves) {
-					openAsRecipe(leaf, file);
-				}
-			}, 50);
-		})
-	);
+		openAsRecipe(view.leaf, view.file);
+	};
+
+	// file-open covers navigating to a new file within the leaf that's
+	// already active. active-leaf-change covers switching focus to a
+	// different leaf whose file didn't change. Both are needed; neither
+	// alone covers every navigation path (e.g. a split-pane focus switch
+	// onto an existing markdown leaf showing a recipe fires the latter,
+	// not the former).
+	plugin.registerEvent(plugin.app.workspace.on("file-open", tryConvert));
+	plugin.registerEvent(plugin.app.workspace.on("active-leaf-change", tryConvert));
+
 }
 
 export function registerContextMenu(
