@@ -1,3 +1,9 @@
+## [0.1.9-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.1...0.1.9-beta.2) (2026-07-16)
+
+### Bug Fixes
+
+* derive recipe-view auto-open from active view, not a timed leaf search ([86892d5](https://github.com/AdamArcane/obsidian-recipebox/commit/86892d53351ebf882a0664f5a36d2f3dabe5c43b))
+
 ## [0.1.9-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.0...0.1.9-beta.1) (2026-07-16)
 
 ### Bug Fixes
