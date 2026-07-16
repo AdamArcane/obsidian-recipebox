@@ -20,20 +20,21 @@ export type NutritionSource = "recipe-total" | "per-serving";
 export type DesktopRecipeLayout = "classic" | "two-column";
 // PDF lands once its exporter is built.
 export type RecipeExportFormat = "plain-markdown" | "importable-markdown" | "json" | "json-ld";
-export type GallerySortOption =
-	| "title-asc"
-	| "title-desc"
+export type GallerySortField =
+	| "title"
 	| "date-added"
 	| "date-modified"
 	| "last-cooked"
 	| "rating"
 	| "times-cooked";
+export type GallerySortDirection = "asc" | "desc";
 
 // All gallery filter/sort state travels together as one persisted unit (see
 // "settings that always travel together get one toggle" convention) rather
 // than as separate top-level settings keys.
 export interface GallerySavedState {
-	sort: GallerySortOption;
+	sortField: GallerySortField;
+	sortDirection: GallerySortDirection;
 	folder: string | null;
 	favoriteOnly: boolean;
 	tag: string | null;

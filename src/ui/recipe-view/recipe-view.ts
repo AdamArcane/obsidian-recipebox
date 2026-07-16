@@ -241,7 +241,7 @@ export class RecipeView extends TextFileView {
 		titleBlock.createEl("h1", { cls: "rb-recipe-title", text: context.file.basename });
 		if (layoutId !== "mobile-tabs") {
 			renderTagRow(titleBlock, this.app, context.file, context.settings);
-			renderStarRating(titleBlock, this.app, context.file, context.frontmatter, context.settings.ratingProperty, true);
+			renderStarRating(titleBlock, this.app, context.file, context.frontmatter, context.settings.ratingProperty, { hoverPreview: true });
 			renderBadgeRow(titleBlock, context.settings, context.frontmatter);
 		}
 

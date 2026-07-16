@@ -5100,22 +5100,69 @@ body.is-mobile .rb-mpv-card-action-btn {
 
 .rb-gallery-toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
 }
 
 .rb-gallery-search {
-  flex: 1 1 12rem;
+  flex: 1 1 auto;
   min-width: 8rem;
+}
+
+.rb-gallery-toolbar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+}
+
+.rb-gallery-toolbar-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.rb-gallery-toolbar-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.rb-gallery-toolbar-btn.is-active {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Small dot badge on the Filter icon when a filter (other than search) is
+   currently applied, so it's visible without opening the panel. */
+.rb-gallery-toolbar-btn.has-active-filters::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background-color: var(--interactive-accent);
+  border: 1.5px solid var(--background-primary);
+}
+
+.rb-gallery-filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-m);
+  background-color: var(--background-secondary);
 }
 
 .rb-gallery-select {
   flex: 0 0 auto;
-}
-
-.rb-gallery-sort {
-  margin-left: auto;
 }
 
 .rb-gallery-toggle {
@@ -5125,6 +5172,16 @@ body.is-mobile .rb-mpv-card-action-btn {
   font-size: var(--font-ui-small);
   color: var(--text-normal);
   white-space: nowrap;
+}
+
+.rb-gallery-filter-panel-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.rb-gallery-filter-panel-btn {
+  font-size: var(--font-ui-small);
 }
 
 .rb-gallery-empty {
@@ -5156,6 +5213,7 @@ body.is-mobile .rb-mpv-card-action-btn {
 }
 
 .rb-gallery-card-image {
+  position: relative;
   width: 100%;
   height: 9rem;
   background: var(--background-secondary);
@@ -5172,6 +5230,83 @@ body.is-mobile .rb-mpv-card-action-btn {
   border-bottom: 1px dashed var(--background-modifier-border);
 }
 
+/* Bottom-anchored, semi-transparent so the image stays visible behind the
+   title -- a gradient rather than a flat fill so the fade into the image
+   above doesn't hard-cut. */
+.rb-gallery-card-title-overlay {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  padding: 1.25rem 0.6rem 0.4rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0));
+}
+
+.rb-gallery-card-title {
+  font-weight: 600;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.rb-gallery-card-favorite {
+  position: absolute;
+  z-index: 2;
+  top: 0.4rem;
+  left: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--color-red);
+}
+
+.rb-gallery-card-favorite svg {
+  fill: currentColor;
+}
+
+.rb-gallery-card-menu-btn {
+  position: absolute;
+  z-index: 2;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* Keep the actions button out of the way until the card is hovered/focused,
+   so it doesn't compete with the image. Always shown on touch devices, which
+   have no hover, via the coarse-pointer query below. */
+.rb-gallery-card:hover .rb-gallery-card-menu-btn,
+.rb-gallery-card:focus-within .rb-gallery-card-menu-btn {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .rb-gallery-card-menu-btn {
+    opacity: 1;
+  }
+}
+
+.rb-gallery-card-menu-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
 .rb-gallery-card-info {
   padding: 0.6rem 0.75rem 0.75rem;
   display: flex;
@@ -5179,19 +5314,74 @@ body.is-mobile .rb-mpv-card-action-btn {
   gap: 0.35rem;
 }
 
-.rb-gallery-card-title {
-  font-weight: 600;
-  color: var(--text-normal);
+/* Read-only star rating on the card -- smaller than the recipe view's
+   interactive widget, and no pointer cursor or hover feedback since it can't
+   be changed from the grid. */
+.rb-gallery-card-info .rb-star-rating {
+  margin: 0;
+}
+
+.rb-gallery-card-info .rb-star {
+  font-size: 0.9rem;
+}
+
+/* No hover feedback, no cursor, and clicks fall through to the card's
+   open-recipe handler -- the rating can only be changed from the open recipe. */
+.rb-star-rating-readonly .rb-star {
+  pointer-events: none;
+}
+
+.rb-gallery-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.rb-gallery-card-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
   white-space: nowrap;
+}
+
+.rb-gallery-card-meta-icon {
+  display: flex;
+  align-items: center;
+}
+
+.rb-gallery-card-meta-icon svg {
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 /* Cards are compact -- clip the same badge row used in the recipe header
    rather than letting a long headerBadges configuration blow up card height. */
 .rb-gallery-card-info .rb-badge-row {
+  gap: 0.3rem;
+  margin: 0;
   overflow: hidden;
   max-height: 3.2rem;
+}
+
+/* Mini-pill variant, scoped to the gallery card only -- .rb-badge is shared
+   with the recipe view header, which keeps its normal size. */
+.rb-gallery-card-info .rb-badge {
+  height: 1.3rem;
+  padding: 0 0.4rem;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+}
+
+.rb-gallery-card-info .rb-badge-icon svg {
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+.rb-gallery-card-info .rb-badge-label {
+  font-size: 0.55rem;
 }
 
 /* ── Folder-click gallery navigation ─────────────────────────────────────── */

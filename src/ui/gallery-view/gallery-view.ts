@@ -7,7 +7,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { GalleryViewDeps } from "./gallery-view-deps";
 import { GallerySavedState } from "../../settings/settings-types";
 import { renderGalleryToolbar } from "./gallery-toolbar";
-import { renderGalleryCard, GalleryCardHandle } from "./gallery-card";
+import { renderGalleryCard, GalleryCardHandle, GalleryCardActions } from "./gallery-card";
 import { matchesGalleryFilters } from "./gallery-filters";
 import { sortGalleryFiles } from "./gallery-sort";
 import { runLazyImagePass, getFrontmatterImageSrc } from "./gallery-image";
@@ -18,6 +18,10 @@ export class GalleryView extends ItemView {
 	private deps: GalleryViewDeps;
 	private unsubscribe: (() => void) | null = null;
 	private state: GallerySavedState;
+	// Whether the filter panel is expanded. Deliberately not part of
+	// GallerySavedState/persisted -- this is ephemeral UI state for the
+	// current session, not something that should survive to next launch.
+	private filterPanelOpen = false;
 	// Bumped on every re-render/close so an in-flight lazy image pass from a
 	// previous render stops touching the vault and writing into stale DOM.
 	private renderGeneration = 0;
@@ -55,6 +59,11 @@ export class GalleryView extends ItemView {
 		this.onStateChange({ ...this.state, folder });
 	}
 
+	private onToggleFilterPanel = (): void => {
+		this.filterPanelOpen = !this.filterPanelOpen;
+		this.render();
+	};
+
 	private render(): void {
 		this.renderGeneration++;
 		const generation = this.renderGeneration;
@@ -74,7 +83,16 @@ export class GalleryView extends ItemView {
 		const settings = this.deps.getSettings();
 		const files = this.deps.getAllRecipeNotes();
 
-		renderGalleryToolbar(content, this.app, files, this.state, settings.myAllergens.length > 0, this.onStateChange);
+		renderGalleryToolbar(
+			content,
+			this.app,
+			files,
+			this.state,
+			settings.myAllergens.length > 0,
+			this.filterPanelOpen,
+			this.onStateChange,
+			this.onToggleFilterPanel,
+		);
 
 		if (restoreSearchFocus) {
 			const newSearch = content.querySelector(".rb-gallery-search");
@@ -87,7 +105,7 @@ export class GalleryView extends ItemView {
 		const filtered = files.filter((file) =>
 			matchesGalleryFilters(this.app, file, this.app.metadataCache.getFileCache(file), this.state, settings),
 		);
-		const sorted = sortGalleryFiles(filtered, this.state.sort, this.app, settings);
+		const sorted = sortGalleryFiles(filtered, this.state.sortField, this.state.sortDirection, this.app, settings);
 
 		if (sorted.length === 0) {
 			content.createDiv({
@@ -100,8 +118,15 @@ export class GalleryView extends ItemView {
 		const grid = content.createDiv({ cls: "rb-gallery-grid" });
 		const needsLazyImage: GalleryCardHandle[] = [];
 
+		const cardActions: GalleryCardActions = {
+			openRecipe: (f) => this.deps.openRecipe(f.path),
+			openAddToMealPlanModal: (f) => this.deps.openAddToMealPlanModal(f),
+			openAddToGroceryModal: (f) => this.deps.openAddToGroceryModal(f),
+			openShareModal: (f) => this.deps.openShareModal(f),
+		};
+
 		for (const file of sorted) {
-			const handle = renderGalleryCard(grid, this.app, file, settings, (f) => this.deps.openRecipe(f.path));
+			const handle = renderGalleryCard(grid, this.app, file, settings, cardActions);
 			if (!getFrontmatterImageSrc(this.app, file, settings)) needsLazyImage.push(handle);
 		}
 

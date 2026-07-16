@@ -15,7 +15,29 @@ import { AddToGroceryModal } from "../ui/modals/add-to-grocery-modal";
 import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { ExportModal } from "../ui/modals/export-modal";
+import { ShareRecipeModal } from "../ui/modals/share-recipe-modal";
 import { resolveNotePath } from "../utils/vault-notes";
+
+// Opens the "update grocery list" modal for a recipe and wires its confirm
+// callback to the grocery manager. Shared by the recipe view and the gallery
+// card menu so the manager-mutation wiring lives in exactly one place.
+function openGroceryModalForFile(plugin: RecipeBoxPlugin, file: TFile): void {
+	new AddToGroceryModal(
+		plugin.app,
+		file,
+		plugin.settings,
+		() => plugin.manager.groceryItems,
+		async (toAdd, toRemoveKeys) => {
+			const addCount = Object.keys(toAdd).length;
+			if (addCount > 0) await plugin.manager.addToGroceryOnly(toAdd, { kind: "recipe", path: file.path }, true);
+			for (const key of toRemoveKeys) await plugin.manager.removeFromGroceryByKey(key, true);
+			const parts: string[] = [];
+			if (addCount > 0) parts.push(`${addCount} item${addCount === 1 ? "" : "s"} added`);
+			if (toRemoveKeys.length > 0) parts.push(`${toRemoveKeys.length} item${toRemoveKeys.length === 1 ? "" : "s"} removed`);
+			if (parts.length > 0) new Notice(parts.join(", ") + ".");
+		},
+	).open();
+}
 
 export function registerViews(plugin: RecipeBoxPlugin): void {
 	plugin.registerView(
@@ -189,6 +211,20 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					const leaf = plugin.app.workspace.getLeaf(false);
 					void leaf.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
 				},
+				openAddToMealPlanModal: (file: TFile) => {
+					new AddToMealPlanModal(
+						plugin.app,
+						{ kind: "recipe", file },
+						plugin.settings,
+						(day, meal, contributions, isLeftovers) => {
+							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
+						},
+					).open();
+				},
+				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
+				openShareModal: (file: TFile) => {
+					new ShareRecipeModal(plugin.app, file, plugin.settings, () => plugin.saveSettings()).open();
+				},
 			}),
 	);
 
@@ -218,23 +254,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				openAddToMealPlanModal: (file: TFile, onConfirm) => {
 					new AddToMealPlanModal(plugin.app, { kind: "recipe", file }, plugin.settings, onConfirm).open();
 				},
-				openAddToGroceryModal: (file: TFile) => {
-					new AddToGroceryModal(
-						plugin.app,
-						file,
-						plugin.settings,
-						() => plugin.manager.groceryItems,
-						async (toAdd, toRemoveKeys) => {
-							const addCount = Object.keys(toAdd).length;
-							if (addCount > 0) await plugin.manager.addToGroceryOnly(toAdd, { kind: "recipe", path: file.path }, true);
-							for (const key of toRemoveKeys) await plugin.manager.removeFromGroceryByKey(key, true);
-							const parts: string[] = [];
-							if (addCount > 0) parts.push(`${addCount} item${addCount === 1 ? "" : "s"} added`);
-							if (toRemoveKeys.length > 0) parts.push(`${toRemoveKeys.length} item${toRemoveKeys.length === 1 ? "" : "s"} removed`);
-							if (parts.length > 0) new Notice(parts.join(", ") + ".");
-						},
-					).open();
-				},
+				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
 				openMarkCookedModal: (file: TFile, onStamp) => {
 					new MarkCookedModal(plugin.app, file, plugin.settings, onStamp).open();
 				},

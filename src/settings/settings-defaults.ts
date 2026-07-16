@@ -173,7 +173,8 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	recipeExportIncludeImagesDefault: false,
 
 	gallerySavedState: {
-		sort: "title-asc",
+		sortField: "title",
+		sortDirection: "asc",
 		folder: null,
 		favoriteOnly: false,
 		tag: null,

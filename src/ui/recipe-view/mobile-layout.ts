@@ -140,7 +140,7 @@ function renderNativeCard(
 
 	const ratingGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
 	ratingGroup.createDiv({ cls: "rb-label-caps", text: "Rating" });
-	renderStarRating(ratingGroup, app, file, fm, settings.ratingProperty, false);
+	renderStarRating(ratingGroup, app, file, fm, settings.ratingProperty, { hoverPreview: false });
 
 	if (settings.cookHistoryEnabled) {
 		const lastGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });

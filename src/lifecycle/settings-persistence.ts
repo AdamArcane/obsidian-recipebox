@@ -20,7 +20,8 @@ import {
 	CategorySource,
 	DesktopRecipeLayout,
 	GallerySavedState,
-	GallerySortOption,
+	GallerySortDirection,
+	GallerySortField,
 	NutritionDisplay,
 	NutritionSource,
 	RecipeBoxSettings,
@@ -54,9 +55,10 @@ function numInRange(val: unknown, fallback: number, min: number, max: number): n
 	return val;
 }
 
-const GALLERY_SORT_OPTIONS: GallerySortOption[] = [
-	"title-asc", "title-desc", "date-added", "date-modified", "last-cooked", "rating", "times-cooked",
+const GALLERY_SORT_FIELDS: GallerySortField[] = [
+	"title", "date-added", "date-modified", "last-cooked", "rating", "times-cooked",
 ];
+const GALLERY_SORT_DIRECTIONS: GallerySortDirection[] = ["asc", "desc"];
 
 function nullableStr(val: unknown, fallback: string | null): string | null {
 	if (val === null) return null;
@@ -66,8 +68,10 @@ function nullableStr(val: unknown, fallback: string | null): string | null {
 function validateGallerySavedState(raw: unknown, fallback: GallerySavedState): GallerySavedState {
 	if (!raw || typeof raw !== "object") return fallback;
 	const g = raw as Record<string, unknown>;
+
 	return {
-		sort: oneOf<GallerySortOption>(g.sort, GALLERY_SORT_OPTIONS, fallback.sort),
+		sortField: oneOf<GallerySortField>(g.sortField, GALLERY_SORT_FIELDS, fallback.sortField),
+		sortDirection: oneOf<GallerySortDirection>(g.sortDirection, GALLERY_SORT_DIRECTIONS, fallback.sortDirection),
 		folder: nullableStr(g.folder, fallback.folder),
 		favoriteOnly: bool(g.favoriteOnly, fallback.favoriteOnly),
 		tag: nullableStr(g.tag, fallback.tag),
