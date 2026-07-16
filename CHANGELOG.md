@@ -1,3 +1,9 @@
+## [0.1.9-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.0...0.1.9-beta.1) (2026-07-16)
+
+### Bug Fixes
+
+* replace createEl with createSpan and createFragment for consistency ([bbbc173](https://github.com/AdamArcane/obsidian-recipebox/commit/bbbc173ca6d21787083175ffa267cf9d58e9d980))
+
 ## [0.1.9-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.8...0.1.9-beta.0) (2026-07-16)
 
 ### Features
