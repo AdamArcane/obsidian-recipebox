@@ -101,7 +101,7 @@ export class RecipeExportModal extends BaseModal {
 		const imagesBox = imagesField.createEl("input", { type: "checkbox" });
 		imagesBox.checked = this.options.includeImages;
 		imagesField.createEl("label", { text: "Include images" });
-		imagesField.createEl("div", {
+		imagesField.createDiv({
 			cls: "rb-modal-field-hint",
 			text: "Image bundling isn't implemented yet, local images are omitted with a marker instead of embedded.",
 		});

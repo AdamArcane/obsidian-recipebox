@@ -9,7 +9,7 @@
 export function downloadTextFile(filename: string, content: string, mimeType: string): void {
 	const blob = new Blob([content], { type: mimeType });
 	const url = URL.createObjectURL(blob);
-	const anchor = activeDocument.createElement("a");
+	const anchor = activeDocument.createEl("a");
 	anchor.href = url;
 	anchor.download = filename;
 	anchor.click();

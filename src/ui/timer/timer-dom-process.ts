@@ -27,7 +27,7 @@ export function processTimerNodes(container: HTMLElement, opts: TimerOptions): v
 
 	for (const { node: textNode, matches } of toReplace) {
 		const content = textNode.textContent ?? "";
-		const frag = activeDocument.createDocumentFragment();
+		const frag = createFragment();
 		let cursor = 0;
 
 		for (const match of matches) {
@@ -38,7 +38,7 @@ export function processTimerNodes(container: HTMLElement, opts: TimerOptions): v
 
 			const seconds = matchToSeconds(match, opts.rangeDefault);
 			if (seconds > 0) {
-				const btn = createEl("span", { cls: "rb-duration-btn", attr: { role: "button", tabindex: "0" } });
+				const btn = createSpan({ cls: "rb-duration-btn", attr: { role: "button", tabindex: "0" } });
 				const iconSpan = btn.createSpan({ cls: "rb-duration-icon" });
 				setIcon(iconSpan, "timer");
 				btn.appendChild(activeDocument.createTextNode(match[0]));

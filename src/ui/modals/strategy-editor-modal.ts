@@ -99,8 +99,8 @@ export class ModeEditorModal extends BaseModal {
 	private renderFiltersSection(bodyEl: HTMLElement): void {
 		const section = bodyEl.createDiv({ cls: "rb-modal-section" });
 		const header = section.createDiv({ cls: "rb-modal-section-header" });
-		header.createEl("span", { cls: "rb-modal-section-heading", text: "Filters" });
-		header.createEl("span", { cls: "rb-modal-section-hint", text: "Narrow the recipe pool before scoring" });
+		header.createSpan({ cls: "rb-modal-section-heading", text: "Filters" });
+		header.createSpan({ cls: "rb-modal-section-hint", text: "Narrow the recipe pool before scoring" });
 
 		const listEl = section.createDiv({ cls: "rb-rule-list" });
 		for (const filter of this.draft.filters) {
@@ -189,7 +189,7 @@ export class ModeEditorModal extends BaseModal {
 			const [lo, hi] = Array.isArray(filter.value) ? filter.value as [unknown, unknown] : [undefined, undefined];
 			const loInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
 			const hiInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
-			wrap.createEl("span", { cls: "rb-filter-between-sep", text: "To" });
+			wrap.createSpan({ cls: "rb-filter-between-sep", text: "To" });
 			if (lo !== undefined && lo !== null) loInput.value = `${lo as string | number}`;
 			if (hi !== undefined && hi !== null) hiInput.value = `${hi as string | number}`;
 			const update = (): void => {
@@ -206,7 +206,7 @@ export class ModeEditorModal extends BaseModal {
 			const input = wrap.createEl("input", { cls: "rb-modal-input rb-filter-days-input", attr: { type: "number", min: "1", placeholder: "0" } });
 			if (typeof filter.value === "number") input.value = String(filter.value);
 			input.addEventListener("input", () => { filter.value = parseInt(input.value, 10) || 0; });
-			wrap.createEl("span", { cls: "rb-filter-days-label", text: "Days" });
+			wrap.createSpan({ cls: "rb-filter-days-label", text: "Days" });
 			return;
 		}
 
@@ -236,8 +236,8 @@ export class ModeEditorModal extends BaseModal {
 	private renderRulesSection(bodyEl: HTMLElement): void {
 		const section = bodyEl.createDiv({ cls: "rb-modal-section" });
 		const header = section.createDiv({ cls: "rb-modal-section-header" });
-		header.createEl("span", { cls: "rb-modal-section-heading", text: "Scoring rules" });
-		header.createEl("span", {
+		header.createSpan({ cls: "rb-modal-section-heading", text: "Scoring rules" });
+		header.createSpan({
 			cls: "rb-modal-section-hint",
 			text: Platform.isMobile
 				? "Use arrows to reorder — top rule matters most"
@@ -293,7 +293,7 @@ export class ModeEditorModal extends BaseModal {
 
 		// "Prefer" select — two options, auto-phrased from field name + type
 		const preferWrap = row.createDiv({ cls: "rb-rule-prefer-wrap" });
-		preferWrap.createEl("span", { cls: "rb-rule-label", text: "Prefer" });
+		preferWrap.createSpan({ cls: "rb-rule-label", text: "Prefer" });
 		const preferSel = preferWrap.createEl("select", { cls: "rb-select" });
 
 		const rebuildPreferOptions = (): void => {
