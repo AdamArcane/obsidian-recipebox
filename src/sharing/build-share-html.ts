@@ -53,6 +53,13 @@ function renderBadgeRow(badges: MetaBadge[]): string {
 	return `<div class="rbs-badge-row">${pills}</div>`;
 }
 
+function renderPrintButton(): string {
+	return `<button type="button" class="rbs-print-btn" id="rbs-print-btn" aria-label="Print recipe">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+<span>Print</span>
+</button>`;
+}
+
 function renderHeaderImage(image: ResolvedShareImage | null, title: string, sourceUrl: string | null): string {
 	if (!image) return "";
 	const caption = image.isScraperOrigin
@@ -161,6 +168,14 @@ body {
 	padding: 0 1rem 3rem;
 	line-height: 1.55;
 }
+.rbs-print-btn {
+	position: fixed; top: 1rem; right: 1rem; z-index: 10;
+	display: inline-flex; align-items: center; gap: 0.35rem;
+	height: 2rem; padding: 0 0.8rem; border-radius: 999px;
+	background: var(--rb-bg-secondary); border: 1px solid var(--rb-border); color: var(--rb-text);
+	font-size: 0.8rem; font-family: inherit; cursor: pointer;
+}
+.rbs-print-btn:hover { border-color: var(--rb-accent); color: var(--rb-accent); }
 .rbs-header-image { margin: 0 -1rem 1.5rem; position: relative; }
 .rbs-header-image img { width: 100%; display: block; border-radius: 0 0 12px 12px; max-height: 360px; object-fit: cover; }
 .rbs-image-caption {
@@ -195,9 +210,22 @@ a { color: var(--rb-accent); }
 .rbs-footer a { color: inherit; }
 .rbs-footer-attribution { margin-bottom: 0.35rem; }
 .rbs-logo { width: 50px; vertical-align: text-bottom; margin-right: 0.3em; }
+@media print {
+	/* Static, view-only page -- the print button and any hover chrome have no
+	   place on paper, and printing burns through ink/paper the recipient is
+	   paying for, so the page drops to plain black-on-white regardless of the
+	   recipient's dark-mode preference. */
+	.rbs-print-btn { display: none; }
+	body { background: #fff; color: #000; max-width: none; }
+	a { color: #000; text-decoration: underline; }
+	.rbs-header-image img { max-height: 280px; }
+	.rbs-badge { border-color: #000; }
+	.rbs-nutrition-value { color: #000; }
+}
 </style>
 </head>
 <body>
+${renderPrintButton()}
 ${renderHeaderImage(image, data.title, sourceUrl)}
 <h1 class="rbs-title">${title}</h1>
 ${renderBadgeRow(buildMetaBadges(data))}
@@ -211,6 +239,9 @@ ${renderNutrition(data)}
 ${footerAttribution}
 <img src="https://cdn.arcanerecipes.com/rb-logo.png" class="rbs-logo" /> Made with <a href="https://obsidian.md" target="_blank">Obsidian</a> and <a href="https://community.obsidian.md/plugins/recipe-box" target="_blank">Recipe Box</a>
 </div>
+<script>
+document.getElementById("rbs-print-btn").addEventListener("click", function () { window.print(); });
+</script>
 </body>
 </html>
 `;
