@@ -1,3 +1,11 @@
+## [0.1.9-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.8...0.1.9-beta.0) (2026-07-16)
+
+### Features
+
+* add print button functionality to shared recipe HTML ([b69eb0a](https://github.com/AdamArcane/obsidian-recipebox/commit/b69eb0a8af61a4959669e0fbfc6c2a5ca7379b54))
+* enhance gallery view with new modals and sorting options ([9adf410](https://github.com/AdamArcane/obsidian-recipebox/commit/9adf4102f62c2ae181693df6058abd8b86bd6266))
+* initial implentation of the recipe gallery view ([45c8ce2](https://github.com/AdamArcane/obsidian-recipebox/commit/45c8ce246bb0cbff08cce4dd8c6a6bb1c6893124))
+
 ## [0.1.8](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.8-beta.0...0.1.8) (2026-07-15)
 
 ## [0.1.8-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.7...0.1.8-beta.0) (2026-07-15)
