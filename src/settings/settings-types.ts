@@ -20,10 +20,37 @@ export type NutritionSource = "recipe-total" | "per-serving";
 export type DesktopRecipeLayout = "classic" | "two-column";
 // PDF lands once its exporter is built.
 export type RecipeExportFormat = "plain-markdown" | "importable-markdown" | "json" | "json-ld";
+export type GallerySortOption =
+	| "title-asc"
+	| "title-desc"
+	| "date-added"
+	| "date-modified"
+	| "last-cooked"
+	| "rating"
+	| "times-cooked";
+
+// All gallery filter/sort state travels together as one persisted unit (see
+// "settings that always travel together get one toggle" convention) rather
+// than as separate top-level settings keys.
+export interface GallerySavedState {
+	sort: GallerySortOption;
+	folder: string | null;
+	favoriteOnly: boolean;
+	tag: string | null;
+	minRating: number;
+	neverCooked: boolean;
+	excludeAllergens: boolean;
+	search: string;
+}
 
 export interface RecipeBoxSettings {
 	// Recipe location & structure
 	recipeFolders: string[];
+	// Folder-note style navigation: clicking a recipe folder in the file
+	// explorer (or Notebook Navigator) opens the gallery instead of just
+	// expanding it. See src/integrations/ for the adapters that read these.
+	openGalleryOnFolderClick: boolean;
+	openGalleryOnFolderClickSubfolders: boolean;
 	mealPlanPath: string;
 	groceryListPath: string;
 	ingredientsHeading: string;
@@ -118,7 +145,10 @@ export interface RecipeBoxSettings {
 	recipeExportIncludeCookHistoryDefault: boolean;
 	recipeExportIncludeImagesDefault: boolean;
 
-	// Recipe sharing -- shareServerUrl is the base URL of the server used for sharing recipes. 
+	// Gallery view
+	gallerySavedState: GallerySavedState;
+
+	// Recipe sharing -- shareServerUrl is the base URL of the server used for sharing recipes.
 	shareServerUrl: string;
 	// The four share values (slug/token/created/expires) are never read or
 	// written independently, so per convention ("settings that always travel

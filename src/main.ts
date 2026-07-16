@@ -18,12 +18,15 @@ import { RecipeBoxSettingsTab } from "./ui/settings/settings-tab";
 import { GROCERY_VIEW_TYPE } from "./ui/grocery-view";
 import { RECIPE_VIEW_TYPE, RecipeView } from "./ui/recipe-view/recipe-view";
 import { MEAL_PLAN_VIEW_TYPE } from "./ui/meal-plan-view/meal-plan-view";
+import { GALLERY_VIEW_TYPE, GalleryView } from "./ui/gallery-view";
 import { scrollToHeading } from "./ui/recipe-view/jump-bar";
+import { createFolderClickGalleryController, FolderClickGalleryController } from "./lifecycle/register-folder-click-gallery";
 
 export default class RecipeBoxPlugin extends Plugin {
 	settings!: RecipeBoxSettings;
 	manager!: GroceryManager;
 	discoveryCache!: DiscoveryCache;
+	private folderClickGallery!: FolderClickGalleryController;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -38,10 +41,14 @@ export default class RecipeBoxPlugin extends Plugin {
 		registerCommands(this);
 		registerVaultWatchers(this);
 
+		this.folderClickGallery = createFolderClickGalleryController(this);
+		this.folderClickGallery.sync();
+
 		this.addSettingTab(new RecipeBoxSettingsTab(this.app, this));
 
 		this.addRibbonIcon("shopping-cart", "Open grocery list", () => this.activateGroceryView());
 		this.addRibbonIcon("calendar", "Open meal plan", () => this.activateMealPlanView());
+		this.addRibbonIcon("layout-grid", "Open recipe gallery", () => this.activateGalleryView());
 
 		registerAutoOpen(
 			this,
@@ -63,11 +70,22 @@ export default class RecipeBoxPlugin extends Plugin {
 			void this.manager.refresh();
 			// Populate the discovery cache so the mode editor field picker has real fields.
 			void this.discoveryCache.refresh(this.app, this.settings);
+			// The earlier sync() call above runs before the workspace layout (and
+			// therefore the file explorer's DOM) exists, so any folder underlines
+			// it tried to apply found nothing to mark. onLayoutReady alone still
+			// fires before the explorer has actually painted its rows though (its
+			// DOM builds asynchronously after layout restore) -- a plain retry
+			// here still finds nothing, only a later user click (which happens to
+			// fire its own layout-change) does. Same class of "Obsidian internals
+			// haven't caught up yet" timing gap as registerAutoOpen's setTimeout
+			// in recipe-file-detection.ts; same fix.
+			window.setTimeout(() => this.folderClickGallery.sync(), 50);
 		});
 
 	}
 
 	onunload(): void {
+		this.folderClickGallery?.cleanup();
 	}
 
 	async loadSettings(): Promise<void> {
@@ -98,6 +116,9 @@ export default class RecipeBoxPlugin extends Plugin {
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 		this.notifyRecipeViews();
+		// Every settings change (including the folder-click toggles) flows
+		// through here, so this is what makes toggling take effect immediately.
+		this.folderClickGallery?.sync();
 	}
 
 	// ── public helpers called by lifecycle modules and commands ───────────────
@@ -108,6 +129,13 @@ export default class RecipeBoxPlugin extends Plugin {
 
 	async activateGroceryView(): Promise<void> {
 		await findOrOpenLeaf(this.app, GROCERY_VIEW_TYPE);
+	}
+
+	async activateGalleryView(folder?: string, options?: { newLeaf?: boolean | "tab" }): Promise<void> {
+		const leaf = await findOrOpenLeaf(this.app, GALLERY_VIEW_TYPE, undefined, options?.newLeaf ?? "tab");
+		if (folder !== undefined && leaf.view instanceof GalleryView) {
+			leaf.view.applyFolderFilter(folder);
+		}
 	}
 
 	openCurrentFileAsRecipe(leaf: WorkspaceLeaf, file: TFile): void {

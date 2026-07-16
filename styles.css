@@ -5089,6 +5089,133 @@ body.is-mobile .rb-mpv-card-action-btn {
   line-height: 1.4;
 }
 
+/* ── Gallery view ────────────────────────────────────────────────────────── */
+
+.rb-gallery-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rb-gallery-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rb-gallery-search {
+  flex: 1 1 12rem;
+  min-width: 8rem;
+}
+
+.rb-gallery-select {
+  flex: 0 0 auto;
+}
+
+.rb-gallery-sort {
+  margin-left: auto;
+}
+
+.rb-gallery-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+.rb-gallery-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.rb-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1rem;
+}
+
+.rb-gallery-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.1s ease-in-out;
+}
+
+.rb-gallery-card:hover,
+.rb-gallery-card:focus-visible {
+  border-color: var(--interactive-accent);
+}
+
+.rb-gallery-card-image {
+  width: 100%;
+  height: 9rem;
+  background: var(--background-secondary);
+}
+
+.rb-gallery-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rb-gallery-card-image--empty {
+  border-bottom: 1px dashed var(--background-modifier-border);
+}
+
+.rb-gallery-card-info {
+  padding: 0.6rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rb-gallery-card-title {
+  font-weight: 600;
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cards are compact -- clip the same badge row used in the recipe header
+   rather than letting a long headerBadges configuration blow up card height. */
+.rb-gallery-card-info .rb-badge-row {
+  overflow: hidden;
+  max-height: 3.2rem;
+}
+
+/* ── Folder-click gallery navigation ─────────────────────────────────────── */
+
+/* Applied to .nav-folder-title-content in the core file explorer (see
+   src/integrations/folder-click-underline.ts) to signal that clicking this
+   folder opens the recipe gallery instead of expanding it. Dotted, not a
+   plain solid underline, so it doesn't collide visually with a folder-note
+   plugin the person might also have installed. */
+.rb-folder-gallery-link {
+  text-decoration: underline dotted;
+}
+
+.rb-folder-gallery-link:hover {
+  text-decoration: underline solid;
+  cursor: pointer;
+}
+
+.rb-folder-gallery-link::after {
+  content: " 🍴";
+  display: inline-block;
+  text-decoration: none;
+}
+
 /* ── Force-hidden utility ──────────────────────────────────────────────────
    Keep this rule last in the file. It's applied alongside other layout
    classes (e.g. .rb-modal-fields sets display: flex) to force-hide an

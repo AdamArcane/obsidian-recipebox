@@ -35,6 +35,8 @@ export const DEFAULT_CATEGORY_ORDER: string[] = [
 
 export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	recipeFolders: ["Recipes"],
+	openGalleryOnFolderClick: false,
+	openGalleryOnFolderClickSubfolders: false,
 	mealPlanPath: "Meal Plan.md",
 	groceryListPath: "Grocery List.md",
 	ingredientsHeading: "Ingredients",
@@ -169,6 +171,17 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	recipeExportDefaultFormat: "plain-markdown",
 	recipeExportIncludeCookHistoryDefault: false,
 	recipeExportIncludeImagesDefault: false,
+
+	gallerySavedState: {
+		sort: "title-asc",
+		folder: null,
+		favoriteOnly: false,
+		tag: null,
+		minRating: 0,
+		neverCooked: false,
+		excludeAllergens: false,
+		search: "",
+	},
 
 	shareServerUrl: "https://share.arcanerecipes.com",
 	shareDataProperty: "recipe-share",

@@ -19,6 +19,8 @@ import { generateEntryId } from "../utils/date";
 import {
 	CategorySource,
 	DesktopRecipeLayout,
+	GallerySavedState,
+	GallerySortOption,
 	NutritionDisplay,
 	NutritionSource,
 	RecipeBoxSettings,
@@ -50,6 +52,30 @@ function numInRange(val: unknown, fallback: number, min: number, max: number): n
 	if (val < min) return min;
 	if (val > max) return max;
 	return val;
+}
+
+const GALLERY_SORT_OPTIONS: GallerySortOption[] = [
+	"title-asc", "title-desc", "date-added", "date-modified", "last-cooked", "rating", "times-cooked",
+];
+
+function nullableStr(val: unknown, fallback: string | null): string | null {
+	if (val === null) return null;
+	return typeof val === "string" ? val : fallback;
+}
+
+function validateGallerySavedState(raw: unknown, fallback: GallerySavedState): GallerySavedState {
+	if (!raw || typeof raw !== "object") return fallback;
+	const g = raw as Record<string, unknown>;
+	return {
+		sort: oneOf<GallerySortOption>(g.sort, GALLERY_SORT_OPTIONS, fallback.sort),
+		folder: nullableStr(g.folder, fallback.folder),
+		favoriteOnly: bool(g.favoriteOnly, fallback.favoriteOnly),
+		tag: nullableStr(g.tag, fallback.tag),
+		minRating: numInRange(g.minRating, fallback.minRating, 0, 5),
+		neverCooked: bool(g.neverCooked, fallback.neverCooked),
+		excludeAllergens: bool(g.excludeAllergens, fallback.excludeAllergens),
+		search: str(g.search, fallback.search),
+	};
 }
 
 // ── complex type validators ───────────────────────────────────────────────────
@@ -199,6 +225,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 	const merged: RecipeBoxSettings = {
 		recipeFolders: strArr(r.recipeFolders, d.recipeFolders),
+		openGalleryOnFolderClick: bool(r.openGalleryOnFolderClick, d.openGalleryOnFolderClick),
+		openGalleryOnFolderClickSubfolders: bool(r.openGalleryOnFolderClickSubfolders, d.openGalleryOnFolderClickSubfolders),
 		mealPlanPath: str(r.mealPlanPath, d.mealPlanPath),
 		groceryListPath: str(r.groceryListPath, d.groceryListPath),
 		ingredientsHeading: str(r.ingredientsHeading, d.ingredientsHeading),
@@ -285,6 +313,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		),
 		recipeExportIncludeCookHistoryDefault: bool(r.recipeExportIncludeCookHistoryDefault, d.recipeExportIncludeCookHistoryDefault),
 		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
+
+		gallerySavedState: validateGallerySavedState(r.gallerySavedState, d.gallerySavedState),
 
 		shareServerUrl: str(r.shareServerUrl, d.shareServerUrl),
 		shareDataProperty: str(r.shareDataProperty, d.shareDataProperty),

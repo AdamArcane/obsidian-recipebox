@@ -5,7 +5,7 @@
 import { EventRef, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
-import { findFirstImageInBody, stripRedundantBodyContent } from "../../parser/recipe-body-clean";
+import { stripRedundantBodyContent } from "../../parser/recipe-body-clean";
 import { splitBodyAroundIngredients } from "../../parser/recipe-ingredient-groups";
 import { splitBodyAroundInstructions } from "../../parser/recipe-instruction-groups";
 import { readRecipeMultiplier } from "../../parser/recipe-multiplier";
@@ -22,18 +22,11 @@ import { getShareData } from "../../sharing/share-frontmatter";
 import { getShareStatus, ShareStatus } from "../../sharing/share-status";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
-import { findValue } from "../../parser/frontmatter-lookup";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
+import { resolveHeroImageValue } from "../../parser/resolve-hero-image";
 import { makeLightboxable } from "../components/lightbox";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
-
-function frontmatterString(frontmatter: Record<string, unknown>, candidateKeys: string[]): string | null {
-	const raw = findValue(frontmatter, candidateKeys);
-	if (typeof raw !== "string") return null;
-	const trimmed = raw.trim();
-	return trimmed.length > 0 ? trimmed : null;
-}
 
 export class RecipeView extends TextFileView {
 	private deps: RecipeViewDeps;
@@ -295,12 +288,7 @@ export class RecipeView extends TextFileView {
 		// Normalize to an empty string so parser helpers that call startsWith do not crash.
 		const rawData = typeof this.data === "string" ? this.data : "";
 		const rawBody = stripFrontmatter(rawData);
-		const imageKeys = aliases.image;
-		const frontmatterImage = frontmatterString(frontmatter, imageKeys);
-		const fallbackBodyImage = settings.useFirstBodyImageWhenFrontmatterEmpty
-			? findFirstImageInBody(rawBody)
-			: null;
-		const resolvedImage = frontmatterImage ?? fallbackBodyImage;
+		const resolvedImage = resolveHeroImageValue(frontmatter, rawBody, settings);
 		const body = stripRedundantBodyContent(rawBody, {
 			cleanNoteBody: settings.cleanNoteBody,
 			title: file.basename,

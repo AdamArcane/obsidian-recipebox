@@ -7,6 +7,9 @@ import RecipeBoxPlugin from "../main";
 import { GroceryView, GROCERY_VIEW_TYPE } from "../ui/grocery-view";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 import { MealPlanView, MEAL_PLAN_VIEW_TYPE } from "../ui/meal-plan-view/meal-plan-view";
+import { GalleryView, GALLERY_VIEW_TYPE } from "../ui/gallery-view";
+import { getAllRecipeNotes } from "./recipe-file-detection";
+import { debounce } from "../utils/debounce";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { AddToGroceryModal } from "../ui/modals/add-to-grocery-modal";
 import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
@@ -152,6 +155,39 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 							{ day: entry.day, meal: entry.meal, isLeftovers: entry.isLeftovers, isEdit: true },
 						).open();
 					}
+				},
+			}),
+	);
+
+	plugin.registerView(
+		GALLERY_VIEW_TYPE,
+		(leaf) =>
+			new GalleryView(leaf, {
+				getSettings: () => plugin.settings,
+				saveSettings: () => plugin.saveSettings(),
+				getAllRecipeNotes: () => getAllRecipeNotes(plugin.app, plugin.settings),
+				saveGalleryState: async (state) => {
+					plugin.settings.gallerySavedState = state;
+					await plugin.saveSettings();
+				},
+				subscribeToChanges: (cb) => {
+					// Frontmatter edits (favorite/rating/cook-history) happen outside the
+					// gallery's own control flow, unlike grocery/meal-plan state -- so this
+					// listens to the metadataCache directly instead of plugin.manager's
+					// "change" event, debounced since edits can fire several events in a row.
+					const debounced = debounce(cb, 300);
+					const changedRef = plugin.app.metadataCache.on("changed", () => debounced());
+					const resolvedRef = plugin.app.metadataCache.on("resolved", () => debounced());
+					return () => {
+						plugin.app.metadataCache.offref(changedRef);
+						plugin.app.metadataCache.offref(resolvedRef);
+					};
+				},
+				openRecipe: (path) => {
+					const file = plugin.app.vault.getFileByPath(path);
+					if (!file) return;
+					const leaf = plugin.app.workspace.getLeaf(false);
+					void leaf.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
 				},
 			}),
 	);

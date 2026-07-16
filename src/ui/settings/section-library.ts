@@ -13,7 +13,7 @@ export function renderSectionLibrary(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
-	_rerender: () => void,
+	rerender: () => void,
 	app: App
 ): void {
 	new Setting(container).setName("Recipe library").setHeading();
@@ -115,4 +115,27 @@ export function renderSectionLibrary(
 				updateWarning();
 			})
 		);
+
+	new Setting(container)
+		.setName("Open gallery when clicking a recipe folder")
+		.setDesc("Clicking a recipe folder in the file explorer opens the recipe gallery filtered to that folder, instead of expanding it.")
+		.addToggle((t) =>
+			t.setValue(settings.openGalleryOnFolderClick).onChange(async (v) => {
+				settings.openGalleryOnFolderClick = v;
+				await save();
+				rerender();
+			})
+		);
+
+	if (settings.openGalleryOnFolderClick) {
+		new Setting(container)
+			.setName("Also apply to subfolders")
+			.setDesc("Clicking a subfolder inside a recipe folder opens the gallery filtered to that subfolder specifically.")
+			.addToggle((t) =>
+				t.setValue(settings.openGalleryOnFolderClickSubfolders).onChange(async (v) => {
+					settings.openGalleryOnFolderClickSubfolders = v;
+					await save();
+				})
+			);
+	}
 }

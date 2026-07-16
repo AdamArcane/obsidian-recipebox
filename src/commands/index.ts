@@ -29,6 +29,12 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 	});
 
 	plugin.addCommand({
+		id: "open-recipe-gallery",
+		name: "Open recipe gallery",
+		callback: () => plugin.activateGalleryView(),
+	});
+
+	plugin.addCommand({
 		id: "import-recipe",
 		name: "Import recipe",
 		callback: () => new ImportRecipeModal(plugin.app, plugin.settings).open(),

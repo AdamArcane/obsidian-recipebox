@@ -8,7 +8,7 @@ const STAR_COUNT = 5;
 const STAR_FILLED = "★";
 const STAR_EMPTY = "☆";
 
-function readRating(fm: Record<string, unknown>, property: string): number {
+export function readRating(fm: Record<string, unknown>, property: string): number {
 	const raw = fm[property];
 	const n = typeof raw === "number" ? raw : typeof raw === "string" ? parseFloat(raw) : NaN;
 	if (!isFinite(n)) return 0;
