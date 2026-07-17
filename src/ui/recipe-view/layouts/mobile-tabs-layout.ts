@@ -18,6 +18,7 @@ export const renderMobileTabsLayout: RecipeLayoutRenderer = async ({
         component,
         context.file,
         context.frontmatter,
+        context.imageValue,
         context.settings,
         context.multiplier,
         context.servings,

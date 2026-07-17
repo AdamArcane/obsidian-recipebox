@@ -15,17 +15,17 @@ import { RecipeIngredient, IngredientGroup, InstructionGroup } from "../types";
 import { RecipeMeta, readRecipeMeta } from "../parser/recipe-meta-read";
 import { TrailingSection, splitTrailingSections } from "../ui/recipe-view/section-extra-content";
 import { getRecipeMetaAliases } from "../parser/recipe-meta-aliases";
-import { findValue } from "../parser/frontmatter-lookup";
 import { fmNum } from "../ui/recipe-view/frontmatter-read-helpers";
 import { stripFrontmatter } from "../parser/recipe-frontmatter-strip";
-import { findFirstImageInBody, stripRedundantBodyContent } from "../parser/recipe-body-clean";
+import { stripRedundantBodyContent } from "../parser/recipe-body-clean";
 import { splitBodyAroundIngredients } from "../parser/recipe-ingredient-groups";
 import { splitBodyAroundInstructions } from "../parser/recipe-instruction-groups";
 import { readRecipeMultiplier } from "../parser/recipe-multiplier";
 import { parseIngredientLine } from "../parser/ingredient-parse";
 import { hasIgnoreTag } from "../parser/ingredient-clean";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "../ui/recipe-view/nutrition-fields";
-import { resolveImageFile } from "../ui/recipe-view/image-resolve";
+import { resolveImageFile, ABSOLUTE_URL_RE } from "../ui/recipe-view/image-resolve";
+import { resolveHeroImageValue } from "../parser/resolve-hero-image";
 import { rescaleIngredientLine } from "./rescale-ingredient-line";
 
 export interface RecipeExportOptions {
@@ -57,15 +57,6 @@ export interface RecipeExportData {
 	sourcePath: string;
 }
 
-const ABSOLUTE_URL_RE = /^(?:https?|data|app|capacitor):\/\//i;
-
-function frontmatterString(frontmatter: Record<string, unknown>, candidateKeys: string[]): string | null {
-	const raw = findValue(frontmatter, candidateKeys);
-	if (typeof raw !== "string") return null;
-	const trimmed = raw.trim();
-	return trimmed.length > 0 ? trimmed : null;
-}
-
 export async function buildRecipeExportData(
 	app: App,
 	file: TFile,
@@ -79,11 +70,7 @@ export async function buildRecipeExportData(
 	const rawData = await app.vault.cachedRead(file);
 	const rawBody = stripFrontmatter(rawData);
 
-	const frontmatterImage = frontmatterString(frontmatter, aliases.image);
-	const fallbackBodyImage = settings.useFirstBodyImageWhenFrontmatterEmpty
-		? findFirstImageInBody(rawBody)
-		: null;
-	const resolvedImageValue = frontmatterImage ?? fallbackBodyImage;
+	const resolvedImageValue = resolveHeroImageValue(frontmatter, rawBody, settings);
 
 	const body = stripRedundantBodyContent(rawBody, {
 		cleanNoteBody: settings.cleanNoteBody,

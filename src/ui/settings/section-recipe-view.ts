@@ -117,6 +117,19 @@ export function renderSectionRecipeView(
 			})
 		);
 
+	new Setting(container)
+		.setName("Default recipe image")
+		.setDesc("Shown in recipe view and gallery when a recipe has no frontmatter or body image. Accepts a vault path, wikilink, or URL -- same format as the image frontmatter property. Leave blank to disable. Never used on public shares.")
+		.addText((t) =>
+			t.setPlaceholder("e.g. Attachments/default-recipe.png")
+				.setValue(settings.defaultRecipeImage)
+				.onChange(async (v) => {
+					settings.defaultRecipeImage = v;
+					await save();
+					rerender();
+				})
+		);
+
 
 
 

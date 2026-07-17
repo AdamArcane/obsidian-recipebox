@@ -126,13 +126,12 @@ function renderNativeCard(
 	app: App,
 	file: TFile,
 	fm: Record<string, unknown>,
+	imageValue: string | null,
 	settings: RecipeBoxSettings,
 	meta: RecipeMeta,
 	shareStatus: ShareStatus,
 	saveSettings: () => Promise<void>,
 ): void {
-	const imageValue = fmStr(fm, getRecipeMetaAliases(settings).image);
-
 	const card = container.createDiv({ cls: "rb-mobile-native-card" });
 	if (imageValue) renderImageCard(card, app, imageValue);
 
@@ -393,6 +392,7 @@ export async function renderMobileLayout(
 	component: Component,
 	file: TFile,
 	fm: Record<string, unknown>,
+	imageValue: string | null,
 	settings: RecipeBoxSettings,
 	multiplier: number,
 	servings: number | null,
@@ -428,7 +428,7 @@ export async function renderMobileLayout(
 	}
 
 	// Native card: image + rating + last-made + share status
-	renderNativeCard(container, app, file, fm, settings, meta, shareStatus, deps.saveSettings);
+	renderNativeCard(container, app, file, fm, imageValue, settings, meta, shareStatus, deps.saveSettings);
 
 	// Tags row
 	renderMobileTagRow(container, app, file, settings);

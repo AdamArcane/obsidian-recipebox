@@ -254,6 +254,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		crossOffWhileCooking: bool(r.crossOffWhileCooking, d.crossOffWhileCooking),
 		cleanNoteBody: bool(r.cleanNoteBody, d.cleanNoteBody),
 		useFirstBodyImageWhenFrontmatterEmpty: bool(r.useFirstBodyImageWhenFrontmatterEmpty, d.useFirstBodyImageWhenFrontmatterEmpty),
+		defaultRecipeImage: str(r.defaultRecipeImage, d.defaultRecipeImage),
 		desktopRecipeLayout: oneOf<DesktopRecipeLayout>(r.desktopRecipeLayout, ["classic", "two-column"], d.desktopRecipeLayout),
 		desktopTwoColumnSplitRatio: numInRange(r.desktopTwoColumnSplitRatio, d.desktopTwoColumnSplitRatio, 0.25, 0.75),
 

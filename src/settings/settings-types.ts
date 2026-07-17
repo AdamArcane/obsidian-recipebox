@@ -75,6 +75,10 @@ export interface RecipeBoxSettings {
 	crossOffWhileCooking: boolean;
 	cleanNoteBody: boolean;
 	useFirstBodyImageWhenFrontmatterEmpty: boolean;
+	// Vault path, wikilink, or URL -- same value format as a frontmatter image
+	// property. Used by recipe view and gallery when no real image is found.
+	// Empty string disables the fallback. Never applied to public shares.
+	defaultRecipeImage: string;
 	desktopRecipeLayout: DesktopRecipeLayout;
 	desktopTwoColumnSplitRatio: number;
 

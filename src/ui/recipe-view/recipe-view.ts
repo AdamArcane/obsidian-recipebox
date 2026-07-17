@@ -292,8 +292,13 @@ export class RecipeView extends TextFileView {
 		const body = stripRedundantBodyContent(rawBody, {
 			cleanNoteBody: settings.cleanNoteBody,
 			title: file.basename,
+			// Real resolved value only, never the default fallback -- there is
+			// nothing to strip from the body when the image isn't actually in the note.
 			imageValue: resolvedImage ?? undefined,
 		});
+		// Default fallback is a display-only concern, applied after body-stripping
+		// so it never gets treated as a real note reference.
+		const displayImage = resolvedImage ?? (settings.defaultRecipeImage.trim() || null);
 
 		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
 		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);
@@ -315,7 +320,7 @@ export class RecipeView extends TextFileView {
 			afterContent: instructionSplit.after,
 			ingredientGroups,
 			instructionGroups: instructionSplit.groups,
-			imageValue: resolvedImage,
+			imageValue: displayImage,
 			trailingSections,
 			// A share pill (see section-extra-content.ts) needs the same sidebar
 			// row cook history uses, so an active share alone should be enough to

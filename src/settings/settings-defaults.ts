@@ -58,6 +58,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	crossOffWhileCooking: true,
 	cleanNoteBody: true,
 	useFirstBodyImageWhenFrontmatterEmpty: true,
+	defaultRecipeImage: "",
 	desktopRecipeLayout: "two-column",
 	desktopTwoColumnSplitRatio: 0.5,
 

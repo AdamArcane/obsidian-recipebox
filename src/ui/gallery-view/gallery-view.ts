@@ -12,6 +12,7 @@ import { matchesGalleryFilters } from "./gallery-filters";
 import { sortGalleryFiles } from "./gallery-sort";
 import { renderStatsRow } from "./gallery-result-stats";
 import { runLazyImagePass, getFrontmatterImageSrc } from "./gallery-image";
+import { resolveImagePath } from "../recipe-view/image-resolve";
 
 export const GALLERY_VIEW_TYPE = "recipe-box-gallery-view";
 
@@ -132,13 +133,19 @@ export class GalleryView extends ItemView {
 		}
 
 		if (needsLazyImage.length > 0) {
+			// Resolved once per render, not per card -- the lazy pass callback runs
+			// once for every card still missing an image after both the frontmatter
+			// and body lookups came up empty, so this is the true "nothing found"
+			// landing point. Never applied to public shares, display-only.
+			const defaultImageValue = settings.defaultRecipeImage.trim();
+			const defaultSrc = defaultImageValue ? resolveImagePath(this.app, defaultImageValue) : null;
 			void runLazyImagePass(
 				this.app,
 				needsLazyImage.map((h) => h.file),
 				settings,
 				(file, src) => {
 					const handle = needsLazyImage.find((h) => h.file.path === file.path);
-					handle?.setImage(src);
+					handle?.setImage(src ?? defaultSrc);
 				},
 				() => generation !== this.renderGeneration,
 			);
