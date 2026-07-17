@@ -11,7 +11,7 @@ import { mergeSettings } from "./lifecycle/settings-persistence";
 import { resolveNotePath } from "./utils/vault-notes";
 import { registerViews } from "./lifecycle/register-views";
 import { registerVaultWatchers } from "./lifecycle/register-vault-watchers";
-import { registerAutoOpen, registerContextMenu } from "./lifecycle/recipe-file-detection";
+import { registerAutoOpen, registerContextMenu, suppressAutoOpenOnce } from "./lifecycle/recipe-file-detection";
 import { registerMarkdownRecipeButton } from "./lifecycle/markdown-recipe-button";
 import { registerCommands } from "./commands/index";
 import { RecipeBoxSettingsTab } from "./ui/settings/settings-tab";
@@ -145,6 +145,7 @@ export default class RecipeBoxPlugin extends Plugin {
 	openCurrentFileAsMarkdown(leaf: WorkspaceLeaf): void {
 		const file = this.app.workspace.getActiveFile();
 		if (!file) return;
+		suppressAutoOpenOnce(file.path);
 		void leaf.setViewState({ type: "markdown", state: { file: file.path }, active: true });
 	}
 

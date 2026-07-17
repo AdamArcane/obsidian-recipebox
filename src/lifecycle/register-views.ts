@@ -4,6 +4,7 @@
  */
 import { Notice, TFile } from "obsidian";
 import RecipeBoxPlugin from "../main";
+import { suppressAutoOpenOnce } from "./recipe-file-detection";
 import { GroceryView, GROCERY_VIEW_TYPE } from "../ui/grocery-view";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 import { MealPlanView, MEAL_PLAN_VIEW_TYPE } from "../ui/meal-plan-view/meal-plan-view";
@@ -248,6 +249,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				},
 				navigateToGroceryCategory: (cat) => plugin.navigateToGroceryCategory(cat),
 				editAsMarkdown: (path) => {
+					suppressAutoOpenOnce(path);
 					const leaf2 = plugin.app.workspace.getLeaf(false);
 					if (leaf2) void leaf2.setViewState({ type: "markdown", state: { file: path }, active: true });
 				},

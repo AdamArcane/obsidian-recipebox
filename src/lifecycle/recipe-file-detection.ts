@@ -38,6 +38,19 @@ export function isRecipeFile(app: App, file: TFile, settings: RecipeBoxSettings)
 	return inRecipeFolderScope(file, settings) && matchesRecipeType(app, file, settings);
 }
 
+// Paths recently switched to markdown *deliberately* (the pencil action, the
+// "Open current file as Markdown" command) -- so the auto-open listeners
+// below don't immediately convert the leaf straight back to recipe view. Both
+// file-open and active-leaf-change fire for a single setViewState call, well
+// within this window, so a short timeout covers both without needing a
+// consume-once flag that could miss the second event.
+const suppressedPaths = new Set<string>();
+
+export function suppressAutoOpenOnce(path: string): void {
+	suppressedPaths.add(path);
+	window.setTimeout(() => suppressedPaths.delete(path), 500);
+}
+
 /** Every recipe note in the vault (or configured recipe folders), folder-scoped and type-matched in one call. */
 export function getAllRecipeNotes(app: App, settings: RecipeBoxSettings): TFile[] {
 	return listMarkdownFilesInRecipeFolders(app, settings).filter((file) =>
@@ -55,6 +68,7 @@ export function registerAutoOpen(
 
 		const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!view?.file) return;
+		if (suppressedPaths.has(view.file.path)) return;
 		if (!isRecipeFile(plugin.app, view.file, settings())) return;
 
 		openAsRecipe(view.leaf, view.file);
