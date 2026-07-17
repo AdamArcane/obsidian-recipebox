@@ -1,3 +1,9 @@
+## [0.1.9-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.2...0.1.9-beta.3) (2026-07-17)
+
+### Features
+
+* enhance gallery view with stats row and improved search functionality ([518f635](https://github.com/AdamArcane/obsidian-recipebox/commit/518f6359cdf0c04909dc612426868d4d0457e347))
+
 ## [0.1.9-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.1...0.1.9-beta.2) (2026-07-16)
 
 ### Bug Fixes
