@@ -13,6 +13,7 @@ import { sortGalleryFiles } from "./gallery-sort";
 import { renderStatsRow } from "./gallery-result-stats";
 import { runLazyImagePass, getFrontmatterImageSrc } from "./gallery-image";
 import { resolveImagePath } from "../recipe-view/image-resolve";
+import { defaultRecipeImageValue } from "../../parser/resolve-hero-image";
 
 export const GALLERY_VIEW_TYPE = "recipe-box-gallery-view";
 
@@ -137,7 +138,7 @@ export class GalleryView extends ItemView {
 			// once for every card still missing an image after both the frontmatter
 			// and body lookups came up empty, so this is the true "nothing found"
 			// landing point. Never applied to public shares, display-only.
-			const defaultImageValue = settings.defaultRecipeImage.trim();
+			const defaultImageValue = defaultRecipeImageValue(settings);
 			const defaultSrc = defaultImageValue ? resolveImagePath(this.app, defaultImageValue) : null;
 			void runLazyImagePass(
 				this.app,

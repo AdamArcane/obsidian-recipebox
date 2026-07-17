@@ -23,7 +23,7 @@ import { getShareStatus, ShareStatus } from "../../sharing/share-status";
 import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/registry";
 import { RecipeLayoutContext } from "./layouts/types";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
-import { resolveHeroImageValue } from "../../parser/resolve-hero-image";
+import { resolveHeroImageValue, defaultRecipeImageValue } from "../../parser/resolve-hero-image";
 import { makeLightboxable } from "../components/lightbox";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
@@ -298,7 +298,7 @@ export class RecipeView extends TextFileView {
 		});
 		// Default fallback is a display-only concern, applied after body-stripping
 		// so it never gets treated as a real note reference.
-		const displayImage = resolvedImage ?? (settings.defaultRecipeImage.trim() || null);
+		const displayImage = resolvedImage ?? defaultRecipeImageValue(settings);
 
 		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
 		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);

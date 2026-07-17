@@ -30,3 +30,12 @@ export function resolveHeroImageValue(
 		: null;
 	return frontmatterImage ?? fallbackBodyImage;
 }
+
+// The one place that knows what counts as "a default is configured" --
+// trimmed, empty string treated as disabled. Callers only reach for this
+// once every real source (frontmatter, body) has already come up empty.
+// Never call this for the public share/export path -- that stays real-image-only.
+export function defaultRecipeImageValue(settings: RecipeBoxSettings): string | null {
+	const trimmed = settings.defaultRecipeImage.trim();
+	return trimmed.length > 0 ? trimmed : null;
+}
