@@ -1,3 +1,10 @@
+## [0.1.9-beta.6](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.5...0.1.9-beta.6) (2026-07-17)
+
+### Bug Fixes
+
+* detect and handle broken recipe image ([a072ac4](https://github.com/AdamArcane/obsidian-recipebox/commit/a072ac4234b7efe12979a3bc0c842ede1b6524c5))
+* don't auto-open recipe view when switching to markdown ([bb38abd](https://github.com/AdamArcane/obsidian-recipebox/commit/bb38abd3296301eba4cd647c71f35a90f13a1476))
+
 ## [0.1.9-beta.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.4...0.1.9-beta.5) (2026-07-17)
 
 ### Features
