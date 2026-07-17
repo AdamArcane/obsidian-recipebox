@@ -89,7 +89,8 @@ async function decodeToCanvas(bytes: ArrayBuffer, mime: string): Promise<HTMLCan
 		const width = Math.round(bitmap.width * scale);
 		const height = Math.round(bitmap.height * scale);
 
-		const canvas = activeDocument.createEl("canvas");
+
+		const canvas = createEl("canvas");
 		canvas.width = width;
 		canvas.height = height;
 		const ctx = canvas.getContext("2d");
