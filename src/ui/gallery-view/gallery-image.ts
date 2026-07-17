@@ -9,13 +9,14 @@ import { RecipeBoxSettings } from "../../settings/settings-types";
 import { frontmatterImageValue } from "../../parser/resolve-hero-image";
 import { findFirstImageInBody } from "../../parser/recipe-body-clean";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
-import { resolveImagePath } from "../recipe-view/image-resolve";
+import { resolveImagePath, usableImageValue } from "../recipe-view/image-resolve";
 
 /** Synchronous phase 1: frontmatter-only, no file read. */
 export function getFrontmatterImageSrc(app: App, file: TFile, settings: RecipeBoxSettings): string | null {
 	const cache = app.metadataCache.getFileCache(file);
 	const value = frontmatterImageValue(cache?.frontmatter ?? {}, settings);
-	return value ? resolveImagePath(app, value) : null;
+	const usable = usableImageValue(app, value);
+	return usable ? resolveImagePath(app, usable) : null;
 }
 
 /** Lazy phase 2: reads the file body to find its first embedded image. */
@@ -24,7 +25,8 @@ async function resolveBodyImageSrc(app: App, file: TFile, settings: RecipeBoxSet
 	const raw = await app.vault.cachedRead(file);
 	const body = stripFrontmatter(raw);
 	const value = findFirstImageInBody(body);
-	return value ? resolveImagePath(app, value) : null;
+	const usable = usableImageValue(app, value);
+	return usable ? resolveImagePath(app, usable) : null;
 }
 
 /**

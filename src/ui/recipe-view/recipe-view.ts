@@ -24,6 +24,7 @@ import { getRecipeLayoutRenderer, resolveRecipeLayoutId } from "./layouts/regist
 import { RecipeLayoutContext } from "./layouts/types";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { resolveHeroImageValue, defaultRecipeImageValue } from "../../parser/resolve-hero-image";
+import { usableImageValue } from "./image-resolve";
 import { makeLightboxable } from "../components/lightbox";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
@@ -297,8 +298,10 @@ export class RecipeView extends TextFileView {
 			imageValue: resolvedImage ?? undefined,
 		});
 		// Default fallback is a display-only concern, applied after body-stripping
-		// so it never gets treated as a real note reference.
-		const displayImage = resolvedImage ?? defaultRecipeImageValue(settings);
+		// so it never gets treated as a real note reference. A resolvedImage that
+		// doesn't actually resolve to a file (broken reference) counts as no image,
+		// same as one that was never set.
+		const displayImage = usableImageValue(this.app, resolvedImage) ?? defaultRecipeImageValue(settings);
 
 		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
 		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);

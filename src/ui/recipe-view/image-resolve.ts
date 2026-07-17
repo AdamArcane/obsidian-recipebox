@@ -49,3 +49,16 @@ export function renderImageCard(container: HTMLElement, app: App, imageValue: st
 		card.createDiv({ cls: "rb-image-placeholder" });
 	};
 }
+
+// A frontmatter/body image reference that doesn't actually resolve to a real
+// file (deleted attachment, stale import, typo'd wikilink) is treated the
+// same as no reference at all -- callers fall through to their next source
+// (body fallback, then default image) instead of showing a broken value's
+// placeholder. Takes and returns the raw value, not a resolved src, so callers
+// that only need a yes/no plus the original value (RecipeView) don't pay for a
+// resolution they're about to redo; callers that want the src directly
+// (gallery) can still call resolveImagePath themselves afterward.
+export function usableImageValue(app: App, value: string | null): string | null {
+	if (!value) return null;
+	return resolveImagePath(app, value) ? value : null;
+}
