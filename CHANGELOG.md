@@ -1,3 +1,9 @@
+## [0.1.9-beta.4](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.3...0.1.9-beta.4) (2026-07-17)
+
+### Bug Fixes
+
+* use global createEl for anchor and canvas elements to avoid document restrictions ([1e6380e](https://github.com/AdamArcane/obsidian-recipebox/commit/1e6380e658185f771e1c33e3383e8040222f5fd6))
+
 ## [0.1.9-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.2...0.1.9-beta.3) (2026-07-17)
 
 ### Features
