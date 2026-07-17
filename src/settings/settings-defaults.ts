@@ -58,7 +58,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	crossOffWhileCooking: true,
 	cleanNoteBody: true,
 	useFirstBodyImageWhenFrontmatterEmpty: true,
-	defaultRecipeImage: "",
+	defaultRecipeImage: "https://cdn.arcanerecipes.com/default-recipe.png",
 	desktopRecipeLayout: "two-column",
 	desktopTwoColumnSplitRatio: 0.5,
 
