@@ -2,6 +2,7 @@
 .claude/
 .vscode/
 node_modules/
+ProjectDocs
 
 # files
 .DS_Store
@@ -11,8 +12,6 @@ node_modules/
 
 data.json
 main.js
-
-cleanroom-specs.md
 
 
 

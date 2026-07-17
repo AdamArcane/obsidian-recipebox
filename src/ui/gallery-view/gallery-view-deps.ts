@@ -12,9 +12,6 @@ export interface GalleryViewDeps {
 	saveGalleryState: (state: GallerySavedState) => Promise<void>;
 	subscribeToChanges: (cb: () => void) => () => void;
 	openRecipe: (path: string) => void;
-	// Card 3-dot actions menu -- each is just a new entry point to an existing
-	// modal; the manager wiring lives in register-views.ts, same as the
-	// recipe view's equivalents, so no mutation logic is duplicated here.
 	openAddToMealPlanModal: (file: TFile) => void;
 	openAddToGroceryModal: (file: TFile) => void;
 	openShareModal: (file: TFile) => void;

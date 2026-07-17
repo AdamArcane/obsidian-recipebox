@@ -10,6 +10,7 @@ import { renderGalleryToolbar } from "./gallery-toolbar";
 import { renderGalleryCard, GalleryCardHandle, GalleryCardActions } from "./gallery-card";
 import { matchesGalleryFilters } from "./gallery-filters";
 import { sortGalleryFiles } from "./gallery-sort";
+import { renderStatsRow } from "./gallery-result-stats";
 import { runLazyImagePass, getFrontmatterImageSrc } from "./gallery-image";
 
 export const GALLERY_VIEW_TYPE = "recipe-box-gallery-view";
@@ -18,9 +19,6 @@ export class GalleryView extends ItemView {
 	private deps: GalleryViewDeps;
 	private unsubscribe: (() => void) | null = null;
 	private state: GallerySavedState;
-	// Whether the filter panel is expanded. Deliberately not part of
-	// GallerySavedState/persisted -- this is ephemeral UI state for the
-	// current session, not something that should survive to next launch.
 	private filterPanelOpen = false;
 	// Bumped on every re-render/close so an in-flight lazy image pass from a
 	// previous render stops touching the vault and writing into stale DOM.
@@ -114,6 +112,9 @@ export class GalleryView extends ItemView {
 			});
 			return;
 		}
+
+		renderStatsRow(content, sorted, this.state);
+
 
 		const grid = content.createDiv({ cls: "rb-gallery-grid" });
 		const needsLazyImage: GalleryCardHandle[] = [];

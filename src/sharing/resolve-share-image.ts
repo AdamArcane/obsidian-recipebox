@@ -125,8 +125,9 @@ async function encodeVaultImage(app: App, file: TFile): Promise<{ bytes: ArrayBu
 	try {
 		const rawBytes = await app.vault.readBinary(file);
 		canvas = await decodeToCanvas(rawBytes, mime);
-	} catch {
-		return { bytes: null, omittedReason: "The recipe's image couldn't be processed, so the recipe was shared without an image." };
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		return { bytes: null, omittedReason: `Image processing failed: ${message}` };
 	}
 
 	for (const quality of QUALITY_PASSES) {
