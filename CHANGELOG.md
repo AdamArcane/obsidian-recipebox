@@ -1,3 +1,14 @@
+## [0.1.9-beta.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.4...0.1.9-beta.5) (2026-07-17)
+
+### Features
+
+* add default recipe image setting and update image resolution logic ([8dd8f83](https://github.com/AdamArcane/obsidian-recipebox/commit/8dd8f83f21d9d74bab357693e88b9ae68b3d5a32))
+* implement default recipe image handling in gallery and recipe views ([d6de379](https://github.com/AdamArcane/obsidian-recipebox/commit/d6de3795925da61528ae1c5a96b0ab6bb1a313da))
+
+### Bug Fixes
+
+* add default recipe image value ([3da261a](https://github.com/AdamArcane/obsidian-recipebox/commit/3da261a3900c57e747108b92250d80ff0aac8ad5))
+
 ## [0.1.9-beta.4](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.3...0.1.9-beta.4) (2026-07-17)
 
 ### Bug Fixes
