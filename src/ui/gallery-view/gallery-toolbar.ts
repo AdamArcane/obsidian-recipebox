@@ -165,10 +165,13 @@ function renderFilterPanel(
 
 	const footer = panel.createDiv({ cls: "rb-gallery-filter-panel-footer" });
 
-	const clearBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn", text: "Clear filters" });
+	const clearBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
+	setIcon(clearBtn, "eraser");
+	clearBtn.createSpan({ text: "Clear" });
 	clearBtn.addEventListener("click", () => onChange({ ...state, ...CLEARED_FILTERS }));
 
-	const hideBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn", text: "Hide filters" });
+	const hideBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
+	setIcon(hideBtn, "x");
 	hideBtn.addEventListener("click", onHide);
 }
 
@@ -184,7 +187,11 @@ export function renderGalleryToolbar(
 ): void {
 	const bar = container.createDiv({ cls: "rb-gallery-toolbar" });
 
-	const searchInput = bar.createEl("input", {
+	const searchWrap = bar.createDiv({ cls: "rb-gallery-search-wrap" });
+	const searchIcon = searchWrap.createSpan({ cls: "rb-gallery-search-icon" });
+	setIcon(searchIcon, "search");
+
+	const searchInput = searchWrap.createEl("input", {
 		cls: "rb-gallery-search",
 		attr: { type: "search", placeholder: "Search recipes…" },
 	});

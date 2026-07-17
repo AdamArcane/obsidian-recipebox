@@ -5102,11 +5102,43 @@ body.is-mobile .rb-mpv-card-action-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 75%;
+  margin: 25px auto;
+
+}
+
+.rb-gallery-search-wrap {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 8rem;
+  align-items: center;
+}
+
+.rb-gallery-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.rb-gallery-search-icon svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .rb-gallery-search {
   flex: 1 1 auto;
-  min-width: 8rem;
+  min-width: 0;
+
+}
+
+input[type='search'].rb-gallery-search {
+  padding: 1.3rem 2rem;
+
 }
 
 .rb-gallery-toolbar-actions {
@@ -5184,6 +5216,39 @@ body.is-mobile .rb-mpv-card-action-btn {
   font-size: var(--font-ui-small);
 }
 
+
+/* stats and results row */
+.rb-gallery-stats-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 2px 12px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.rb-gallery-stats-count,
+.rb-gallery-stats-sort {
+  white-space: nowrap;
+}
+
+.rb-gallery-stats-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rb-gallery-stats-filters .rb-gallery-stats {
+  padding: 2px 8px;
+  border-radius: var(--radius-s);
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* gallery grid and cards */
+
 .rb-gallery-empty {
   padding: 2rem 1rem;
   text-align: center;
@@ -5247,6 +5312,7 @@ body.is-mobile .rb-mpv-card-action-btn {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   line-height: 1.25;
 }
