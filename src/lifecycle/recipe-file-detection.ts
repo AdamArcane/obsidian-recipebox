@@ -35,6 +35,14 @@ export function matchesRecipeType(app: App, file: TFile, settings: RecipeBoxSett
 }
 
 export function isRecipeFile(app: App, file: TFile, settings: RecipeBoxSettings): boolean {
+
+	// sanity check before proceeding with recipe detection
+	if (!file) return false; // make sure we have a file
+	if (file.extension !== "md") return false; // only markdown files
+	if (file.path.startsWith(".")) return false; // ignore hidden files and folders
+	if (file.path === settings.groceryListPath) return false; // ignore the grocery list file
+	if (file.path === settings.mealPlanPath) return false; // ignore the meal plan file
+
 	return inRecipeFolderScope(file, settings) && matchesRecipeType(app, file, settings);
 }
 
