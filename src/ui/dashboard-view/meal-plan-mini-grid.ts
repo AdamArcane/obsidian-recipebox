@@ -54,7 +54,7 @@ function renderEntryRow(
 	defaultSrc: string | null,
 	actions: MealPlanMiniGridActions,
 ): void {
-	const row = list.createDiv({ cls: "rb-dashboard-mpg-entry", attr: { role: "button", tabindex: "0" } });
+	const row = list.createDiv({ cls: "rb-dashboard-mpg-entry", attr: { title: entryTitle(entry), role: "button", tabindex: "0" } });
 
 	const thumb = row.createDiv({ cls: "rb-dashboard-mpg-entry-thumb" });
 	const src = resolveDayThumbSrc(app, entry, settings, defaultSrc);

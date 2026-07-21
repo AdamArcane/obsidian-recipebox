@@ -5506,7 +5506,7 @@ input[type='search'].rb-gallery-search {
 }
 
 .rb-dashboard-card-label {
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 0.6rem;
@@ -5700,6 +5700,9 @@ input[type='search'].rb-gallery-search {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
+  border-bottom: 1px solid var(--background-modifier-border-hover);
+  margin-bottom: 4px;
+  padding-bottom: 4px;
 }
 
 .rb-dashboard-mpg-list {
