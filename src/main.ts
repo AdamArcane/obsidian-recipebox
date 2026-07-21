@@ -19,6 +19,7 @@ import { GROCERY_VIEW_TYPE } from "./ui/grocery-view";
 import { RECIPE_VIEW_TYPE, RecipeView } from "./ui/recipe-view/recipe-view";
 import { MEAL_PLAN_VIEW_TYPE } from "./ui/meal-plan-view/meal-plan-view";
 import { GALLERY_VIEW_TYPE, GalleryView } from "./ui/gallery-view";
+import { DASHBOARD_VIEW_TYPE } from "./ui/dashboard-view";
 import { scrollToHeading } from "./ui/recipe-view/jump-bar";
 import { createFolderClickGalleryController, FolderClickGalleryController } from "./lifecycle/register-folder-click-gallery";
 
@@ -46,9 +47,7 @@ export default class RecipeBoxPlugin extends Plugin {
 
 		this.addSettingTab(new RecipeBoxSettingsTab(this.app, this));
 
-		this.addRibbonIcon("shopping-cart", "Open grocery list", () => this.activateGroceryView());
-		this.addRibbonIcon("calendar", "Open meal plan", () => this.activateMealPlanView());
-		this.addRibbonIcon("layout-grid", "Open recipe gallery", () => this.activateGalleryView());
+		this.addRibbonIcon("chef-hat", "Recipe box", () => this.activateDashboardView());
 
 		registerAutoOpen(
 			this,
@@ -123,6 +122,10 @@ export default class RecipeBoxPlugin extends Plugin {
 
 	// ── public helpers called by lifecycle modules and commands ───────────────
 
+	async activateDashboardView(): Promise<void> {
+		await findOrOpenLeaf(this.app, DASHBOARD_VIEW_TYPE);
+	}
+
 	async activateMealPlanView(): Promise<void> {
 		await findOrOpenLeaf(this.app, MEAL_PLAN_VIEW_TYPE);
 	}
@@ -131,10 +134,13 @@ export default class RecipeBoxPlugin extends Plugin {
 		await findOrOpenLeaf(this.app, GROCERY_VIEW_TYPE);
 	}
 
-	async activateGalleryView(folder?: string, options?: { newLeaf?: boolean | "tab" }): Promise<void> {
+	async activateGalleryView(folder?: string, options?: { newLeaf?: boolean | "tab" }, search?: string): Promise<void> {
 		const leaf = await findOrOpenLeaf(this.app, GALLERY_VIEW_TYPE, undefined, options?.newLeaf ?? "tab");
 		if (folder !== undefined && leaf.view instanceof GalleryView) {
 			leaf.view.applyFolderFilter(folder);
+		}
+		if (search !== undefined && leaf.view instanceof GalleryView) {
+			leaf.view.applySearchFilter(search);
 		}
 	}
 

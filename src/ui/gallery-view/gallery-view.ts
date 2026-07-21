@@ -59,6 +59,11 @@ export class GalleryView extends ItemView {
 		this.onStateChange({ ...this.state, folder });
 	}
 
+	/** Called by the dashboard's search box (see src/ui/dashboard-view/). */
+	applySearchFilter(search: string): void {
+		this.onStateChange({ ...this.state, search });
+	}
+
 	private onToggleFilterPanel = (): void => {
 		this.filterPanelOpen = !this.filterPanelOpen;
 		this.render();

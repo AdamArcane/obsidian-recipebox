@@ -9,6 +9,7 @@ import { GroceryView, GROCERY_VIEW_TYPE } from "../ui/grocery-view";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 import { MealPlanView, MEAL_PLAN_VIEW_TYPE } from "../ui/meal-plan-view/meal-plan-view";
 import { GalleryView, GALLERY_VIEW_TYPE } from "../ui/gallery-view";
+import { DashboardView, DASHBOARD_VIEW_TYPE } from "../ui/dashboard-view";
 import { getAllRecipeNotes } from "./recipe-file-detection";
 import { debounce } from "../utils/debounce";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
@@ -17,6 +18,8 @@ import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { ExportModal } from "../ui/modals/export-modal";
 import { ShareRecipeModal } from "../ui/modals/share-recipe-modal";
+import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
+import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { resolveNotePath } from "../utils/vault-notes";
 
 // Opens the "update grocery list" modal for a recipe and wires its confirm
@@ -212,6 +215,85 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					const leaf = plugin.app.workspace.getLeaf(false);
 					void leaf.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
 				},
+				openAddToMealPlanModal: (file: TFile) => {
+					new AddToMealPlanModal(
+						plugin.app,
+						{ kind: "recipe", file },
+						plugin.settings,
+						(day, meal, contributions, isLeftovers) => {
+							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
+						},
+					).open();
+				},
+				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
+				openShareModal: (file: TFile) => {
+					new ShareRecipeModal(plugin.app, file, plugin.settings, () => plugin.saveSettings()).open();
+				},
+			}),
+	);
+
+	plugin.registerView(
+		DASHBOARD_VIEW_TYPE,
+		(leaf) =>
+			new DashboardView(leaf, {
+				getSettings: () => plugin.settings,
+				saveSettings: () => plugin.saveSettings(),
+				getAllRecipeNotes: () => getAllRecipeNotes(plugin.app, plugin.settings),
+				getMealPlan: () => plugin.manager.mealPlan,
+				getGroceryItems: () => plugin.manager.groceryItems,
+				subscribeToChanges: (cb) => {
+					// Dashboard reads from both the manager (meal plan/grocery mutations)
+					// and the metadataCache (recipe frontmatter edits affecting stats), so
+					// both sources are combined behind this one callback -- matching the
+					// gallery view's approach of hiding multi-source subscriptions from
+					// the view itself (see dashboard-spec.md section 2.3).
+					const debounced = debounce(cb, 300);
+					plugin.manager.on("change", cb);
+					const changedRef = plugin.app.metadataCache.on("changed", () => debounced());
+					const resolvedRef = plugin.app.metadataCache.on("resolved", () => debounced());
+					return () => {
+						plugin.manager.off("change", cb);
+						plugin.app.metadataCache.offref(changedRef);
+						plugin.app.metadataCache.offref(resolvedRef);
+					};
+				},
+				openGroceryView: () => { void plugin.activateGroceryView(); },
+				openMealPlanView: () => { void plugin.activateMealPlanView(); },
+				openGalleryView: () => { void plugin.activateGalleryView(); },
+				openRecipe: (path) => {
+					const file = plugin.app.vault.getFileByPath(path);
+					if (!file) return;
+					const leaf2 = plugin.app.workspace.getLeaf(false);
+					void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
+				},
+				searchRecipes: (query) => { void plugin.activateGalleryView(undefined, undefined, query); },
+				openImportModal: () => {
+					new ImportRecipeModal(plugin.app, plugin.settings).open();
+				},
+				openAddGroceryItemModal: () => {
+					new AddGroceryItemModal(plugin.app, {
+						addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
+						updateGroceryItem: (id, updates) => plugin.manager.updateGroceryItem(id, updates),
+						getKnownCategories: () => plugin.manager.getKnownCategories(),
+					}).open();
+				},
+				openSuggestMealModal: () => {
+					new SuggestMealModal(plugin.app, {
+						getSettings: () => plugin.settings,
+						saveSettings: () => plugin.saveSettings(),
+						getDiscovery: () => plugin.discoveryCache.get(),
+						openFile: (file) => {
+							const leaf2 = plugin.app.workspace.getLeaf(false);
+							void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: file.path }, active: true });
+						},
+						getMealPlan: () => plugin.manager.mealPlan,
+						addMealPlanEntry: (path, day) => plugin.manager.addMealPlanEntry(path, day),
+						setMealType: (id, mealType) => plugin.manager.setMealType(id, mealType),
+						clearMealPlan: (alsoRemove) => plugin.manager.clearMealPlan(alsoRemove),
+						openMealPlan: () => { void plugin.activateMealPlanView(); },
+					}).open();
+				},
+				toggleChecked: (key, checked) => { void plugin.manager.toggleChecked(key, checked); },
 				openAddToMealPlanModal: (file: TFile) => {
 					new AddToMealPlanModal(
 						plugin.app,

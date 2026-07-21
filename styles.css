@@ -5472,6 +5472,305 @@ input[type='search'].rb-gallery-search {
   text-decoration: none;
 }
 
+/* ── Dashboard view ───────────────────────────────────────────────────────── */
+
+.rb-dashboard-view {
+  padding: 1rem;
+}
+
+.rb-dashboard-greeting {
+  padding: 1.5rem 0 2rem;
+}
+
+.rb-dashboard-greeting-text {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.rb-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.rb-dashboard-span-4 { grid-column: span 4; }
+.rb-dashboard-span-8 { grid-column: span 8; }
+.rb-dashboard-span-12 { grid-column: span 12; }
+
+.rb-dashboard-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-primary);
+  padding: 0.9rem 1rem;
+}
+
+.rb-dashboard-card-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.rb-dashboard-empty-text {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.rb-dashboard-footer-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-accent);
+  cursor: pointer;
+}
+
+.rb-dashboard-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Stats row: hero slot (chart or recently-made fallback) + stacked stat cards */
+
+.rb-dashboard-hero {
+  display: flex;
+  flex-direction: column;
+}
+
+.rb-dashboard-stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rb-dashboard-stat-card--number {
+  cursor: pointer;
+}
+
+.rb-dashboard-stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.rb-dashboard-recently-made-list,
+.rb-dashboard-most-cooked-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rb-dashboard-recently-made-row,
+.rb-dashboard-most-cooked-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.rb-dashboard-recently-made-name,
+.rb-dashboard-most-cooked-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-dashboard-recently-made-date,
+.rb-dashboard-most-cooked-count {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Cooking activity chart -- see chart-bars.ts. Bar height is a runtime value,
+   driven through a CSS custom property + scaleY transform rather than an
+   inline style, per the plugin's no-inline-style convention. */
+
+.rb-dashboard-chart {
+  width: 100%;
+  height: 6rem;
+}
+
+.rb-dashboard-chart-bar {
+  fill: var(--interactive-accent);
+  transform: scaleY(var(--rb-bar-scale));
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+
+/* Meal plan mini-grid: seven thin day columns, dot per scheduled entry */
+
+.rb-dashboard-mpg {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.rb-dashboard-mpg-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.25rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  cursor: pointer;
+}
+
+.rb-dashboard-mpg-col:hover {
+  background: var(--background-modifier-hover);
+}
+
+.rb-dashboard-mpg-day {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rb-dashboard-mpg-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 0.6rem;
+}
+
+.rb-dashboard-mpg-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+}
+
+.rb-dashboard-mpg-dot--breakfast { background: var(--color-yellow); }
+.rb-dashboard-mpg-dot--lunch { background: var(--color-green); }
+.rb-dashboard-mpg-dot--dinner { background: var(--color-blue); }
+.rb-dashboard-mpg-dot--snack { background: var(--color-purple); }
+
+.rb-dashboard-mpg-empty {
+  color: var(--text-faint);
+}
+
+.rb-dashboard-empty-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.rb-dashboard-empty-vault-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 9rem;
+}
+
+.rb-dashboard-empty-cta-btn {
+  cursor: pointer;
+}
+
+/* New recipes strip -- horizontal scroll, not wrap, same overflow pattern as
+   the modal footer button row. */
+
+.rb-dashboard-new-recipes-strip {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.rb-dashboard-new-recipes-strip .rb-gallery-card {
+  flex: 0 0 11rem;
+  width: 11rem;
+}
+
+/* Grocery preview */
+
+.rb-dashboard-grocery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rb-dashboard-grocery-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rb-dashboard-grocery-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-dashboard-grocery-more {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+/* Quick actions row: search box on the left, action buttons on the right */
+
+.rb-dashboard-quick-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.rb-dashboard-search {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 16rem;
+  max-width: 22rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+}
+
+.rb-dashboard-search-icon {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+
+.rb-dashboard-search-input {
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.rb-dashboard-quick-action-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.rb-dashboard-quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.rb-dashboard-quick-action-icon {
+  display: inline-flex;
+}
+
+@media (max-width: 700px) {
+  .rb-dashboard-span-4,
+  .rb-dashboard-span-8 {
+    grid-column: span 12;
+  }
+
+  .rb-dashboard-mpg {
+    grid-template-columns: repeat(7, minmax(2.2rem, 1fr));
+  }
+}
+
 /* ── Force-hidden utility ──────────────────────────────────────────────────
    Keep this rule last in the file. It's applied alongside other layout
    classes (e.g. .rb-modal-fields sets display: flex) to force-hide an
