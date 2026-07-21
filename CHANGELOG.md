@@ -1,3 +1,16 @@
+## [0.1.9-beta.7](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.6...0.1.9-beta.7) (2026-07-21)
+
+### Features
+
+* add ability to disable the dashboard in the settings. ([9b7b0c3](https://github.com/AdamArcane/obsidian-recipebox/commit/9b7b0c3ebd423739bc5cad5dc7d2e8d07c66978b))
+* add dashboard activity range setting and enhance dashboard view ([d975181](https://github.com/AdamArcane/obsidian-recipebox/commit/d97518103fe6514b3cd91c2f596c9127c795e594))
+* add dashboard view with stats, meal plan, and grocery preview ([625d70f](https://github.com/AdamArcane/obsidian-recipebox/commit/625d70fbd4b219179a186ae419f951710e58ef40))
+
+### Bug Fixes
+
+* add sanity checks for recipe file detection ([2a53aed](https://github.com/AdamArcane/obsidian-recipebox/commit/2a53aedc545c31da60d5b2673682cbfc3950f827))
+* improve release script clarity and error handling ([faf9154](https://github.com/AdamArcane/obsidian-recipebox/commit/faf9154222c5a41d2cb8579c7b7f2ac947244b3a))
+
 ## [0.1.9-beta.6](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.5...0.1.9-beta.6) (2026-07-17)
 
 ### Bug Fixes
