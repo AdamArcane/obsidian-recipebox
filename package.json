@@ -18,7 +18,8 @@
     "release:beta": "npm version prerelease --preid=beta",
     "release:minor": "npm version minor --no-git-tag-version && git add package.json manifest.json && git commit -m \"chore: bump minor version\"",
     "release:major": "npm version major --no-git-tag-version && git add package.json manifest.json && git commit -m \"chore: bump major version\"",
-    "release:stable": "bash scripts/release-stable.sh"
+    "release:stable": "bash scripts/release-stable.sh",
+    "release:rc": "bash scripts/release-stable.sh -- --rc"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
