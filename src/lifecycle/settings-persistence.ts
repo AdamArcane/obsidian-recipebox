@@ -321,6 +321,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
 
 		gallerySavedState: validateGallerySavedState(r.gallerySavedState, d.gallerySavedState),
+		enableDashboard: bool(r.enableDashboard, d.enableDashboard),
 
 		dashboardActivityRangeWeeks: oneOf<DashboardActivityRangeWeeks>(r.dashboardActivityRangeWeeks, [2, 4, 8, 12], d.dashboardActivityRangeWeeks),
 

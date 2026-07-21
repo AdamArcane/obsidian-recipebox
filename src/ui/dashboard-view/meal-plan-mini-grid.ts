@@ -8,7 +8,7 @@
  * rescheduling wiring, which a glance preview has no business owning (see
  * dashboard-spec.md section 11.3).
  */
-import { App, setIcon } from "obsidian";
+import { App, setIcon, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { getFrontmatterImageSrc } from "../gallery-view/gallery-image";
@@ -16,7 +16,7 @@ import { resolveImagePath } from "../recipe-view/image-resolve";
 import { defaultRecipeImageValue } from "../../parser/resolve-hero-image";
 
 export interface MealPlanMiniGridActions {
-	openRecipe: (path: string) => void;
+	openRecipe: (file: TFile) => void;
 	openMealPlanView: () => void;
 	openSuggestMealModal: () => void;
 }
@@ -70,8 +70,13 @@ function renderEntryRow(
 	if (entry.meal) textCol.createDiv({ cls: "rb-dashboard-mpg-entry-meal", text: entry.meal });
 
 	const open = (): void => {
-		if (entry.recipePath) actions.openRecipe(entry.recipePath);
-		else actions.openMealPlanView();
+		if (entry.recipePath) {
+			const file = app.vault.getFileByPath(entry.recipePath);
+			if (file) actions.openRecipe(file);
+		}
+		else {
+			actions.openMealPlanView();
+		}
 	};
 	row.addEventListener("click", (e) => {
 		e.stopPropagation();

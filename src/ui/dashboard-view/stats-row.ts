@@ -3,7 +3,7 @@
  * "Recently made" list when cook history tracking is off) and the stacked
  * stat cards beside it. See dashboard-spec.md sections 3, 11.2-11.4, 13.2.
  */
-import { Menu } from "obsidian";
+import { Menu, TFile } from "obsidian";
 import { RecipeBoxSettings, DashboardActivityRangeWeeks } from "../../settings/settings-types";
 import { DashboardStats, CookingActivityResult, CookingActivityBucket, ActivityGranularity } from "./dashboard-stats";
 import { renderBarChart, BarChartBar } from "./chart-bars";
@@ -11,7 +11,7 @@ import { daysSince } from "../../utils/date-distance";
 
 export interface StatsRowActions {
 	openGalleryView: () => void;
-	openRecipe: (path: string) => void;
+	openRecipe: (file: TFile) => void;
 	activityRangeWeeks: DashboardActivityRangeWeeks;
 	onActivityRangeChange: (weeks: DashboardActivityRangeWeeks) => void;
 }
@@ -37,7 +37,7 @@ function renderRecentlyMadeFallback(hero: HTMLElement, stats: DashboardStats, ac
 		const row = list.createDiv({ cls: "rb-dashboard-recently-made-row", attr: { role: "button", tabindex: "0" } });
 		row.createSpan({ cls: "rb-dashboard-recently-made-name", text: entry.file.basename });
 		row.createSpan({ cls: "rb-dashboard-recently-made-date", text: formatLastMade(entry.lastMade) });
-		row.addEventListener("click", () => actions.openRecipe(entry.file.path));
+		row.addEventListener("click", () => actions.openRecipe(entry.file));
 	}
 }
 
@@ -58,19 +58,19 @@ function formatHoverLabel(bucket: CookingActivityBucket, granularity: ActivityGr
 // Reuses the same lightweight-popover pattern as the meal plan mini-grid's
 // day popover (an Obsidian Menu) rather than building a second tooltip
 // mechanism -- see meal-plan-mini-grid.ts's openDayMenu.
-function openBucketMenu(evt: MouseEvent, bucket: CookingActivityBucket, openRecipe: (path: string) => void): void {
-	const counts = new Map<string, { path: string; name: string; count: number }>();
+function openBucketMenu(evt: MouseEvent, bucket: CookingActivityBucket, openRecipe: (file: TFile) => void): void {
+	const counts = new Map<string, { file: TFile; name: string; count: number }>();
 	for (const entry of bucket.entries) {
 		const existing = counts.get(entry.file.path);
 		if (existing) existing.count += 1;
-		else counts.set(entry.file.path, { path: entry.file.path, name: entry.file.basename, count: 1 });
+		else counts.set(entry.file.path, { file: entry.file, name: entry.file.basename, count: 1 });
 	}
 	const menu = new Menu();
-	for (const { path, name, count } of counts.values()) {
+	for (const { file, name, count } of counts.values()) {
 		menu.addItem((item) =>
 			item.setTitle(count > 1 ? `${name} (${count}×)` : name)
 				.setIcon("utensils")
-				.onClick(() => openRecipe(path))
+				.onClick(() => openRecipe(file))
 		);
 	}
 	menu.showAtMouseEvent(evt);
@@ -135,7 +135,7 @@ function renderStatCards(grid: HTMLElement, stats: DashboardStats, actions: Stat
 		const row = cookedCard.createDiv({ cls: "rb-dashboard-most-cooked-row", attr: { role: "button", tabindex: "0" } });
 		row.createSpan({ cls: "rb-dashboard-most-cooked-name", text: file.basename });
 		row.createSpan({ cls: "rb-dashboard-most-cooked-count", text: `${cookedCount}×` });
-		row.addEventListener("click", () => actions.openRecipe(file.path));
+		row.addEventListener("click", () => actions.openRecipe(file));
 	}
 }
 

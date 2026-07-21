@@ -4,7 +4,6 @@
  * navigating to the view that already surfaces them as a button — genuine
  * "jump there" or "act on whatever I'm currently looking at" shortcuts.
  */
-import { Notice } from "obsidian";
 import RecipeBoxPlugin from "../main";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
@@ -149,9 +148,21 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 		},
 	});
 
-	plugin.addCommand({
-		id: "show-cooking-stats",
-		name: "Show cooking stats",
-		callback: () => new Notice("Cooking stats are not yet available."),
-	});
+
+	if (plugin.settings.enableDashboard) {
+
+		plugin.addCommand({
+			id: "open-dashboard",
+			name: "Open recipe dashboard",
+			callback: async () => {
+				await plugin.activateDashboardView();
+			},
+		});
+	}
+
+	// plugin.addCommand({
+	// 	id: "show-cooking-stats",
+	// 	name: "Show cooking stats",
+	// 	callback: () => new Notice("Cooking stats are not yet available."),
+	// });
 }

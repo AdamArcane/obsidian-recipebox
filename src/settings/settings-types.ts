@@ -58,6 +58,7 @@ export interface RecipeBoxSettings {
 	ingredientsHeading: string;
 	instructionsHeading: string;
 	notesHeading: string;
+	enableDashboard: boolean;
 
 	// Grocery list display
 	groupingMode: GroupingMode;

@@ -261,11 +261,9 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				openGroceryView: () => { void plugin.activateGroceryView(); },
 				openMealPlanView: () => { void plugin.activateMealPlanView(); },
 				openGalleryView: () => { void plugin.activateGalleryView(); },
-				openRecipe: (path) => {
-					const file = plugin.app.vault.getFileByPath(path);
-					if (!file) return;
+				openRecipe: (file: TFile) => {
 					const leaf2 = plugin.app.workspace.getLeaf(false);
-					void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: path }, active: true });
+					void leaf2.setViewState({ type: RECIPE_VIEW_TYPE, state: { file: file.path }, active: true });
 				},
 				searchRecipes: (query) => { void plugin.activateGalleryView(undefined, undefined, query); },
 				openImportModal: () => {

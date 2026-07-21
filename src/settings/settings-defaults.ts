@@ -42,6 +42,8 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	ingredientsHeading: "Ingredients",
 	instructionsHeading: "Instructions",
 	notesHeading: "Notes",
+	enableDashboard: true,
+
 
 	groupingMode: "category",
 	categorySource: "dictionary",

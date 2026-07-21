@@ -123,7 +123,7 @@ export class DashboardView extends ItemView {
 			this.renderEmptyVaultCard(grid);
 		} else {
 			const cardActions: GalleryCardActions = {
-				openRecipe: (f) => this.deps.openRecipe(f.path),
+				openRecipe: (f) => this.deps.openRecipe(f),
 				openAddToMealPlanModal: (f) => this.deps.openAddToMealPlanModal(f),
 				openAddToGroceryModal: (f) => this.deps.openAddToGroceryModal(f),
 				openShareModal: (f) => this.deps.openShareModal(f),

@@ -115,7 +115,19 @@ export function renderSectionLibrary(
 				updateWarning();
 			})
 		);
-
+	
+	
+	new Setting(container)
+		.setName("Enable dashboard")
+		.setDesc("Show the recipe box dashboard ribbon icon. If disabled, individual ribbon icons will not be shown.")
+		.addToggle((t) =>
+			t.setValue(settings.enableDashboard).onChange(async (v) => {
+				settings.enableDashboard = v;
+				await save();
+				rerender();
+			})
+		);
+		
 	new Setting(container)
 		.setName("Open gallery when clicking a recipe folder")
 		.setDesc("Clicking a recipe folder in the file explorer opens the recipe gallery filtered to that folder, instead of expanding it.")

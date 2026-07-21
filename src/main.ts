@@ -28,6 +28,8 @@ export default class RecipeBoxPlugin extends Plugin {
 	manager!: GroceryManager;
 	discoveryCache!: DiscoveryCache;
 	private folderClickGallery!: FolderClickGalleryController;
+	private dashboardRibbonIcon!: HTMLElement;
+	private individualRibbonIcons: HTMLElement[] = [];
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -47,7 +49,7 @@ export default class RecipeBoxPlugin extends Plugin {
 
 		this.addSettingTab(new RecipeBoxSettingsTab(this.app, this));
 
-		this.addRibbonIcon("chef-hat", "Recipe box", () => this.activateDashboardView());
+		this.setUpRibbonIcons();
 
 		registerAutoOpen(
 			this,
@@ -118,6 +120,30 @@ export default class RecipeBoxPlugin extends Plugin {
 		// Every settings change (including the folder-click toggles) flows
 		// through here, so this is what makes toggling take effect immediately.
 		this.folderClickGallery?.sync();
+		this.refreshRibbonIcons();
+	}
+
+	// Creates both ribbon icon sets once, up front. Obsidian's ribbon doesn't
+	// reliably drop an icon added via addRibbonIcon() when you later call
+	// remove() on the returned element -- it appears to keep its own record of
+	// registered ribbon actions and can redraw the "removed" one back in, so
+	// toggling by add/remove left stale icons behind. Building both sets once
+	// and toggling visibility with the rb-hidden CSS class sidesteps that
+	// entirely: the DOM nodes never leave the ribbon, so there's nothing for
+	// Obsidian to resurrect.
+	private setUpRibbonIcons(): void {
+		this.dashboardRibbonIcon = this.addRibbonIcon("tool-case", "Recipe box dashboard", () => this.activateDashboardView());
+		this.individualRibbonIcons = [
+			this.addRibbonIcon("shopping-cart", "Open grocery list", () => this.activateGroceryView()),
+			this.addRibbonIcon("calendar", "Open meal plan", () => this.activateMealPlanView()),
+			this.addRibbonIcon("layout-list", "Browse recipes", () => this.activateGalleryView()),
+		];
+		this.refreshRibbonIcons();
+	}
+
+	private refreshRibbonIcons(): void {
+		this.dashboardRibbonIcon.toggleClass("rb-hidden", !this.settings.enableDashboard);
+		this.individualRibbonIcons.forEach((icon) => icon.toggleClass("rb-hidden", this.settings.enableDashboard));
 	}
 
 	// ── public helpers called by lifecycle modules and commands ───────────────
