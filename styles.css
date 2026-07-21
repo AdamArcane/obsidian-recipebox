@@ -5458,11 +5458,13 @@ input[type='search'].rb-gallery-search {
    plain solid underline, so it doesn't collide visually with a folder-note
    plugin the person might also have installed. */
 .rb-folder-gallery-link {
-  text-decoration: underline dotted;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
 }
 
 .rb-folder-gallery-link:hover {
-  text-decoration: underline solid;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
   cursor: pointer;
 }
 
