@@ -18,7 +18,7 @@ export interface NotebookNavigatorNavItem {
 
 // Opaque handle from NN's API, only ever passed back into nn.off(); not
 // meant to have shape of its own.
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- opaque handle, intentionally has no members of its own
 export interface NotebookNavigatorEventRef {
 }
 
