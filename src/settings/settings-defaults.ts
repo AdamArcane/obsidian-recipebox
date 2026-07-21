@@ -185,6 +185,8 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		search: "",
 	},
 
+	dashboardActivityRangeWeeks: 8,
+
 	shareServerUrl: "https://share.arcanerecipes.com",
 	shareDataProperty: "recipe-share",
 	userGuid: "",

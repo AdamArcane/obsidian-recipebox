@@ -18,7 +18,7 @@ export interface DashboardViewDeps {
 	openGroceryView: () => void;
 	openMealPlanView: () => void;
 	openGalleryView: () => void;
-	openRecipe: (path: string) => void;
+	openRecipe: (file: TFile) => void;
 	searchRecipes: (query: string) => void;
 
 	// actions surfaced in the quick-actions row
@@ -33,4 +33,7 @@ export interface DashboardViewDeps {
 	openAddToMealPlanModal: (file: TFile) => void;
 	openAddToGroceryModal: (file: TFile) => void;
 	openShareModal: (file: TFile) => void;
+
+	// shared-recipes preview
+	unshareRecipe: (file: TFile) => Promise<void>;
 }

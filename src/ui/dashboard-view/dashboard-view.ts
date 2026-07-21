@@ -6,6 +6,7 @@
  * math instead of nested flexbox rows.
  */
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { RecipeBoxSettings, DashboardActivityRangeWeeks } from "../../settings/settings-types";
 import { DashboardViewDeps } from "./dashboard-view-deps";
 import { computeDashboardStats, computeCookingActivity } from "./dashboard-stats";
 import { renderStatsRow } from "./stats-row";
@@ -14,6 +15,7 @@ import { renderGroceryPreview } from "./grocery-preview";
 import { renderNewRecipesStrip } from "./new-recipes-strip";
 import { renderQuickActions } from "./quick-actions";
 import { renderGreeting } from "./greeting";
+import { renderSharedRecipesPreview } from "./shared-recipes-preview";
 import { GalleryCardActions } from "../gallery-view/gallery-card";
 
 export const DASHBOARD_VIEW_TYPE = "recipe-box-dashboard-view";
@@ -46,12 +48,23 @@ export class DashboardView extends ItemView {
 		this.unsubscribe = null;
 	}
 
-	private renderMealPlanCard(grid: HTMLElement): void {
+	// Range changes are a dashboard-local settings edit, same posture as
+	// GalleryView.onStateChange -- mutate, persist, then re-render immediately
+	// rather than waiting on the "change"/metadataCache subscription, since
+	// neither of those fires for a settings-only edit.
+	private onActivityRangeChange = (weeks: DashboardActivityRangeWeeks): void => {
+		const settings = this.deps.getSettings();
+		settings.dashboardActivityRangeWeeks = weeks;
+		void this.deps.saveSettings();
+		this.render();
+	};
+
+	private renderMealPlanCard(grid: HTMLElement, settings: RecipeBoxSettings): void {
 		const card = grid.createDiv({ cls: "rb-dashboard-card rb-dashboard-span-12" });
 		card.createDiv({ cls: "rb-dashboard-card-label", text: "Meal plan this week" });
 
 		const mealPlan = this.deps.getMealPlan();
-		renderMealPlanMiniGrid(card, mealPlan, {
+		renderMealPlanMiniGrid(card, this.app, mealPlan, settings, {
 			openRecipe: this.deps.openRecipe,
 			openMealPlanView: this.deps.openMealPlanView,
 			openSuggestMealModal: this.deps.openSuggestMealModal,
@@ -64,7 +77,7 @@ export class DashboardView extends ItemView {
 			planBtn.addEventListener("click", () => this.deps.openSuggestMealModal());
 		}
 
-		const footer = card.createEl("a", { cls: "rb-dashboard-footer-link", text: "View full meal plan →" });
+		const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: "View/edit meal plan →" });
 		footer.addEventListener("click", () => this.deps.openMealPlanView());
 	}
 
@@ -96,13 +109,15 @@ export class DashboardView extends ItemView {
 		});
 
 		const stats = computeDashboardStats(this.app, files, settings);
-		const activity = computeCookingActivity(this.app, files, settings);
+		const activity = computeCookingActivity(this.app, files, settings, settings.dashboardActivityRangeWeeks);
 		renderStatsRow(grid, stats, activity, settings, {
 			openGalleryView: this.deps.openGalleryView,
 			openRecipe: this.deps.openRecipe,
+			activityRangeWeeks: settings.dashboardActivityRangeWeeks,
+			onActivityRangeChange: this.onActivityRangeChange,
 		});
 
-		this.renderMealPlanCard(grid);
+		this.renderMealPlanCard(grid, settings);
 
 		if (files.length === 0) {
 			this.renderEmptyVaultCard(grid);
@@ -129,6 +144,9 @@ export class DashboardView extends ItemView {
 			openGroceryView: this.deps.openGroceryView,
 		});
 
-	
+		renderSharedRecipesPreview(grid, this.app, files, settings, {
+			openRecipe: (f) => this.deps.openRecipe(f),
+			unshareRecipe: (f) => this.deps.unshareRecipe(f),
+		});
 	}
 }

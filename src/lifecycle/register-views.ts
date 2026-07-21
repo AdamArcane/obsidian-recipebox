@@ -20,6 +20,7 @@ import { ExportModal } from "../ui/modals/export-modal";
 import { ShareRecipeModal } from "../ui/modals/share-recipe-modal";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
+import { unshareRecipe } from "../sharing/unshare-recipe";
 import { resolveNotePath } from "../utils/vault-notes";
 
 // Opens the "update grocery list" modal for a recipe and wires its confirm
@@ -308,6 +309,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				openShareModal: (file: TFile) => {
 					new ShareRecipeModal(plugin.app, file, plugin.settings, () => plugin.saveSettings()).open();
 				},
+				unshareRecipe: (file: TFile) => unshareRecipe(plugin.app, file, plugin.settings, () => plugin.saveSettings()),
 			}),
 	);
 

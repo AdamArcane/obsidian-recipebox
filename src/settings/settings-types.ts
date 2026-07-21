@@ -28,6 +28,7 @@ export type GallerySortField =
 	| "rating"
 	| "times-cooked";
 export type GallerySortDirection = "asc" | "desc";
+export type DashboardActivityRangeWeeks = 2 | 4 | 8 | 12;
 
 // All gallery filter/sort state travels together as one persisted unit (see
 // "settings that always travel together get one toggle" convention) rather
@@ -152,6 +153,12 @@ export interface RecipeBoxSettings {
 
 	// Gallery view
 	gallerySavedState: GallerySavedState;
+
+	// Dashboard view -- changed only via the dashboard's own range dropdown
+	// (see dashboard-spec.md section 13.2), not a settings-tab field, so it
+	// doesn't reopen the "no new settings for v1" call the way a user-facing
+	// settings-tab control would.
+	dashboardActivityRangeWeeks: DashboardActivityRangeWeeks;
 
 	// Recipe sharing -- shareServerUrl is the base URL of the server used for sharing recipes.
 	shareServerUrl: string;

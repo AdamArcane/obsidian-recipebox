@@ -50,6 +50,6 @@ export function renderNewRecipesStrip(
 		);
 	}
 
-	const footer = card.createEl("a", { cls: "rb-dashboard-footer-link", text: "View full gallery →" });
+	const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: "Browse all recipes →" });
 	footer.addEventListener("click", () => openGalleryView());
 }

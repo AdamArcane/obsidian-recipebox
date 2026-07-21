@@ -6,7 +6,7 @@
  * section 11.2).
  */
 import { App, TFile } from "obsidian";
-import { RecipeBoxSettings } from "../../settings/settings-types";
+import { RecipeBoxSettings, DashboardActivityRangeWeeks } from "../../settings/settings-types";
 import { readRecipeMeta, formatLocalISO } from "../../parser/recipe-meta-read";
 import { readCookHistory } from "../../recipe-history/cook-history";
 
@@ -26,9 +26,26 @@ export interface DashboardStats {
 	mostCooked: MostCookedEntry | null;
 }
 
-export interface WeeklyActivity {
-	weekStart: string; // ISO date, Monday of that week
+export type ActivityGranularity = "day" | "week";
+
+export interface CookingActivityBucket {
+	bucketStart: string; // ISO date -- the day itself (daily) or its Monday (weekly)
 	count: number;
+	entries: { file: TFile; date: string }[]; // for the per-bucket detail popover
+}
+
+export interface CookingActivityResult {
+	granularity: ActivityGranularity;
+	buckets: CookingActivityBucket[];
+}
+
+// "Finer granularity" (daily bars) and "go back further" (up to 12 weeks) pull
+// in opposite directions for legibility -- 12 weeks of daily bars would be 84
+// bars in a chart meant to be readable at a glance. Granularity follows the
+// selected range rather than being a separate control (see dashboard-spec.md
+// section 13.2's table).
+export function granularityForRange(rangeWeeks: DashboardActivityRangeWeeks): ActivityGranularity {
+	return rangeWeeks <= 4 ? "day" : "week";
 }
 
 export function computeDashboardStats(
@@ -66,30 +83,48 @@ export function computeCookingActivity(
 	app: App,
 	files: TFile[],
 	settings: RecipeBoxSettings,
-	weeks = 8,
-): WeeklyActivity[] {
-	const thisWeekMonday = mondayOf(new Date());
-	const buckets = new Map<string, number>();
-	for (let i = weeks - 1; i >= 0; i--) {
-		const d = new Date(thisWeekMonday);
-		d.setDate(d.getDate() - i * 7);
-		buckets.set(formatLocalISO(d), 0);
+	rangeWeeks: DashboardActivityRangeWeeks,
+): CookingActivityResult {
+	const granularity = granularityForRange(rangeWeeks);
+	const today = new Date();
+	const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+	const buckets = new Map<string, CookingActivityBucket>();
+	if (granularity === "day") {
+		const totalDays = rangeWeeks * 7;
+		for (let i = totalDays - 1; i >= 0; i--) {
+			const d = new Date(todayMidnight);
+			d.setDate(d.getDate() - i);
+			const key = formatLocalISO(d);
+			buckets.set(key, { bucketStart: key, count: 0, entries: [] });
+		}
+	} else {
+		const thisWeekMonday = mondayOf(todayMidnight);
+		for (let i = rangeWeeks - 1; i >= 0; i--) {
+			const d = new Date(thisWeekMonday);
+			d.setDate(d.getDate() - i * 7);
+			const key = formatLocalISO(d);
+			buckets.set(key, { bucketStart: key, count: 0, entries: [] });
+		}
 	}
 
 	// Cook history is opt-in; skip the per-file read entirely when it's off
 	// rather than looping to collect nothing (see dashboard-spec.md section 11.2).
-	if (!settings.cookHistoryEnabled) return [...buckets.entries()].map(([weekStart, count]) => ({ weekStart, count }));
-
-	const earliestWeek = [...buckets.keys()][0];
-	for (const file of files) {
-		for (const entry of readCookHistory(app, file, settings)) {
-			const entryDate = new Date(entry.date + "T00:00:00");
-			if (isNaN(entryDate.getTime())) continue;
-			const weekKey = formatLocalISO(mondayOf(entryDate));
-			if (weekKey < earliestWeek) continue;
-			if (buckets.has(weekKey)) buckets.set(weekKey, (buckets.get(weekKey) ?? 0) + 1);
+	if (settings.cookHistoryEnabled) {
+		const earliestKey = [...buckets.keys()][0];
+		for (const file of files) {
+			for (const entry of readCookHistory(app, file, settings)) {
+				const entryDate = new Date(entry.date + "T00:00:00");
+				if (isNaN(entryDate.getTime())) continue;
+				const key = granularity === "day" ? entry.date : formatLocalISO(mondayOf(entryDate));
+				if (key < earliestKey) continue;
+				const bucket = buckets.get(key);
+				if (!bucket) continue;
+				bucket.count += 1;
+				bucket.entries.push({ file, date: entry.date });
+			}
 		}
 	}
 
-	return [...buckets.entries()].map(([weekStart, count]) => ({ weekStart, count }));
+	return { granularity, buckets: [...buckets.values()] };
 }

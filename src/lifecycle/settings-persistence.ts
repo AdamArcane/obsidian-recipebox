@@ -18,6 +18,7 @@ import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
 import {
 	CategorySource,
+	DashboardActivityRangeWeeks,
 	DesktopRecipeLayout,
 	GallerySavedState,
 	GallerySortDirection,
@@ -320,6 +321,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
 
 		gallerySavedState: validateGallerySavedState(r.gallerySavedState, d.gallerySavedState),
+
+		dashboardActivityRangeWeeks: oneOf<DashboardActivityRangeWeeks>(r.dashboardActivityRangeWeeks, [2, 4, 8, 12], d.dashboardActivityRangeWeeks),
 
 		shareServerUrl: str(r.shareServerUrl, d.shareServerUrl),
 		shareDataProperty: str(r.shareDataProperty, d.shareDataProperty),
