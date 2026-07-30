@@ -50,9 +50,17 @@ export function extractTrailingTags(text: string): { cleaned: string; tags: stri
 	return { cleaned: text.slice(0, text.length - match[0].length).trim(), tags };
 }
 
+// Paired single-asterisk emphasis, e.g. the *600g* of a RecipeMD amount, which
+// otherwise reached the quantity parser with its markers still attached.
+// Lookarounds keep multiplication like "2*3 cups" intact.
+const SINGLE_ASTERISK_EMPHASIS = /(?<![\w*])\*(?!\s)([^*]+?)(?<!\s)\*(?!\w)/g;
+
 export function stripMarkdownEmphasis(text: string): string {
 	return text
+		// bold/underline first, so neither leaves a stray marker to mispair
 		.replace(/\*{2,3}|_{2,}/g, "")
+		// single underscores are left alone; they appear inside identifiers
+		.replace(SINGLE_ASTERISK_EMPHASIS, "$1")
 		.replace(/\s{2,}/g, " ")
 		.trim();
 }
