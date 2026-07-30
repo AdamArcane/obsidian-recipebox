@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildInfoTokens } from "../../src/suggester/result-info-line";
 import { DEFAULT_SETTINGS } from "../../src/settings/settings-defaults";
+import { localDateISO } from "../../src/utils/date";
 import type { SuggesterMode } from "../../src/suggester/strategy-types";
 
 function mode(rules: SuggesterMode["rules"]): SuggesterMode {
@@ -13,17 +14,24 @@ describe("buildInfoTokens", () => {
 		expect(tokens).toContain("Never made");
 	});
 
+	// lastMade holds a local calendar date, the same way mark-cooked writes it, so
+	// these build their fixtures with localDateISO. toISOString would resolve to the
+	// UTC day and drift by one either side of midnight.
 	it("renders 'Made today'/'Made yesterday' for recent lastMade dates", () => {
-		const today = new Date().toISOString().slice(0, 10);
-		const tokens = buildInfoTokens({ lastMade: today }, mode([{ field: "lastMade", direction: "favor-low" }]), DEFAULT_SETTINGS);
+		const tokens = buildInfoTokens({ lastMade: localDateISO() }, mode([{ field: "lastMade", direction: "favor-low" }]), DEFAULT_SETTINGS);
 		expect(tokens).toContain("Made today");
+
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		const older = buildInfoTokens({ lastMade: localDateISO(yesterday) }, mode([{ field: "lastMade", direction: "favor-low" }]), DEFAULT_SETTINGS);
+		expect(older).toContain("Made yesterday");
 	});
 
 	it("renders 'Last made Nd ago' for an older date", () => {
 		const past = new Date();
 		past.setDate(past.getDate() - 10);
 		const tokens = buildInfoTokens(
-			{ lastMade: past.toISOString().slice(0, 10) },
+			{ lastMade: localDateISO(past) },
 			mode([{ field: "lastMade", direction: "favor-low" }]),
 			DEFAULT_SETTINGS,
 		);
