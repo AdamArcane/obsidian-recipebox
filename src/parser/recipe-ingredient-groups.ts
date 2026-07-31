@@ -4,6 +4,7 @@
  */
 import { IngredientGroup } from "../types";
 import { findHeadingIndex } from "./recipe-heading-search";
+import { findRecipeMdIngredients } from "./recipemd-sections";
 
 export interface IngredientSplit {
 	before: string;
@@ -19,6 +20,20 @@ export function splitBodyAroundIngredients(body: string, headingName: string): I
 	const { index: headingIdx, level: headingLevel } = findHeadingIndex(lines, headingName);
 
 	if (headingIdx < 0) {
+		// RecipeMD keeps its ingredients between two thematic breaks rather than
+		// under a heading; without this the whole note counted as "before" and the
+		// recipe view showed no ingredients at all.
+		const recipeMd = findRecipeMdIngredients(lines);
+		if (recipeMd) {
+			const recipeMdLines = lines.slice(recipeMd.start, recipeMd.end).filter((l) => LIST_ITEM_RE.test(l));
+			if (recipeMdLines.length > 0) {
+				return {
+					before: lines.slice(0, recipeMd.start).join("\n"),
+					groups: [{ heading: null, lines: recipeMdLines }],
+					after: lines.slice(recipeMd.end).join("\n"),
+				};
+			}
+		}
 		return { before: body, groups: [], after: "" };
 	}
 
