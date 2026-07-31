@@ -40,3 +40,18 @@ describe("parseLeadingQuantity", () => {
 		expect(result.quantity).not.toBe(Infinity);
 	});
 });
+
+describe("decimal notation", () => {
+	it("accepts a leading decimal point", () => {
+		expect(parseLeadingQuantity(".5 teaspoon salt")).toEqual({ quantity: 0.5, rest: "teaspoon salt" });
+	});
+
+	it("accepts a comma as the decimal divider", () => {
+		expect(parseLeadingQuantity("1,5 kg potatoes")).toEqual({ quantity: 1.5, rest: "kg potatoes" });
+		expect(parseLeadingQuantity(",5 kg potatoes")).toEqual({ quantity: 0.5, rest: "kg potatoes" });
+	});
+
+	it("leaves a comma that follows the amount as text", () => {
+		expect(parseLeadingQuantity("2, peeled onions")).toEqual({ quantity: 2, rest: ", peeled onions" });
+	});
+});

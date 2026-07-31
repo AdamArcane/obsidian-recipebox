@@ -78,10 +78,10 @@ export async function buildRecipeExportData(
 		imageValue: resolvedImageValue ?? undefined,
 	});
 
-	const { before: introContent, groups: ingredientGroups, after: afterIngredients } =
+	const { before: introContent, groups: ingredientGroups, after: afterIngredients, isRecipeMd } =
 		splitBodyAroundIngredients(body, settings.ingredientsHeading);
 	const { groups: instructionGroups, after: afterInstructions } =
-		splitBodyAroundInstructions(afterIngredients, settings.instructionsHeading);
+		splitBodyAroundInstructions(afterIngredients, settings.instructionsHeading, isRecipeMd);
 
 	const trailingSections = options.includeCookHistoryAndSections
 		? splitTrailingSections(afterInstructions, settings.cookHistoryHeading)

@@ -20,6 +20,11 @@ export function stripListMarkers(line: string): string {
 // Also consumes flanking * or _ so e.g. *(text)* and (text)* don't leave stray chars.
 const NOTE_RE = /[*_]*\(([^()]*(?:\([^()]*\)[^()]*)*)\)[*_]*/g;
 
+// A markdown link is masked before notes are extracted, because its destination
+// is not an aside: reading "(sauce.md)" as a note left a dangling "[name]", and
+// the orphaned-paren sweep below would otherwise glue the bare destination on.
+const INLINE_LINK_RE = /\[[^\]]*\]\([^)]*\)/g;
+
 // Strips one layer of surrounding parens when the entire content is itself wrapped: (text) → text
 function unwrapNote(inner: string): string {
 	const t = inner.trim();
@@ -30,15 +35,29 @@ function unwrapNote(inner: string): string {
 // Must run after stripMarkdownEmphasis so *(text)* has already become (text).
 export function extractInlineNotes(text: string): { cleaned: string; note: string | null } {
 	const notes: string[] = [];
-	const cleaned = text
-		.replace(NOTE_RE, (_, inner: string) => {
-			const unwrapped = unwrapNote(inner);
-			if (unwrapped) notes.push(unwrapped);
-			return "";
-		})
-		.replace(/[()]/g, "")  // strip any remaining orphaned parens
-		.replace(/\s{2,}/g, " ")
-		.trim();
+
+	const scrub = (segment: string): string =>
+		segment
+			.replace(NOTE_RE, (_, inner: string) => {
+				const unwrapped = unwrapNote(inner);
+				if (unwrapped) notes.push(unwrapped);
+				return "";
+			})
+			.replace(/[()]/g, ""); // strip any remaining orphaned parens
+
+	// Links are copied through untouched. Their destination is not an aside, and
+	// scrubbing it left a dangling "[name]" with the bare destination glued on.
+	const parts: string[] = [];
+	let last = 0;
+	INLINE_LINK_RE.lastIndex = 0;
+	let match: RegExpExecArray | null;
+	while ((match = INLINE_LINK_RE.exec(text)) !== null) {
+		parts.push(scrub(text.slice(last, match.index)), match[0]);
+		last = match.index + match[0].length;
+	}
+	parts.push(scrub(text.slice(last)));
+
+	const cleaned = parts.join("").replace(/\s{2,}/g, " ").trim();
 	return { cleaned, note: notes.length > 0 ? notes.join(", ") : null };
 }
 
@@ -77,8 +96,21 @@ export function normaliseName(name: string): string {
 		.trim();
 }
 
+/**
+ * RecipeMD: when a name is only an inline link, the link text is the ingredient
+ * name and the destination points at a sub-recipe. Unwrapped here rather than in
+ * normaliseName so the rendered name keeps its link.
+ */
+function unwrapLinks(name: string): string {
+	return name
+		.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2")
+		.replace(/\[\[([^\]]+)\]\]/g, "$1")
+		.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+		.trim();
+}
+
 export function ingredientKey(name: string, unit: string): string {
-	return `${normaliseName(name)}|${unit.toLowerCase()}`;
+	return `${normaliseName(unwrapLinks(name))}|${unit.toLowerCase()}`;
 }
 
 export function hasIgnoreTag(tags: string[]): boolean {

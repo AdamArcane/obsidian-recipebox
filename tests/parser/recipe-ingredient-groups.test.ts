@@ -4,7 +4,7 @@ import { splitBodyAroundIngredients } from "../../src/parser/recipe-ingredient-g
 describe("splitBodyAroundIngredients", () => {
 	it("returns everything as 'before' when the heading is absent", () => {
 		const result = splitBodyAroundIngredients("Just some text.", "Ingredients");
-		expect(result).toEqual({ before: "Just some text.", groups: [], after: "" });
+		expect(result).toEqual({ before: "Just some text.", groups: [], after: "", isRecipeMd: false });
 	});
 
 	it("collects a flat list of ingredient lines with no sub-headings", () => {

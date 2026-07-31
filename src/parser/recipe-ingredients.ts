@@ -8,6 +8,7 @@ import { RecipeBoxSettings } from "../settings/settings-types";
 import { parseIngredientLine } from "./ingredient-parse";
 import { hasIgnoreTag } from "./ingredient-clean";
 import { findHeadingIndex } from "./recipe-heading-search";
+import { findRecipeMdIngredients } from "./recipemd-sections";
 import { stripFrontmatter } from "./recipe-frontmatter-strip";
 import { readRecipeMultiplier } from "./recipe-multiplier";
 
@@ -18,6 +19,13 @@ export function extractIngredientLines(body: string, headingName: string): strin
 	const { index, level } = findHeadingIndex(lines, headingName);
 
 	if (index < 0) {
+		// Without a heading, RecipeMD's ingredient block is the only reliable
+		// boundary. The old catch-all below also matched numbered list items, so
+		// instruction steps were returned as ingredients.
+		const recipeMd = findRecipeMdIngredients(lines);
+		if (recipeMd) {
+			return lines.slice(recipeMd.start, recipeMd.end).filter(l => LIST_ITEM_RE.test(l));
+		}
 		return lines.filter(l => LIST_ITEM_RE.test(l));
 	}
 
