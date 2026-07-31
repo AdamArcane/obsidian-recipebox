@@ -303,8 +303,8 @@ export class RecipeView extends TextFileView {
 		// same as one that was never set.
 		const displayImage = usableImageValue(this.app, resolvedImage) ?? defaultRecipeImageValue(settings);
 
-		const { before, groups: ingredientGroups, after } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
-		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading);
+		const { before, groups: ingredientGroups, after, isRecipeMd } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
+		const instructionSplit = splitBodyAroundInstructions(after, settings.instructionsHeading, isRecipeMd);
 		const trailingSections = splitTrailingSections(instructionSplit.after, settings.cookHistoryHeading);
 		const shareStatus = getShareStatus(getShareData(cache, settings));
 

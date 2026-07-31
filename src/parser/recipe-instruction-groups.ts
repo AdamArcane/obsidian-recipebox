@@ -50,11 +50,21 @@ function buildStep(lines: string[]): string {
 	return lines.join("\n").trim();
 }
 
-export function splitBodyAroundInstructions(body: string, headingName: string): InstructionSplit {
+export function splitBodyAroundInstructions(body: string, headingName: string, isRecipeMd = false): InstructionSplit {
 	const lines = body.split("\n");
 	const { index: headingIdx, level: headingLevel } = findHeadingIndex(lines, headingName);
 
 	if (headingIdx < 0) {
+		// RecipeMD marks the method with a thematic break rather than a heading, so
+		// everything handed to us is the method. Only trusted when the caller says
+		// the note is RecipeMD: in a heading-based note this text is whatever
+		// follows the ingredients, and a bulleted "Notes" section is not a method.
+		if (isRecipeMd) {
+			const steps = parseSteps(lines);
+			if (steps.length > 0) {
+				return { before: "", groups: [{ heading: null, headingLevel: 0, steps }], after: "" };
+			}
+		}
 		return { before: body, groups: [], after: "" };
 	}
 
