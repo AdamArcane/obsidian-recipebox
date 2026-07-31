@@ -5,17 +5,17 @@ import { splitBodyAroundIngredients } from "../../src/parser/recipe-ingredient-g
 import { splitBodyAroundInstructions } from "../../src/parser/recipe-instruction-groups";
 
 const RECIPE_MD = [
-	"# Bolonhesa",
+	"# Bolognese",
 	"",
 	"---",
 	"",
-	"- *400 g* carne picada",
-	"- *1* cebola",
+	"- *400 g* minced beef",
+	"- *1* onion",
 	"",
 	"---",
 	"",
-	"1. Refogar a cebola.",
-	"2. Juntar a carne.",
+	"1. Fry the onion.",
+	"2. Add the beef.",
 ].join("\n");
 
 const WITH_HEADING = [
@@ -48,8 +48,8 @@ describe("findRecipeMdIngredients", () => {
 describe("extractIngredientLines without a heading", () => {
 	it("returns only the RecipeMD ingredient block, not the instructions", () => {
 		expect(extractIngredientLines(RECIPE_MD, "Ingredients")).toEqual([
-			"- *400 g* carne picada",
-			"- *1* cebola",
+			"- *400 g* minced beef",
+			"- *1* onion",
 		]);
 	});
 
@@ -66,10 +66,10 @@ describe("splitBodyAroundIngredients without a heading", () => {
 	it("yields one group from the RecipeMD block", () => {
 		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
 		expect(split.groups).toEqual([
-			{ heading: null, lines: ["- *400 g* carne picada", "- *1* cebola"] },
+			{ heading: null, lines: ["- *400 g* minced beef", "- *1* onion"] },
 		]);
-		expect(split.before).toContain("# Bolonhesa");
-		expect(split.after).toContain("1. Refogar a cebola.");
+		expect(split.before).toContain("# Bolognese");
+		expect(split.after).toContain("1. Fry the onion.");
 	});
 
 	it("returns no groups when the note is neither RecipeMD nor headed", () => {
@@ -115,7 +115,7 @@ describe("RecipeMD instructions", () => {
 		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
 		expect(split.isRecipeMd).toBe(true);
 		expect(split.after.trim().startsWith("---")).toBe(false);
-		expect(split.after).toContain("1. Refogar a cebola.");
+		expect(split.after).toContain("1. Fry the onion.");
 	});
 
 	it("does not flag a heading-based note", () => {
@@ -126,7 +126,7 @@ describe("RecipeMD instructions", () => {
 		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
 		const instructions = splitBodyAroundInstructions(split.after, "Instructions", split.isRecipeMd);
 		expect(instructions.groups).toEqual([
-			{ heading: null, headingLevel: 0, steps: ["Refogar a cebola.", "Juntar a carne."] },
+			{ heading: null, headingLevel: 0, steps: ["Fry the onion.", "Add the beef."] },
 		]);
 	});
 
