@@ -79,8 +79,19 @@ describe("stripMarkdownEmphasis", () => {
 		expect(stripMarkdownEmphasis("**flour** and __sugar__")).toBe("flour and sugar");
 	});
 
+	it("strips paired single-asterisk emphasis around a RecipeMD amount", () => {
+		expect(stripMarkdownEmphasis("*600g* flour")).toBe("600g flour");
+		expect(stripMarkdownEmphasis("*1 clove* garlic")).toBe("1 clove garlic");
+		expect(stripMarkdownEmphasis("*½* cup sugar")).toBe("½ cup sugar");
+	});
+
 	it("leaves single asterisks/underscores alone", () => {
 		expect(stripMarkdownEmphasis("2*3 cups")).toBe("2*3 cups");
+	});
+
+	it("leaves an unpaired asterisk alone", () => {
+		expect(stripMarkdownEmphasis("*flour")).toBe("*flour");
+		expect(stripMarkdownEmphasis("flour *")).toBe("flour *");
 	});
 });
 
