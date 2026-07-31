@@ -10,6 +10,12 @@ export interface IngredientSplit {
 	before: string;
 	groups: IngredientGroup[];
 	after: string;
+	/**
+	 * True when the ingredients came from a RecipeMD block rather than a heading.
+	 * The instructions splitter needs to know, because a RecipeMD note has no
+	 * instructions heading either and everything after the block is the method.
+	 */
+	isRecipeMd: boolean;
 }
 
 const LIST_ITEM_RE = /^[-*+]\s|^\d+\.\s/;
@@ -51,11 +57,14 @@ export function splitBodyAroundIngredients(body: string, headingName: string): I
 				return {
 					before: lines.slice(0, recipeMd.start).join("\n"),
 					groups,
-					after: lines.slice(recipeMd.end).join("\n"),
+					// end is the closing break itself; handing it on rendered a stray
+					// horizontal rule above the instructions.
+					after: lines.slice(recipeMd.end + 1).join("\n"),
+					isRecipeMd: true,
 				};
 			}
 		}
-		return { before: body, groups: [], after: "" };
+		return { before: body, groups: [], after: "", isRecipeMd: false };
 	}
 
 	const before = lines.slice(0, headingIdx).join("\n");
@@ -92,5 +101,5 @@ export function splitBodyAroundIngredients(body: string, headingName: string): I
 	}
 
 	const after = lines.slice(afterStart).join("\n");
-	return { before, groups, after };
+	return { before, groups, after, isRecipeMd: false };
 }

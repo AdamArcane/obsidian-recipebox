@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { findRecipeMdIngredients } from "../../src/parser/recipemd-sections";
 import { extractIngredientLines } from "../../src/parser/recipe-ingredients";
 import { splitBodyAroundIngredients } from "../../src/parser/recipe-ingredient-groups";
+import { splitBodyAroundInstructions } from "../../src/parser/recipe-instruction-groups";
 
 const RECIPE_MD = [
 	"# Bolonhesa",
@@ -106,5 +107,36 @@ describe("RecipeMD spec conformance", () => {
 
 	it("still requires at least one ingredient after a lone break", () => {
 		expect(findRecipeMdIngredients(["# T", "---", "", ""])).toBeNull();
+	});
+});
+
+describe("RecipeMD instructions", () => {
+	it("flags a RecipeMD split and hands on the method without the closing break", () => {
+		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
+		expect(split.isRecipeMd).toBe(true);
+		expect(split.after.trim().startsWith("---")).toBe(false);
+		expect(split.after).toContain("1. Refogar a cebola.");
+	});
+
+	it("does not flag a heading-based note", () => {
+		expect(splitBodyAroundIngredients(WITH_HEADING, "Ingredients").isRecipeMd).toBe(false);
+	});
+
+	it("treats everything after the block as one unnamed instruction group", () => {
+		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
+		const instructions = splitBodyAroundInstructions(split.after, "Instructions", split.isRecipeMd);
+		expect(instructions.groups).toEqual([
+			{ heading: null, headingLevel: 0, steps: ["Refogar a cebola.", "Juntar a carne."] },
+		]);
+	});
+
+	it("leaves the same text alone when the note is not RecipeMD", () => {
+		const split = splitBodyAroundIngredients(RECIPE_MD, "Ingredients");
+		expect(splitBodyAroundInstructions(split.after, "Instructions", false).groups).toEqual([]);
+	});
+
+	it("yields no instructions for a recipe that has none", () => {
+		const split = splitBodyAroundIngredients(NO_INSTRUCTIONS, "Ingredients");
+		expect(splitBodyAroundInstructions(split.after, "Instructions", split.isRecipeMd).groups).toEqual([]);
 	});
 });
