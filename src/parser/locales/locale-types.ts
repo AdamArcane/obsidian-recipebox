@@ -12,4 +12,8 @@ export interface RecipeLocale {
 	 * Variety words belong nowhere near this list: a red onion is not an onion.
 	 */
 	qualifiers?: string[];
+	/** Spelled-out amounts, the locale counterpart of English "a"/"an". */
+	numerals?: Record<string, number>;
+	/** Words joining a unit to its ingredient, stripped like the English "of". */
+	prepositions?: string[];
 }

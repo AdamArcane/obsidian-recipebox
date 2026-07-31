@@ -14,10 +14,19 @@ export interface PhraseTable {
 	maxWords: number;
 }
 
+/** Normalised phrase to its numeric value. */
+export interface NumeralTable {
+	forms: Map<string, number>;
+	maxWords: number;
+}
+
 export interface ParseVocabulary {
 	units: PhraseTable;
 	/** Size and preparation words moved out of the name and into the note. */
 	qualifiers: PhraseTable;
+	numerals: NumeralTable;
+	/** Stripped between a unit and its ingredient, like the English "of". */
+	prepositions: readonly string[];
 }
 
 const COMBINING_MARKS = /[̀-ͯ]/g;
@@ -71,10 +80,24 @@ export function compileQualifierTable(localeId: string): PhraseTable {
 	return buildTable([Object.fromEntries(qualifiers.map((q) => [q, q]))]);
 }
 
+export function compileNumeralTable(localeId: string): NumeralTable {
+	const forms = new Map<string, number>();
+	let maxWords = 1;
+	for (const [word, value] of Object.entries(getLocale(localeId)?.numerals ?? {})) {
+		const key = normalisePhrase(word);
+		if (!key) continue;
+		forms.set(key, value);
+		maxWords = Math.max(maxWords, key.split(" ").length);
+	}
+	return { forms, maxWords };
+}
+
 export function compileVocabulary(localeId: string, aliasText: string): ParseVocabulary {
 	return {
 		units: compileUnitTable(localeId, aliasText),
 		qualifiers: compileQualifierTable(localeId),
+		numerals: compileNumeralTable(localeId),
+		prepositions: getLocale(localeId)?.prepositions ?? [],
 	};
 }
 

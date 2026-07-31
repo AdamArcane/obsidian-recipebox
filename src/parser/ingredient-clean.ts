@@ -9,7 +9,8 @@ export function stripListMarkers(line: string): string {
 	while (cur !== prev) {
 		prev = cur;
 		cur = cur
-			.replace(/^\s*[-*+]\s+/, "")
+			// Bullet glyphs survive copy-paste from recipe sites and blogs.
+			.replace(/^\s*[-*+•·]\s+/, "")
 			.replace(/^\s*\d+\.\s+/, "")
 			.replace(/^\s*\[[ x?]\]\s*/i, "");
 	}
@@ -84,8 +85,13 @@ export function stripMarkdownEmphasis(text: string): string {
 		.trim();
 }
 
-export function stripOf(text: string): string {
-	return text.replace(/^of\s+/i, "");
+// Locale prepositions join a unit to its ingredient ("chávena de tomates"), so
+// they are stripped at the same points as the English "of".
+export function stripOf(text: string, prepositions: readonly string[] = []): string {
+	const words = ["of", ...prepositions];
+	// String.raw: in a plain template literal "\s" collapses to "s", which silently
+	// builds /^(?:of)s+/ and strips nothing.
+	return text.replace(new RegExp(String.raw`^(?:${words.join("|")})\s+`, "i"), "");
 }
 
 export function normaliseName(name: string): string {

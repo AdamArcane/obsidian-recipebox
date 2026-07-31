@@ -57,4 +57,10 @@ export const PT_PT: RecipeLocale = {
 		"finamente", "grosseiramente",
 		"em cubos", "em pedaços", "em rodelas", "em tiras", "aos cubos",
 	],
+	numerals: {
+		"um": 1, "uma": 1, "dois": 2, "duas": 2, "três": 3, "quatro": 4, "cinco": 5,
+		"seis": 6, "sete": 7, "oito": 8, "nove": 9, "dez": 10, "dúzia": 12,
+		"meio": 0.5, "meia": 0.5, "um quarto": 0.25, "uma quarta": 0.25,
+	},
+	prepositions: ["de", "do", "da", "dos", "das"],
 };

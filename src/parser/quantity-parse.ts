@@ -3,6 +3,32 @@
  * decimals, ASCII fractions, mixed numbers, and Unicode vulgar fractions.
  */
 import { UNICODE_FRACTIONS, UNICODE_FRACTION_PATTERN } from "./quantity-fractions";
+import { NumeralTable, normalisePhrase } from "./unit-table";
+
+/** Longest-first, so "um quarto" (0.25) is preferred to a bare "um" (1). */
+function consumeNumeral(text: string, numerals?: NumeralTable): QuantityResult | null {
+	if (!numerals || numerals.forms.size === 0) return null;
+
+	const words: { text: string; end: number }[] = [];
+	const pattern = /\S+/g;
+	let match: RegExpExecArray | null;
+	while (words.length < numerals.maxWords && (match = pattern.exec(text)) !== null) {
+		words.push({ text: match[0], end: match.index + match[0].length });
+	}
+
+	for (let count = words.length; count >= 1; count--) {
+		const phrase = normalisePhrase(words.slice(0, count).map((w) => w.text).join(" "));
+		const value = numerals.forms.get(phrase);
+		if (value === undefined) continue;
+		// A numeral with nothing after it is a name, not an amount ("um" alone).
+		// Test the real remainder: `words` is capped at maxWords, so its length
+		// says nothing about whether the line continues.
+		const rest = text.slice(words[count - 1].end).trim();
+		if (rest) return { quantity: value, rest };
+	}
+
+	return null;
+}
 
 export interface QuantityResult {
 	quantity: number | null;
@@ -20,8 +46,12 @@ function tryAsciiFraction(token: string): number | null {
 	return num / den;
 }
 
-export function parseLeadingQuantity(input: string): QuantityResult {
+export function parseLeadingQuantity(input: string, numerals?: NumeralTable): QuantityResult {
 	const trimmed = input.trim();
+
+	// Spelled-out numbers, the locale counterpart of the "a"/"an" rule below.
+	const spelled = consumeNumeral(trimmed, numerals);
+	if (spelled) return spelled;
 
 	// "a" or "an" followed by a space
 	if (/^an?\s+\S/i.test(trimmed)) {

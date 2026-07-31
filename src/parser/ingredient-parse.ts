@@ -50,11 +50,11 @@ export function parseIngredientLine(line: string, vocabulary: ParseVocabulary): 
 	const { cleaned: afterNotes, note } = extractInlineNotes(text);
 	text = afterNotes;
 
-	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
-	text = stripOf(afterQty);
+	const { quantity, rest: afterQty } = parseLeadingQuantity(text, vocabulary.numerals);
+	text = stripOf(afterQty, vocabulary.prepositions);
 
 	const { unit, remaining: afterUnit } = consumeUnit(text, vocabulary.units);
-	text = stripOf(afterUnit);
+	text = stripOf(afterUnit, vocabulary.prepositions);
 
 	// Strip trailing punctuation
 	text = text.replace(/[,;:.]+$/, "").trim();
