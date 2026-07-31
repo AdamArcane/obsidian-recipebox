@@ -134,3 +134,28 @@ describe("hasIgnoreTag", () => {
 		expect(hasIgnoreTag([])).toBe(false);
 	});
 });
+
+describe("inline links", () => {
+	it("keeps a link intact rather than reading its destination as a note", () => {
+		expect(extractInlineNotes("[tomato sauce](sauce.md)")).toEqual({
+			cleaned: "[tomato sauce](sauce.md)",
+			note: null,
+		});
+	});
+
+	it("still extracts a real note alongside a link", () => {
+		expect(extractInlineNotes("[sauce](s.md) (warmed)")).toEqual({
+			cleaned: "[sauce](s.md)",
+			note: "warmed",
+		});
+	});
+
+	it("keys a linked ingredient on its link text, per RecipeMD", () => {
+		expect(ingredientKey("[tomato sauce](sauce.md)", "")).toBe(ingredientKey("Tomato Sauce", ""));
+	});
+
+	it("keys a wikilink on its page name or alias", () => {
+		expect(ingredientKey("[[Tomato Sauce]]", "")).toBe("tomato sauce|");
+		expect(ingredientKey("[[recipes/sauce|Tomato Sauce]]", "")).toBe("tomato sauce|");
+	});
+});

@@ -63,10 +63,13 @@ export function parseLeadingQuantity(input: string): QuantityResult {
 		if (frac !== null) return { quantity: frac, rest: asciiOnly[2].trim() };
 	}
 
-	// plain decimal or integer
-	const plain = trimmed.match(/^(\d+(?:\.\d+)?)(.*)/);
+	// Plain decimal or integer. Both "." and "," divide a decimal, and the leading
+	// digit is optional, so ".5 teaspoon" and "1,5 kg" are amounts rather than the
+	// start of an ingredient name. A comma is only a divider between digits, never
+	// after them, so "2, peeled" keeps its trailing note.
+	const plain = trimmed.match(/^(\d*[.,]\d+|\d+)(.*)/);
 	if (plain) {
-		return { quantity: parseFloat(plain[1]), rest: plain[2].trim() };
+		return { quantity: parseFloat(plain[1].replace(",", ".")), rest: plain[2].trim() };
 	}
 
 	return { quantity: null, rest: trimmed };
