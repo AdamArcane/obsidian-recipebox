@@ -1,3 +1,10 @@
+## [0.1.10-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9...0.1.10-beta.0) (2026-07-31)
+
+### Bug Fixes
+
+* **parser:** strip paired single-asterisk emphasis from ingredient lines ([16796ca](https://github.com/AdamArcane/obsidian-recipebox/commit/16796cac753bcc918a3f6a93a1a8463d2aa3c52a))
+* **tests:** build lastMade fixtures from local dates, not UTC ([23b2e26](https://github.com/AdamArcane/obsidian-recipebox/commit/23b2e2644bfd31b08fd26057c8c1a4ab1bc0dac9))
+
 ## [0.1.9](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.1.9-beta.7...v0.1.9) (2026-07-21)
 
 ## [0.1.9-beta.7](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9-beta.6...0.1.9-beta.7) (2026-07-21)
