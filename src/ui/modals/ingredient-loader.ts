@@ -8,7 +8,7 @@ import { ContributionMap } from "../../types";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
 import { splitBodyAroundIngredients } from "../../parser/recipe-ingredient-groups";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
-import { unitsFromSettings } from "../../parser/unit-table";
+import { vocabularyFromSettings } from "../../parser/unit-table";
 import { ingredientKey } from "../../parser/ingredient-clean";
 import { formatQuantity } from "../../parser/quantity-format";
 import { toTitleCase } from "../../utils/text-case";
@@ -29,7 +29,7 @@ export async function loadRecipeIngredients(
 	const body = stripFrontmatter(text);
 	const { groups } = splitBodyAroundIngredients(body, settings.ingredientsHeading);
 
-	const units = unitsFromSettings(settings);
+	const units = vocabularyFromSettings(settings);
 	const seen = new Set<string>();
 	const results: LoadedIngredient[] = [];
 	for (const group of groups) {

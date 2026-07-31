@@ -1,17 +1,23 @@
 /**
  * Compiles the built-in English units, a selected locale's vocabulary and the
- * user's aliases into one lookup table for consumeUnit. Compile once per
+ * user's aliases into the lookup tables the parser needs. Compile once per
  * operation and thread the result down, the way the GI dictionary is handled.
  */
 import { UNIT_SYNONYMS } from "./ingredient-units";
-import { getLocaleUnits } from "./locales";
+import { getLocale } from "./locales";
 import { compileUnitAliases } from "./unit-aliases";
 
-export interface UnitTable {
-	/** Normalised unit form to canonical unit. */
+/** Normalised phrase to the text shown to the user. */
+export interface PhraseTable {
 	forms: Map<string, string>;
-	/** Longest form in words, so consumeUnit knows how far ahead to look. */
+	/** Longest phrase in words, so matchers know how far ahead to look. */
 	maxWords: number;
+}
+
+export interface ParseVocabulary {
+	units: PhraseTable;
+	/** Size and preparation words moved out of the name and into the note. */
+	qualifiers: PhraseTable;
 }
 
 const COMBINING_MARKS = /[̀-ͯ]/g;
@@ -21,7 +27,7 @@ const COMBINING_MARKS = /[̀-ͯ]/g;
  * "c.  sopa" and "c sopa" all reach the same key. Matching is done on whole words
  * rather than character offsets because stripping accents changes string length.
  */
-export function normaliseUnitForm(text: string): string {
+export function normalisePhrase(text: string): string {
 	return text
 		.normalize("NFD")
 		.replace(COMBINING_MARKS, "")
@@ -31,38 +37,51 @@ export function normaliseUnitForm(text: string): string {
 		.replace(/\s+/g, " ");
 }
 
-export function compileUnitTable(localeId: string, aliasText: string): UnitTable {
-	const locale = getLocaleUnits(localeId);
-	const suppressed = new Set((locale?.suppress ?? []).map(normaliseUnitForm));
-
-	const english: Record<string, string> = {};
-	for (const [form, unit] of Object.entries(UNIT_SYNONYMS)) {
-		if (!suppressed.has(normaliseUnitForm(form))) english[form] = unit;
-	}
-
-	// Highest precedence first; a later layer never overwrites an earlier one.
-	const layers = [compileUnitAliases(aliasText).forms, locale?.forms ?? {}, english];
-
+/** Builds a table from layers, highest precedence first. */
+function buildTable(layers: Record<string, string>[]): PhraseTable {
 	const forms = new Map<string, string>();
 	for (const layer of layers) {
-		for (const [form, unit] of Object.entries(layer)) {
-			const key = normaliseUnitForm(form);
-			if (key && !forms.has(key)) forms.set(key, unit);
+		for (const [form, value] of Object.entries(layer)) {
+			const key = normalisePhrase(form);
+			if (key && !forms.has(key)) forms.set(key, value);
 		}
 	}
 
 	let maxWords = 1;
-	for (const key of forms.keys()) {
-		maxWords = Math.max(maxWords, key.split(" ").length);
-	}
+	for (const key of forms.keys()) maxWords = Math.max(maxWords, key.split(" ").length);
 
 	return { forms, maxWords };
 }
 
-/** The built-in English vocabulary with no locale or user aliases applied. */
-export const ENGLISH_UNITS: UnitTable = compileUnitTable("en", "");
+export function compileUnitTable(localeId: string, aliasText: string): PhraseTable {
+	const locale = getLocale(localeId);
+	const suppressed = new Set((locale?.suppress ?? []).map(normalisePhrase));
 
-/** Convenience for the many call sites that hold settings and need a table. */
-export function unitsFromSettings(settings: { recipeLocale: string; unitAliases: string }): UnitTable {
-	return compileUnitTable(settings.recipeLocale, settings.unitAliases);
+	const english: Record<string, string> = {};
+	for (const [form, unit] of Object.entries(UNIT_SYNONYMS)) {
+		if (!suppressed.has(normalisePhrase(form))) english[form] = unit;
+	}
+
+	return buildTable([compileUnitAliases(aliasText).forms, locale?.forms ?? {}, english]);
+}
+
+export function compileQualifierTable(localeId: string): PhraseTable {
+	const qualifiers = getLocale(localeId)?.qualifiers ?? [];
+	// A qualifier maps to itself: the original wording is what lands in the note.
+	return buildTable([Object.fromEntries(qualifiers.map((q) => [q, q]))]);
+}
+
+export function compileVocabulary(localeId: string, aliasText: string): ParseVocabulary {
+	return {
+		units: compileUnitTable(localeId, aliasText),
+		qualifiers: compileQualifierTable(localeId),
+	};
+}
+
+/** The built-in English vocabulary with no locale or user aliases applied. */
+export const ENGLISH_VOCABULARY: ParseVocabulary = compileVocabulary("en", "");
+
+/** Convenience for the many call sites that hold settings and need a vocabulary. */
+export function vocabularyFromSettings(settings: { recipeLocale: string; unitAliases: string }): ParseVocabulary {
+	return compileVocabulary(settings.recipeLocale, settings.unitAliases);
 }

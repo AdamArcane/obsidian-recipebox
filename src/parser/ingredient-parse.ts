@@ -4,7 +4,8 @@
  */
 import { ParsedIngredient } from "../types";
 import { parseLeadingQuantity } from "./quantity-parse";
-import { UnitTable, normaliseUnitForm } from "./unit-table";
+import { ParseVocabulary, PhraseTable, normalisePhrase } from "./unit-table";
+import { extractQualifiers } from "./ingredient-qualifiers";
 import {
 	stripListMarkers,
 	extractInlineNotes,
@@ -16,7 +17,7 @@ import {
 
 // Longest-first over whole words, so "colher de sopa" is preferred to "colher"
 // and multi-word forms like "fluid ounces" need no special case.
-export function consumeUnit(rest: string, units: UnitTable): { unit: string; remaining: string } {
+export function consumeUnit(rest: string, units: PhraseTable): { unit: string; remaining: string } {
 	const words: { text: string; end: number }[] = [];
 	const wordPattern = /\S+/g;
 	let match: RegExpExecArray | null;
@@ -25,7 +26,7 @@ export function consumeUnit(rest: string, units: UnitTable): { unit: string; rem
 	}
 
 	for (let count = words.length; count >= 1; count--) {
-		const form = normaliseUnitForm(words.slice(0, count).map((w) => w.text).join(" "));
+		const form = normalisePhrase(words.slice(0, count).map((w) => w.text).join(" "));
 		const canonical = units.forms.get(form);
 		if (canonical !== undefined) {
 			return { unit: canonical, remaining: rest.slice(words[count - 1].end).trim() };
@@ -35,7 +36,7 @@ export function consumeUnit(rest: string, units: UnitTable): { unit: string; rem
 	return { unit: "", remaining: rest };
 }
 
-export function parseIngredientLine(line: string, units: UnitTable): ParsedIngredient | null {
+export function parseIngredientLine(line: string, vocabulary: ParseVocabulary): ParsedIngredient | null {
 	const raw = line;
 
 	let text = stripListMarkers(line);
@@ -52,17 +53,22 @@ export function parseIngredientLine(line: string, units: UnitTable): ParsedIngre
 	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
 	text = stripOf(afterQty);
 
-	const { unit, remaining: afterUnit } = consumeUnit(text, units);
+	const { unit, remaining: afterUnit } = consumeUnit(text, vocabulary.units);
 	text = stripOf(afterUnit);
 
 	// Strip trailing punctuation
 	text = text.replace(/[,;:.]+$/, "").trim();
 
-	const name = normaliseName(text);
+	// Qualifiers move to the note so the grocery list merges on what is bought,
+	// while the recipe view still shows how to prepare it.
+	const split = extractQualifiers(normaliseName(text), vocabulary.qualifiers);
+	const name = split.name;
 	if (!name) return null;
 
 	// A quantity with nothing else attached is not a valid ingredient
 	if (quantity !== null && !name) return null;
 
-	return { quantity, unit, name, note, tags, raw };
+	const notes = [note, ...split.qualifiers].filter((n): n is string => !!n);
+
+	return { quantity, unit, name, note: notes.length > 0 ? notes.join(", ") : null, tags, raw };
 }

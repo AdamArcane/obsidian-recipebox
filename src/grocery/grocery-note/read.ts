@@ -5,7 +5,7 @@
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
-import { unitsFromSettings } from "../../parser/unit-table";
+import { vocabularyFromSettings } from "../../parser/unit-table";
 import { ingredientKey } from "../../parser/ingredient-clean";
 import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText } from "./parse";
@@ -24,7 +24,7 @@ export async function readGroceryNoteItems(app: App, settings: RecipeBoxSettings
 	if (!text) return new Map();
 
 	const result = new Map<string, GroceryNoteItem>();
-	for (const section of parseGroceryNoteText(text, unitsFromSettings(settings))) {
+	for (const section of parseGroceryNoteText(text, vocabularyFromSettings(settings))) {
 		for (const line of section.lines) {
 			if (line.kind !== "item" || !line.key) continue;
 			result.set(line.key, { name: line.name, unit: line.unit, quantity: line.quantity, checked: line.checked, category: section.category });
@@ -39,7 +39,7 @@ export async function toggleGroceryNoteItemChecked(app: App, key: string, checke
 	if (!text) return;
 
 	const lines = text.split("\n");
-	const units = unitsFromSettings(settings);
+	const units = vocabularyFromSettings(settings);
 	let changed = false;
 
 	for (let i = 0; i < lines.length; i++) {

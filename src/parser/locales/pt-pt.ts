@@ -2,9 +2,9 @@
  * Portuguese (Portugal) unit vocabulary. Forms are matched whole-word and
  * longest-first, so "colher de sopa" wins over a bare "colher".
  */
-import { LocaleUnits } from "./locale-types";
+import { RecipeLocale } from "./locale-types";
 
-export const PT_PT_UNITS: LocaleUnits = {
+export const PT_PT: RecipeLocale = {
 	id: "pt-PT",
 	label: "Portuguese (Portugal)",
 	forms: {
@@ -40,4 +40,21 @@ export const PT_PT_UNITS: LocaleUnits = {
 	// is an abbreviated colher, never a cup, and guessing cup silently produces a
 	// wrong amount rather than an obviously missing one.
 	suppress: ["c"],
+	// Size is relative and preparation happens after shopping, so neither changes
+	// what goes in the basket. Deliberately absent: roxa, preta, branco, integral,
+	// doce and every other variety word, which do change it.
+	qualifiers: [
+		"q.b.", "qb", "a gosto",
+		"grande", "grandes", "médio", "média", "médios", "médias",
+		"pequeno", "pequena", "pequenos", "pequenas",
+		"picado", "picada", "picados", "picadas",
+		"esmagado", "esmagada", "esmagados", "esmagadas",
+		"ralado", "ralada", "ralados", "raladas",
+		"cortado", "cortada", "cortados", "cortadas",
+		"laminado", "laminada", "laminados", "laminadas",
+		"fatiado", "fatiada", "fatiados", "fatiadas",
+		"descascado", "descascada", "descascados", "descascadas",
+		"finamente", "grosseiramente",
+		"em cubos", "em pedaços", "em rodelas", "em tiras", "aos cubos",
+	],
 };

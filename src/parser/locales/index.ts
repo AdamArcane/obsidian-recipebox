@@ -2,14 +2,14 @@
  * Registry of recipe locales. English is the base vocabulary every locale falls
  * back to, so it has no entry of its own here.
  */
-import { LocaleUnits } from "./locale-types";
-import { PT_PT_UNITS } from "./pt-pt";
+import { RecipeLocale } from "./locale-types";
+import { PT_PT } from "./pt-pt";
 
-export type { LocaleUnits } from "./locale-types";
+export type { RecipeLocale } from "./locale-types";
 
 export const BASE_LOCALE_ID = "en";
 
-const LOCALES: LocaleUnits[] = [PT_PT_UNITS];
+const LOCALES: RecipeLocale[] = [PT_PT];
 
 /** Locale ids to labels, for the settings dropdown. English first. */
 export function localeOptions(): Record<string, string> {
@@ -19,6 +19,6 @@ export function localeOptions(): Record<string, string> {
 }
 
 /** Returns null for English or an unknown id, both meaning "base vocabulary only". */
-export function getLocaleUnits(id: string): LocaleUnits | null {
+export function getLocale(id: string): RecipeLocale | null {
 	return LOCALES.find((l) => l.id === id) ?? null;
 }

@@ -9,7 +9,7 @@ import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { GroceryItem } from "../../types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
-import { unitsFromSettings } from "../../parser/unit-table";
+import { vocabularyFromSettings } from "../../parser/unit-table";
 import { hasIgnoreTag, ingredientKey } from "../../parser/ingredient-clean";
 import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
@@ -30,7 +30,7 @@ export async function renderIngredientsSection(
 ): Promise<void> {
 	const groceryKeySet = new Set(groceryItems.map(i => i.key));
 	const giPatterns = settings.showHighGIWarnings ? compileGiDictionary(settings.giDictionary).patterns : [];
-	const units = unitsFromSettings(settings);
+	const units = vocabularyFromSettings(settings);
 
 	const section = container.createDiv({ cls: "rb-ingredients-section" });
 	const header = section.createDiv({ cls: "rb-section-header" });

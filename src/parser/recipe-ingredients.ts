@@ -6,7 +6,7 @@ import { App, TFile, CachedMetadata } from "obsidian";
 import { RecipeIngredient } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { parseIngredientLine } from "./ingredient-parse";
-import { unitsFromSettings } from "./unit-table";
+import { vocabularyFromSettings } from "./unit-table";
 import { hasIgnoreTag } from "./ingredient-clean";
 import { findHeadingIndex } from "./recipe-heading-search";
 import { findRecipeMdIngredients } from "./recipemd-sections";
@@ -51,7 +51,7 @@ export async function parseRecipeFile(
 	const cache: CachedMetadata | null = app.metadataCache.getFileCache(file);
 	const multiplier = readRecipeMultiplier(cache);
 
-	const units = unitsFromSettings(settings);
+	const units = vocabularyFromSettings(settings);
 
 	const results: RecipeIngredient[] = [];
 	for (const line of rawLines) {
