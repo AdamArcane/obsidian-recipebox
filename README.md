@@ -13,6 +13,13 @@ Plan meals, build grocery lists, and view recipes as interactive cards, all stor
 
 Recipe Box treats recipes the same way Obsidian treats everything else: as notes you own. Meal plans and grocery lists are markdown files too, so you can edit them by hand, query them with Dataview or Bases, and sync them with whatever sync solution you already use.
 
+<span align="center">
+
+🎉 **NEW!** [RecipeMD](https://recipe.md) format now supported
+
+</span>
+
+
 <img width="800"  alt="device-mockup" src="https://github.com/user-attachments/assets/f71bde46-511a-41e9-9a60-3bde915a4748" />
 
 ## Feature Highlights
@@ -78,9 +85,14 @@ BRAT will notify you when new beta releases are available and can update the plu
 
 ## Getting started
 
-Drop a note into the `Recipes` folder (created automatically the first time you enable the plugin), structure ingredients and instructions under headings of your choice, and open it. Recipe Box detects any note in that folder as a recipe and offers to switch into recipe view, no frontmatter required.
+Drop a note into the `Recipes` folder (created automatically the first time you enable the plugin), structure ingredients and instructions under headings of your choice, or using RecipeMD format, and open it. Recipe Box detects any note in that folder as a recipe and offers to switch into recipe view, no frontmatter required.
 
 Want recipes somewhere else, or mixed in with other notes? Change the recipe folder, or set a recipe type value (`recipe`, for example, matched against a frontmatter property) to narrow detection further, under **Settings → Recipe Box → Recipe library**.
+
+> [!NOTE] 
+> Notes written in [RecipeMD](https://recipemd.org/) format, ingredients and 
+> instructions separated by thematic breaks (`---`) instead of headings, work the same way with 
+> no extra setup. An explicit heading always takes precedence when both are present.
 
 ## License
 
