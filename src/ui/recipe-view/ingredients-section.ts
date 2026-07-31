@@ -9,6 +9,7 @@ import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { GroceryItem } from "../../types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
+import { unitsFromSettings } from "../../parser/unit-table";
 import { hasIgnoreTag, ingredientKey } from "../../parser/ingredient-clean";
 import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
@@ -29,6 +30,7 @@ export async function renderIngredientsSection(
 ): Promise<void> {
 	const groceryKeySet = new Set(groceryItems.map(i => i.key));
 	const giPatterns = settings.showHighGIWarnings ? compileGiDictionary(settings.giDictionary).patterns : [];
+	const units = unitsFromSettings(settings);
 
 	const section = container.createDiv({ cls: "rb-ingredients-section" });
 	const header = section.createDiv({ cls: "rb-section-header" });
@@ -55,7 +57,7 @@ export async function renderIngredientsSection(
 		}
 
 		for (const raw of group.lines) {
-			const parsed = parseIngredientLine(raw);
+			const parsed = parseIngredientLine(raw, units);
 			if (!parsed || !parsed.name || hasIgnoreTag(parsed.tags)) continue;
 
 			const scaled = parsed.quantity !== null ? parsed.quantity * multiplier : null;

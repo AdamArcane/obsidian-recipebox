@@ -8,6 +8,7 @@ import { renderSectionLibrary } from "./section-library";
 import { renderSectionNotesStorage } from "./section-notes-storage";
 import { renderSectionImporter } from "./section-importer";
 import { renderSectionRecipeView } from "./section-recipe-view";
+import { renderSectionParsing } from "./section-parsing";
 import { renderSectionTimers } from "./section-timers";
 import { renderSectionShopping } from "./section-shopping";
 import { renderSectionCookingTracking } from "./section-cooking-tracking";
@@ -40,6 +41,7 @@ export class RecipeBoxSettingsTab extends PluginSettingTab {
 		renderSectionLibrary(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionNotesStorage(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionRecipeView(this.containerEl, this.plugin.settings, save, rerender, this.app, () => this.plugin.discoveryCache.get());
+		renderSectionParsing(this.containerEl, this.plugin.settings, save, rerender, this.app);
 		renderSectionCookingTracking(this.containerEl, this.plugin.settings, save, rerender);
 		renderSectionMealPlan(this.containerEl, this.plugin.settings, save, rerender);
 		renderSectionShopping(this.containerEl, this.plugin.settings, save, rerender, this.app, () => this.plugin.manager.getKnownCategories());

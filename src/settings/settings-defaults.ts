@@ -4,6 +4,7 @@
  */
 import { RecipeBoxSettings } from "./settings-types";
 import { DEFAULT_GI_DICTIONARY } from "../parser/glycemic-dictionary";
+import { DEFAULT_UNIT_ALIASES } from "../parser/unit-aliases";
 import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 
 export const DEFAULT_CATEGORY_ORDER: string[] = [
@@ -89,6 +90,9 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	carbsProperty: "carbs",
 
 	suggesterModes: BUILTIN_MODES,
+
+	recipeLocale: "en",
+	unitAliases: DEFAULT_UNIT_ALIASES,
 
 	showHighGIWarnings: false,
 	giDictionary: DEFAULT_GI_DICTIONARY,

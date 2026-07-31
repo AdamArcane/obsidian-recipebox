@@ -4,7 +4,7 @@
  */
 import { ParsedIngredient } from "../types";
 import { parseLeadingQuantity } from "./quantity-parse";
-import { UNIT_SYNONYMS } from "./ingredient-units";
+import { UnitTable, normaliseUnitForm } from "./unit-table";
 import {
 	stripListMarkers,
 	extractInlineNotes,
@@ -14,27 +14,28 @@ import {
 	normaliseName,
 } from "./ingredient-clean";
 
-export function consumeUnit(rest: string): { unit: string; remaining: string } {
-	const lower = rest.toLowerCase();
-
-	// Two-word fluid ounce forms
-	for (const twoWord of ["fluid ounces", "fluid ounce", "fl oz"]) {
-		if (lower.startsWith(twoWord)) {
-			return { unit: "fl oz", remaining: rest.slice(twoWord.length).trim() };
-		}
+// Longest-first over whole words, so "colher de sopa" is preferred to "colher"
+// and multi-word forms like "fluid ounces" need no special case.
+export function consumeUnit(rest: string, units: UnitTable): { unit: string; remaining: string } {
+	const words: { text: string; end: number }[] = [];
+	const wordPattern = /\S+/g;
+	let match: RegExpExecArray | null;
+	while (words.length < units.maxWords && (match = wordPattern.exec(rest)) !== null) {
+		words.push({ text: match[0], end: match.index + match[0].length });
 	}
 
-	const token = rest.split(/\s+/)[0];
-	const strippedToken = token.replace(/\.+$/, "");
-	const canonical = UNIT_SYNONYMS[strippedToken.toLowerCase()];
-	if (canonical !== undefined) {
-		return { unit: canonical, remaining: rest.slice(token.length).trim() };
+	for (let count = words.length; count >= 1; count--) {
+		const form = normaliseUnitForm(words.slice(0, count).map((w) => w.text).join(" "));
+		const canonical = units.forms.get(form);
+		if (canonical !== undefined) {
+			return { unit: canonical, remaining: rest.slice(words[count - 1].end).trim() };
+		}
 	}
 
 	return { unit: "", remaining: rest };
 }
 
-export function parseIngredientLine(line: string): ParsedIngredient | null {
+export function parseIngredientLine(line: string, units: UnitTable): ParsedIngredient | null {
 	const raw = line;
 
 	let text = stripListMarkers(line);
@@ -51,7 +52,7 @@ export function parseIngredientLine(line: string): ParsedIngredient | null {
 	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
 	text = stripOf(afterQty);
 
-	const { unit, remaining: afterUnit } = consumeUnit(text);
+	const { unit, remaining: afterUnit } = consumeUnit(text, units);
 	text = stripOf(afterUnit);
 
 	// Strip trailing punctuation

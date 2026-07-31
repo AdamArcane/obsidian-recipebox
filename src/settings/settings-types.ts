@@ -115,6 +115,10 @@ export interface RecipeBoxSettings {
 	// Meal suggester
 	suggesterModes: SuggesterMode[];
 
+	// Ingredient parsing
+	recipeLocale: string;
+	unitAliases: string;
+
 	// Diabetic mode
 	showHighGIWarnings: boolean;
 	giDictionary: string;

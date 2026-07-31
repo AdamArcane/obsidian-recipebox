@@ -286,6 +286,9 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		// Support migration from the old "suggesterStrategies" key (renamed to "suggesterModes")
 		suggesterModes: mergeModes(r.suggesterModes ?? r.suggesterStrategies),
 
+		recipeLocale: str(r.recipeLocale, d.recipeLocale),
+		unitAliases: str(r.unitAliases, d.unitAliases),
+
 		showHighGIWarnings: bool(r.diabeticModeEnabled, d.showHighGIWarnings),
 		giDictionary: str(r.giDictionary, d.giDictionary),
 
