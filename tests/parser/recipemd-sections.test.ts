@@ -35,8 +35,12 @@ describe("findRecipeMdIngredients", () => {
 		expect(findRecipeMdIngredients(["a", "***", "- x", "___", "b"])).toEqual({ start: 2, end: 3 });
 	});
 
-	it("ignores a note with a single horizontal rule", () => {
-		expect(findRecipeMdIngredients(["a", "---", "- x"])).toBeNull();
+	it("treats a lone break followed only by bullets as an instruction-less recipe", () => {
+		expect(findRecipeMdIngredients(["a", "---", "- x"])).toEqual({ start: 2, end: 3 });
+	});
+
+	it("ignores a lone break when what follows is not an ingredient list", () => {
+		expect(findRecipeMdIngredients(["a", "---", "some prose"])).toBeNull();
 	});
 });
 
@@ -69,5 +73,38 @@ describe("splitBodyAroundIngredients without a heading", () => {
 
 	it("returns no groups when the note is neither RecipeMD nor headed", () => {
 		expect(splitBodyAroundIngredients(NO_STRUCTURE, "Ingredients").groups).toEqual([]);
+	});
+});
+
+const GROUPED = [
+	"# Cake", "", "---", "",
+	"## Dough", "- *200 g* flour",
+	"## Filling", "- *100 g* jam",
+	"", "---", "", "1. Bake.",
+].join("\n");
+
+const NO_INSTRUCTIONS = ["# Salad", "", "---", "", "- *1* lettuce", "- *2* tomatoes"].join("\n");
+
+const RULE_THEN_PROSE = ["# Note", "", "---", "", "Some prose.", "", "1. A step."].join("\n");
+
+describe("RecipeMD spec conformance", () => {
+	it("titles ingredient groups from headings inside the block", () => {
+		expect(splitBodyAroundIngredients(GROUPED, "Ingredients").groups).toEqual([
+			{ heading: "Dough", lines: ["- *200 g* flour"] },
+			{ heading: "Filling", lines: ["- *100 g* jam"] },
+		]);
+	});
+
+	it("accepts an omitted closing break when the recipe has no instructions", () => {
+		expect(findRecipeMdIngredients(NO_INSTRUCTIONS.split("\n"))).toEqual({ start: 3, end: 6 });
+		expect(extractIngredientLines(NO_INSTRUCTIONS, "Ingredients")).toEqual(["- *1* lettuce", "- *2* tomatoes"]);
+	});
+
+	it("does not mistake an ordinary horizontal rule for an ingredient block", () => {
+		expect(findRecipeMdIngredients(RULE_THEN_PROSE.split("\n"))).toBeNull();
+	});
+
+	it("still requires at least one ingredient after a lone break", () => {
+		expect(findRecipeMdIngredients(["# T", "---", "", ""])).toBeNull();
 	});
 });
