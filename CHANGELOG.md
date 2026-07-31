@@ -1,3 +1,15 @@
+## [0.1.10-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.0...0.1.10-beta.1) (2026-07-31)
+
+### Features
+
+* **parser:** read ingredients from a RecipeMD block when no heading exists ([f9df939](https://github.com/AdamArcane/obsidian-recipebox/commit/f9df939179b2b28b2a5f784f7b54aedd57ffd129))
+* **parser:** treat a RecipeMD note's method as instructions ([ec0c63b](https://github.com/AdamArcane/obsidian-recipebox/commit/ec0c63b9f10b8d99017915018fdaa8aa821e0089))
+
+### Bug Fixes
+
+* **parser:** follow RecipeMD on ingredient groups and the closing break ([fce288f](https://github.com/AdamArcane/obsidian-recipebox/commit/fce288f3d9d811548d0e962f6203f263c8c6c238))
+* **parser:** RecipeMD decimal notation and linked ingredient names ([0ab1947](https://github.com/AdamArcane/obsidian-recipebox/commit/0ab1947057e0ecdbbd4a82652fe13325193b31f6))
+
 ## [0.1.10-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.9...0.1.10-beta.0) (2026-07-31)
 
 ### Bug Fixes
