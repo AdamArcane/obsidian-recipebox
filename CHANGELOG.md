@@ -1,3 +1,5 @@
+## [0.1.10-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.1...0.1.10-beta.2) (2026-07-31)
+
 ## [0.1.10-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.0...0.1.10-beta.1) (2026-07-31)
 
 ### Features
