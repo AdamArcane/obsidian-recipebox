@@ -1,11 +1,13 @@
 /**
- * Renders the desktop recipe meta banner — the multiplier stepper, nutrition
- * cells, and action buttons (favorite, mark cooked, meal plan toggle).
+ * Renders the desktop recipe meta banner: the multiplier stepper, nutrition
+ * cells, source link, and action buttons (favorite, mark cooked, meal plan).
  */
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { RecipeViewDeps } from "./recipe-view-deps";
+import { findSourceUrl } from "../../sharing/find-source-url";
+import { describeSourceLink } from "./source-link-display";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { renderFavoriteToggle } from "./favorite-toggle";
 import { renderMealPlanToggle } from "./meal-plan-toggle";
@@ -73,6 +75,36 @@ function renderNutritionCell(
 	}
 }
 
+// Desktop counterpart of the source row the mobile Info tab already shows
+// (mobile-layout.ts). It lives in the banner rather than the section sidebar
+// because the banner renders unconditionally in both desktop layouts, while the
+// sidebar is gated on there being extra sections or an image to hang it off --
+// a recipe with only a source would have shown nothing at all there.
+function renderSourceCell(container: HTMLElement, fm: Record<string, unknown>): void {
+	const display = describeSourceLink(findSourceUrl(fm));
+	if (!display) return;
+
+	const cell = container.createDiv({ cls: "rb-banner-cell rb-source-cell" });
+	cell.createSpan({ cls: "rb-source-label", text: "Source" });
+
+	// The title attribute carries the untruncated value, since the cell is
+	// width-capped and a source is not always a short hostname.
+	if (display.href) {
+		cell.createEl("a", {
+			cls: "rb-source-value",
+			href: display.href,
+			text: display.label,
+			attr: { target: "_blank", rel: "noopener", title: display.href },
+		});
+	} else {
+		cell.createSpan({
+			cls: "rb-source-value",
+			text: display.label,
+			attr: { title: display.label },
+		});
+	}
+}
+
 export function renderMetaBanner(
 	container: HTMLElement,
 	app: App,
@@ -90,6 +122,7 @@ export function renderMetaBanner(
 	renderMultiplierCell(cells, app, file, multiplier);
 	renderServingsCell(cells, servings, multiplier);
 	renderNutritionCell(cells, fm, settings, servings, multiplier);
+	renderSourceCell(cells, fm);
 
 	const actions = banner.createDiv({ cls: "rb-header-actions" });
 	renderFavoriteToggle(actions, app, file, fm, settings);

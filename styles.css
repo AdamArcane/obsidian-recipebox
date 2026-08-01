@@ -1839,6 +1839,34 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 }
 
 
+/* Source cell: desktop counterpart of the mobile Info tab's source row.
+   The value is width-capped and ellipsised because a source is free text --
+   a cookbook title or a handwritten-note reference would otherwise stretch
+   the banner row well past the cells beside it. The full value stays
+   reachable through the title attribute set in meta-banner.ts. */
+
+.rb-source-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.rb-source-label {
+  font-size: var(--font-ui-small);
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.rb-source-value {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-ui-small);
+}
+
+
 
 /* Mobile nutrition strip */
 
