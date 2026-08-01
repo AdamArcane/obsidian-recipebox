@@ -88,7 +88,9 @@ export function stripMarkdownEmphasis(text: string): string {
 // Locale prepositions join a unit to its ingredient ("chávena de tomates"), so
 // they are stripped at the same points as the English "of".
 export function stripOf(text: string, prepositions: readonly string[] = []): string {
-	const words = ["of", ...prepositions];
+	// Locale data reaches a regex here, so it is escaped rather than trusted to be
+	// plain words. locale-contract.test.ts asserts the same thing at the source.
+	const words = ["of", ...prepositions].map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 	// String.raw: in a plain template literal "\s" collapses to "s", which silently
 	// builds /^(?:of)s+/ and strips nothing.
 	return text.replace(new RegExp(String.raw`^(?:${words.join("|")})\s+`, "i"), "");

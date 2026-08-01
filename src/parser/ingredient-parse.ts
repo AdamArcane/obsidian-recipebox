@@ -63,11 +63,12 @@ export function parseIngredientLine(line: string, vocabulary: ParseVocabulary): 
 	// Qualifiers move to the note so the grocery list merges on what is bought,
 	// while the recipe view still shows how to prepare it.
 	const split = extractQualifiers(normaliseName(text), vocabulary.qualifiers);
-	const name = split.name;
+	// Lifting a leading qualifier can expose the preposition that followed it, so
+	// "q.b. de sal" would otherwise be left as an ingredient named "de sal". This
+	// is the same dangling-separator cleanup extractQualifiers does for commas,
+	// done here because only the caller knows the locale's prepositions.
+	const name = stripOf(split.name, vocabulary.prepositions);
 	if (!name) return null;
-
-	// A quantity with nothing else attached is not a valid ingredient
-	if (quantity !== null && !name) return null;
 
 	const notes = [note, ...split.qualifiers].filter((n): n is string => !!n);
 

@@ -22,3 +22,8 @@ export function localeOptions(): Record<string, string> {
 export function getLocale(id: string): RecipeLocale | null {
 	return LOCALES.find((l) => l.id === id) ?? null;
 }
+
+/** Every registered locale, so the contract test can check all of them at once. */
+export function allLocales(): readonly RecipeLocale[] {
+	return LOCALES;
+}

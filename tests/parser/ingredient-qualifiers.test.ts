@@ -59,4 +59,15 @@ describe("parseIngredientLine with qualifiers", () => {
 		expect(parseIngredientLine("- *1* cebola roxa", PT)?.name).toBe("cebola roxa");
 		expect(parseIngredientLine("- *1* cebola grande", PT)?.name).toBe("cebola");
 	});
+
+	// "q.b." used to be a unit as well as a qualifier, so the two orderings keyed
+	// differently and the grocery list carried salt twice. Lifting a leading
+	// qualifier also exposes the preposition behind it, which is why the name is
+	// "sal" rather than "de sal".
+	it("parses a to-taste modifier the same way in either position", () => {
+		const trailing = parseIngredientLine("- sal q.b.", PT);
+		const leading = parseIngredientLine("- q.b. de sal", PT);
+		expect(trailing).toMatchObject({ quantity: null, unit: "", name: "sal", note: "q.b." });
+		expect(leading).toMatchObject({ quantity: null, unit: "", name: "sal", note: "q.b." });
+	});
 });

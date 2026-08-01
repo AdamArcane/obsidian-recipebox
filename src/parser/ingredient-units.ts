@@ -20,9 +20,17 @@ export const UNIT_SYNONYMS: Record<string, string> = {
 	// milliliter
 	ml: "ml", mls: "ml", milliliter: "ml", milliliters: "ml",
 	millilitre: "ml", millilitres: "ml",
+	// centiliter
+	cl: "cl", centiliter: "cl", centiliters: "cl", centilitre: "cl", centilitres: "cl",
+	// deciliter. Metric volumes below a litre are common in European recipes and
+	// were missing entirely, so "2 dl de leite" parsed as an ingredient named
+	// "dl de leite". They sit here with the other metric units even though they
+	// are not English, which is the mixing the base table still needs untangling.
+	dl: "dl", deciliter: "dl", deciliters: "dl", decilitre: "dl", decilitres: "dl",
 	// liter
 	l: "l", liter: "l", liters: "l", litre: "l", litres: "l",
-	// fluid ounce (handled separately in consumeUnit as two-word)
+	// fluid ounce. Matched by the ordinary longest-phrase-first pass in consumeUnit
+	// like any other multi-word form, not by the special case this used to need.
 	"fl oz": "fl oz", "fluid ounce": "fl oz", "fluid ounces": "fl oz",
 	// ounce
 	oz: "oz", ozs: "oz", ounce: "oz", ounces: "oz",

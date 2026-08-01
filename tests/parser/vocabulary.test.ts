@@ -50,6 +50,14 @@ describe("compileQualifierTable", () => {
 		expect(qualifiers.has("qb")).toBe(true);
 	});
 
+	// grosso/fino read as size words and are not: sal grosso and sal fino are two
+	// separate products, so lifting either would merge them in the grocery list.
+	it("does not treat coarse/fine as size words", () => {
+		const qualifiers = compileQualifierTable("pt-PT").forms;
+		for (const grade of ["grosso", "grossa", "fino", "fina"]) {
+			expect(qualifiers.has(grade)).toBe(false);
+		}
+	});
 
 	it("does not treat variety words as qualifiers", () => {
 		const qualifiers = compileQualifierTable("pt-PT").forms;
