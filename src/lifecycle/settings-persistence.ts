@@ -16,6 +16,7 @@ import {
 import type { SuggesterMode, FieldFilter, ScoringRule } from "../suggester/strategy-types";
 import { BUILTIN_MODES } from "../suggester/built-in-strategies";
 import { generateEntryId } from "../utils/date";
+import { localeOptions } from "../parser/locales";
 import {
 	CategorySource,
 	DashboardActivityRangeWeeks,
@@ -286,7 +287,12 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		// Support migration from the old "suggesterStrategies" key (renamed to "suggesterModes")
 		suggesterModes: mergeModes(r.suggesterModes ?? r.suggesterStrategies),
 
-		recipeLocale: str(r.recipeLocale, d.recipeLocale),
+		// Validated against the registry rather than accepted as any string: an id
+		// that no longer resolves falls back to English, and English silently parses
+		// a Portuguese recipe with the wrong units, which is the failure the locale
+		// layer exists to prevent. Better to pin a stale id to the default loudly at
+		// the one place every other enum-shaped setting is already checked.
+		recipeLocale: oneOf(r.recipeLocale, Object.keys(localeOptions()), d.recipeLocale),
 		unitAliases: str(r.unitAliases, d.unitAliases),
 
 		showHighGIWarnings: bool(r.diabeticModeEnabled, d.showHighGIWarnings),

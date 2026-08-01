@@ -18,7 +18,10 @@ export function renderSectionParsing(
 	createCollapsibleSection(container, "Ingredient parsing", (body) => {
 		new Setting(body)
 			.setName("Recipe language")
-			.setDesc("Units written in this language are recognised alongside the built-in ones, so amounts scale and the grocery list can merge them.")
+			.setDesc(
+				"Units written in this language are recognised alongside the built-in ones, so amounts scale and the grocery list can merge them. " +
+				"Changing it changes how existing grocery lines are read, so entries added under the old language may not merge with new ones until you clear the list."
+			)
 			.addDropdown((d) =>
 				d
 					.addOptions(localeOptions())
