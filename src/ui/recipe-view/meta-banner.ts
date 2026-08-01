@@ -80,7 +80,13 @@ function renderNutritionCell(
 // because the banner renders unconditionally in both desktop layouts, while the
 // sidebar is gated on there being extra sections or an image to hang it off --
 // a recipe with only a source would have shown nothing at all there.
-function renderSourceCell(container: HTMLElement, fm: Record<string, unknown>): void {
+function renderSourceCell(
+	container: HTMLElement,
+	fm: Record<string, unknown>,
+	settings: RecipeBoxSettings,
+): void {
+	if (!settings.showRecipeSource) return;
+
 	const display = describeSourceLink(findSourceUrl(fm));
 	if (!display) return;
 
@@ -122,7 +128,7 @@ export function renderMetaBanner(
 	renderMultiplierCell(cells, app, file, multiplier);
 	renderServingsCell(cells, servings, multiplier);
 	renderNutritionCell(cells, fm, settings, servings, multiplier);
-	renderSourceCell(cells, fm);
+	renderSourceCell(cells, fm, settings);
 
 	const actions = banner.createDiv({ cls: "rb-header-actions" });
 	renderFavoriteToggle(actions, app, file, fm, settings);

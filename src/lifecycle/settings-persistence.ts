@@ -307,6 +307,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		headerBadges: Array.isArray(r.headerBadges)
 			? (r.headerBadges as unknown[]).map(validateBadge).filter((x): x is CustomBadge => x !== null)
 			: d.headerBadges,
+		showRecipeSource: bool(r.showRecipeSource, d.showRecipeSource),
 		showTagsInHeader: bool(r.showTagsInHeader, d.showTagsInHeader),
 		prefixTagsWithHash: bool(r.prefixTagsWithHash, d.prefixTagsWithHash),
 		showFullTagPath: bool(r.showFullTagPath, d.showFullTagPath),

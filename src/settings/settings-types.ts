@@ -140,6 +140,9 @@ export interface RecipeBoxSettings {
 
 	// Header badges
 	headerBadges: CustomBadge[];
+	// One toggle for both surfaces: the desktop banner cell and the mobile Info
+	// tab row are the same feature, so they are never configured independently.
+	showRecipeSource: boolean;
 	showTagsInHeader: boolean;
 	prefixTagsWithHash: boolean;
 	showFullTagPath: boolean;
