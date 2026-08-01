@@ -50,27 +50,26 @@ function buildStep(lines: string[]): string {
 	return lines.join("\n").trim();
 }
 
-export function splitBodyAroundInstructions(body: string, headingName: string, isRecipeMd = false): InstructionSplit {
-	const lines = body.split("\n");
-	const { index: headingIdx, level: headingLevel } = findHeadingIndex(lines, headingName);
-
-	if (headingIdx < 0) {
-		// RecipeMD marks the method with a thematic break rather than a heading, so
-		// everything handed to us is the method. Only trusted when the caller says
-		// the note is RecipeMD: in a heading-based note this text is whatever
-		// follows the ingredients, and a bulleted "Notes" section is not a method.
-		if (isRecipeMd) {
-			const steps = parseSteps(lines);
-			if (steps.length > 0) {
-				return { before: "", groups: [{ heading: null, headingLevel: 0, steps }], after: "" };
-			}
-		}
-		return { before: body, groups: [], after: "" };
+/**
+ * Index of the first heading at or above `sectionLevel`, which is where the
+ * method stops and trailing sections (Notes, Cook History, anything the user
+ * added) begin. Returns lines.length when the method runs to the end.
+ */
+function findSectionBoundary(lines: string[], from: number, sectionLevel: number): number {
+	for (let i = from; i < lines.length; i++) {
+		const hMatch = lines[i].match(HEADING_RE);
+		if (hMatch && hMatch[1].length <= sectionLevel) return i;
 	}
+	return lines.length;
+}
 
-	const before = lines.slice(0, headingIdx).join("\n");
+/**
+ * Builds instruction groups from a method region. Headings deeper than
+ * `sectionLevel` open a sub-group; the caller has already cut the region at the
+ * first heading that is not deeper, so none appears here.
+ */
+function collectGroups(lines: string[], sectionLevel: number): InstructionGroup[] {
 	const groups: InstructionGroup[] = [];
-	let afterStart = lines.length;
 	let currentGroupHeading: string | null = null;
 	let currentGroupLevel = 0;
 	let currentRawLines: string[] = [];
@@ -87,24 +86,70 @@ export function splitBodyAroundInstructions(body: string, headingName: string, i
 		currentRawLines = [];
 	}
 
-	for (let i = headingIdx + 1; i < lines.length; i++) {
-		const line = lines[i];
+	for (const line of lines) {
 		const hMatch = line.match(HEADING_RE);
-		if (hMatch) {
-			const depth = hMatch[1].length;
-			if (depth <= headingLevel) {
-				afterStart = i;
-				break;
-			}
+		if (hMatch && hMatch[1].length > sectionLevel) {
 			flushGroup();
 			currentGroupHeading = hMatch[2].trim();
-			currentGroupLevel = depth;
+			currentGroupLevel = hMatch[1].length;
 		} else {
 			currentRawLines.push(line);
 		}
 	}
 	flushGroup();
+	return groups;
+}
 
-	const after = lines.slice(afterStart).join("\n");
-	return { before, groups, after };
+// RecipeMD marks the method with a thematic break rather than a heading, so
+// there is no instructions heading whose depth says where the method ends. The
+// spec puts the title at level 1, which makes level 2 the section level, and
+// level 2 is also what this plugin appends when it writes its own sections
+// (## Cook History). Using it as the reference lets the identical rule that
+// governs heading-based notes apply here: deeper headings group the method,
+// headings at this level or above end it and become trailing sections.
+//
+// Deliberately a constant rather than derived from the note's own title, since
+// cleanNoteBody may already have stripped that h1 before this runs.
+const RECIPEMD_SECTION_LEVEL = 2;
+
+/**
+ * RecipeMD's own reading of the method is "everything after the second thematic
+ * break, to the end of the file", which leaves no room for the trailing sections
+ * this plugin supports -- a Notes section, or the Cook History block the plugin
+ * appends itself, would otherwise be swallowed into the final step. Ending the
+ * method at a section-level heading is a deliberate, documented divergence from
+ * the spec so both note formats behave the same way.
+ */
+function splitRecipeMdMethod(lines: string[]): InstructionSplit {
+	const boundary = findSectionBoundary(lines, 0, RECIPEMD_SECTION_LEVEL);
+	const methodLines = lines.slice(0, boundary);
+	const after = lines.slice(boundary).join("\n");
+
+	const groups = collectGroups(methodLines, RECIPEMD_SECTION_LEVEL);
+	// A method with no list markers yields no steps. Hand it back as prose
+	// instead of dropping it, which is what this path did before it learned
+	// about trailing sections.
+	if (groups.length === 0) return { before: methodLines.join("\n"), groups: [], after };
+
+	return { before: "", groups, after };
+}
+
+export function splitBodyAroundInstructions(body: string, headingName: string, isRecipeMd = false): InstructionSplit {
+	const lines = body.split("\n");
+	const { index: headingIdx, level: headingLevel } = findHeadingIndex(lines, headingName);
+
+	if (headingIdx < 0) {
+		// Only trusted when the caller says the note is RecipeMD: in a heading-based
+		// note this text is whatever follows the ingredients, and a bulleted "Notes"
+		// section is not a method.
+		if (isRecipeMd) return splitRecipeMdMethod(lines);
+		return { before: body, groups: [], after: "" };
+	}
+
+	const boundary = findSectionBoundary(lines, headingIdx + 1, headingLevel);
+	return {
+		before: lines.slice(0, headingIdx).join("\n"),
+		groups: collectGroups(lines.slice(headingIdx + 1, boundary), headingLevel),
+		after: lines.slice(boundary).join("\n"),
+	};
 }
