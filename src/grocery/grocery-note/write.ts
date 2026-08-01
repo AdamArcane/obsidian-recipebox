@@ -8,7 +8,7 @@ import { RecipeBoxSettings } from "../../settings/settings-types";
 import { categorize } from "../category-match";
 import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText, GrocerySection } from "./parse";
-import { vocabularyFromSettings } from "../../parser/unit-table";
+import { vocabularyFromSettings } from "../../parser/vocabulary";
 import { renderGroceryLine, renderGrocerySections } from "./render";
 
 export function mergeIntoGroceryText(noteText: string, contributions: ContributionMap, settings: RecipeBoxSettings): string {

@@ -5,6 +5,7 @@
  */
 import { UNIT_SYNONYMS } from "./ingredient-units";
 import { getLocale } from "./locales";
+import { normalisePhrase } from "./phrase-normalise";
 import { compileUnitAliases } from "./unit-aliases";
 
 /** Normalised phrase to the text shown to the user. */
@@ -27,23 +28,6 @@ export interface ParseVocabulary {
 	numerals: NumeralTable;
 	/** Stripped between a unit and its ingredient, like the English "of". */
 	prepositions: readonly string[];
-}
-
-const COMBINING_MARKS = /[̀-ͯ]/g;
-
-/**
- * Lowercases, strips accents and periods, and collapses whitespace, so "C. Sopa",
- * "c.  sopa" and "c sopa" all reach the same key. Matching is done on whole words
- * rather than character offsets because stripping accents changes string length.
- */
-export function normalisePhrase(text: string): string {
-	return text
-		.normalize("NFD")
-		.replace(COMBINING_MARKS, "")
-		.toLowerCase()
-		.replace(/\./g, "")
-		.trim()
-		.replace(/\s+/g, " ");
 }
 
 /** Builds a table from layers, highest precedence first. */
@@ -104,7 +88,17 @@ export function compileVocabulary(localeId: string, aliasText: string): ParseVoc
 /** The built-in English vocabulary with no locale or user aliases applied. */
 export const ENGLISH_VOCABULARY: ParseVocabulary = compileVocabulary("en", "");
 
+// The settings pair changes only when the user edits it, while the views below
+// ask for a vocabulary on every render. One slot is enough: nothing holds two
+// settings objects at once, and a stale entry can only cost one recompile.
+let cached: { localeId: string; aliasText: string; vocabulary: ParseVocabulary } | null = null;
+
 /** Convenience for the many call sites that hold settings and need a vocabulary. */
 export function vocabularyFromSettings(settings: { recipeLocale: string; unitAliases: string }): ParseVocabulary {
-	return compileVocabulary(settings.recipeLocale, settings.unitAliases);
+	if (cached && cached.localeId === settings.recipeLocale && cached.aliasText === settings.unitAliases) {
+		return cached.vocabulary;
+	}
+	const vocabulary = compileVocabulary(settings.recipeLocale, settings.unitAliases);
+	cached = { localeId: settings.recipeLocale, aliasText: settings.unitAliases, vocabulary };
+	return vocabulary;
 }

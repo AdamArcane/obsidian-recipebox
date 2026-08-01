@@ -3,17 +3,8 @@ import {
 	compileUnitTable,
 	compileQualifierTable,
 	compileVocabulary,
-	normalisePhrase,
 	ENGLISH_VOCABULARY,
-} from "../../src/parser/unit-table";
-
-describe("normalisePhrase", () => {
-	it("lowercases, strips accents and periods, and collapses whitespace", () => {
-		expect(normalisePhrase("C. Sopa")).toBe("c sopa");
-		expect(normalisePhrase("c.  sopa")).toBe("c sopa");
-		expect(normalisePhrase("chávena")).toBe("chavena");
-	});
-});
+} from "../../src/parser/vocabulary";
 
 describe("compileUnitTable", () => {
 	it("falls back to the English vocabulary for an unknown locale", () => {
@@ -58,6 +49,7 @@ describe("compileQualifierTable", () => {
 		expect(qualifiers.has("media")).toBe(true);
 		expect(qualifiers.has("qb")).toBe(true);
 	});
+
 
 	it("does not treat variety words as qualifiers", () => {
 		const qualifiers = compileQualifierTable("pt-PT").forms;

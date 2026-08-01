@@ -3,7 +3,8 @@
  * so "cebola picada" and "cebola" become the same grocery line while the recipe
  * still reads "cebola (picada)".
  */
-import { PhraseTable, normalisePhrase } from "./unit-table";
+import { PhraseTable } from "./vocabulary";
+import { normalisePhrase } from "./phrase-normalise";
 
 export interface QualifierSplit {
 	name: string;

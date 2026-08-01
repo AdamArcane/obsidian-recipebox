@@ -4,7 +4,8 @@
  */
 import { ParsedIngredient } from "../types";
 import { parseLeadingQuantity } from "./quantity-parse";
-import { ParseVocabulary, PhraseTable, normalisePhrase } from "./unit-table";
+import { ParseVocabulary, PhraseTable } from "./vocabulary";
+import { normalisePhrase } from "./phrase-normalise";
 import { extractQualifiers } from "./ingredient-qualifiers";
 import {
 	stripListMarkers,

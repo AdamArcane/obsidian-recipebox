@@ -3,7 +3,7 @@
  * objects, distinguishing recognised ingredient checkboxes from opaque lines.
  */
 import { parseIngredientLine } from "../../parser/ingredient-parse";
-import { ParseVocabulary } from "../../parser/unit-table";
+import { ParseVocabulary } from "../../parser/vocabulary";
 import { ingredientKey } from "../../parser/ingredient-clean";
 
 export interface GroceryLine {
@@ -23,7 +23,7 @@ export interface GrocerySection {
 
 const CHECKBOX_RE = /^- \[([x ])\] (.+)$/i;
 
-export function parseGroceryNoteText(text: string, units: ParseVocabulary): GrocerySection[] {
+export function parseGroceryNoteText(text: string, vocabulary: ParseVocabulary): GrocerySection[] {
 	const sections: GrocerySection[] = [];
 	let current: GrocerySection | null = null;
 
@@ -42,7 +42,7 @@ export function parseGroceryNoteText(text: string, units: ParseVocabulary): Groc
 		}
 
 		const checked = m[1].toLowerCase() === "x";
-		const parsed = parseIngredientLine(m[2], units);
+		const parsed = parseIngredientLine(m[2], vocabulary);
 		if (!parsed?.name) {
 			current.lines.push({ kind: "opaque", key: "", name: "", unit: "", quantity: null, checked, raw });
 			continue;

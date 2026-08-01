@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { parseIngredientLine } from "../../src/parser/ingredient-parse";
 import { stripListMarkers, stripOf } from "../../src/parser/ingredient-clean";
-import { compileVocabulary, ENGLISH_VOCABULARY } from "../../src/parser/unit-table";
+import { compileVocabulary, ENGLISH_VOCABULARY } from "../../src/parser/vocabulary";
 
 const PT = compileVocabulary("pt-PT", "");
 

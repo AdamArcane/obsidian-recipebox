@@ -3,7 +3,8 @@
  * decimals, ASCII fractions, mixed numbers, and Unicode vulgar fractions.
  */
 import { UNICODE_FRACTIONS, UNICODE_FRACTION_PATTERN } from "./quantity-fractions";
-import { NumeralTable, normalisePhrase } from "./unit-table";
+import { NumeralTable } from "./vocabulary";
+import { normalisePhrase } from "./phrase-normalise";
 
 /** Longest-first, so "um quarto" (0.25) is preferred to a bare "um" (1). */
 function consumeNumeral(text: string, numerals?: NumeralTable): QuantityResult | null {

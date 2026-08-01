@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { extractQualifiers } from "../../src/parser/ingredient-qualifiers";
-import { compileQualifierTable } from "../../src/parser/unit-table";
+import { compileQualifierTable } from "../../src/parser/vocabulary";
 import { parseIngredientLine } from "../../src/parser/ingredient-parse";
-import { compileVocabulary } from "../../src/parser/unit-table";
+import { compileVocabulary } from "../../src/parser/vocabulary";
 
 const PT_QUALIFIERS = compileQualifierTable("pt-PT");
 const PT = compileVocabulary("pt-PT", "");

@@ -1,4 +1,4 @@
-import { ENGLISH_VOCABULARY } from "../../src/parser/unit-table";
+import { ENGLISH_VOCABULARY } from "../../src/parser/vocabulary";
 import { describe, it, expect } from "vitest";
 import { parseGroceryNoteText } from "../../src/grocery/grocery-note/parse";
 

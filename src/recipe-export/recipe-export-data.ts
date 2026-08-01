@@ -22,7 +22,7 @@ import { splitBodyAroundIngredients } from "../parser/recipe-ingredient-groups";
 import { splitBodyAroundInstructions } from "../parser/recipe-instruction-groups";
 import { readRecipeMultiplier } from "../parser/recipe-multiplier";
 import { parseIngredientLine } from "../parser/ingredient-parse";
-import { vocabularyFromSettings } from "../parser/unit-table";
+import { vocabularyFromSettings } from "../parser/vocabulary";
 import { hasIgnoreTag } from "../parser/ingredient-clean";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "../ui/recipe-view/nutrition-fields";
 import { resolveImageFile, ABSOLUTE_URL_RE } from "../ui/recipe-view/image-resolve";
@@ -94,15 +94,15 @@ export async function buildRecipeExportData(
 	// Matches meta-banner.ts's on-screen "Serves" cell (scaled = baseServings * multiplier).
 	const servings = baseServings !== null ? baseServings * multiplier : null;
 
-	const units = vocabularyFromSettings(settings);
+	const vocabulary = vocabularyFromSettings(settings);
 	const parsedIngredients: RecipeIngredient[] = [];
 	const scaledIngredientGroups: IngredientGroup[] = ingredientGroups.map((group) => ({
 		heading: group.heading,
-		lines: group.lines.map((line) => rescaleIngredientLine(line, multiplier, units)),
+		lines: group.lines.map((line) => rescaleIngredientLine(line, multiplier, vocabulary)),
 	}));
 	for (const group of ingredientGroups) {
 		for (const line of group.lines) {
-			const parsed = parseIngredientLine(line, units);
+			const parsed = parseIngredientLine(line, vocabulary);
 			if (!parsed || !parsed.name) continue;
 			if (hasIgnoreTag(parsed.tags)) continue;
 			parsedIngredients.push({

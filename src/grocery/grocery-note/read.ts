@@ -5,7 +5,7 @@
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { parseIngredientLine } from "../../parser/ingredient-parse";
-import { vocabularyFromSettings } from "../../parser/unit-table";
+import { vocabularyFromSettings } from "../../parser/vocabulary";
 import { ingredientKey } from "../../parser/ingredient-clean";
 import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText } from "./parse";
@@ -39,13 +39,13 @@ export async function toggleGroceryNoteItemChecked(app: App, key: string, checke
 	if (!text) return;
 
 	const lines = text.split("\n");
-	const units = vocabularyFromSettings(settings);
+	const vocabulary = vocabularyFromSettings(settings);
 	let changed = false;
 
 	for (let i = 0; i < lines.length; i++) {
 		const m = lines[i].match(/^- \[([x ])\] (.+)$/i);
 		if (!m) continue;
-		const parsed = parseIngredientLine(m[2], units);
+		const parsed = parseIngredientLine(m[2], vocabulary);
 		if (!parsed?.name) continue;
 		if (ingredientKey(parsed.name, parsed.unit) !== key) continue;
 		const updated = renderGroceryLine(parsed.name, parsed.unit, parsed.quantity, checked);

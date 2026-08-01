@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ENGLISH_VOCABULARY, compileVocabulary } from "../../src/parser/unit-table";
+import { ENGLISH_VOCABULARY, compileVocabulary } from "../../src/parser/vocabulary";
 import { parseIngredientLine, consumeUnit } from "../../src/parser/ingredient-parse";
 
 describe("consumeUnit", () => {

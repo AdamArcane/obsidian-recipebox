@@ -1,4 +1,4 @@
-import { ENGLISH_VOCABULARY } from "../../src/parser/unit-table";
+import { ENGLISH_VOCABULARY } from "../../src/parser/vocabulary";
 import { describe, it, expect } from "vitest";
 import { rescaleIngredientLine } from "../../src/recipe-export/rescale-ingredient-line";
 
