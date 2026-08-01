@@ -1,3 +1,15 @@
+## [0.1.10-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.2...0.1.10-beta.3) (2026-08-01)
+
+### Features
+
+* **parser:** let a section heading end a RecipeMD method ([a340581](https://github.com/AdamArcane/obsidian-recipebox/commit/a340581c9ae6bf832bfdd4308b651da02572b752))
+* **recipe-view:** show the source link on desktop ([306e4d1](https://github.com/AdamArcane/obsidian-recipebox/commit/306e4d179588d2abdc77ed1d2b44456e0be2a24f))
+* **settings:** add a toggle for the recipe source display ([23dc887](https://github.com/AdamArcane/obsidian-recipebox/commit/23dc887e03e75993b8d5859b8a3f5a03ab5679ca))
+
+### Bug Fixes
+
+* **recipe-view:** stop a non-URL source from breaking the mobile Info tab ([5ab9681](https://github.com/AdamArcane/obsidian-recipebox/commit/5ab9681e74d382a5add89f209e03709bd54c3cdb))
+
 ## [0.1.10-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.1...0.1.10-beta.2) (2026-07-31)
 
 ## [0.1.10-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10-beta.0...0.1.10-beta.1) (2026-07-31)
