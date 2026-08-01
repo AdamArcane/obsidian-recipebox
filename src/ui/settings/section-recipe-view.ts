@@ -58,6 +58,17 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
+		.setName("Show recipe source")
+		.setDesc("Show the recipe's source frontmatter, as a link when it is a web address. Appears in the banner on desktop and in the info tab on mobile.")
+		.addToggle((t) =>
+			t.setValue(settings.showRecipeSource).onChange(async (v) => {
+				settings.showRecipeSource = v;
+				await save();
+				rerender();
+			})
+		);
+
+	new Setting(container)
 		.setName("Show tags in header")
 		.addToggle((t) =>
 			t.setValue(settings.showTagsInHeader).onChange(async (v) => {

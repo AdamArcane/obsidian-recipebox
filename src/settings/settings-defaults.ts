@@ -166,6 +166,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 			builtin: true,
 		},
 	],
+	showRecipeSource: true,
 	showTagsInHeader: true,
 	prefixTagsWithHash: true,
 	showFullTagPath: false,

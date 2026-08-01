@@ -519,12 +519,17 @@ export async function renderMobileLayout(
 	// Info tab — nutrition + source URL + notes content
 	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
 
-	// The hostname is derived inside describeSourceLink, which checks the scheme
-	// before parsing. Previously new URL() ran here unconditionally, one line
-	// above the ^https?:// test meant to protect it, so a source that was not a
-	// web address (a cookbook title, a bare domain) threw and took the whole Info
-	// tab render with it -- leaving the tab bar wired to nothing.
-	const source = describeSourceLink(fmStr(fm, ["source", "url", "sourceUrl", "source_url"]));
+	// Gated by the same setting as the desktop banner cell (meta-banner.ts):
+	// one feature on two surfaces, never configured independently.
+	//
+	// The hostname comes from describeSourceLink, which checks the scheme before
+	// parsing. new URL() used to run here unconditionally, one line above the
+	// ^https?:// test meant to protect it, so a source that was not a web address
+	// (a cookbook title, a bare domain) threw and took the whole Info tab render
+	// with it -- leaving the tab bar wired to nothing.
+	const source = settings.showRecipeSource
+		? describeSourceLink(fmStr(fm, ["source", "url", "sourceUrl", "source_url"]))
+		: null;
 	if (source) {
 		const urlRow = panelInfo.createDiv({ cls: "rb-info-url" });
 		urlRow.createSpan({ cls: "rb-info-url-label", text: "Source: " });
