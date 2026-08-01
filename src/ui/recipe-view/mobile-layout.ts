@@ -23,6 +23,7 @@ import { renderInstructionsSection } from "./instructions-section";
 import { findOrOpenLeaf } from "../../utils/open-leaf";
 import { RECIPE_VIEW_TYPE } from "./recipe-view";
 import { fmStr } from "./frontmatter-read-helpers";
+import { describeSourceLink } from "./source-link-display";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
@@ -518,15 +519,19 @@ export async function renderMobileLayout(
 	// Info tab — nutrition + source URL + notes content
 	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
 
-	const sourceUrl = fmStr(fm, ["source", "url", "sourceUrl", "source_url"]);
-	const sourceURLDisplay = sourceUrl ? new URL(sourceUrl).hostname : undefined;
-	if (sourceUrl) {
+	// The hostname is derived inside describeSourceLink, which checks the scheme
+	// before parsing. Previously new URL() ran here unconditionally, one line
+	// above the ^https?:// test meant to protect it, so a source that was not a
+	// web address (a cookbook title, a bare domain) threw and took the whole Info
+	// tab render with it -- leaving the tab bar wired to nothing.
+	const source = describeSourceLink(fmStr(fm, ["source", "url", "sourceUrl", "source_url"]));
+	if (source) {
 		const urlRow = panelInfo.createDiv({ cls: "rb-info-url" });
 		urlRow.createSpan({ cls: "rb-info-url-label", text: "Source: " });
-		if (/^https?:\/\//.test(sourceUrl)) {
-			urlRow.createEl("a", { href: sourceUrl, text: sourceURLDisplay, attr: { target: "_blank", rel: "noopener" } });
+		if (source.href) {
+			urlRow.createEl("a", { href: source.href, text: source.label, attr: { target: "_blank", rel: "noopener" } });
 		} else {
-			urlRow.createSpan({ text: sourceURLDisplay ?? sourceUrl });
+			urlRow.createSpan({ text: source.label });
 		}
 	}
 
