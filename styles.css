@@ -5486,20 +5486,18 @@ input[type='search'].rb-gallery-search {
    plain solid underline, so it doesn't collide visually with a folder-note
    plugin the person might also have installed. */
 .rb-folder-gallery-link {
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
+  border-bottom: 1px dotted currentColor;
 }
 
 .rb-folder-gallery-link:hover {
-  text-decoration-line: underline;
-  text-decoration-style: solid;
+  border-bottom-style: solid;
   cursor: pointer;
 }
 
 .rb-folder-gallery-link::after {
   content: " 🍴";
   display: inline-block;
-  text-decoration: none;
+  border-bottom: 0;
 }
 
 /* ── Dashboard view ───────────────────────────────────────────────────────── */
