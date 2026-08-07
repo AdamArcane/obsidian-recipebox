@@ -5506,6 +5506,31 @@ input[type='search'].rb-gallery-search {
   padding: 1rem;
 }
 
+/* Declarative settings rows that host legacy section renderers should use
+   the full row width, otherwise Obsidian's two-column setting layout squeezes
+   the embedded section UI into a narrow control column. */
+.setting-item.rb-settings-declarative-legacy-row > .setting-item-info {
+  display: none;
+}
+
+.setting-item.rb-settings-declarative-legacy-row > .setting-item-control {
+  display: block;
+  flex: 1 1 100%;
+  max-width: 100%;
+  margin-inline-start: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.setting-item.rb-settings-declarative-legacy-row .rb-settings-declarative-legacy-mount {
+  display: block;
+  width: 100%;
+}
+
+.setting-item.rb-settings-declarative-legacy-row .rb-settings-declarative-legacy-mount > .setting-item {
+  width: 100%;
+}
+
 .rb-dashboard-greeting {
   padding: 1.5rem 0 2rem;
 }

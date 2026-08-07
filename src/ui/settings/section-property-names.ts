@@ -1,12 +1,10 @@
 /**
  * Consolidated "Property names" settings section — every setting that maps a
- * plugin concept to a frontmatter key, gathered in one place and collapsed by
- * default since most users never need to touch them.
+ * plugin concept to a frontmatter key, gathered in one place.
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
-import { createCollapsibleSection } from "../components/collapsible-section";
 
 export function renderSectionPropertyNames(
 	container: HTMLElement,
@@ -14,7 +12,7 @@ export function renderSectionPropertyNames(
 	save: () => Promise<void>,
 	rerender: () => void
 ): void {
-	createCollapsibleSection(container, "Property names", (body) => renderBody(body, settings, save, rerender));
+	renderBody(container, settings, save, rerender);
 }
 
 function renderBody(

@@ -7,7 +7,6 @@
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings, RecipeExportFormat } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";
-import { createCollapsibleSection } from "../components/collapsible-section";
 
 const RECIPE_EXPORT_FORMAT_LABELS: Record<RecipeExportFormat, string> = {
 	"plain-markdown": "Markdown (plain)",
@@ -23,7 +22,7 @@ export function renderSectionExport(
 	rerender: () => void,
 	app: App,
 ): void {
-	createCollapsibleSection(container, "Default export settings", (body) => renderBody(body, settings, save, rerender, app));
+	renderBody(container, settings, save, rerender, app);
 }
 
 function renderBody(

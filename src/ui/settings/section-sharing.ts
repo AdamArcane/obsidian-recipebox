@@ -7,26 +7,20 @@
  */
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { createCollapsibleSection } from "../components/collapsible-section";
 
 export function renderSectionSharing(
 	container: HTMLElement,
 	settings: RecipeBoxSettings,
 	save: () => Promise<void>,
-	rerender: () => void,
+	_rerender: () => void,
 ): void {
-
-
-	createCollapsibleSection(container, "Recipe sharing", (body) => {
-
-		new Setting(body)
-			.setName("Share server URL")
-			.setDesc("The server that hosts shared recipe links. Only change this if you're self-hosting the recipe sharing worker.")
-			.addText((t) =>
-				t.setValue(settings.shareServerUrl).onChange(async (v) => {
-					settings.shareServerUrl = v.trim() || settings.shareServerUrl;
-					await save();
-				})
-			);
-	});
+	new Setting(container)
+		.setName("Share server URL")
+		.setDesc("The server that hosts shared recipe links. Only change this if you're self-hosting the recipe sharing worker.")
+		.addText((t) =>
+			t.setValue(settings.shareServerUrl).onChange(async (v) => {
+				settings.shareServerUrl = v.trim() || settings.shareServerUrl;
+				await save();
+			})
+		);
 }
