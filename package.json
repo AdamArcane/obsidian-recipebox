@@ -26,7 +26,7 @@
     "@types/node": "^22.0.0",
     "conventional-changelog": "^8.0.1",
     "conventional-changelog-conventionalcommits": "^10.2.1",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "eslint": "^9.39.4",
     "eslint-plugin-obsidianmd": "^0.3.0",
     "globals": "^17.7.0",
