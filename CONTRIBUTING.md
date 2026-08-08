@@ -28,11 +28,11 @@ what you tried first.
 This project uses a specific git workflow. If you'd like to contribute
 code:
 
-1. Fork the repo and branch off `dev`, not `main`.
+1. Fork the repo and branch off `development`, not `main`.
 2. Branch naming: `type/short-description`, e.g. `fix/grocery-list-dedup`
    or `feature/export-json-ld`. Valid types: `feature`, `fix`, `chore`,
    `refactor`.
-3. Open your PR against `dev`. PRs are squash-merged.
+3. Open your PR against `development`. PRs are squash-merged.
 4. Keep PRs small and single-purpose. Match the existing code style —
    see the "Code conventions" section below.
 5. `main` only gets updated via release scripts, not direct merges.

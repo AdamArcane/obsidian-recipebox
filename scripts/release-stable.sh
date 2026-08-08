@@ -2,29 +2,30 @@
 set -e
 
 # Reads the current version from package.json, strips the pre-release suffix,
-# bumps the version on dev first, then merges and pushes to main (tagged) or
+# bumps the version on development first, then merges and pushes to main (tagged) or
 # release-candidate (untagged, for a final Obsidian-review pass before main).
-# Run this from the dev branch when ready to publish a stable release.
+# Run this from the development branch when ready to publish a stable release.
 #
 # Usage:
 #   npm run release:stable          # merge to main, tag, publish
 #   npm run release:stable -- --rc  # merge to release-candidate only, no tag
 #
 # Example (no --rc):
-#   dev is at 0.1.7-beta.3
+#   development is at 0.1.7-beta.3
 #   running this script:
-#     1. bumps dev to 0.1.7
-#     2. merges dev → main
+#     1. bumps development to 0.1.7
+#     2. merges development -> main
 #     3. tags 0.1.7 on main
-#     4. returns to dev (already in sync, no extra commit on main)
+#     4. returns to development (already in sync, no extra commit on main)
 
 rc_branch="release-candidate";
 main_branch="main";
+development_branch="development";
 
-# Must not be on main branch
+# Must run from development branch
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ "$current_branch" == "$main_branch" ]]; then
-  echo "Error: must not be on '$main_branch' branch to release a stable or RC version."
+if [[ "$current_branch" != "$development_branch" ]]; then
+  echo "Error: stable/RC releases must be run from '$development_branch' (current: '$current_branch')."
   exit 1
 fi
 
@@ -40,9 +41,10 @@ if [[ "$1" == "--rc" ]]; then
   rc=true
 fi
 
-# Guard against releasing on top of a broken dev. PRs into dev are already
+# Guard against releasing on top of a broken development branch. PRs into
+# development are already
 # gated by CI, but this catches drift from anything committed straight to
-# dev (hotfixes, manual pushes) since the last PR merge.
+# development (hotfixes, manual pushes) since the last PR merge.
 echo "→ Running tests before release..."
 if ! npm run test; then
   echo "Error: tests are failing on current branch. Fix them before releasing."
@@ -60,7 +62,8 @@ if [[ "$current_version" == "$stable_version" ]]; then
     exit 1
   fi
   # No suffix left, and not an --rc run: this is the second half of an
-  # RC->main promotion (the --rc run already stripped it on dev). Nothing
+  # RC->main promotion (the --rc run already stripped it on development).
+  # Nothing
   # left to bump -- skip straight to merge/tag/publish below.
   already_bumped=true
 else
