@@ -1,3 +1,13 @@
+## [0.1.11](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.11-beta.0...0.1.11) (2026-08-08)
+
+### Features
+
+* **meal-plan:** implement multi-day recipe placement in meal plan modal ([83394c3](https://github.com/AdamArcane/obsidian-recipebox/commit/83394c3f88bcdfad22e3c41f4acc5c0df5df5877))
+
+### Bug Fixes
+
+* **ci:** sync lockfile for npm 10 esbuild resolution ([f82687e](https://github.com/AdamArcane/obsidian-recipebox/commit/f82687e23bc8c50bde3b8eb540580560efd131bb))
+
 ## [0.1.11-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.10...0.1.11-beta.0) (2026-08-08)
 
 ### Features
