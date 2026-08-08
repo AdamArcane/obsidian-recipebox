@@ -66,13 +66,14 @@ export async function addToMealPlan(
 	new Notice(dayMeal ? `${name} added to meal plan (${dayMeal})` : `${name} added to meal plan`);
 }
 
-/** Creates a new independent entry without replacing any existing entry for the same recipe. Used by drag-drop in the meal plan view. Returns the new entry ID. */
+/** Creates a new independent entry without replacing any existing entry for the same recipe. Used by drag-drop in the meal plan view, and by multi-day placement (add-to-meal-plan-modal) which needs one entry per day rather than addToMealPlan's replace-by-recipe-path behavior. Returns the new entry ID. */
 export async function addMealPlanEntry(
 	app: App,
 	recipePath: string,
 	day: string | undefined,
 	settings: RecipeBoxSettings,
-	save: () => Promise<void>
+	save: () => Promise<void>,
+	isLeftovers = false,
 ): Promise<string> {
 	if (!recipePath.trim()) return "";
 
@@ -80,6 +81,7 @@ export async function addMealPlanEntry(
 		id: generateEntryId(),
 		recipePath: recipePath.trim(),
 		day: day?.trim() || undefined,
+		isLeftovers: isLeftovers || undefined,
 		addedDate: localDateISO(),
 		contributions: {},
 	};

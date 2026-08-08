@@ -5,7 +5,7 @@
  */
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { ContributionMap } from "../../types";
+import { ContributionMap, GroceryContributionSource } from "../../types";
 import {
 	loadRecipeIngredients,
 	buildContributions,
@@ -21,8 +21,24 @@ export type MealPlanEntryTarget =
 	| { kind: "recipe"; file: TFile }
 	| { kind: "custom"; label: string };
 
+/**
+ * Write ops needed to place one recipe on more than one day in a single confirm.
+ * Deliberately separate from `onConfirm`: multi-day placement must create N
+ * independent entries via addMealPlanEntry, not call addToMealPlan N times,
+ * since addToMealPlan replaces any existing entry for the same recipe path
+ * (see meal-plan-actions.ts) and would delete each prior day's entry as the
+ * next one was added.
+ */
+export interface MultiDayMealPlanDeps {
+	addMealPlanEntry: (recipePath: string, day: string | undefined, isLeftovers: boolean) => Promise<string>;
+	setMealType: (id: string, mealType: string | undefined) => Promise<void>;
+	addToGroceryOnly: (contributions: ContributionMap, source: GroceryContributionSource) => Promise<void>;
+}
+
 export class AddToMealPlanModal extends BaseModal {
-	private day: string | undefined = undefined;
+	// Multiple days only apply to new recipe entries (see supportsMultiDay()); every
+	// other path (custom meals, edit mode) only ever populates the first element.
+	private days: string[] = [];
 	private meal: string | undefined = undefined;
 	private isLeftovers = false;
 	private customMealName: string;
@@ -40,9 +56,10 @@ export class AddToMealPlanModal extends BaseModal {
 		private readonly settings: RecipeBoxSettings,
 		private readonly onConfirm: (day?: string, meal?: string, contributions?: ContributionMap, isLeftovers?: boolean, label?: string) => void,
 		private readonly prefill?: { day?: string; meal?: string; label?: string; isLeftovers?: boolean; isEdit?: boolean },
+		private readonly multiDayDeps?: MultiDayMealPlanDeps,
 	) {
 		super(app);
-		this.day = prefill?.day;
+		this.days = prefill?.day ? [prefill.day] : [];
 		this.meal = prefill?.meal;
 		this.isLeftovers = prefill?.isLeftovers ?? false;
 		this.customMealName = entry.kind === "custom" ? (prefill?.label ?? entry.label) : "";
@@ -51,6 +68,13 @@ export class AddToMealPlanModal extends BaseModal {
 		// can't tell "editing an existing entry" apart from "adding a new one with a
 		// preset day" (e.g. the week-grid "+" button also prefills day).
 		this.editMode = prefill?.isEdit ?? false;
+	}
+
+	// Multi-day checkbox placement is a recipe-entry-only feature: custom meals have
+	// no signal for multi-day use, and editing an existing entry means editing that
+	// one entry, not fanning it out into new ones (see spec's editMode note).
+	private supportsMultiDay(): boolean {
+		return this.entry.kind === "recipe" && !this.editMode;
 	}
 
 	getTitle(): string { return (this.editMode ? "Edit" : "Add to") + " meal plan"; }
@@ -87,17 +111,60 @@ export class AddToMealPlanModal extends BaseModal {
 			window.requestAnimationFrame(() => nameInput.focus());
 		}
 
-		// Day + Meal row
+		if (this.supportsMultiDay()) {
+			// Full-width checkbox group so a recipe can be placed on several days in
+			// one confirm (e.g. a daily mocha on every morning) instead of repeating
+			// the add flow once per day.
+			const dayRow = planSection.createDiv({ cls: "rb-modal-fields rb-modal-fields--full" });
+			const dayField = dayRow.createDiv({ cls: "rb-modal-field rb-modal-field--grow" });
+			dayField.createEl("label", { cls: "rb-modal-field-label", text: "Day" });
+			const dayGroup = dayField.createDiv({ cls: "rb-modal-radio-group rb-modal-radio-group--wrap" });
+
+			// Queue and day placement are mutually exclusive: queue entries have no
+			// day by definition, and no one has asked for "queue AND specific days"
+			// in one action (queue-only already exists as its own mode elsewhere).
+			const queueRow = dayGroup.createEl("label", { cls: "rb-modal-radio-row" });
+			const queueCheck = queueRow.createEl("input", { attr: { type: "checkbox" } });
+			queueRow.createSpan({ text: "Queue" });
+			queueCheck.checked = this.days.length === 0;
+
+			const dayChecks = new Map<string, HTMLInputElement>();
+			queueCheck.addEventListener("change", () => {
+				if (!queueCheck.checked) return;
+				this.days = [];
+				for (const c of dayChecks.values()) c.checked = false;
+			});
+			for (const d of WEEKDAYS) {
+				const row = dayGroup.createEl("label", { cls: "rb-modal-radio-row" });
+				const check = row.createEl("input", { attr: { type: "checkbox" } });
+				check.checked = this.days.includes(d);
+				row.createSpan({ text: d });
+				dayChecks.set(d, check);
+				check.addEventListener("change", () => {
+					if (check.checked) {
+						queueCheck.checked = false;
+						this.days.push(d);
+					} else {
+						this.days = this.days.filter((x) => x !== d);
+					}
+					this.updateConfirmLabel();
+				});
+			}
+		}
+
+		// Day (single) + Meal row
 		const fields = planSection.createDiv({ cls: "rb-modal-fields" });
 
-		// Day dropdown
-		const dayField = fields.createDiv({ cls: "rb-modal-field" });
-		dayField.createEl("label", { cls: "rb-modal-field-label", text: "Day" });
-		const daySelect = dayField.createEl("select", { cls: "rb-modal-select" });
-		daySelect.createEl("option", { attr: { value: "" }, text: "Queue" });
-		for (const d of WEEKDAYS) daySelect.createEl("option", { attr: { value: d }, text: d });
-		if (this.prefill?.day) daySelect.value = this.prefill.day;
-		daySelect.addEventListener("change", () => { this.day = daySelect.value || undefined; });
+		if (!this.supportsMultiDay()) {
+			// Day dropdown
+			const dayField = fields.createDiv({ cls: "rb-modal-field" });
+			dayField.createEl("label", { cls: "rb-modal-field-label", text: "Day" });
+			const daySelect = dayField.createEl("select", { cls: "rb-modal-select" });
+			daySelect.createEl("option", { attr: { value: "" }, text: "Queue" });
+			for (const d of WEEKDAYS) daySelect.createEl("option", { attr: { value: d }, text: d });
+			if (this.prefill?.day) daySelect.value = this.prefill.day;
+			daySelect.addEventListener("change", () => { this.days = daySelect.value ? [daySelect.value] : []; });
+		}
 
 		// Meal type input
 		const mealField = fields.createDiv({ cls: "rb-modal-field" });
@@ -175,16 +242,45 @@ export class AddToMealPlanModal extends BaseModal {
 		this.contributions = () => buildContributions(this.ingredients, this.selectedKeys);
 	}
 
+	private confirmLabel(): string {
+		if (this.editMode) return "Update";
+		if (this.days.length > 1) return `Add to ${this.days.length} days`;
+		return "Add to plan";
+	}
+
+	private updateConfirmLabel(): void {
+		if (this.confirmBtn) this.confirmBtn.textContent = this.confirmLabel();
+	}
+
 	renderFooter(footerEl: HTMLElement): void {
 		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
 			.addEventListener("click", () => this.close());
 
-		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: this.editMode ? "Update" : "Add to plan" });
+		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: this.confirmLabel() });
 		this.confirmBtn.addEventListener("click", () => { void (async () => {
 			this.confirmBtn.disabled = true;
 			this.confirmBtn.textContent = this.editMode ? "Updating…" : "Adding…";
-			await Promise.resolve(this.onConfirm(this.day, this.meal, this.contributions?.(), this.isLeftovers, this.customMealName || undefined));
+			if (this.days.length > 1 && this.entry.kind === "recipe" && this.multiDayDeps) {
+				await this.confirmMultiDay(this.entry.file, this.multiDayDeps);
+			} else {
+				await Promise.resolve(this.onConfirm(this.days[0], this.meal, this.contributions?.(), this.isLeftovers, this.customMealName || undefined));
+			}
 			this.close();
 		})(); });
+	}
+
+	// Places the recipe on every selected day as an independent entry (see
+	// MultiDayMealPlanDeps doc comment for why this can't just loop onConfirm).
+	private async confirmMultiDay(file: TFile, deps: MultiDayMealPlanDeps): Promise<void> {
+		const contributions = this.contributions?.() ?? {};
+		for (const day of this.days) {
+			const id = await deps.addMealPlanEntry(file.path, day, this.isLeftovers);
+			if (this.meal) await deps.setMealType(id, this.meal);
+			// Contribute once per created entry, matching the existing per-entry
+			// contribution model rather than inventing a shared-across-N-entries concept.
+			if (Object.keys(contributions).length > 0) {
+				await deps.addToGroceryOnly(contributions, { kind: "recipe", path: file.path, day, mealType: this.meal });
+			}
+		}
 	}
 }

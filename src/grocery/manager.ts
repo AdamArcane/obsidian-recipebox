@@ -59,8 +59,8 @@ export class GroceryManager extends Events {
 		await this.refresh();
 	}
 
-	async addMealPlanEntry(recipePath: string, day?: string): Promise<string> {
-		const id = await addMealPlanEntry(this.app, recipePath, day, this.sink.getSettings(), () => this.sink.save());
+	async addMealPlanEntry(recipePath: string, day?: string, isLeftovers = false): Promise<string> {
+		const id = await addMealPlanEntry(this.app, recipePath, day, this.sink.getSettings(), () => this.sink.save(), isLeftovers);
 		await this.refresh();
 		return id;
 	}

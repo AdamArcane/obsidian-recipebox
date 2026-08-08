@@ -12,7 +12,7 @@ import { GalleryView, GALLERY_VIEW_TYPE } from "../ui/gallery-view";
 import { DashboardView, DASHBOARD_VIEW_TYPE } from "../ui/dashboard-view";
 import { getAllRecipeNotes } from "./recipe-file-detection";
 import { debounce } from "../utils/debounce";
-import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
+import { AddToMealPlanModal, MultiDayMealPlanDeps } from "../ui/modals/add-to-meal-plan-modal";
 import { AddToGroceryModal } from "../ui/modals/add-to-grocery-modal";
 import { MarkCookedModal } from "../ui/modals/mark-cooked-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
@@ -22,6 +22,18 @@ import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { unshareRecipe } from "../sharing/unshare-recipe";
 import { resolveNotePath } from "../utils/vault-notes";
+
+// Wires the multi-day placement path (see MultiDayMealPlanDeps doc comment)
+// straight to the manager, same as every other meal-plan mutation in this file.
+// Exported so the toggle-recipe-in-meal-plan command (the one AddToMealPlanModal
+// call site outside this file) can reuse it instead of duplicating the wiring.
+export function multiDayMealPlanDeps(plugin: RecipeBoxPlugin): MultiDayMealPlanDeps {
+	return {
+		addMealPlanEntry: (recipePath, day, isLeftovers) => plugin.manager.addMealPlanEntry(recipePath, day, isLeftovers),
+		setMealType: (id, mealType) => plugin.manager.setMealType(id, mealType),
+		addToGroceryOnly: (contributions, source) => plugin.manager.addToGroceryOnly(contributions, source),
+	};
+}
 
 // Opens the "update grocery list" modal for a recipe and wires its confirm
 // callback to the grocery manager. Shared by the recipe view and the gallery
@@ -141,6 +153,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
 						},
 						prefill,
+						multiDayMealPlanDeps(plugin),
 					).open();
 				},
 				openAddCustomMealModal: (label, day, editingEntry) => {
@@ -224,6 +237,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 						(day, meal, contributions, isLeftovers) => {
 							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
 						},
+						undefined,
+						multiDayMealPlanDeps(plugin),
 					).open();
 				},
 				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
@@ -301,6 +316,8 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 						(day, meal, contributions, isLeftovers) => {
 							void plugin.manager.addToMealPlan(file.path, day, meal, contributions ?? {}, isLeftovers);
 						},
+						undefined,
+						multiDayMealPlanDeps(plugin),
 					).open();
 				},
 				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
@@ -336,7 +353,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 					if (leaf2) void leaf2.setViewState({ type: "markdown", state: { file: path }, active: true });
 				},
 				openAddToMealPlanModal: (file: TFile, onConfirm) => {
-					new AddToMealPlanModal(plugin.app, { kind: "recipe", file }, plugin.settings, onConfirm).open();
+					new AddToMealPlanModal(plugin.app, { kind: "recipe", file }, plugin.settings, onConfirm, undefined, multiDayMealPlanDeps(plugin)).open();
 				},
 				openAddToGroceryModal: (file: TFile) => openGroceryModalForFile(plugin, file),
 				openMarkCookedModal: (file: TFile, onStamp) => {

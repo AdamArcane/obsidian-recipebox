@@ -2692,12 +2692,21 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   cursor: pointer;
 }
 
-/* ── Radio group (Schedule recipes modal: day fill mode) ─────────────────── */
+/* ── Radio group (Schedule recipes modal: day fill mode; also reused with
+   checkboxes for the Add to meal plan modal's multi-day picker) ──────────── */
 
 .rb-modal-radio-group {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+/* Multi-day picker: Queue + seven weekdays reads better as a wrapping grid
+   than one column, since a single column runs the modal tall unnecessarily. */
+.rb-modal-radio-group--wrap {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
 }
 
 .rb-modal-radio-row {
@@ -2709,7 +2718,8 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--text-normal);
 }
 
-.rb-modal-radio-row input[type="radio"] {
+.rb-modal-radio-row input[type="radio"],
+.rb-modal-radio-row input[type="checkbox"] {
   flex-shrink: 0;
   cursor: pointer;
 }
