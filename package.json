@@ -13,7 +13,7 @@
     "test:typecheck": "tsc -noEmit -skipLibCheck -p tests/tsconfig.json",
     "changelog:first": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s --first-release",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s",
-    "version": "node -e \"const fs=require('fs'); const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=process.env.npm_new_version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && npm run changelog && git add manifest.json CHANGELOG.md",
+    "version": "node -e \"const fs=require('fs'); const next=process.env.npm_new_version || process.env.npm_package_version; if(!next){throw new Error('Missing npm_new_version/npm_package_version');} const m=JSON.parse(fs.readFileSync('manifest.json')); m.version=next; fs.writeFileSync('manifest.json', JSON.stringify(m, null, '\\t'));\" && npm run changelog && git add manifest.json CHANGELOG.md",
     "postversion": "git push && git push --tags",
     "release:beta": "npm version prerelease --preid=beta",
     "release:minor": "npm version minor --no-git-tag-version && git add package.json manifest.json && git commit -m \"chore: bump minor version\"",
