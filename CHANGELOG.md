@@ -1,3 +1,9 @@
+## [0.1.12-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.0...0.1.12-beta.1) (2026-08-29)
+
+### Features
+
+* **timer:** Added ability to create ad-hoc timers, from either the command pallette or a new button in trhe instructions section ([3a3d759](https://github.com/AdamArcane/obsidian-recipebox/commit/3a3d7598e5342d899b7d95cfa7459b96ee4195de))
+
 ## [0.1.12-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.11...0.1.12-beta.0) (2026-08-29)
 
 ## [0.1.11](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.11-beta.0...0.1.11) (2026-08-08)
