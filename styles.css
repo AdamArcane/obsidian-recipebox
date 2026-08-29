@@ -974,7 +974,8 @@
   flex: 1;
 }
 
-button:not(.clickable-icon).rb-grocery-add-btn {
+button:not(.clickable-icon).rb-grocery-add-btn,
+button:not(.clickable-icon).rb-start-timer-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -994,7 +995,8 @@ button:not(.clickable-icon).rb-grocery-add-btn {
   height: 0.75rem;
 } */
 
-.rb-grocery-add-btn:hover {
+.rb-grocery-add-btn:hover,
+.rb-start-timer-btn:hover {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent);
@@ -2630,6 +2632,15 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   min-width: 0;
 }
 
+/* Row holds a single field capped to half the modal's width, rather than
+   stretching to fill it -- used where a full-width input would look
+   disproportionate for short values (e.g. Start timer's name/duration). */
+.rb-modal-field--half {
+  flex: 0 1 50%;
+  max-width: 50%;
+  min-width: 0;
+}
+
 .rb-modal-field {
   display: flex;
   flex-direction: column;
@@ -2672,6 +2683,12 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 .rb-modal-select:focus,
 .rb-modal-input:focus {
   border-color: var(--interactive-accent);
+}
+
+/* Start timer modal: just two short fields, so add breathing room above/below
+   the form that the default compact modal-body padding doesn't provide. */
+.rb-start-timer-modal .rb-modal-body {
+  padding: 1rem 0;
 }
 
 /* Confirm modal */
@@ -2823,7 +2840,8 @@ body.is-mobile .rb-ingredient-row {
 }
 
 /* Grocery add/remove buttons */
-body.is-mobile .rb-grocery-add-btn {
+body.is-mobile .rb-grocery-add-btn,
+body.is-mobile .rb-start-timer-btn {
   width: 2rem;
   height: 2rem;
 }
@@ -3022,9 +3040,15 @@ body.is-mobile .rb-jump-btn {
   pointer-events: none;
 }
 
-/* Individual timer widget */
+/* Individual timer widget. z-index is set here (not just on the tray) because
+   dragging (timer-drag.ts) detaches the widget and reparents it directly onto
+   document.body -- without its own stacking priority it then rendered behind
+   other fixed UI chrome (e.g. the status bar). position: relative anchors the
+   ::after flash ring below (see .rb-timer-flashing::after). */
 .rb-timer-widget {
+  position: relative;
   pointer-events: all;
+  z-index: 1000;
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   border-radius: var(--radius-l);
@@ -3039,6 +3063,28 @@ body.is-mobile .rb-jump-btn {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 30%, transparent),
     0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Bright, pulsing border for a done-but-not-yet-acknowledged timer. Stops as
+   soon as the widget is clicked (see TimerWidget.stopFlashing).
+   Named rb-timer-flashing, not is-flashing -- Obsidian's own core CSS defines
+   a global .is-flashing utility (used for its flash-on-jump-to-heading
+   feature) with `background-color: var(--text-highlight-bg) !important` and
+   a mix-blend-mode. Reusing that name meant Obsidian's rule was silently
+   painting over this widget regardless of anything in this stylesheet. */
+.rb-timer-widget.rb-timer-flashing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: rb-timer-flash-border 1s ease-in-out infinite;
+}
+
+@keyframes rb-timer-flash-border {
+  0%, 100% { border-color: var(--color-red); }
+  50% { border-color: transparent; }
 }
 
 /* Handle / drag area */

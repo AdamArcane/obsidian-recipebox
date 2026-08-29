@@ -6,6 +6,7 @@ import { App, Component, MarkdownRenderer, setIcon } from "obsidian";
 import { InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { TimerOptions, processTimerNodes } from "../timer/timer-dom-process";
+import { StartTimerModal } from "../modals/start-timer-modal";
 export type { TimerOptions };
 
 export async function renderInstructionsSection(
@@ -22,6 +23,15 @@ export async function renderInstructionsSection(
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "list-ordered");
 	header.createSpan({ cls: "rb-section-title", text: settings.instructionsHeading });
+
+	if (settings.timersEnabled) {
+		const timerBtn = header.createEl("button", {
+			cls: "rb-start-timer-btn",
+			attr: { "aria-label": "Start a timer" },
+		});
+		setIcon(timerBtn, "timer");
+		timerBtn.addEventListener("click", () => new StartTimerModal(app, settings).open());
+	}
 
 	for (const group of groups) {
 		if (!group.heading && group.steps.length === 0) continue;

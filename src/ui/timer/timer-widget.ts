@@ -80,7 +80,16 @@ export class TimerWidget {
 
 		const detachDrag = makeDraggable(this.el, handle);
 		this.cleanups.push(detachDrag);
+
+		// Any interaction with the finished widget counts as acknowledging it --
+		// stops the flashing border without requiring a dedicated dismiss button.
+		this.el.addEventListener("click", this.stopFlashing);
+		this.cleanups.push(() => this.el.removeEventListener("click", this.stopFlashing));
 	}
+
+	private stopFlashing = (): void => {
+		this.el.removeClass("rb-timer-flashing");
+	};
 
 	private makeIconBtn(container: HTMLElement, icon: string, label: string, onClick: () => void, cls = "rb-timer-btn"): HTMLElement {
 		const btn = container.createDiv({ cls, attr: { "aria-label": label, role: "button", tabindex: "0" } });
@@ -101,6 +110,7 @@ export class TimerWidget {
 		this.remaining = Math.max(0, this.remaining + delta);
 		this.total = Math.max(0, this.total + delta);
 		this.el.removeClass("is-finished");
+		this.el.removeClass("rb-timer-flashing");
 		this.updateDisplay();
 	}
 
@@ -155,6 +165,7 @@ export class TimerWidget {
 		this.pause();
 		this.remaining = this.total;
 		this.el.removeClass("is-finished");
+		this.el.removeClass("rb-timer-flashing");
 		this.updateDisplay();
 	}
 
@@ -163,6 +174,12 @@ export class TimerWidget {
 		this.remaining = 0;
 		this.updateDisplay();
 		this.el.addClass("is-finished");
+		// Flashes until the user clicks the widget (see stopFlashing) -- a static
+		// highlight was easy to miss when the tray sits at the edge of the screen.
+		// Namespaced (not "is-flashing") -- that name collides with Obsidian's own
+		// global flash-on-jump utility class, which force-applies a highlight
+		// background + mix-blend-mode via !important and broke this widget's paint.
+		this.el.addClass("rb-timer-flashing");
 		playCompletionSound();
 		new Notice(`Timer done: ${this.label}`);
 	}

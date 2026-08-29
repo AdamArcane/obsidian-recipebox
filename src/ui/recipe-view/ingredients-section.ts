@@ -35,6 +35,7 @@ export async function renderIngredientsSection(
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "carrot");
 	header.createSpan({ cls: "rb-section-title", text: settings.ingredientsHeading });
+
 	const addBtn = header.createEl("button", {
 		cls: "rb-grocery-add-btn",
 		attr: { "aria-label": "Add to grocery list" },

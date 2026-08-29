@@ -11,6 +11,7 @@ import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
 import { RecipeExportModal } from "../ui/modals/recipe-export-modal";
 import { ShareRecipeModal } from "../ui/modals/share-recipe-modal";
+import { StartTimerModal } from "../ui/modals/start-timer-modal";
 import { isRecipeFile } from "../lifecycle/recipe-file-detection";
 import { RecipeView, RECIPE_VIEW_TYPE } from "../ui/recipe-view/recipe-view";
 import { multiDayMealPlanDeps } from "../lifecycle/register-views";
@@ -126,6 +127,17 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
 			if (checking) return true;
 			new ShareRecipeModal(plugin.app, file, plugin.settings, () => plugin.saveSettings()).open();
+			return true;
+		},
+	});
+
+	plugin.addCommand({
+		id: "start-timer",
+		name: "Start a timer",
+		checkCallback: (checking) => {
+			if (!plugin.settings.timersEnabled) return false;
+			if (checking) return true;
+			new StartTimerModal(plugin.app, plugin.settings).open();
 			return true;
 		},
 	});
