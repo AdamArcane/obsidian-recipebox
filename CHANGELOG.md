@@ -1,3 +1,14 @@
+## [0.1.12-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.2...0.1.12-beta.3) (2026-09-04)
+
+### Features
+
+* Implement Add Recipe form with import functionality ([b85f975](https://github.com/AdamArcane/obsidian-recipebox/commit/b85f9759eec5b37f5119cc39fa97009fb91d38da))
+* **import:** rework recipe import process with manual entry option and enhanced UI ([c107435](https://github.com/AdamArcane/obsidian-recipebox/commit/c1074354d2770731cc6a3ba819e0178b48f93e34))
+
+### Bug Fixes
+
+* update discussion URL in issue template and remove outdated notes from CLAUDE.md ([cfe864b](https://github.com/AdamArcane/obsidian-recipebox/commit/cfe864bb8ca0e9915ba625f18b0318fcbe8741d1))
+
 ## [0.1.12-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.1...0.1.12-beta.2) (2026-09-04)
 
 ### Features
