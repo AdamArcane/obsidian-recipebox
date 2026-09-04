@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Questions / usage help
-    url: https://github.com/AdamArcane/recipe-box/discussions
+    url: https://github.com/AdamArcane/obsidian-recipebox/discussions
     about: Ask a question or discuss usage before filing a bug or feature request
