@@ -37,7 +37,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "import-recipe",
-		name: "Import recipe",
+		name: "Add recipe",
 		callback: () => new ImportRecipeModal(plugin.app, plugin.settings).open(),
 	});
 

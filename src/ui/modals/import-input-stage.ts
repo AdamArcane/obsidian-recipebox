@@ -9,11 +9,34 @@ import { ExtractedRecipe } from "../../importer/recipe-extract-types";
 import { submitUrl, submitText, resolveDestinationFolder } from "./import-submit";
 
 export interface InputStageState {
-	tab: "url" | "text";
+	tab: "url" | "text" | "manual";
 	url: string;
 	text: string;
 	titleOverride: string;
 	folder: string;
+}
+
+/** A blank starting point for the Manual tab -- every string field empty, every
+ * numeric/nullable field null, no ingredient/step/note groups. Manual entry
+ * skips extraction entirely and hands this straight to the review stage. */
+function blankRecipe(): ExtractedRecipe {
+	return {
+		title: "",
+		description: "",
+		heroImage: null,
+		servings: null,
+		prepTime: null,
+		cookTime: null,
+		totalTime: null,
+		ingredientGroups: [],
+		instructionGroups: [],
+		notesGroups: [],
+		sourceUrl: "",
+		calories: null,
+		protein: null,
+		fat: null,
+		carbs: null,
+	};
 }
 
 export function renderInputStage(
@@ -28,17 +51,22 @@ export function renderInputStage(
 	const tabs = bodyEl.createDiv({ cls: "rb-import-tabs" });
 	const urlTab = tabs.createEl("button", { cls: "rb-import-tab", text: "From URL" });
 	const textTab = tabs.createEl("button", { cls: "rb-import-tab", text: "From text" });
+	const manualTab = tabs.createEl("button", { cls: "rb-import-tab", text: "Manual" });
 
-	function setTab(tab: "url" | "text"): void {
+	function setTab(tab: "url" | "text" | "manual"): void {
 		state.tab = tab;
 		urlTab.toggleClass("rb-import-tab--active", tab === "url");
 		textTab.toggleClass("rb-import-tab--active", tab === "text");
+		manualTab.toggleClass("rb-import-tab--active", tab === "manual");
 		urlPane.toggle(tab === "url");
 		textPane.toggle(tab === "text");
+		manualPane.toggle(tab === "manual");
+		submitBtn.setText(tab === "manual" ? "Continue" : "Import");
 	}
 
 	urlTab.addEventListener("click", () => setTab("url"));
 	textTab.addEventListener("click", () => setTab("text"));
+	manualTab.addEventListener("click", () => setTab("manual"));
 
 	// URL pane
 	const urlPane = bodyEl.createDiv({ cls: "rb-import-pane" });
@@ -73,6 +101,14 @@ export function renderInputStage(
 	textArea.value = state.text;
 	textArea.addEventListener("input", () => { state.text = textArea.value; });
 
+	// Manual pane -- no fields of its own, the blank ExtractedRecipe is built
+	// entirely on the review stage.
+	const manualPane = bodyEl.createDiv({ cls: "rb-import-pane" });
+	manualPane.createDiv({
+		cls: "rb-import-field-label",
+		text: "Start with a blank recipe and fill in every field on the next screen.",
+	});
+
 	// Shared folder field
 	const folderSection = bodyEl.createDiv({ cls: "rb-import-folder-row" });
 	folderSection.createDiv({ cls: "rb-import-field-label", text: "Destination folder" });
@@ -85,10 +121,14 @@ export function renderInputStage(
 	folderInput.addEventListener("input", () => { state.folder = folderInput.value; });
 	new FolderSuggest(app, folderInput);
 
-	const importBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
-	importBtn.addEventListener("click", () => { void (async () => {
-		importBtn.disabled = true;
-		importBtn.setText("Importing…");
+	const submitBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
+	submitBtn.addEventListener("click", () => { void (async () => {
+		if (state.tab === "manual") {
+			onResult(blankRecipe(), state.folder, null);
+			return;
+		}
+		submitBtn.disabled = true;
+		submitBtn.setText("Importing…");
 		urlErrorBox.empty();
 		urlErrorBox.hide();
 		try {
@@ -105,8 +145,8 @@ export function renderInputStage(
 				if (recipe) onResult(recipe, state.folder, null);
 			}
 		} finally {
-			importBtn.disabled = false;
-			importBtn.setText("Import");
+			submitBtn.disabled = false;
+			submitBtn.setText("Import");
 		}
 	})(); });
 

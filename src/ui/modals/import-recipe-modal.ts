@@ -1,6 +1,8 @@
 /**
- * Two-stage import modal: input stage (URL or pasted text) followed by a
- * review/edit stage before the note is written to the vault.
+ * Two-stage add-recipe modal: input stage (URL, pasted text, or manual entry)
+ * followed by a review/edit stage before the note is written to the vault.
+ * The review stage is the plugin's one official "add a recipe" screen --
+ * URL and text imports just prefill it, Manual opens it blank.
  *
  * Extends BaseModal; stage transitions clear and repopulate the shell's body
  * and footer rather than rebuilding the whole modal from scratch.
@@ -56,6 +58,14 @@ export class ImportRecipeModal extends BaseModal {
 		this.currentFooterEl.empty();
 		// Keep the shell title in sync with the current stage
 		this.shellTitleEl.textContent = this.getTitle();
+		// The review stage is the plugin's one official "add a recipe" screen
+		// (manual entry included), so it gets a wider layout than the small
+		// input-stage picker -- toggled here rather than baked into
+		// getContentClasses() since BaseModal only reads that once, at open.
+		// This has to go on modalEl, not contentEl: contentEl is the inner
+		// .modal-content, and Obsidian's .modal itself has a fixed width, so a
+		// class on contentEl alone never changes what the dialog looks like.
+		this.modalEl.toggleClass("rb-import-modal--wide", this.stage === "review");
 
 		if (this.stage === "input") {
 			renderInputStage(

@@ -4,11 +4,14 @@
  */
 import { App, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
-import { ExtractedRecipe } from "../../importer/recipe-extract-types";
+import { ExtractedRecipe, ImportedGroup } from "../../importer/recipe-extract-types";
 import { groupsToTextarea, textareaToGroups } from "../../importer/recipe-group-textarea";
 import { saveRecipe } from "./import-submit";
 import { ConfirmModal } from "./confirm-modal";
 import { openInRecipeView } from "../utils/open-in-recipe-view";
+import { VaultImageSuggestModal } from "./vault-image-suggest-modal";
+import { renderIngredientListEditor } from "./import-ingredient-editor";
+import { renderStepListEditor } from "./import-step-editor";
 
 function leadingInt(s: string | null): string {
 	if (!s) return "";
@@ -19,6 +22,10 @@ function leadingInt(s: string | null): string {
 function parseNum(s: string): number | null {
 	const n = Number(s.trim());
 	return s.trim() !== "" && isFinite(n) ? n : null;
+}
+
+function flattenItems(groups: ImportedGroup[]): string[] {
+	return groups.flatMap((g) => g.items);
 }
 
 function inlineRow(
@@ -38,40 +45,28 @@ function inlineRow(
 	}
 }
 
-// Reuses the same header/arrow/body structure and rb-extra-card* classes as
-// the recipe view's trailing-section cards (section-extra-content.ts), rather
-// than the settings tab's collapsible pattern -- that one is styled for
-// dense settings lists (small chevron-text toggle), while this needs a
-// full-bordered card that reads as a distinct block in a modal. Collapsing
-// uses display:none (not the tab panels' visibility trick), so a collapsed
-// section actually stops contributing height -- that's the point here, since
-// the complaint was inner scrollbars/wasted space, not preserving layout
-// height across a switch.
-function importCard(parent: HTMLElement, title: string, expandedByDefault: boolean): HTMLElement {
-	const card = parent.createDiv({ cls: "rb-extra-card" });
-	if (!expandedByDefault) card.addClass("rb-extra-card--collapsed");
-	const header = card.createDiv({ cls: "rb-extra-card-header" });
-	const arrow = header.createDiv({ cls: "rb-extra-card-arrow" });
-	setIcon(arrow, "chevron-down");
-	header.createDiv({ cls: "rb-extra-card-title", text: title });
-	const body = card.createDiv({ cls: "rb-extra-card-body" });
-	header.addEventListener("click", () => {
-		card.toggleClass("rb-extra-card--collapsed", !card.hasClass("rb-extra-card--collapsed"));
-	});
-	return body;
+// Deliberately its own class set rather than reusing rb-extra-card* -- those
+// classes also back the recipe view's actual collapsible trailing-content
+// cards (section-card.ts), and this section is never collapsible, so sharing
+// the class would mean either dragging collapse behavior in here or stripping
+// it there. All sections render open, all the time -- the earlier per-section
+// collapse (Ingredients/Steps hidden by default) was the original complaint
+// this modal exists to fix, and full accordion behavior for every section
+// turned out to just be more clicking to see the same always-needed content.
+function importSection(parent: HTMLElement, title: string): HTMLElement {
+	const card = parent.createDiv({ cls: "rb-import-section" });
+	card.createDiv({ cls: "rb-import-section-header", text: title });
+	return card.createDiv({ cls: "rb-import-section-body" });
 }
 
-// Grows a textarea to fit its content instead of scrolling internally overflow stays hidden and
-// resize is disabled via the rb-import-textarea--auto CSS class. A
-// ResizeObserver (not a fixed rAF delay) drives the recalculation: a
-// collapsed rb-extra-card sets its body to display:none, which makes any
-// textarea inside it report scrollHeight 0 until the section is expanded, so
-// a one-time measurement at render time can't work once cards start
-// collapsed by default. The observer fires whenever the textarea's actual
-// box size changes for any reason -- expand/collapse, mobile layout settling
-// after the modal opens, orientation change -- so there's no timing to guess
-// at. Also still recalculates on input, since typed content can grow the
-// textarea without any external size change to trigger the observer.
+// Grows a textarea to fit its content instead of scrolling internally --
+// overflow stays hidden and resize is disabled via the
+// rb-import-textarea--auto CSS class. A ResizeObserver (not a fixed rAF
+// delay) drives the recalculation, since it fires whenever the textarea's
+// actual box size changes for any reason (mobile layout settling after the
+// modal opens, orientation change), not just on typed input. Also still
+// recalculates on input, since typed content can grow the textarea without
+// any external size change to trigger the observer.
 function autosizeTextarea(ta: HTMLTextAreaElement): void {
 	const resize = (): void => {
 		ta.setCssProps({ height: "auto" });
@@ -103,14 +98,26 @@ export function renderReviewStage(
 		bodyEl.createDiv({ cls: "rb-import-warning-box", text: warning });
 	}
 
-	// Best-effort preview of the source image at its original (pre-download) URL.
-	// The actual vault download happens later in saveRecipe -- this is just a
-	// visual check so the user can see what they're about to import. Silently
-	// omitted if there's no heroImage or the URL fails to load, rather than
-	// showing a broken-image icon.
-	if (recipe.heroImage) {
-		const imgWrap = bodyEl.createDiv({ cls: "rb-import-image-preview" });
-		const img = imgWrap.createEl("img", { attr: { src: recipe.heroImage, alt: "" } });
+	// Best-effort preview of the image at its current (pre-download) URL or
+	// vault path. The actual vault download happens later in saveRecipe -- this
+	// is just a visual check of what's about to be saved. Silently omitted if
+	// there's no heroImage or the source fails to load, rather than showing a
+	// broken-image icon. Now that heroImage is directly editable (not just
+	// something URL imports populate via scraping), the preview re-renders on
+	// every change instead of being drawn once from the initial value.
+	//
+	// A plain <img src> can't load a vault-relative path directly -- it needs
+	// Obsidian's resource URL for whatever file that path resolves to. URLs
+	// and data: URIs fall straight through unchanged, since getFileByPath just
+	// returns null for those and heroImage is used as-is.
+	const previewWrap = bodyEl.createDiv();
+	function renderPreview(): void {
+		previewWrap.empty();
+		if (!recipe.heroImage) return;
+		const imgWrap = previewWrap.createDiv({ cls: "rb-import-image-preview" });
+		const img = imgWrap.createEl("img", { attr: { alt: "" } });
+		const vaultFile = app.vault.getFileByPath(recipe.heroImage);
+		img.src = vaultFile ? app.vault.getResourcePath(vaultFile) : recipe.heroImage;
 		img.addEventListener("error", () => imgWrap.remove());
 	}
 
@@ -131,13 +138,40 @@ export function renderReviewStage(
 		}
 	}
 
-	// Title stays outside every card -- it's the one field worth seeing no
-	// matter which sections are expanded or collapsed.
+	// Title and Image stay outside every section -- they're the two fields
+	// worth seeing above everything else, not tucked under a heading.
 	field(bodyEl, "Title", recipe.title, false, (v) => { recipe.title = v; });
 
-	// Basic info: description, timing, servings. Expanded by default -- this is
-	// the section most worth seeing right away.
-	const basicBody = importCard(bodyEl, "Basic info", true);
+	function setHeroImage(v: string): void {
+		const trimmed = v.trim();
+		recipe.heroImage = trimmed || null;
+		renderPreview();
+	}
+
+	const imageField = bodyEl.createDiv({ cls: "rb-import-field" });
+	imageField.createDiv({ cls: "rb-import-field-label", text: "Image" });
+	const imageRow = imageField.createDiv({ cls: "rb-import-image-row" });
+	const imageInput = imageRow.createEl("input", {
+		cls: "rb-import-text-input",
+		attr: { type: "text", placeholder: "Image URL, or browse the vault" },
+	});
+	imageInput.value = recipe.heroImage ?? "";
+	imageInput.addEventListener("input", () => setHeroImage(imageInput.value));
+
+	const browseBtn = imageRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
+	setIcon(browseBtn.createSpan({ cls: "rb-modal-btn-icon" }), "folder");
+	browseBtn.createSpan({ text: "Browse vault" });
+	browseBtn.addEventListener("click", () => {
+		new VaultImageSuggestModal(app, (file) => {
+			imageInput.value = file.path;
+			setHeroImage(file.path);
+		}).open();
+	});
+
+	renderPreview();
+
+	// Basic info: description, timing, servings.
+	const basicBody = importSection(bodyEl, "Basic info");
 	field(basicBody, "Description", recipe.description, true, (v) => { recipe.description = v; }, "rb-import-textarea rb-import-textarea--auto");
 
 	const timingValues = {
@@ -162,33 +196,32 @@ export function renderReviewStage(
 	servInput.value = leadingInt(recipe.servings);
 	servInput.addEventListener("input", () => { recipe.servings = servInput.value || null; });
 
-	// Ingredients: its own card, stacked (not side-by-side with steps).
-	const ingredientsBody = importCard(bodyEl, "Ingredients", false);
-	const ingTa = ingredientsBody.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--auto" });
-	ingTa.value = groupsToTextarea(recipe.ingredientGroups);
-	ingTa.addEventListener("input", () => { recipe.ingredientGroups = textareaToGroups(ingTa.value); });
-	autosizeTextarea(ingTa);
+	// Ingredients: structured qty/unit/name/note entry instead of a free-text
+	// group textarea. Sub-group headings (e.g. "For the sauce") from a scraped
+	// import aren't representable in this form, so all groups are flattened
+	// into one list on entry -- an accepted trade for a controlled, editable
+	// list over free-text group editing.
+	const ingredientsBody = importSection(bodyEl, "Ingredients");
+	renderIngredientListEditor(ingredientsBody, flattenItems(recipe.ingredientGroups), (items) => {
+		recipe.ingredientGroups = [{ name: null, items }];
+	});
 
-	// Steps: its own card.
-	const stepsBody = importCard(bodyEl, "Steps", false);
-	const instrTa = stepsBody.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--auto" });
-	instrTa.value = groupsToTextarea(recipe.instructionGroups);
-	instrTa.addEventListener("input", () => { recipe.instructionGroups = textareaToGroups(instrTa.value); });
-	autosizeTextarea(instrTa);
+	// Steps: same structured entry pattern as Ingredients.
+	const stepsBody = importSection(bodyEl, "Steps");
+	renderStepListEditor(stepsBody, flattenItems(recipe.instructionGroups), (items) => {
+		recipe.instructionGroups = [{ name: null, items }];
+	});
 
-	// Notes: its own card, hide if no notes imported --
-	if (recipe.notesGroups.length > 0) {
-		const notesBody = importCard(bodyEl, "Notes", false);
-		const notesTa = notesBody.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--auto" });
-		notesTa.value = groupsToTextarea(recipe.notesGroups);
-		notesTa.addEventListener("input", () => { recipe.notesGroups = textareaToGroups(notesTa.value); });
-		autosizeTextarea(notesTa);
-	}
+	// Notes: still free text -- there's no fixed shape to a note the way there
+	// is to an ingredient or a step, so a structured form wouldn't fit.
+	const notesBody = importSection(bodyEl, "Notes");
+	const notesTa = notesBody.createEl("textarea", { cls: "rb-import-textarea rb-import-textarea--auto" });
+	notesTa.value = groupsToTextarea(recipe.notesGroups);
+	notesTa.addEventListener("input", () => { recipe.notesGroups = textareaToGroups(notesTa.value); });
+	autosizeTextarea(notesTa);
 
-	// Nutrition: its own card. Collapsed by default -- least essential field
-	// set, and often blank on a fresh import, so it's the one worth hiding
-	// to shorten the overall scroll unless the user wants to fill it in.
-	const nutritionBody = importCard(bodyEl, "Nutrition", false);
+	// Nutrition: its own section.
+	const nutritionBody = importSection(bodyEl, "Nutrition");
 	const nutValues = {
 		cal: recipe.calories !== null ? String(recipe.calories) : "",
 		prot: recipe.protein !== null ? String(recipe.protein) : "",
