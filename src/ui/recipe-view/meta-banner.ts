@@ -9,6 +9,7 @@ import { RecipeViewDeps } from "./recipe-view-deps";
 import { findSourceUrl } from "../../sharing/find-source-url";
 import { describeSourceLink } from "./source-link-display";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
+import { NutritionEditModal } from "../modals/modal-nutrition-edit";
 import { renderFavoriteToggle } from "./favorite-toggle";
 import { renderMealPlanToggle } from "./meal-plan-toggle";
 import { renderMarkCookedButton } from "./mark-cooked-button";
@@ -61,18 +62,32 @@ function renderServingsCell(
 
 function renderNutritionCell(
 	container: HTMLElement,
+	app: App,
+	file: TFile,
 	fm: Record<string, unknown>,
 	settings: RecipeBoxSettings,
 	servings: number | null,
 	multiplier: number,
 ): void {
-	const cell = container.createDiv({ cls: "rb-banner-cell rb-nutrition-cell" });
+	const cell = container.createDiv({
+		cls: "rb-banner-cell rb-nutrition-cell rb-nutrition-cell--editable",
+		attr: { role: "button", tabindex: "0", "aria-label": "Edit nutrition" },
+	});
 	const grid = cell.createDiv({ cls: "rb-nutrition-grid" });
 	for (const field of NUTRITION_FIELDS) {
 		const value = resolveNutritionDisplay(fm, field, settings, servings, multiplier);
 		grid.createSpan({ cls: "rb-nutrition-label", text: field.label });
 		grid.createSpan({ cls: "rb-nutrition-value", text: value });
 	}
+
+	const openModal = (): void => new NutritionEditModal(app, file, fm, settings).open();
+	cell.addEventListener("click", openModal);
+	cell.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			openModal();
+		}
+	});
 }
 
 // Desktop counterpart of the source row the mobile Info tab already shows
@@ -127,7 +142,7 @@ export function renderMetaBanner(
 	const cells = banner.createDiv({ cls: "rb-banner-cells" });
 	renderMultiplierCell(cells, app, file, multiplier);
 	renderServingsCell(cells, servings, multiplier);
-	renderNutritionCell(cells, fm, settings, servings, multiplier);
+	renderNutritionCell(cells, app, file, fm, settings, servings, multiplier);
 	renderSourceCell(cells, fm, settings);
 
 	const actions = banner.createDiv({ cls: "rb-header-actions" });

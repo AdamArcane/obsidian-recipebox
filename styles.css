@@ -653,6 +653,19 @@
   text-align: right;
 }
 
+.rb-nutrition-cell--editable {
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  padding: 0.15rem 0.3rem;
+  margin: -0.15rem -0.3rem;
+  transition: background 0.12s;
+}
+
+.rb-nutrition-cell--editable:hover,
+.rb-nutrition-cell--editable:focus-visible {
+  background: var(--background-modifier-hover);
+}
+
 /* Action buttons */
 
 .rb-header-actions {
@@ -1901,6 +1914,32 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   font-weight: 700;
   color: var(--interactive-accent);
   line-height: 1.1;
+}
+
+.rb-mobile-nutrition-strip--editable {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.rb-mobile-nutrition-strip--editable:active,
+.rb-mobile-nutrition-strip--editable:focus-visible {
+  background: var(--background-modifier-hover);
+}
+
+/* Slim pencil affordance -- mobile has no hover state to signal
+   editability, so the strip carries a small always-visible icon instead. */
+.rb-mobile-nutrition-edit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.rb-mobile-nutrition-edit-cell svg {
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 

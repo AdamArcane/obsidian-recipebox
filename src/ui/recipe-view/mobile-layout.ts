@@ -25,6 +25,7 @@ import { RECIPE_VIEW_TYPE } from "./recipe-view";
 import { fmStr } from "./frontmatter-read-helpers";
 import { describeSourceLink } from "./source-link-display";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "./nutrition-fields";
+import { NutritionEditModal } from "../modals/modal-nutrition-edit";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { renderCookHistoryList } from "../../recipe-history/cook-history-render";
@@ -294,26 +295,39 @@ function renderScaleActionsRow(
 	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
 }
 
+// Always renders, even with no nutrition data set, so tapping the strip is
+// the "add" path on mobile too (mirrors the desktop banner cell, which
+// always shows -- with -- placeholders rather than disappearing when empty).
 function renderMobileNutritionStrip(
 	container: HTMLElement,
+	app: App,
+	file: TFile,
 	fm: Record<string, unknown>,
 	settings: RecipeBoxSettings,
 	servings: number | null,
 	multiplier: number,
 ): void {
-	const hasAny = NUTRITION_FIELDS.some(f => {
-		const key = settings[f.settingsKey] as string;
-		return fm[key] !== undefined || f.aliases.some(a => fm[a] !== undefined);
+	const strip = container.createDiv({
+		cls: "rb-mobile-nutrition-strip rb-mobile-nutrition-strip--editable",
+		attr: { role: "button", tabindex: "0", "aria-label": "Edit nutrition" },
 	});
-	if (!hasAny) return;
-
-	const strip = container.createDiv({ cls: "rb-mobile-nutrition-strip" });
 	for (const field of NUTRITION_FIELDS) {
 		const cell = strip.createDiv({ cls: "rb-mobile-nutrition-cell" });
 		const value = resolveNutritionDisplay(fm, field, settings, servings, multiplier);
 		cell.createSpan({ cls: "rb-mobile-nutrition-value", text: value });
 		cell.createSpan({ cls: "rb-label-caps", text: field.label });
 	}
+	const editCell = strip.createDiv({ cls: "rb-mobile-nutrition-edit-cell" });
+	setIcon(editCell, "pencil");
+
+	const openModal = (): void => new NutritionEditModal(app, file, fm, settings).open();
+	strip.addEventListener("click", openModal);
+	strip.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			openModal();
+		}
+	});
 }
 
 // ── Swipe gesture ─────────────────────────────────────────────────────────────
@@ -517,7 +531,7 @@ export async function renderMobileLayout(
 	await renderInstructionsSection(panelSteps, app, component, file.path, instructionGroups, settings, timerOpts);
 
 	// Info tab — nutrition + source URL + notes content
-	renderMobileNutritionStrip(panelInfo, fm, settings, servings, multiplier);
+	renderMobileNutritionStrip(panelInfo, app, file, fm, settings, servings, multiplier);
 
 	// Gated by the same setting as the desktop banner cell (meta-banner.ts):
 	// one feature on two surfaces, never configured independently.
