@@ -1,3 +1,9 @@
+## [0.1.12-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.1...0.1.12-beta.2) (2026-09-04)
+
+### Features
+
+* **nutrition:** implement editable nutrition fields with modal for updates ([3474ed3](https://github.com/AdamArcane/obsidian-recipebox/commit/3474ed3f3117420d0c839ff1d90ced31dc4d78d3))
+
 ## [0.1.12-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.0...0.1.12-beta.1) (2026-08-29)
 
 ### Features
