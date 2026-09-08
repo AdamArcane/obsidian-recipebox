@@ -26,6 +26,7 @@ import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { resolveHeroImageValue, defaultRecipeImageValue } from "../../parser/resolve-hero-image";
 import { usableImageValue } from "./image-resolve";
 import { makeLightboxable } from "../components/lightbox";
+import { suppressAutoOpenOnce } from "../../lifecycle/recipe-file-detection";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
 
@@ -93,6 +94,17 @@ export class RecipeView extends TextFileView {
 		this.cookModeActive = false;
 		this.unsubscribe?.();
 		this.unsubscribe = null;
+
+		// Leaving the recipe view -- whether by the pencil action, a workspace
+		// navigation-history back/forward step, or any other view-state change --
+		// briefly re-opens this file as a plain Markdown view before (if
+		// auto-open is enabled) the auto-open listener would normally flip it
+		// straight back to recipe view. Without this, navigating "back" out of
+		// a recipe never actually leaves it: the back step lands on that
+		// transient Markdown state, which the auto-open listener immediately
+		// converts back to the recipe view, so the user's back navigation is
+		// swallowed and appears to just flicker/reload in place.
+		if (this.file) suppressAutoOpenOnce(this.file.path);
 	}
 
 	async onLoadFile(file: TFile): Promise<void> {
