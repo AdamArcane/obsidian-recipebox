@@ -11,9 +11,13 @@
  * panel that expands below the toolbar and stays open across changes.
  */
 import { App, Menu, setIcon, TFile } from "obsidian";
-import { GallerySavedState, GallerySortField } from "../../settings/settings-types";
+import { GallerySavedState, GallerySortField, RecipeBoxSettings } from "../../settings/settings-types";
 import { debounce } from "../../utils/debounce";
 import { distinctFolders, distinctTags } from "./gallery-filters";
+import { DiscoveryResult } from "../../discovery/discovery-cache";
+import { FieldFilter } from "../../discovery/filter-types";
+import { buildPickerFieldList } from "../components/field-picker";
+import { renderFieldFilterRow } from "../components/filter-row";
 
 const SORT_FIELD_LABELS: Record<GallerySortField, string> = {
 	title: "Title",
@@ -42,13 +46,14 @@ const RATING_LABELS: Record<number, string> = {
 	5: "5 stars",
 };
 
-const CLEARED_FILTERS: Pick<GallerySavedState, "folder" | "tag" | "favoriteOnly" | "minRating" | "neverCooked" | "excludeAllergens"> = {
+const CLEARED_FILTERS: Pick<GallerySavedState, "folder" | "tag" | "favoriteOnly" | "minRating" | "neverCooked" | "excludeAllergens" | "fieldFilters"> = {
 	folder: null,
 	tag: null,
 	favoriteOnly: false,
 	minRating: 0,
 	neverCooked: false,
 	excludeAllergens: false,
+	fieldFilters: [],
 };
 
 // Search isn't a "filter" for this purpose (it has its own always-visible
@@ -59,7 +64,8 @@ function hasActiveFilters(state: GallerySavedState): boolean {
 		|| state.favoriteOnly
 		|| state.minRating > 0
 		|| state.neverCooked
-		|| state.excludeAllergens;
+		|| state.excludeAllergens
+		|| state.fieldFilters.length > 0;
 }
 
 function openSortMenu(evt: MouseEvent, state: GallerySavedState, onChange: (next: GallerySavedState) => void): void {
@@ -91,16 +97,112 @@ function openSortMenu(evt: MouseEvent, state: GallerySavedState, onChange: (next
 	menu.showAtMouseEvent(evt);
 }
 
+/**
+ * Renders the "+ Property filter" button into `panel`'s main control row, at
+ * whatever point in DOM order it's called (the caller places it wherever it
+ * wants the button to sit among folder/tag/rating/checkboxes). Clicking it
+ * needs to re-render the row list below, but that list isn't built until
+ * after the checkboxes -- `getRenderRows` is called lazily on click, once the
+ * real render function has been assigned, rather than passed directly.
+ */
+function renderAddFieldFilterButton(
+	panel: HTMLElement,
+	state: GallerySavedState,
+	getRenderRows: () => () => void,
+): void {
+	const addBtn = panel.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
+	setIcon(addBtn, "plus");
+	addBtn.createSpan({ text: "Property filter" });
+	addBtn.addEventListener("click", () => {
+		const filter: FieldFilter = { field: "", operator: "eq", value: "" };
+		state.fieldFilters = [...state.fieldFilters, filter];
+		getRenderRows()();
+	});
+}
+
+/**
+ * Renders the open-ended "property filters" (season, cuisine, difficulty,
+ * ...) row list: a full-width block (via `rb-gallery-field-filters`'s
+ * flex-basis: 100%) that collapses to nothing when empty, so an untouched
+ * filter panel looks the same as before this feature. Field/operator/value
+ * edits mutate `state.fieldFilters` in place (same convention as the mode
+ * editor's draft); a value input only reports the change once it settles
+ * (blur/Enter, see filter-row.ts) rather than per keystroke, since rebuilding
+ * this whole list on every keystroke would tear down a value input's native
+ * autocomplete popup mid-typing. The debounce here is a small extra buffer
+ * for rapid field/operator/checkbox changes, not the thing keeping value
+ * typing smooth. Returns the re-render function so the "+ Property filter"
+ * button (rendered earlier, in the main control row) can trigger it after
+ * pushing a new blank filter.
+ */
+function renderFieldFilterList(
+	panel: HTMLElement,
+	state: GallerySavedState,
+	settings: RecipeBoxSettings,
+	discovery: DiscoveryResult | null,
+	onChange: (next: GallerySavedState) => void,
+): () => void {
+	const fields = buildPickerFieldList(settings, discovery);
+	const section = panel.createDiv({ cls: "rb-gallery-field-filters" });
+	const listEl = section.createDiv({ cls: "rb-rule-list" });
+
+	const commit = (): void => onChange({ ...state, fieldFilters: state.fieldFilters });
+	const debouncedCommit = debounce(commit, 200);
+
+	const renderRows = (): void => {
+		listEl.empty();
+		state.fieldFilters.forEach((filter, index) => {
+			// Index-derived, not filter-derived: filters have no id of their own,
+			// and rows are never reordered (only appended/removed), so a row's
+			// index is stable for as long as the user is actively editing it.
+			renderFieldFilterRow(listEl, filter, fields, discovery, `rb-gallery-filter-${index}`, debouncedCommit, () => {
+				state.fieldFilters = state.fieldFilters.filter((f) => f !== filter);
+				renderRows();
+				commit();
+			});
+		});
+		section.toggleClass("is-empty", state.fieldFilters.length === 0);
+	};
+	renderRows();
+	return renderRows;
+}
+
 function renderFilterPanel(
 	container: HTMLElement,
 	app: App,
 	files: TFile[],
 	state: GallerySavedState,
+	settings: RecipeBoxSettings,
+	discovery: DiscoveryResult | null,
 	hasAllergenList: boolean,
 	onChange: (next: GallerySavedState) => void,
-	onHide: () => void,
+	onToggleRememberFilters: (remember: boolean) => void,
 ): void {
 	const panel = container.createDiv({ cls: "rb-gallery-filter-panel" });
+
+	// Its own row, above the actual filter controls, right-aligned: neither of
+	// these is a filter criterion -- "Remember filters" is a persistence
+	// preference and "Clear" is an action -- so they don't belong mixed in
+	// with the folder/tag/rating/checkbox row below.
+	const header = panel.createDiv({ cls: "rb-gallery-filter-panel-header" });
+
+	// Only shown once there's something to clear
+	if (hasActiveFilters(state)) {
+		const clearBtn = header.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
+		setIcon(clearBtn, "eraser");
+		clearBtn.createSpan({ text: "Clear" });
+		clearBtn.addEventListener("click", () => onChange({ ...state, ...CLEARED_FILTERS }));
+	}
+
+
+	const rememberToggle = header.createEl("label", { cls: "rb-gallery-toggle" });
+	const rememberCheckbox = rememberToggle.createEl("input", { attr: { type: "checkbox" } });
+	rememberCheckbox.checked = settings.galleryRememberFilters;
+	rememberToggle.createSpan({ text: "Remember filters" });
+	rememberCheckbox.addEventListener("change", () => {
+		onToggleRememberFilters(rememberCheckbox.checked);
+	});
+
 
 	const folderSelect = panel.createEl("select", { cls: "rb-gallery-select" });
 	folderSelect.createEl("option", { value: "", text: "All folders" });
@@ -137,6 +239,12 @@ function renderFilterPanel(
 		onChange({ ...state, minRating: Number(ratingSelect.value) });
 	});
 
+	// Rendered here (before the checkboxes) so it lands in the main control
+	// row right after the other pickers; renderFieldFilterRows is only
+	// assigned once the row list is built further down.
+	let renderFieldFilterRows: () => void = () => {};
+	renderAddFieldFilterButton(panel, state, () => renderFieldFilterRows);
+
 	const favoriteToggle = panel.createEl("label", { cls: "rb-gallery-toggle" });
 	const favoriteCheckbox = favoriteToggle.createEl("input", { attr: { type: "checkbox" } });
 	favoriteCheckbox.checked = state.favoriteOnly;
@@ -163,16 +271,7 @@ function renderFilterPanel(
 		});
 	}
 
-	const footer = panel.createDiv({ cls: "rb-gallery-filter-panel-footer" });
-
-	const clearBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
-	setIcon(clearBtn, "eraser");
-	clearBtn.createSpan({ text: "Clear" });
-	clearBtn.addEventListener("click", () => onChange({ ...state, ...CLEARED_FILTERS }));
-
-	const hideBtn = footer.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
-	setIcon(hideBtn, "x");
-	hideBtn.addEventListener("click", onHide);
+	renderFieldFilterRows = renderFieldFilterList(panel, state, settings, discovery, onChange);
 }
 
 export function renderGalleryToolbar(
@@ -180,9 +279,12 @@ export function renderGalleryToolbar(
 	app: App,
 	files: TFile[],
 	state: GallerySavedState,
+	settings: RecipeBoxSettings,
+	discovery: DiscoveryResult | null,
 	hasAllergenList: boolean,
 	filterPanelOpen: boolean,
 	onChange: (next: GallerySavedState) => void,
+	onToggleRememberFilters: (remember: boolean) => void,
 	onToggleFilterPanel: () => void,
 ): void {
 	const bar = container.createDiv({ cls: "rb-gallery-toolbar" });
@@ -193,7 +295,7 @@ export function renderGalleryToolbar(
 
 	const searchInput = searchWrap.createEl("input", {
 		cls: "rb-gallery-search",
-		attr: { type: "search", placeholder: "Search recipes…" },
+		attr: { type: "search", placeholder: "Search recipes…", "data-rb-focus-key": "gallery-search" },
 	});
 	searchInput.value = state.search;
 	const debouncedSearch = debounce(() => onChange({ ...state, search: searchInput.value }), 200);
@@ -218,6 +320,6 @@ export function renderGalleryToolbar(
 	sortBtn.addEventListener("click", (evt) => openSortMenu(evt, state, onChange));
 
 	if (filterPanelOpen) {
-		renderFilterPanel(container, app, files, state, hasAllergenList, onChange, onToggleFilterPanel);
+		renderFilterPanel(container, app, files, state, settings, discovery, hasAllergenList, onChange, onToggleRememberFilters);
 	}
 }

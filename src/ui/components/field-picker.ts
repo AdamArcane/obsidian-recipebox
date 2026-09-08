@@ -19,12 +19,19 @@ export function typeIcon(type: FilterableType, hasArrayValues = false): string {
 	}
 }
 
+/** A field offered by the picker: a settings-configured built-in or a discovered frontmatter key. */
+export interface PickerField {
+	key: string;
+	type: FilterableType;
+	hasArrayValues: boolean;
+}
+
 /** Returns the combined sorted field list for a picker (built-ins first, then discovered). */
 export function buildPickerFieldList(
 	settings: RecipeBoxSettings,
 	discovery: DiscoveryResult | null,
-): Array<{ key: string; type: FilterableType; hasArrayValues: boolean }> {
-	const builtins: Array<{ key: string; type: FilterableType; hasArrayValues: boolean }> = [
+): PickerField[] {
+	const builtins: PickerField[] = [
 		{ key: settings.lastMadeProperty, type: "date",    hasArrayValues: false },
 		{ key: settings.cookedCountProperty, type: "number",  hasArrayValues: false },
 		{ key: settings.favoriteProperty,    type: "boolean", hasArrayValues: false },
@@ -55,7 +62,7 @@ export function buildPickerFieldList(
 export function buildFieldPickerBtn(
 	parent: HTMLElement,
 	currentValue: string,
-	fields: Array<{ key: string; type: FilterableType; hasArrayValues?: boolean }>,
+	fields: PickerField[],
 	onChange: (val: string) => void,
 ): HTMLButtonElement {
 	const btn = parent.createEl("button", { cls: "rb-field-picker-btn" });

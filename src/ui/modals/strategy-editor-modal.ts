@@ -7,11 +7,12 @@
 import { App, Platform, setIcon } from "obsidian";
 import type { SuggesterMode, ScoringRule, ScoringDirection } from "../../suggester/strategy-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
-import { FieldFilter, OPERATORS, FilterableType } from "../../discovery/filter-types";
+import { FieldFilter, FilterableType } from "../../discovery/filter-types";
 import { BaseModal, addFooterButtons } from "./modal-shell";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { BUILTIN_MODES } from "../../suggester/built-in-strategies";
 import { buildFieldPickerBtn, buildPickerFieldList } from "../components/field-picker";
+import { renderFieldFilterRow } from "../components/filter-row";
 
 export interface ModeEditorDeps {
 	getDiscovery: () => DiscoveryResult | null;
@@ -116,118 +117,13 @@ export class ModeEditorModal extends BaseModal {
 	}
 
 	private renderFilterRow(listEl: HTMLElement, filter: FieldFilter): void {
-		const row = listEl.createDiv({ cls: "rb-rule-row" });
 		const discovery = this.deps.getDiscovery();
 		const settings = this.deps.getSettings();
 		const fields = buildPickerFieldList(settings, discovery);
 
-		buildFieldPickerBtn(row, filter.field, fields, (val) => {
-			filter.field = val;
-			rebuildOperators();
-		});
-
-		const opSel = row.createEl("select", { cls: "rb-select" });
-		const valueWrap = row.createDiv({ cls: "rb-filter-value-wrap" });
-
-		const inferType = (): FilterableType => {
-			const match = fields.find(f => f.key === filter.field);
-			if (match) return match.type;
-			if (filter.field.startsWith("#")) return "tag";
-			return "string";
-		};
-
-		const rebuildOperators = (): void => {
-			opSel.empty();
-			valueWrap.empty();
-			let type = inferType();
-			// Preserve a saved operator whose type doesn't match the inferred one —
-			// e.g. "not-within-last" belongs to "date", not "string".
-			if (filter.operator && !OPERATORS[type].some(op => op.id === filter.operator)) {
-				const ownerType = (Object.keys(OPERATORS) as FilterableType[]).find(t =>
-					OPERATORS[t].some(op => op.id === filter.operator)
-				);
-				if (ownerType) type = ownerType;
-			}
-			for (const op of OPERATORS[type] ?? []) {
-				opSel.createEl("option", { attr: { value: op.id }, text: op.label });
-			}
-			opSel.value = filter.operator || OPERATORS[type][0]?.id || "";
-			filter.operator = opSel.value;
-			this.buildValueInput(valueWrap, filter, inferType);
-		};
-
-		opSel.addEventListener("change", () => {
-			filter.operator = opSel.value;
-			valueWrap.empty();
-			this.buildValueInput(valueWrap, filter, inferType);
-		});
-
-		rebuildOperators();
-
-		const delBtn = row.createEl("button", { cls: "rb-icon-btn rb-icon-btn--md rb-icon-btn--danger" });
-		setIcon(delBtn.createSpan(), "x");
-		delBtn.addEventListener("click", () => {
+		const row = renderFieldFilterRow(listEl, filter, fields, discovery, undefined, () => {}, () => {
 			this.draft.filters.splice(this.draft.filters.indexOf(filter), 1);
 			row.remove();
-		});
-	}
-
-	private buildValueInput(
-		wrap: HTMLElement,
-		filter: FieldFilter,
-		inferType: () => FilterableType,
-	): void {
-		const op = filter.operator;
-		if (["is-true", "is-false", "has", "not-has"].includes(op)) {
-			filter.value = undefined;
-			return;
-		}
-
-		if (op === "between") {
-			const type = inferType();
-			const inputType = type === "date" ? "date" : "number";
-			const [lo, hi] = Array.isArray(filter.value) ? filter.value as [unknown, unknown] : [undefined, undefined];
-			const loInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
-			const hiInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
-			wrap.createSpan({ cls: "rb-filter-between-sep", text: "To" });
-			if (lo !== undefined && lo !== null) loInput.value = `${lo as string | number}`;
-			if (hi !== undefined && hi !== null) hiInput.value = `${hi as string | number}`;
-			const update = (): void => {
-				const lv = type === "number" ? parseFloat(loInput.value) : loInput.value;
-				const hv = type === "number" ? parseFloat(hiInput.value) : hiInput.value;
-				filter.value = [lv, hv];
-			};
-			loInput.addEventListener("input", update);
-			hiInput.addEventListener("input", update);
-			return;
-		}
-
-		if (op === "within-last" || op === "not-within-last") {
-			const input = wrap.createEl("input", { cls: "rb-modal-input rb-filter-days-input", attr: { type: "number", min: "1", placeholder: "0" } });
-			if (typeof filter.value === "number") input.value = String(filter.value);
-			input.addEventListener("input", () => { filter.value = parseInt(input.value, 10) || 0; });
-			wrap.createSpan({ cls: "rb-filter-days-label", text: "Days" });
-			return;
-		}
-
-		if (op === "one-of") {
-			const input = wrap.createEl("input", {
-				cls: "rb-modal-input",
-				attr: { type: "text", placeholder: "Comma-separated values" },
-			});
-			if (Array.isArray(filter.value)) input.value = (filter.value as string[]).join(", ");
-			input.addEventListener("input", () => {
-				filter.value = input.value.split(",").map(s => s.trim()).filter(Boolean);
-			});
-			return;
-		}
-
-		const type = inferType();
-		const inputType = type === "date" ? "date" : type === "number" ? "number" : "text";
-		const input = wrap.createEl("input", { cls: "rb-modal-input", attr: { type: inputType } });
-		if (typeof filter.value === "string" || typeof filter.value === "number") input.value = String(filter.value);
-		input.addEventListener("input", () => {
-			filter.value = type === "number" ? parseFloat(input.value) : input.value;
 		});
 	}
 

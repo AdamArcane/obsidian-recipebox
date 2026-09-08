@@ -5543,14 +5543,70 @@ input[type='search'].rb-gallery-search {
   white-space: nowrap;
 }
 
-.rb-gallery-filter-panel-footer {
+.rb-gallery-filter-panel-header {
+  flex: 1 1 100%;
   display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .rb-gallery-filter-panel-btn {
   font-size: var(--font-ui-small);
+}
+
+.rb-gallery-field-filters {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2-2);
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* No filters yet: collapse entirely so an untouched panel looks unchanged. */
+.rb-gallery-field-filters.is-empty {
+  display: none;
+}
+
+.rb-gallery-filter-panel .rb-rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2-2);
+}
+
+.rb-gallery-filter-panel .rb-rule-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-2);
+  flex-wrap: wrap;
+}
+
+.rb-gallery-filter-panel .rb-filter-value-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2-1);
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 8rem;
+}
+
+.rb-filter-one-of-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+}
+
+.rb-filter-one-of-option {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  white-space: nowrap;
 }
 
 

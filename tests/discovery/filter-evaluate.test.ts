@@ -25,6 +25,20 @@ describe("matchesFilters", () => {
 		expect(matchesFilters({}, ["vegetarian"], notHas)).toBe(true);
 	});
 
+	it("matches everything for a filter with no field selected yet (ALL, not NONE)", () => {
+		const blank: FieldFilter[] = [{ field: "", operator: "eq", value: "" }];
+		expect(matchesFilters({}, [], blank)).toBe(true);
+		expect(matchesFilters({ cuisine: "italian" }, [], blank)).toBe(true);
+
+		// ANDs normally with a real filter alongside it.
+		const mixed: FieldFilter[] = [
+			{ field: "", operator: "eq", value: "" },
+			{ field: "cuisine", operator: "eq", value: "italian" },
+		];
+		expect(matchesFilters({ cuisine: "italian" }, [], mixed)).toBe(true);
+		expect(matchesFilters({ cuisine: "french" }, [], mixed)).toBe(false);
+	});
+
 	it("fails any filter when the field is missing, except not-within-last", () => {
 		const eqFilter: FieldFilter[] = [{ field: "cuisine", operator: "eq", value: "italian" }];
 		expect(matchesFilters({}, [], eqFilter)).toBe(false);

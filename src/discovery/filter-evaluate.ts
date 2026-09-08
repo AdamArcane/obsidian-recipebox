@@ -44,6 +44,13 @@ function evaluateFilter(
 	tags: string[],
 	filter: FieldFilter,
 ): boolean {
+	// A freshly added filter row with no property chosen yet has field: "".
+	// It isn't a real restriction, so it must match everything ("ALL") rather
+	// than nothing -- without this, findValue(meta, [""]) below is undefined
+	// for every recipe and an "eq" filter fails universally, which reads as
+	// "the whole gallery vanished" the instant someone clicks "add filter."
+	if (!filter.field) return true;
+
 	// Tag pseudo-fields: just test presence in the recipe's tag list.
 	if (isTagFilter(filter.field)) {
 		const name = filter.field.slice(TAG_PREFIX.length);

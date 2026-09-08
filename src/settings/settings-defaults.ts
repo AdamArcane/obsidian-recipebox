@@ -186,7 +186,9 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		neverCooked: false,
 		excludeAllergens: false,
 		search: "",
+		fieldFilters: [],
 	},
+	galleryRememberFilters: false,
 
 	dashboardActivityRangeWeeks: 8,
 

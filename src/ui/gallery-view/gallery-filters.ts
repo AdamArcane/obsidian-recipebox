@@ -1,14 +1,17 @@
 /**
- * Bounded gallery filter set: search/folder/favorite/tag/allergen/rating/
- * never-cooked, all ANDed. Deliberately not built on the generic
- * discovery/filter-evaluate.ts FieldFilter engine -- that engine models
- * "any property, any operator" (Bases/Dataview territory), while the gallery
- * is scoped to a fixed, known set of facets the plugin already understands.
+ * Gallery filter set: a fixed set of facets the plugin already understands
+ * (search/folder/favorite/tag/allergen/rating/never-cooked) ANDed with an
+ * open-ended list of per-property filters (state.fieldFilters) built on the
+ * generic discovery/filter-evaluate.ts FieldFilter engine -- the same engine
+ * the meal suggester's mode filters use. The fixed facets stay hand-rolled
+ * because they read plugin-computed values (readRecipeMeta, readRating) that
+ * aren't plain frontmatter lookups; fieldFilters covers "any other property."
  */
 import { App, CachedMetadata, TFile, getAllTags } from "obsidian";
 import { RecipeBoxSettings, GallerySavedState } from "../../settings/settings-types";
 import { readRecipeMeta, matchingAllergens } from "../../parser/recipe-meta-read";
 import { readRating } from "../recipe-view/rating";
+import { matchesFilters } from "../../discovery/filter-evaluate";
 
 export type GalleryFilterState = GallerySavedState;
 
@@ -50,6 +53,8 @@ export function matchesGalleryFilters(
 	if (state.minRating > 0 && readRating(fm, settings.ratingProperty) < state.minRating) return false;
 
 	if (state.neverCooked && meta.cookedCount !== 0) return false;
+
+	if (state.fieldFilters.length > 0 && !matchesFilters(fm, fileTags(cache), state.fieldFilters)) return false;
 
 	return true;
 }

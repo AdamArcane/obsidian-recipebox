@@ -80,6 +80,9 @@ function validateGallerySavedState(raw: unknown, fallback: GallerySavedState): G
 		neverCooked: bool(g.neverCooked, fallback.neverCooked),
 		excludeAllergens: bool(g.excludeAllergens, fallback.excludeAllergens),
 		search: str(g.search, fallback.search),
+		fieldFilters: Array.isArray(g.fieldFilters)
+			? (g.fieldFilters as unknown[]).map(validateFieldFilter).filter((x): x is FieldFilter => x !== null)
+			: fallback.fieldFilters,
 	};
 }
 
@@ -322,6 +325,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		recipeExportIncludeImagesDefault: bool(r.recipeExportIncludeImagesDefault, d.recipeExportIncludeImagesDefault),
 
 		gallerySavedState: validateGallerySavedState(r.gallerySavedState, d.gallerySavedState),
+		galleryRememberFilters: bool(r.galleryRememberFilters, d.galleryRememberFilters),
 		enableDashboard: bool(r.enableDashboard, d.enableDashboard),
 
 		dashboardActivityRangeWeeks: oneOf<DashboardActivityRangeWeeks>(r.dashboardActivityRangeWeeks, [2, 4, 8, 12], d.dashboardActivityRangeWeeks),

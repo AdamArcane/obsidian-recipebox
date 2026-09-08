@@ -11,7 +11,7 @@ import {
 	GroceryItemEntry,
 	CustomBadge,
 } from "../types";
-import type { SuggesterMode } from "../suggester/strategy-types";
+import type { SuggesterMode, FieldFilter } from "../suggester/strategy-types";
 
 export type NutritionDisplay = "per-serving" | "total";
 export type MealTypeNotation = "tag" | "dataview" | "text";
@@ -43,6 +43,10 @@ export interface GallerySavedState {
 	neverCooked: boolean;
 	excludeAllergens: boolean;
 	search: string;
+	// Generic per-property filters (season, cuisine, difficulty, ...), ANDed
+	// with each other and with the fixed facets above. Reuses the same
+	// FieldFilter engine as the meal suggester's mode filters.
+	fieldFilters: FieldFilter[];
 }
 
 export interface RecipeBoxSettings {
@@ -157,6 +161,11 @@ export interface RecipeBoxSettings {
 
 	// Gallery view
 	gallerySavedState: GallerySavedState;
+	// When false (default), every filter (folder/tag/rating/checkboxes/property
+	// filters, but not sort) resets to its default the next time the gallery
+	// view opens, even though gallerySavedState itself keeps getting written to
+	// on every change -- this only controls what a fresh view load reads back.
+	galleryRememberFilters: boolean;
 
 	// Dashboard view -- changed only via the dashboard's own range dropdown
 	// (see dashboard-spec.md section 13.2), not a settings-tab field, so it

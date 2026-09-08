@@ -206,6 +206,7 @@ export function registerViews(plugin: RecipeBoxPlugin): void {
 				getSettings: () => plugin.settings,
 				saveSettings: () => plugin.saveSettings(),
 				getAllRecipeNotes: () => getAllRecipeNotes(plugin.app, plugin.settings),
+				getDiscovery: () => plugin.discoveryCache.get(),
 				saveGalleryState: async (state) => {
 					plugin.settings.gallerySavedState = state;
 					await plugin.saveSettings();
