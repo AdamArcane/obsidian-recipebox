@@ -69,6 +69,29 @@ export function submitText(text: string, titleOverride: string): ExtractedRecipe
 	return extractRecipeFromText(trimmed, titleOverride.trim() || undefined);
 }
 
+/** A blank starting point for the Add Recipe form -- every string field
+ * empty, every numeric/nullable field null, no ingredient/step/note groups.
+ * The form's default state; Import from URL/Text replace it in place. */
+export function blankRecipe(): ExtractedRecipe {
+	return {
+		title: "",
+		description: "",
+		heroImage: null,
+		servings: null,
+		prepTime: null,
+		cookTime: null,
+		totalTime: null,
+		ingredientGroups: [],
+		instructionGroups: [],
+		notesGroups: [],
+		sourceUrl: "",
+		calories: null,
+		protein: null,
+		fat: null,
+		carbs: null,
+	};
+}
+
 export function resolveDestinationFolder(settings: RecipeBoxSettings): string {
 	if (settings.importerDefaultFolder) return settings.importerDefaultFolder;
 	if (settings.recipeFolders.length > 0) return settings.recipeFolders[0];

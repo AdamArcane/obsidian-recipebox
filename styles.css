@@ -2376,55 +2376,276 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
 
 /* ── Import recipe modal ────────────────────────────────────────────────── */
 
-.rb-import-input-stage,
-.rb-import-review-stage {
-  overflow-x: hidden;
-}
-
-.rb-import-image-preview {
-  margin-bottom: 0.75rem;
-  border-radius: var(--radius-l);
-  overflow: hidden;
-}
-
-.rb-import-image-preview img {
-  width: 100%;
-  max-height: 220px;
-  object-fit: cover;
-  display: block;
-  border-radius: var(--radius-l);
-  border: 1px solid var(--background-modifier-border);
-}
-
-/* Tab switcher */
-.rb-import-tabs {
+/* Import from URL / Import from text, top of the Add Recipe form */
+.rb-import-quick-row {
   display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--background-modifier-border);
+  gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
-.rb-import-tab {
+/* Title + Image, half-width side by side, thumbnail filling the other half */
+.rb-import-title-image-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  align-items: flex-start;
+}
+
+.rb-import-title-image-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.rb-import-image-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rb-import-image-thumb {
+  width: 260px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--background-modifier-border);
+  overflow: hidden;
+  background: var(--background-secondary);
+}
+
+.rb-import-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rb-import-image-thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rb-import-image-thumb-icon {
+  color: var(--text-faint);
+  display: flex;
+}
+
+.rb-import-image-thumb-icon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Wider layout for the review/add stage -- it's the plugin's one official
+   "add a recipe" screen, not just a narrow byproduct of pasting a URL, so it
+   shouldn't inherit the input stage's picker-sized width. Applied to modalEl
+   (the outer .modal), so the extra specificity from the .modal prefix wins
+   over Obsidian's own fixed-width rule. */
+.modal.rb-import-modal--wide {
+  width: 1040px;
+  max-width: 92vw;
+}
+
+/* Non-collapsible section blocks in the review/add stage. Plain heading +
+   divider rather than a bordered card -- these sections are never
+   collapsible (so they don't need rb-extra-card's collapse-card treatment
+   anyway), and with the group boxes nested inside Ingredients/Steps, a card
+   around the section too meant two stacked boxes just to reach one field. */
+.rb-import-section {
+  margin-bottom: 1.25rem;
+}
+
+.rb-import-section-header {
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-weight: 600;
+  font-size: var(--font-ui-medium);
+}
+
+.rb-import-section-body {
+  padding: 0;
+}
+
+/* Structured ingredient/step entry: field row + editable list */
+.rb-import-entry-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.rb-import-entry-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rb-import-entry-cell--qty {
+  width: 4.5rem;
+}
+
+.rb-import-entry-cell--unit {
+  width: 6rem;
+}
+
+.rb-import-entry-cell--name {
+  flex: 2;
+  min-width: 9rem;
+}
+
+.rb-import-entry-cell--note {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.rb-import-entry-cell-label {
+  font-size: var(--font-ui-smaller);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rb-import-entry-cancel-btn {
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
   color: var(--text-muted);
   cursor: pointer;
   font-size: var(--font-ui-small);
-  font-weight: 500;
-  margin-bottom: -1px;
-  padding: 0.45rem 1rem;
-  transition: color 120ms, border-color 120ms;
+  padding: 0.4rem 0.5rem;
 }
 
-.rb-import-tab:hover {
+.rb-import-entry-cancel-btn:hover {
   color: var(--text-normal);
 }
 
-.rb-import-tab--active {
-  border-bottom-color: var(--interactive-accent);
+.rb-import-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.rb-import-entry-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  background: var(--background-primary);
+}
+
+.rb-import-entry-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.rb-import-entry-item--editing {
+  border-color: var(--interactive-accent);
+}
+
+.rb-import-entry-item-index {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.4rem;
+}
+
+.rb-import-entry-item-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-import-entry-item-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.rb-import-entry-item-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.rb-import-entry-item-remove:hover {
+  color: var(--color-red);
+}
+
+/* Ingredient/step groups (import-group-list-editor.ts) */
+.rb-import-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* A light background fill (not a border) marks each group as its own block
+   once grouping is active -- with two group blocks stacked directly on top
+   of each other, a border-only separator read as a stray line rather than a
+   clear boundary between two distinct things. Only applied when chrome is
+   visible (see import-group-list-editor.ts) -- a single flat, unnamed group
+   stays completely unstyled. */
+.rb-import-group {
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+  padding: 0.75rem;
+}
+
+.rb-import-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.rb-import-group-name-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.rb-import-group-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.rb-import-group-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+}
+
+.rb-import-group-icon-btn:hover {
   color: var(--text-normal);
 }
+
+.rb-import-group-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rb-import-group-icon-btn--danger:hover {
+  color: var(--color-red);
+}
+
+.rb-import-add-group-btn {
+  align-self: flex-start;
+}
+
 
 /* Fields */
 .rb-import-field {
@@ -2557,13 +2778,6 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   background: rgba(var(--color-orange-rgb), 0.08);
   color: var(--color-orange);
   font-size: var(--font-ui-small);
-}
-
-/* Folder row (input stage) */
-.rb-import-folder-row {
-  margin-top: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--background-modifier-border);
 }
 
 /* Footer */
