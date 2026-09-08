@@ -51,12 +51,10 @@ function commitOnSettle(input: HTMLInputElement, onChange: () => void): void {
 function attachDatalist(input: HTMLInputElement, values: string[] | null): void {
 	if (!values || values.length === 0) return;
 	const listId = `rb-filter-datalist-${Math.random().toString(36).slice(2, 9)}`;
-	const datalist = input.ownerDocument.createElement("datalist");
-	datalist.id = listId;
+	const datalist = input.createEl("datalist", { attr: { id: listId } });
 	for (const value of values) {
-		const opt = input.ownerDocument.createElement("option");
+		const opt = datalist.createEl("option");
 		opt.value = value;
-		datalist.appendChild(opt);
 	}
 	input.insertAdjacentElement("afterend", datalist);
 	input.setAttribute("list", listId);
