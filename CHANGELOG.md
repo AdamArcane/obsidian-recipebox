@@ -1,3 +1,11 @@
+## [0.1.13-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12...0.1.13-beta.0) (2026-10-01)
+
+### Features
+
+* enhance field filter functionality and improve stats row rendering ([4d61828](https://github.com/AdamArcane/obsidian-recipebox/commit/4d6182849f248a233751e45c8bed60bb6eae685f))
+* enhance ingredient parsing with multi-filler word support and unit normalization ([3a039d4](https://github.com/AdamArcane/obsidian-recipebox/commit/3a039d4bb8cc295b18a68e580d320bd7eb129cdc))
+* implement localized ingredient unit mappings and filler word settings ([4a082b3](https://github.com/AdamArcane/obsidian-recipebox/commit/4a082b3ae5c868bffbc0befb627093f4e3b4328f))
+
 ## [0.1.12](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.4...0.1.12) (2026-09-08)
 
 ## [0.1.12-beta.4](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12-beta.2...0.1.12-beta.4) (2026-09-08)
