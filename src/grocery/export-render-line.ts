@@ -17,7 +17,7 @@ export function renderLine(
 	options: RenderOptions
 ): string {
 	const displayName = toTitleCase(item.name);
-	const qty = item.quantity !== null ? formatQuantity(item.quantity) : "";
+	const qty = item.quantity !== null ? formatQuantity(item.quantity, item.unit) : "";
 	const suffix = qty ? ` (${qty}${item.unit ? " " + item.unit : ""})` : "";
 	const text = `${displayName}${suffix}`;
 

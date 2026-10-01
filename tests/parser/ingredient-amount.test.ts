@@ -19,6 +19,12 @@ describe("scaleAmount", () => {
 		expect(amountOf("125 g / 4 oz rice sticks", 2).alt).toEqual({ text: "8", unit: "oz" });
 	});
 
+	it("shows scaled metric amounts as decimals, in both measures", () => {
+		expect(amountOf("125 g / 4 oz rice sticks", 1 / 3).text).toBe("42");
+		expect(amountOf("8 cups|1892 ml water", 1 / 3).alt).toEqual({ text: "631", unit: "ml" });
+		expect(amountOf("1 1/2 kg flour", 1).text).toBe("1.5");
+	});
+
 	it("shows one number when a scaled range collapses", () => {
 		expect(amountOf("1-1.01 tsp salt", 1).text).toBe("1");
 	});

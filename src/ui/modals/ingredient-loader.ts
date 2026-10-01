@@ -92,7 +92,7 @@ export function renderIngredientChecklist(
 		const label = row.createEl("label", { attr: { for: cbId } });
 		label.createSpan({ cls: "rb-checklist-name", text: toTitleCase(item.name) });
 
-		const qtyStr = item.quantity !== null ? formatQuantity(item.quantity) : "";
+		const qtyStr = item.quantity !== null ? formatQuantity(item.quantity, item.unit) : "";
 		const qty = qtyStr && item.unit ? `${qtyStr} ${item.unit}` : qtyStr;
 		if (qty) label.createSpan({ cls: "rb-checklist-qty", text: qty });
 	}
