@@ -1,3 +1,10 @@
+## [0.1.13-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.2...0.1.13-beta.3) (2026-10-01)
+
+### Features
+
+* add support for wikilinks with hover previews and link handling in recipe view ([998d209](https://github.com/AdamArcane/obsidian-recipebox/commit/998d209b38bc8f53dffff925ada789e519d83754))
+* add support for wikilinks with hover previews and link handling in recipe view ([e10ecd6](https://github.com/AdamArcane/obsidian-recipebox/commit/e10ecd69ab30a6e0193c2ef2ad5e46e788375186))
+
 ## [0.1.13-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.1...0.1.13-beta.2) (2026-10-01)
 
 ### Features
