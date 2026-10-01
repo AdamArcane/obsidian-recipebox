@@ -1,3 +1,9 @@
+## [0.1.13-beta.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.1...0.1.13-beta.2) (2026-10-01)
+
+### Features
+
+* enhance quantity formatting to support decimals for metric units and implement ingredient range handling in parsing and rendering ([bafa749](https://github.com/AdamArcane/obsidian-recipebox/commit/bafa7493314119bbc7ecdc53c556f5449497dda7))
+
 ## [0.1.13-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.0...0.1.13-beta.1) (2026-10-01)
 
 ### Features
