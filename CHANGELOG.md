@@ -1,3 +1,9 @@
+## [0.1.13-beta.4](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.2...0.1.13-beta.4) (2026-10-01)
+
+### Features
+
+* update minimum app version to 1.13.0 ([54fa742](https://github.com/AdamArcane/obsidian-recipebox/commit/54fa74268e4242acea077ec3d7bb066c76995d2b))
+
 ## [0.1.13-beta.3](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.2...0.1.13-beta.3) (2026-10-01)
 
 ### Features
