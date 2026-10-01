@@ -1,0 +1,132 @@
+{
+ "name": "Apfelkuchen mit Streuseln",
+ "slug": "apfelkuchen-mit-streuseln",
+ "image": "A4kj",
+ "recipe_servings": 12.0,
+ "recipe_yield_quantity": 0.0,
+ "recipe_yield": "",
+ "total_time": null,
+ "prep_time": null,
+ "cook_time": null,
+ "perform_time": null,
+ "total_time_seconds": 3600,
+ "prep_time_seconds": 900,
+ "perform_time_seconds": 2700,
+ "description": "Ein einfacher Apfel-Streuselkuchen: Der Kuchenboden und das Topping sind aus derselben Streuselteig-Masse und der Boden wird nicht vorgebacken. So lecker!",
+ "recipe_category": [],
+ "tags": [],
+ "tools": [],
+ "rating": null,
+ "org_url": "https://emmikochteinfach.de/apfelkuchen-mit-streuseln/",
+ "date_added": "2026-10-01",
+ "date_updated": "2026-10-01T14:28:56.171521Z",
+ "created_at": "2026-10-01T14:27:27.981084Z",
+ "updated_at": "2026-10-01T14:28:56.174790Z",
+ "last_made": null,
+ "recipe_ingredient": [
+  {
+   "quantity": 150.0,
+   "unit": {
+    "name": "g"
+   },
+   "food": {
+    "name": "kalte Butter"
+   },
+   "referenced_recipe": null,
+   "note": "möglichst keine \"streichzart\"-Sorte verwenden",
+   "display": "150 g kalte Butter möglichst keine \"streichzart\"-Sorte verwenden",
+   "title": "",
+   "original_text": "150 g kalte Butter (möglichst keine \"streichzart\"-Sorte verwenden)",
+   "substitutions": [],
+   "reference_id": "ref"
+  },
+  {
+   "quantity": 150.0,
+   "unit": {
+    "name": "g"
+   },
+   "food": {
+    "name": "Zucker"
+   },
+   "referenced_recipe": null,
+   "note": "",
+   "display": "150 g Zucker",
+   "title": "",
+   "original_text": "150 g Zucker",
+   "substitutions": [],
+   "reference_id": "ref"
+  },
+  {
+   "quantity": 300.0,
+   "unit": {
+    "name": "g"
+   },
+   "food": {
+    "name": "weizenmehl"
+   },
+   "referenced_recipe": null,
+   "note": "alternativ Dinkelmehl Type 630",
+   "display": "300 g weizenmehl alternativ Dinkelmehl Type 630",
+   "title": "Topping",
+   "original_text": "300 g Weizenmehl (alternativ Dinkelmehl Type 630)",
+   "substitutions": [],
+   "reference_id": "ref"
+  }
+ ],
+ "recipe_instructions": [
+  {
+   "id": "x",
+   "title": "",
+   "summary": "",
+   "text": "Den Backofen heizt du rechtzeitig auf 180 Grad Ober- / Unterhitze auf. Den Boden deiner Springform legst du mit Backpapier aus. Die Ränder ganz leicht mit Butter einfetten.",
+   "ingredient_references": [],
+   "note_references": []
+  },
+  {
+   "id": "x",
+   "title": "FÜR DEN STREUSEL-BODEN UND TOPPING",
+   "summary": "",
+   "text": "Für den Teig vermengst du mit dem Knethaken der Küchenmaschine oder dem Handmixer 300 g Mehl, 150 g kalte Butter und 150 g Zucker zu einer krümeligen, leicht \"sandartigen\" Masse.HINWEIS: Für das beste Streusel-Ergebnis empfehle ich dir die Verwendung einer Markenbutter / Süßrahmbutter. Bitte keine \"streichzart\"-Variante oder Margarine verwenden!",
+   "ingredient_references": [],
+   "note_references": []
+  },
+  {
+   "id": "x",
+   "title": "",
+   "summary": "",
+   "text": "Danach knetest du zügig mit der Hand die Masse grob zu Streuseln fest und gibst sie in den Kühlschrank so lange Du Dich um Deinen Belag kümmerst.",
+   "ingredient_references": [],
+   "note_references": []
+  }
+ ],
+ "nutrition": {
+  "calories": "288",
+  "carbohydrate_content": "44",
+  "cholesterol_content": null,
+  "fat_content": "11",
+  "fiber_content": null,
+  "protein_content": "3",
+  "saturated_fat_content": null,
+  "sodium_content": null,
+  "sugar_content": null,
+  "trans_fat_content": null,
+  "unsaturated_fat_content": null
+ },
+ "settings": {
+  "public": false,
+  "show_nutrition": false,
+  "show_assets": false,
+  "landscape_view": false,
+  "disable_comments": false,
+  "locked": false
+ },
+ "assets": [],
+ "notes": [
+  {
+   "title": "Tip",
+   "text": "Better next day."
+  }
+ ],
+ "extras": {},
+ "comments": []
+}

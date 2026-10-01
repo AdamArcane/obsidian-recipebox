@@ -15,7 +15,7 @@ Recipe Box treats recipes the same way Obsidian treats everything else: as notes
 
 <span align="center">
 
-🎉 **NEW!** [RecipeMD](https://recipe.md) format now supported
+🎉 **NEW!** Import your recipe collection from Mealie and other apps
 
 </span>
 
@@ -52,6 +52,8 @@ Mark a recipe as cooked and Recipe Box logs the date, optional notes, and a phot
 ### 📥 Recipe import
 
 Paste a URL from most recipe sites and Recipe Box extracts ingredients, instructions, and metadata into a new note using the built in recipe template, or you can set your own template to use. Plain text and pasted captions work too, for recipes that don't come from a structured page.
+
+Moving from another recipe app? Import your whole collection at once from Mealie, or from any app that exports schema.org Recipe JSON. Pick the exported `.json` or `.zip` files, choose a folder, and Recipe Box turns each recipe into a note, images included. Existing notes are never overwritten.
 
 ### 🔗 Recipe sharing
 

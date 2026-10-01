@@ -98,6 +98,42 @@ export function resolveDestinationFolder(settings: RecipeBoxSettings): string {
 	return "";
 }
 
+/**
+ * Write core shared by the interactive save and the bulk file import: image
+ * handling, template render, folder creation, create-or-modify. Deliberately
+ * silent (no Notice, no conflict prompt) so a loop over hundreds of recipes
+ * isn't drowned in toasts or blocked on dialogs; callers own those concerns.
+ * `imageHandled` lets bulk import resolve the image itself (a bundled zip
+ * image, or a download it wants to report failures for) and pass a recipe
+ * whose heroImage is already final, so no second download is attempted.
+ */
+export async function writeRecipeNote(
+	app: App,
+	recipe: ExtractedRecipe,
+	filePath: string,
+	settings: RecipeBoxSettings,
+	options: { imageHandled?: boolean } = {},
+): Promise<void> {
+	const folder = filePath.includes("/") ? filePath.slice(0, filePath.lastIndexOf("/")) : "";
+	// Attempt to download the hero image into the vault before rendering
+	// the note template, so the template sees the vault path instead of
+	// a raw URL. Best-effort: failure falls back to the original URL and
+	// never blocks the import.
+	let recipeToSave = recipe;
+	if (!options.imageHandled && settings.downloadImagesOnImport && recipe.heroImage) {
+		const imagePath = await downloadRecipeImage(app, recipe.heroImage, recipe.title || "recipe", folder);
+		if (imagePath) recipeToSave = { ...recipe, heroImage: imagePath };
+	}
+	const content = await buildRecipeNote(app, recipeToSave, settings);
+	await ensureParentFolders(app, filePath);
+	const existing = app.vault.getFileByPath(filePath);
+	if (existing) {
+		await app.vault.modify(existing, content);
+	} else {
+		await app.vault.create(filePath, content);
+	}
+}
+
 export async function saveRecipe(
 	app: App,
 	recipe: ExtractedRecipe,
@@ -112,23 +148,7 @@ export async function saveRecipe(
 
 	const doWrite = async (): Promise<void> => {
 		try {
-			// Attempt to download the hero image into the vault before rendering
-			// the note template, so the template sees the vault path instead of
-			// a raw URL. Best-effort: failure falls back to the original URL and
-			// never blocks the import.
-			let recipeToSave = recipe;
-			if (settings.downloadImagesOnImport && recipe.heroImage) {
-				const imagePath = await downloadRecipeImage(app, recipe.heroImage, recipe.title || "recipe", folderTrimmed);
-				if (imagePath) recipeToSave = { ...recipe, heroImage: imagePath };
-			}
-			const content = await buildRecipeNote(app, recipeToSave, settings);
-			await ensureParentFolders(app, filePath);
-			const existing = app.vault.getFileByPath(filePath);
-			if (existing) {
-				await app.vault.modify(existing, content);
-			} else {
-				await app.vault.create(filePath, content);
-			}
+			await writeRecipeNote(app, recipe, filePath, settings);
 			new Notice(`Recipe saved: ${filename}`);
 			onSuccess(filePath);
 		} catch (err) {

@@ -84,28 +84,36 @@ function decodeDataUri(dataUri: string): { bytes: ArrayBuffer; ext: string } | n
 	}
 }
 
-export async function downloadRecipeImage(
+export interface FetchedImage {
+	bytes: ArrayBuffer;
+	ext: string;
+}
+
+/** Fetches image bytes from an HTTP(S) URL or data: URI. Null on any failure. */
+export async function fetchImageBytes(source: string): Promise<FetchedImage | null> {
+	try {
+		if (source.startsWith("data:")) return decodeDataUri(source);
+		const response = await requestUrl({ url: source, method: "GET" });
+		const contentType = (response.headers?.["content-type"] as string | undefined) ?? "";
+		const ext = extensionFromMime(contentType) ?? extensionFromUrl(source) ?? "jpg";
+		return { bytes: response.arrayBuffer, ext };
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Writes already-fetched image bytes into the vault's attachment folder for a
+ * note in noteFolder. Returns the vault path, or null on failure.
+ */
+export async function writeImageToVault(
 	app: App,
-	heroImage: string,
+	bytes: ArrayBuffer,
+	ext: string,
 	recipeTitle: string,
 	noteFolder: string,
 ): Promise<string | null> {
 	try {
-		let bytes: ArrayBuffer;
-		let ext: string;
-
-		if (heroImage.startsWith("data:")) {
-			const decoded = decodeDataUri(heroImage);
-			if (!decoded) return null;
-			bytes = decoded.bytes;
-			ext = decoded.ext;
-		} else {
-			const response = await requestUrl({ url: heroImage, method: "GET" });
-			const contentType = (response.headers?.["content-type"] as string | undefined) ?? "";
-			ext = extensionFromMime(contentType) ?? extensionFromUrl(heroImage) ?? "jpg";
-			bytes = response.arrayBuffer;
-		}
-
 		const attachmentFolder = resolveAttachmentFolder(app, noteFolder);
 		const baseName = titleToFilename(recipeTitle || "recipe");
 		const vaultPath = await uniqueVaultPath(app, attachmentFolder, baseName, ext);
@@ -116,4 +124,15 @@ export async function downloadRecipeImage(
 	} catch {
 		return null;
 	}
+}
+
+export async function downloadRecipeImage(
+	app: App,
+	heroImage: string,
+	recipeTitle: string,
+	noteFolder: string,
+): Promise<string | null> {
+	const fetched = await fetchImageBytes(heroImage);
+	if (!fetched) return null;
+	return writeImageToVault(app, fetched.bytes, fetched.ext, recipeTitle, noteFolder);
 }
