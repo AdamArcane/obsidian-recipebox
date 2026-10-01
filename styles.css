@@ -4955,8 +4955,13 @@ body.is-mobile .rb-mpv-card-action-btn {
 }
 
 .rb-unit-mapping-list .rb-list-row {
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.4rem;
+}
+
+.rb-unit-mapping-hint {
+  flex: 1 1 100%;
 }
 
 .rb-unit-mapping-list .rb-list-row input[type="text"] {

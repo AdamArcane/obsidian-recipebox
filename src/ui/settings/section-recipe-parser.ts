@@ -3,6 +3,7 @@
  * Mappings are edited as rows but remain stored in the parser's text format.
  */
 import { Setting } from "obsidian";
+import { UNIT_SYNONYMS } from "../../parser/ingredient-units";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 
 interface UnitMapping {
@@ -14,8 +15,10 @@ function readMappings(value: string): UnitMapping[] {
 	return value
 		.split("\n")
 		.map((line) => {
-			const [aliases, canonical = ""] = line.split("->", 2);
-			return { aliases: aliases.trim(), canonical: canonical.trim() };
+			// First arrow only, matching compileUnitSynonyms.
+			const arrow = line.indexOf("->");
+			if (arrow === -1) return { aliases: line.trim(), canonical: "" };
+			return { aliases: line.slice(0, arrow).trim(), canonical: line.slice(arrow + 2).trim() };
 		})
 		.filter((mapping) => mapping.aliases.length > 0);
 }
@@ -25,6 +28,17 @@ function writeMappings(settings: RecipeBoxSettings, mappings: UnitMapping[]): vo
 		.filter((mapping) => mapping.aliases.trim())
 		.map((mapping) => `${mapping.aliases.trim()} -> ${mapping.canonical.trim()}`)
 		.join("\n");
+}
+
+const BUILT_IN_CANONICALS = new Set(Object.values(UNIT_SYNONYMS).filter(Boolean));
+
+// A canonical that is neither built in nor shared with another row (e.g.
+// "tasse -> cups" instead of "cup") will never merge with anything. Not an
+// error, since an own-language canonical like "EL" is legitimate.
+function isUnmergedCanonical(mappings: UnitMapping[], index: number): boolean {
+	const canonical = mappings[index].canonical.trim().toLowerCase();
+	if (!canonical || BUILT_IN_CANONICALS.has(canonical)) return false;
+	return !mappings.some((other, i) => i !== index && other.canonical.trim().toLowerCase() === canonical);
 }
 
 export function renderSectionRecipeParser(
@@ -56,6 +70,11 @@ export function renderSectionRecipeParser(
 				placeholder: "Canonical unit",
 			});
 			const remove = row.createEl("button", { text: "Remove" });
+			const hint = row.createDiv({
+				cls: "rb-unit-mapping-hint setting-item-description",
+				text: "This unit is not a built-in unit and no other mapping uses it, so it will not merge with other ingredients.",
+			});
+			hint.toggle(isUnmergedCanonical(mappings, index));
 
 			aliases.addEventListener("change", () => {
 				mapping.aliases = aliases.value;
@@ -65,7 +84,7 @@ export function renderSectionRecipeParser(
 			canonical.addEventListener("change", () => {
 				mapping.canonical = canonical.value;
 				writeMappings(settings, mappings);
-				void save();
+				void save().then(() => render());
 			});
 			remove.addEventListener("click", () => {
 				mappings.splice(index, 1);
@@ -84,13 +103,13 @@ export function renderSectionRecipeParser(
 	render();
 
 	const fillerSetting = new Setting(container)
-		.setName("Ingredient filler word")
-		.setDesc("Word removed between a unit and ingredient name, such as 'of' or 'de'.")
+		.setName("Ingredient filler words")
+		.setDesc("Comma-separated words removed between a unit and ingredient name, such as 'of, de, di'. Leave empty to strip nothing.")
 		.addText((text) => text
 			.setValue(settings.ingredientFillerWord)
-			.setPlaceholder("Of")
+			.setPlaceholder("Of, de")
 			.onChange((value) => {
-				settings.ingredientFillerWord = value.trim() || "of";
+				settings.ingredientFillerWord = value.trim();
 				void save();
 			}),
 		);

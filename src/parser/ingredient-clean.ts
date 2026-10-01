@@ -84,10 +84,18 @@ export function stripMarkdownEmphasis(text: string): string {
 		.trim();
 }
 
+/**
+ * Strips one leading filler word. `fillerWord` is a comma-separated list
+ * (e.g. "of, de, di") so mixed-language vaults can strip several; an empty
+ * list disables stripping.
+ */
 export function stripOf(text: string, fillerWord = "of"): string {
-	const escaped = fillerWord.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-	if (!escaped) return text;
-	return text.replace(new RegExp(`^${escaped}\\s+`, "i"), "");
+	for (const word of fillerWord.split(",").map((w) => w.trim()).filter(Boolean)) {
+		const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+		const stripped = text.replace(new RegExp(`^${escaped}\\s+`, "i"), "");
+		if (stripped !== text) return stripped;
+	}
+	return text;
 }
 
 export function normaliseName(name: string): string {

@@ -79,3 +79,61 @@ describe("parseIngredientLine", () => {
 		expect(parseIngredientLine("2")).toBeNull();
 	});
 });
+
+describe("parseIngredientLine: trailing periods and separators after units", () => {
+	it.each([
+		["2 tbsp. sugar", 2, "tbsp", "sugar"],
+		["1 lb. ground beef", 1, "lb", "ground beef"],
+		["2 oz. cheese", 2, "oz", "cheese"],
+		["1 l. milk", 1, "l", "milk"],
+	])("parses %s with its unit", (line, quantity, unit, name) => {
+		expect(parseIngredientLine(line)).toMatchObject({ quantity, unit, name });
+	});
+
+	it("still does not treat 'c.' as cup", () => {
+		expect(parseIngredientLine("1 c. flour")).toMatchObject({ quantity: 1, unit: "", name: "c. flour" });
+	});
+
+	it("matches a custom period-terminated alias with a filler word", () => {
+		expect(parseIngredientLine("2 c. à s. de sel", {
+			customSynonyms: "c. à s. -> tbsp",
+			fillerWord: "de",
+		})).toMatchObject({ quantity: 2, unit: "tbsp", name: "sel" });
+	});
+
+	it("matches a custom abbreviation with a trailing period", () => {
+		expect(parseIngredientLine("1 Essl. Zucker", { customSynonyms: "essl. -> tbsp" }))
+			.toMatchObject({ quantity: 1, unit: "tbsp", name: "zucker" });
+	});
+
+	it("drops a comma directly after the unit", () => {
+		expect(parseIngredientLine("3 lbs, trimmed beef")).toMatchObject({ quantity: 3, unit: "lb", name: "trimmed beef" });
+	});
+});
+
+describe("filler word list, normalization and mapping parsing", () => {
+	it("strips any word from a comma-separated filler list", () => {
+		const options = { fillerWord: "of, de, di" };
+		expect(parseIngredientLine("2 cups of flour", options)).toMatchObject({ name: "flour" });
+		expect(parseIngredientLine("2 cups de farine", options)).toMatchObject({ name: "farine" });
+		expect(parseIngredientLine("2 cups di farina", options)).toMatchObject({ name: "farina" });
+	});
+
+	it("strips nothing when the filler list is empty", () => {
+		expect(parseIngredientLine("2 cups of flour", { fillerWord: "" })).toMatchObject({ name: "of flour" });
+	});
+
+	it("matches decomposed accents against a precomposed alias and vice versa", () => {
+		const decomposed = "cuillère à soupe".normalize("NFD");
+		const precomposed = "cuillère à soupe".normalize("NFC");
+		expect(consumeUnit(`${decomposed} moutarde`, { customSynonyms: `${precomposed} -> tbsp` }))
+			.toEqual({ unit: "tbsp", remaining: "moutarde" });
+		expect(consumeUnit(`${precomposed} moutarde`, { customSynonyms: `${decomposed} -> tbsp` }))
+			.toEqual({ unit: "tbsp", remaining: "moutarde" });
+	});
+
+	it("keeps everything after the first arrow as the canonical unit", () => {
+		expect(consumeUnit("foo bar", { customSynonyms: "foo -> bar -> baz" })).toEqual({ unit: "bar -> baz", remaining: "bar" });
+	});
+});
+

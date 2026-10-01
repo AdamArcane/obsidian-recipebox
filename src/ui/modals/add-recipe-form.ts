@@ -328,7 +328,7 @@ export function renderAddRecipeForm(
 	renderGroupListEditor(
 		ingredientsBody,
 		recipe.ingredientGroups,
-		renderIngredientListEditor,
+		(body, items, onChange) => renderIngredientListEditor(body, items, onChange, settings),
 		(groups) => { recipe.ingredientGroups = groups; },
 		{ addGroup: "Add group", namePlaceholder: "Group name (optional)" },
 	);

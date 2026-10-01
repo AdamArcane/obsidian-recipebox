@@ -82,11 +82,38 @@ export interface IngredientUnitOptions {
 export function compileUnitSynonyms(customSynonyms = ""): Record<string, string> {
 	const result = { ...UNIT_SYNONYMS };
 	for (const line of customSynonyms.split("\n")) {
-		const [aliasesText, canonicalText] = line.split("->", 2).map((part) => part?.trim());
-		if (!aliasesText || canonicalText === undefined) continue;
-		for (const alias of aliasesText.split(",").map((value) => value.trim().toLowerCase()).filter(Boolean)) {
+		// Split on the first arrow only, so "foo -> bar -> baz" maps to the
+		// canonical "bar -> baz" rather than silently truncating to "bar".
+		const arrow = line.indexOf("->");
+		if (arrow === -1) continue;
+		const aliasesText = line.slice(0, arrow).trim();
+		const canonicalText = line.slice(arrow + 2).trim().normalize("NFC");
+		if (!aliasesText) continue;
+		// NFC so a decomposed "cuillère" typed in settings still matches
+		// precomposed recipe text (consumeUnit normalizes the line the same way).
+		for (const alias of aliasesText.normalize("NFC").split(",").map((value) => value.trim().toLowerCase()).filter(Boolean)) {
 			result[alias] = canonicalText;
 		}
 	}
 	return result;
+}
+
+export interface UnitLookup {
+	synonyms: Record<string, string>;
+	/** Aliases sorted longest first so multi-word and punctuated aliases win. */
+	candidates: string[];
+}
+
+// consumeUnit runs once per ingredient line on every surface, but the
+// mappings string only changes when the user edits settings, so keep the
+// last compiled result instead of recompiling and re-sorting each call.
+let cachedKey: string | null = null;
+let cachedLookup: UnitLookup | null = null;
+
+export function getUnitLookup(customSynonyms = ""): UnitLookup {
+	if (cachedLookup && cachedKey === customSynonyms) return cachedLookup;
+	const synonyms = compileUnitSynonyms(customSynonyms);
+	cachedLookup = { synonyms, candidates: Object.keys(synonyms).sort((a, b) => b.length - a.length) };
+	cachedKey = customSynonyms;
+	return cachedLookup;
 }

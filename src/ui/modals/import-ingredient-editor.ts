@@ -6,8 +6,9 @@
  * keep working on recipes built through this form.
  */
 import { parseLeadingQuantity } from "../../parser/quantity-parse";
-import { consumeUnit } from "../../parser/ingredient-parse";
+import { consumeUnit, ingredientParserOptions, IngredientParserOptions } from "../../parser/ingredient-parse";
 import { stripListMarkers, extractInlineNotes, stripOf } from "../../parser/ingredient-clean";
+import type { RecipeBoxSettings } from "../../settings/settings-types";
 import { renderEntryListEditor, EntryField } from "./import-entry-list-editor";
 
 const FIELDS: EntryField[] = [
@@ -21,14 +22,17 @@ const FIELDS: EntryField[] = [
 // step -- that lowercases the name for grocery-list matching, which is
 // correct there but wrong here: re-clicking a list row to edit it would
 // otherwise silently lowercase whatever casing the user originally typed.
-function decompose(line: string): Record<string, string> {
+// That is why this cannot simply call parseIngredientLine. It does take the
+// same parser options so custom unit mappings and the filler word behave
+// identically to the recipe view and grocery list.
+function decompose(line: string, options: IngredientParserOptions): Record<string, string> {
 	let text = stripListMarkers(line);
 	const { cleaned: afterNotes, note } = extractInlineNotes(text);
 	text = afterNotes;
 	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
-	text = stripOf(afterQty);
-	const { unit, remaining: afterUnit } = consumeUnit(text);
-	text = stripOf(afterUnit).replace(/[,;:.]+$/, "").trim();
+	text = stripOf(afterQty, options.fillerWord);
+	const { unit, remaining: afterUnit } = consumeUnit(text, options);
+	text = stripOf(afterUnit, options.fillerWord).replace(/[,;:.]+$/, "").trim();
 	return { qty: quantity !== null ? String(quantity) : "", unit, name: text, note: note ?? "" };
 }
 
@@ -50,6 +54,8 @@ export function renderIngredientListEditor(
 	parent: HTMLElement,
 	initialItems: string[],
 	onChange: (items: string[]) => void,
+	settings: RecipeBoxSettings,
 ): void {
-	renderEntryListEditor(parent, FIELDS, initialItems, decompose, compose, renderSummary, onChange);
+	const options = ingredientParserOptions(settings);
+	renderEntryListEditor(parent, FIELDS, initialItems, (line) => decompose(line, options), compose, renderSummary, onChange);
 }

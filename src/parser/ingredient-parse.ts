@@ -5,7 +5,7 @@
 import { ParsedIngredient } from "../types";
 import type { RecipeBoxSettings } from "../settings/settings-types";
 import { parseLeadingQuantity } from "./quantity-parse";
-import { compileUnitSynonyms, IngredientUnitOptions } from "./ingredient-units";
+import { getUnitLookup, IngredientUnitOptions } from "./ingredient-units";
 import {
 	stripListMarkers,
 	extractInlineNotes,
@@ -23,18 +23,32 @@ export function ingredientParserOptions(settings: Pick<RecipeBoxSettings, "ingre
 	return { customSynonyms: settings.ingredientUnitSynonyms, fillerWord: settings.ingredientFillerWord };
 }
 
-export function consumeUnit(rest: string, options: IngredientParserOptions = {}): { unit: string; remaining: string } {
+export function consumeUnit(input: string, options: IngredientParserOptions = {}): { unit: string; remaining: string } {
+	// NFC so decomposed accents in recipe text match precomposed aliases.
+	// Slicing below uses this normalized string so offsets stay consistent.
+	const rest = input.normalize("NFC");
 	const lower = rest.toLowerCase();
-	const synonyms = compileUnitSynonyms(options.customSynonyms);
-	const candidates = Object.keys(synonyms).sort((a, b) => b.length - a.length);
+	const { synonyms, candidates } = getUnitLookup(options.customSynonyms);
 	for (const candidate of candidates) {
 		if (!lower.startsWith(candidate)) continue;
-		const next = lower[candidate.length];
-		// A period after a bare alias is usually an abbreviation, not a unit
-		// boundary. This prevents `c.` from becoming cup by accident.
-		if (next === "." && !candidate.endsWith(".")) continue;
+		let end = candidate.length;
+		// Abbreviations are often written with a trailing period ("tbsp.",
+		// "lb."). Earlier work in this area rejected every bare alias followed
+		// by "." so that "c." would not become cup, which also broke "tbsp." and
+		// friends. Tolerate the period(s) for every unit except the single letter
+		// "c", which is the one built-in that collides with "c." abbreviations in
+		// other languages (e.g. French "c. a s."). Longest-first ordering means a
+		// custom alias that includes its own period still wins before we get here.
+		if (lower[end] === "." && !candidate.endsWith(".")) {
+			if (candidate === "c") continue;
+			while (lower[end] === ".") end++;
+		}
+		const next = lower[end];
 		if (next && !/[\s,;:]/.test(next)) continue;
-		return { unit: synonyms[candidate], remaining: rest.slice(candidate.length).trim() };
+		// A separator right after the unit ("3 lbs, trimmed beef") would
+		// otherwise stay at the front of the name.
+		const remaining = rest.slice(end).replace(/^[\s,;:]+/, "");
+		return { unit: synonyms[candidate], remaining };
 	}
 
 	return { unit: "", remaining: rest };
