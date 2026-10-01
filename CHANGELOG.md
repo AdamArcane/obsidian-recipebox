@@ -1,3 +1,11 @@
+## [0.1.13-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.0...0.1.13-beta.1) (2026-10-01)
+
+### Features
+
+* add support for ingredient ranges and second measures in parsing and scaling ([1236aaa](https://github.com/AdamArcane/obsidian-recipebox/commit/1236aaa456f7443dfa241565c015df07d3e2f13c))
+* implement support for ingredient ranges and second measures across parsing, scaling, and exports ([7ab5c86](https://github.com/AdamArcane/obsidian-recipebox/commit/7ab5c86300836f91d1054fe181cad9af5eb184f6))
+* update quantity formatting to include unit in exports and ingredient checklist; add tests for metric unit formatting ([2fe6a0f](https://github.com/AdamArcane/obsidian-recipebox/commit/2fe6a0f3825ffd87be431f7db17922633f90b0f6))
+
 ## [0.1.13-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12...0.1.13-beta.0) (2026-10-01)
 
 ### Features
