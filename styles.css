@@ -6505,3 +6505,77 @@ input[type='search'].rb-gallery-search {
   width: 100%;
 }
 
+
+/* Settings tab header: logo, name/version, and external links. The row is a
+   host only, so its control column is stretched to the full width. */
+.setting-item.rb-settings-header-row > .setting-item-info {
+  display: none;
+}
+
+.setting-item.rb-settings-header-row > .setting-item-control {
+  display: block;
+  flex: 1 1 100%;
+  width: 100%;
+  text-align: start;
+}
+
+.rb-settings-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rb-settings-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rb-settings-header-logo {
+  height: 3rem;
+  width: auto;
+}
+
+.rb-settings-header-name {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+.rb-settings-header-version {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.rb-settings-header-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rb-settings-header-link {
+  padding: var(--size-4-1) var(--size-4-3);
+  border-radius: var(--radius-m);
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+  text-decoration: none;
+}
+
+.rb-settings-header-link:hover {
+  background: var(--interactive-hover);
+  color: var(--text-normal);
+}
+
+.rb-settings-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-4-1);
+}
+
+.rb-settings-header-link-glyph {
+  display: inline-flex;
+}
+
+.rb-settings-header-link .svg-icon {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}

@@ -13,6 +13,8 @@ const context = await esbuild.context({
   treeShaking: true,
   outfile: "main.js",
   minify: prod,
+  // Plugins ship only main.js, manifest.json and styles.css, so images must be inlined.
+  loader: { ".png": "dataurl" },
 });
 
 if (prod) {
