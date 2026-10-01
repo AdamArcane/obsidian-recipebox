@@ -10,7 +10,9 @@ export type GroceryContributionSource =
 
 /** A second measure written alongside the first, e.g. the "4 oz" in "125 g / 4 oz rice sticks". */
 export interface AlternateMeasure {
+	/** Upper bound when the second measure is itself a range ("4-5 oz"). */
 	quantity: number;
+	quantityMin?: number;
 	unit: string;
 }
 

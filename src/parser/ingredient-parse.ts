@@ -65,17 +65,20 @@ const ALT_SEPARATOR = /^\s*[/|]\s*/;
  * ("1 can / tin of beans" or "2 g / some note") is left alone. Goes through
  * consumeUnit so custom unit synonyms apply to the second measure too.
  */
-function consumeAlternateMeasure(
+export function consumeAlternateMeasure(
 	input: string,
 	options: IngredientParserOptions
 ): { alt?: AlternateMeasure; remaining: string } {
 	const sep = input.match(ALT_SEPARATOR);
 	if (!sep) return { remaining: input };
-	const { quantity, rest } = parseLeadingQuantity(input.slice(sep[0].length));
+	const { quantity, min, rest } = parseLeadingQuantity(input.slice(sep[0].length));
 	if (quantity === null) return { remaining: input };
 	const { unit, remaining } = consumeUnit(rest, options);
 	if (!unit) return { remaining: input };
-	return { alt: { quantity, unit }, remaining };
+	// "125-150 g / 4-5 oz": keep the lower bound, or a rescale would drop it.
+	const alt: AlternateMeasure = { quantity, unit };
+	if (min !== undefined) alt.quantityMin = min;
+	return { alt, remaining };
 }
 
 export function parseIngredientLine(line: string, options: IngredientParserOptions = {}): ParsedIngredient | null {

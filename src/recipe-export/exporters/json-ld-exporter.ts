@@ -15,7 +15,7 @@ import { RecipeExportData } from "../recipe-export-data";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { stripObsidianMarkdown } from "../obsidian-markdown-strip";
 import { resolveRawNutrition } from "../nutrition-raw";
-import { formatQuantity } from "../../parser/quantity-format";
+import { scaleAmount } from "../../parser/ingredient-amount";
 
 export interface HowToStep {
 	"@type": "HowToStep";
@@ -95,8 +95,12 @@ export function toIsoDuration(minutes: number | null): string | undefined {
 }
 
 export function ingredientText(ing: RecipeExportData["parsedIngredients"][number]): string {
-	const qty = formatQuantity(ing.quantity);
-	const parts = [qty, ing.unit, stripObsidianMarkdown(ing.name)].filter(Boolean);
+	// ing is already scaled by the export multiplier, so scale by 1 here. This
+	// keeps ranges and second measures in the same "2-3" and "/ 4 oz" form the
+	// markdown rescaler writes.
+	const amount = scaleAmount(ing, 1, "-");
+	const altStr = amount.alt ? `/ ${amount.alt.text} ${amount.alt.unit}` : "";
+	const parts = [amount.text, ing.unit, altStr, stripObsidianMarkdown(ing.name)].filter(Boolean);
 	const note = ing.note ? ` (${stripObsidianMarkdown(ing.note)})` : "";
 	return parts.join(" ") + note;
 }

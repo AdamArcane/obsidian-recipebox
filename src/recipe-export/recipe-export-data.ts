@@ -23,6 +23,7 @@ import { splitBodyAroundInstructions } from "../parser/recipe-instruction-groups
 import { readRecipeMultiplier } from "../parser/recipe-multiplier";
 import { ingredientParserOptions, parseIngredientLine } from "../parser/ingredient-parse";
 import { hasIgnoreTag } from "../parser/ingredient-clean";
+import { scaleNumbers } from "../parser/ingredient-amount";
 import { NUTRITION_FIELDS, resolveNutritionDisplay } from "../ui/recipe-view/nutrition-fields";
 import { resolveImageFile, ABSOLUTE_URL_RE } from "../ui/recipe-view/image-resolve";
 import { resolveHeroImageValue } from "../parser/resolve-hero-image";
@@ -105,7 +106,9 @@ export async function buildRecipeExportData(
 			if (hasIgnoreTag(parsed.tags)) continue;
 			parsedIngredients.push({
 				...parsed,
-				quantity: parsed.quantity !== null ? parsed.quantity * multiplier : null,
+				// Spreading parsed alone would leave quantityMin and alt unscaled
+				// beside a scaled quantity, so scale every numeric field together.
+				...scaleNumbers(parsed, multiplier),
 				sourcePath: file.path,
 				sourceLabel: file.basename,
 			});

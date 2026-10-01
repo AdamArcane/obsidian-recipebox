@@ -5,9 +5,8 @@
  * understands, so scaling, the grocery list, and the ingredient checklist all
  * keep working on recipes built through this form.
  */
-import { parseLeadingQuantity } from "../../parser/quantity-parse";
-import { consumeUnit, ingredientParserOptions, IngredientParserOptions } from "../../parser/ingredient-parse";
-import { stripListMarkers, extractInlineNotes, stripOf } from "../../parser/ingredient-clean";
+import { ingredientParserOptions } from "../../parser/ingredient-parse";
+import { decomposeIngredient, composeIngredient } from "./ingredient-entry-format";
 import type { RecipeBoxSettings } from "../../settings/settings-types";
 import { renderEntryListEditor, EntryField } from "./import-entry-list-editor";
 
@@ -17,33 +16,6 @@ const FIELDS: EntryField[] = [
 	{ key: "name", label: "Ingredient", placeholder: "flour", cls: "rb-import-entry-cell--name" },
 	{ key: "note", label: "Note", placeholder: "optional", cls: "rb-import-entry-cell--note" },
 ];
-
-// Mirrors parseIngredientLine's pipeline but skips its final normaliseName
-// step -- that lowercases the name for grocery-list matching, which is
-// correct there but wrong here: re-clicking a list row to edit it would
-// otherwise silently lowercase whatever casing the user originally typed.
-// That is why this cannot simply call parseIngredientLine. It does take the
-// same parser options so custom unit mappings and the filler word behave
-// identically to the recipe view and grocery list.
-function decompose(line: string, options: IngredientParserOptions): Record<string, string> {
-	let text = stripListMarkers(line);
-	const { cleaned: afterNotes, note } = extractInlineNotes(text);
-	text = afterNotes;
-	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
-	text = stripOf(afterQty, options.fillerWord);
-	const { unit, remaining: afterUnit } = consumeUnit(text, options);
-	text = stripOf(afterUnit, options.fillerWord).replace(/[,;:.]+$/, "").trim();
-	return { qty: quantity !== null ? String(quantity) : "", unit, name: text, note: note ?? "" };
-}
-
-function compose(v: Record<string, string>): string {
-	const name = v.name.trim();
-	if (!name) return "";
-	const parts = [v.qty.trim(), v.unit.trim(), name].filter(Boolean);
-	let line = parts.join(" ");
-	if (v.note.trim()) line += ` (${v.note.trim()})`;
-	return line;
-}
 
 function renderSummary(v: Record<string, string>, textEl: HTMLElement): void {
 	textEl.createSpan({ text: [v.qty, v.unit, v.name].filter(Boolean).join(" ") });
@@ -57,5 +29,5 @@ export function renderIngredientListEditor(
 	settings: RecipeBoxSettings,
 ): void {
 	const options = ingredientParserOptions(settings);
-	renderEntryListEditor(parent, FIELDS, initialItems, (line) => decompose(line, options), compose, renderSummary, onChange);
+	renderEntryListEditor(parent, FIELDS, initialItems, (line) => decomposeIngredient(line, options), composeIngredient, renderSummary, onChange);
 }

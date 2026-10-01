@@ -1,6 +1,7 @@
 /**
  * Formats a numeric quantity for display, snapping near-integers and expressing
- * common fractions as "1 1/2" rather than "1.5".
+ * common fractions as "1 1/2" rather than "1.5". Metric units are the exception:
+ * nobody measures "41 2/3 g", so they get plain decimals instead.
  */
 const DENOMINATORS = [2, 3, 4, 6, 8];
 const SNAP_TOLERANCE = 0.02;
@@ -20,9 +21,24 @@ function nearestFraction(value: number): string | null {
 	return best ? `${best.num}/${best.den}` : null;
 }
 
-export function formatQuantity(qty: number | null): string {
+// Canonical unit spellings (see ingredient-units.ts) that read as decimals.
+const METRIC_UNITS = new Set(["g", "kg", "mg", "ml", "l"]);
+
+// Whole numbers from 10 up, one decimal below that. The 2-decimal fallback
+// stops a small nonzero amount (0.04 g) from rounding down to a misleading "0".
+function formatMetric(qty: number): string {
+	const abs = Math.abs(qty);
+	const sign = qty < 0 ? "-" : "";
+	if (abs >= 10) return `${sign}${Math.round(abs)}`;
+	const oneDecimal = Math.round(abs * 10) / 10;
+	if (oneDecimal > 0) return `${sign}${oneDecimal}`;
+	return `${sign}${parseFloat(abs.toFixed(2))}`;
+}
+
+export function formatQuantity(qty: number | null, unit = ""): string {
 	if (qty === null || isNaN(qty)) return "";
 	if (qty === 0) return "0";
+	if (METRIC_UNITS.has(unit)) return formatMetric(qty);
 
 	const negative = qty < 0;
 	const abs = Math.abs(qty);

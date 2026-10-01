@@ -23,6 +23,19 @@ describe("buildRecipeExportJson", () => {
 		]);
 	});
 
+	it("adds quantityMin and alt only for a range or a second measure", () => {
+		const base = { note: null, tags: [], raw: "", sourcePath: "x.md", sourceLabel: "x" };
+		const data = makeExportData({
+			parsedIngredients: [
+				{ ...base, quantity: 6, quantityMin: 4, unit: "", name: "bananas" },
+				{ ...base, quantity: 250, unit: "g", name: "rice", alt: { quantity: 8, unit: "oz" } },
+			],
+		});
+		const payload = buildRecipeExportJson(data, {}, DEFAULT_SETTINGS, DEFAULT_EXPORT_OPTIONS);
+		expect(payload.ingredients[0]).toEqual({ quantity: 6, quantityMin: 4, unit: "", name: "bananas", note: null, tags: [] });
+		expect(payload.ingredients[1]).toEqual({ quantity: 250, alt: { quantity: 8, unit: "oz" }, unit: "g", name: "rice", note: null, tags: [] });
+	});
+
 	it("omits lastMade when includeCookHistoryAndSections is off", () => {
 		const data = makeExportData({ meta: { diet: [], allergens: [], times: { prep: null, cook: null, total: null }, favorite: false, cookedCount: 0, lastMade: "2024-01-01" } });
 		const payload = buildRecipeExportJson(data, {}, DEFAULT_SETTINGS, DEFAULT_EXPORT_OPTIONS);

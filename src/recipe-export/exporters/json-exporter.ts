@@ -20,6 +20,10 @@ export interface RecipeExportJsonPayload {
 	lastMade: string | null;
 	ingredients: Array<{
 		quantity: number | null;
+		// Additive fields, present only for a range or a second measure, so
+		// existing consumers of this payload are unaffected.
+		quantityMin?: number;
+		alt?: { quantity: number; quantityMin?: number; unit: string };
 		unit: string;
 		name: string;
 		note: string | null;
@@ -49,6 +53,8 @@ export function buildRecipeExportJson(
 		lastMade: options.includeCookHistoryAndSections ? data.meta.lastMade : null,
 		ingredients: data.parsedIngredients.map((ing) => ({
 			quantity: ing.quantity,
+			...(ing.quantityMin !== undefined ? { quantityMin: ing.quantityMin } : {}),
+			...(ing.alt ? { alt: ing.alt } : {}),
 			unit: ing.unit,
 			name: stripObsidianMarkdown(ing.name),
 			note: ing.note ? stripObsidianMarkdown(ing.note) : null,

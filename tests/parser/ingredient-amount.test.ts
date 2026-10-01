@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseIngredientLine } from "../../src/parser/ingredient-parse";
-import { scaleAmount } from "../../src/parser/ingredient-amount";
+import { scaleAmount, scaleNumbers } from "../../src/parser/ingredient-amount";
 import { rescaleIngredientLine } from "../../src/recipe-export/rescale-ingredient-line";
 
 function amountOf(line: string, multiplier: number) {
@@ -34,5 +34,28 @@ describe("rescaleIngredientLine with ranges and second measures", () => {
 	it("round-trips: a rescaled line parses back to the same amounts", () => {
 		const once = rescaleIngredientLine("- 3 to 4 large eggs", 2);
 		expect(parseIngredientLine(once)).toMatchObject({ quantity: 8, quantityMin: 6 });
+	});
+});
+
+describe("second measure ranges", () => {
+	it("parses and rescales a range in both measures", () => {
+		expect(parseIngredientLine("125-150 g / 4-5 oz rice")).toMatchObject({
+			quantity: 150, quantityMin: 125, alt: { quantity: 5, quantityMin: 4, unit: "oz" },
+		});
+		expect(rescaleIngredientLine("- 125-150 g / 4-5 oz rice", 2)).toBe("- 250-300 g / 8-10 oz rice");
+	});
+});
+
+describe("scaleNumbers", () => {
+	it("scales every numeric field together", () => {
+		const parsed = parseIngredientLine("2-3 g / 4-5 oz salt");
+		if (!parsed) throw new Error("did not parse");
+		expect(scaleNumbers(parsed, 2)).toEqual({ quantity: 6, quantityMin: 4, alt: { quantity: 10, quantityMin: 8, unit: "oz" } });
+	});
+
+	it("omits optional fields for a plain ingredient", () => {
+		const parsed = parseIngredientLine("2 cups flour");
+		if (!parsed) throw new Error("did not parse");
+		expect(scaleNumbers(parsed, 2)).toEqual({ quantity: 4 });
 	});
 });

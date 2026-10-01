@@ -30,6 +30,13 @@ describe("ingredientText", () => {
 		).toBe("2 cup flour (sifted)");
 	});
 
+	it("writes a range and a second measure in the markdown rescaler's form", () => {
+		const base = { name: "rice", note: null, tags: [], raw: "", sourcePath: "", sourceLabel: "" };
+		expect(ingredientText({ ...base, quantity: 150, quantityMin: 125, unit: "g", alt: { quantity: 5, quantityMin: 4, unit: "oz" } }))
+			.toBe("125-150 g / 4-5 oz rice");
+		expect(ingredientText({ ...base, name: "bananas", quantity: 6, quantityMin: 4, unit: "" })).toBe("4-6 bananas");
+	});
+
 	it("omits missing parts cleanly", () => {
 		expect(
 			ingredientText({ quantity: null, unit: "", name: "salt", note: null, tags: [], raw: "", sourcePath: "", sourceLabel: "" }),
