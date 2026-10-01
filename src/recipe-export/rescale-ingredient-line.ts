@@ -8,7 +8,7 @@
  * only when actually scaling; at multiplier 1 the raw line passes through
  * unchanged).
  */
-import { parseIngredientLine } from "../parser/ingredient-parse";
+import { IngredientParserOptions, parseIngredientLine } from "../parser/ingredient-parse";
 import { formatQuantity } from "../parser/quantity-format";
 
 // Captures the bullet/number marker plus an optional task-list checkbox
@@ -17,10 +17,10 @@ import { formatQuantity } from "../parser/quantity-format";
 // unchecked checkbox survives the rebuild instead of collapsing to a plain bullet.
 const LIST_MARKER_RE = /^(\s*(?:[-*+]|\d+\.)\s+(?:\[[ x?]\]\s*)?)/i;
 
-export function rescaleIngredientLine(raw: string, multiplier: number): string {
+export function rescaleIngredientLine(raw: string, multiplier: number, parserOptions?: IngredientParserOptions): string {
 	if (multiplier === 1) return raw;
 
-	const parsed = parseIngredientLine(raw);
+	const parsed = parseIngredientLine(raw, parserOptions);
 	if (!parsed || !parsed.name) return raw;
 
 	const markerMatch = raw.match(LIST_MARKER_RE);

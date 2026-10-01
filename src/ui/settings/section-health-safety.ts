@@ -55,4 +55,5 @@ export function renderSectionHealthSafety(
 				})
 			);
 	}
+
 }

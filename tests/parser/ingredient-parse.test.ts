@@ -13,6 +13,16 @@ describe("consumeUnit", () => {
 	it("returns an empty unit when the leading token isn't a known unit", () => {
 		expect(consumeUnit("large eggs")).toEqual({ unit: "", remaining: "large eggs" });
 	});
+
+	it("matches custom aliases by longest prefix and lets them override built-ins", () => {
+		const customSynonyms = "cuillère à soupe, c. à s. -> tbsp\nc. ->";
+		expect(consumeUnit("cuillère à soupe moutarde", { customSynonyms })).toEqual({ unit: "tbsp", remaining: "moutarde" });
+		expect(consumeUnit("c. moutarde", { customSynonyms })).toEqual({ unit: "", remaining: "moutarde" });
+	});
+
+	it("does not interpret an abbreviated c. as cup by default", () => {
+		expect(consumeUnit("c. flour")).toEqual({ unit: "", remaining: "c. flour" });
+	});
 });
 
 describe("parseIngredientLine", () => {
@@ -51,6 +61,13 @@ describe("parseIngredientLine", () => {
 
 	it("strips 'of' after quantity and after unit", () => {
 		expect(parseIngredientLine("2 cups of flour")).toMatchObject({ name: "flour" });
+	});
+
+	it("supports a localized filler word and custom units", () => {
+		expect(parseIngredientLine("1 cuillère à soupe de moutarde", {
+		customSynonyms: "cuillère à soupe -> tbsp",
+		fillerWord: "de",
+	})).toMatchObject({ quantity: 1, unit: "tbsp", name: "moutarde" });
 	});
 
 	it("returns null for an empty or marker-only line", () => {

@@ -8,7 +8,7 @@ import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
 import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { GroceryItem } from "../../types";
-import { parseIngredientLine } from "../../parser/ingredient-parse";
+import { ingredientParserOptions, parseIngredientLine } from "../../parser/ingredient-parse";
 import { hasIgnoreTag, ingredientKey } from "../../parser/ingredient-clean";
 import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
@@ -56,7 +56,7 @@ export async function renderIngredientsSection(
 		}
 
 		for (const raw of group.lines) {
-			const parsed = parseIngredientLine(raw);
+			const parsed = parseIngredientLine(raw, ingredientParserOptions(settings));
 			if (!parsed || !parsed.name || hasIgnoreTag(parsed.tags)) continue;
 
 			const scaled = parsed.quantity !== null ? parsed.quantity * multiplier : null;

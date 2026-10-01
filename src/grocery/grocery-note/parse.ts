@@ -2,7 +2,7 @@
  * Parses the raw text of the grocery list note into typed sections and line
  * objects, distinguishing recognised ingredient checkboxes from opaque lines.
  */
-import { parseIngredientLine } from "../../parser/ingredient-parse";
+import { IngredientParserOptions, parseIngredientLine } from "../../parser/ingredient-parse";
 import { ingredientKey } from "../../parser/ingredient-clean";
 
 export interface GroceryLine {
@@ -22,7 +22,7 @@ export interface GrocerySection {
 
 const CHECKBOX_RE = /^- \[([x ])\] (.+)$/i;
 
-export function parseGroceryNoteText(text: string): GrocerySection[] {
+export function parseGroceryNoteText(text: string, parserOptions?: IngredientParserOptions): GrocerySection[] {
 	const sections: GrocerySection[] = [];
 	let current: GrocerySection | null = null;
 
@@ -41,7 +41,7 @@ export function parseGroceryNoteText(text: string): GrocerySection[] {
 		}
 
 		const checked = m[1].toLowerCase() === "x";
-		const parsed = parseIngredientLine(m[2]);
+		const parsed = parseIngredientLine(m[2], parserOptions);
 		if (!parsed?.name) {
 			current.lines.push({ kind: "opaque", key: "", name: "", unit: "", quantity: null, checked, raw });
 			continue;

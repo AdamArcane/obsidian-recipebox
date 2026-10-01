@@ -9,9 +9,10 @@ import { categorize } from "../category-match";
 import { readNoteOrEmpty, writeNote, resolveNotePath } from "../../utils/vault-notes";
 import { parseGroceryNoteText, GrocerySection } from "./parse";
 import { renderGroceryLine, renderGrocerySections } from "./render";
+import { ingredientParserOptions } from "../../parser/ingredient-parse";
 
 export function mergeIntoGroceryText(noteText: string, contributions: ContributionMap, settings: RecipeBoxSettings): string {
-	const sections = parseGroceryNoteText(noteText);
+	const sections = parseGroceryNoteText(noteText, ingredientParserOptions(settings));
 	const remaining = { ...contributions };
 
 	for (const section of sections) {
@@ -46,7 +47,7 @@ export function mergeIntoGroceryText(noteText: string, contributions: Contributi
 }
 
 export function removeFromGroceryText(noteText: string, contributions: ContributionMap, settings: RecipeBoxSettings): string {
-	const sections = parseGroceryNoteText(noteText);
+	const sections = parseGroceryNoteText(noteText, ingredientParserOptions(settings));
 
 	for (const section of sections) {
 		section.lines = section.lines.filter((line) => {

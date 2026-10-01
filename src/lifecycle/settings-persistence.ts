@@ -291,6 +291,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 		showHighGIWarnings: bool(r.diabeticModeEnabled, d.showHighGIWarnings),
 		giDictionary: str(r.giDictionary, d.giDictionary),
+		ingredientUnitSynonyms: str(r.ingredientUnitSynonyms, d.ingredientUnitSynonyms),
+		ingredientFillerWord: str(r.ingredientFillerWord, d.ingredientFillerWord),
 
 		timersEnabled: bool(r.timersEnabled, d.timersEnabled),
 		timerAutoStart: bool(r.timerAutoStart, d.timerAutoStart),

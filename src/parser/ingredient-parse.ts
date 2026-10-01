@@ -3,8 +3,9 @@
  * quantity, unit, name, inline note, and tags.
  */
 import { ParsedIngredient } from "../types";
+import type { RecipeBoxSettings } from "../settings/settings-types";
 import { parseLeadingQuantity } from "./quantity-parse";
-import { UNIT_SYNONYMS } from "./ingredient-units";
+import { compileUnitSynonyms, IngredientUnitOptions } from "./ingredient-units";
 import {
 	stripListMarkers,
 	extractInlineNotes,
@@ -14,27 +15,32 @@ import {
 	normaliseName,
 } from "./ingredient-clean";
 
-export function consumeUnit(rest: string): { unit: string; remaining: string } {
+export interface IngredientParserOptions extends IngredientUnitOptions {
+	fillerWord?: string;
+}
+
+export function ingredientParserOptions(settings: Pick<RecipeBoxSettings, "ingredientUnitSynonyms" | "ingredientFillerWord">): IngredientParserOptions {
+	return { customSynonyms: settings.ingredientUnitSynonyms, fillerWord: settings.ingredientFillerWord };
+}
+
+export function consumeUnit(rest: string, options: IngredientParserOptions = {}): { unit: string; remaining: string } {
 	const lower = rest.toLowerCase();
-
-	// Two-word fluid ounce forms
-	for (const twoWord of ["fluid ounces", "fluid ounce", "fl oz"]) {
-		if (lower.startsWith(twoWord)) {
-			return { unit: "fl oz", remaining: rest.slice(twoWord.length).trim() };
-		}
-	}
-
-	const token = rest.split(/\s+/)[0];
-	const strippedToken = token.replace(/\.+$/, "");
-	const canonical = UNIT_SYNONYMS[strippedToken.toLowerCase()];
-	if (canonical !== undefined) {
-		return { unit: canonical, remaining: rest.slice(token.length).trim() };
+	const synonyms = compileUnitSynonyms(options.customSynonyms);
+	const candidates = Object.keys(synonyms).sort((a, b) => b.length - a.length);
+	for (const candidate of candidates) {
+		if (!lower.startsWith(candidate)) continue;
+		const next = lower[candidate.length];
+		// A period after a bare alias is usually an abbreviation, not a unit
+		// boundary. This prevents `c.` from becoming cup by accident.
+		if (next === "." && !candidate.endsWith(".")) continue;
+		if (next && !/[\s,;:]/.test(next)) continue;
+		return { unit: synonyms[candidate], remaining: rest.slice(candidate.length).trim() };
 	}
 
 	return { unit: "", remaining: rest };
 }
 
-export function parseIngredientLine(line: string): ParsedIngredient | null {
+export function parseIngredientLine(line: string, options: IngredientParserOptions = {}): ParsedIngredient | null {
 	const raw = line;
 
 	let text = stripListMarkers(line);
@@ -49,10 +55,10 @@ export function parseIngredientLine(line: string): ParsedIngredient | null {
 	text = afterNotes;
 
 	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
-	text = stripOf(afterQty);
+	text = stripOf(afterQty, options.fillerWord);
 
-	const { unit, remaining: afterUnit } = consumeUnit(text);
-	text = stripOf(afterUnit);
+	const { unit, remaining: afterUnit } = consumeUnit(text, options);
+	text = stripOf(afterUnit, options.fillerWord);
 
 	// Strip trailing punctuation
 	text = text.replace(/[,;:.]+$/, "").trim();

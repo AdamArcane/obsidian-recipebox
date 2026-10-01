@@ -122,6 +122,9 @@ export interface RecipeBoxSettings {
 	// Diabetic mode
 	showHighGIWarnings: boolean;
 	giDictionary: string;
+	// Ingredient parsing aliases use one mapping per line: alias, alias -> unit.
+	ingredientUnitSynonyms: string;
+	ingredientFillerWord: string;
 
 	// Timers
 	timersEnabled: boolean;

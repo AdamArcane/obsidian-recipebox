@@ -84,8 +84,10 @@ export function stripMarkdownEmphasis(text: string): string {
 		.trim();
 }
 
-export function stripOf(text: string): string {
-	return text.replace(/^of\s+/i, "");
+export function stripOf(text: string, fillerWord = "of"): string {
+	const escaped = fillerWord.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	if (!escaped) return text;
+	return text.replace(new RegExp(`^${escaped}\\s+`, "i"), "");
 }
 
 export function normaliseName(name: string): string {

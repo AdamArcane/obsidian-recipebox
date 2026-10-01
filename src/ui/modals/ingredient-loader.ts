@@ -7,7 +7,7 @@ import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap } from "../../types";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
 import { splitBodyAroundIngredients } from "../../parser/recipe-ingredient-groups";
-import { parseIngredientLine } from "../../parser/ingredient-parse";
+import { ingredientParserOptions, parseIngredientLine } from "../../parser/ingredient-parse";
 import { ingredientKey } from "../../parser/ingredient-clean";
 import { formatQuantity } from "../../parser/quantity-format";
 import { toTitleCase } from "../../utils/text-case";
@@ -32,7 +32,7 @@ export async function loadRecipeIngredients(
 	const results: LoadedIngredient[] = [];
 	for (const group of groups) {
 		for (const raw of group.lines) {
-			const parsed = parseIngredientLine(raw);
+			const parsed = parseIngredientLine(raw, ingredientParserOptions(settings));
 			if (!parsed || !parsed.name) continue;
 			const key = ingredientKey(parsed.name, parsed.unit);
 			if (seen.has(key)) continue;

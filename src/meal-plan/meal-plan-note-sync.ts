@@ -6,7 +6,7 @@
 import { App } from "obsidian";
 import { ContributionMap, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
-import { parseIngredientLine } from "../parser/ingredient-parse";
+import { ingredientParserOptions, parseIngredientLine } from "../parser/ingredient-parse";
 import { ingredientKey, hasIgnoreTag } from "../parser/ingredient-clean";
 import { generateEntryId } from "../utils/date";
 import { localDateISO } from "../utils/date";
@@ -74,7 +74,7 @@ async function parseRecipeContributions(app: App, filePath: string, settings: Re
 		if (inIngredients && nextHeadingRe.test(line)) break;
 		if (!inIngredients) continue;
 
-		const parsed = parseIngredientLine(line);
+		const parsed = parseIngredientLine(line, ingredientParserOptions(settings));
 		if (!parsed?.name || hasIgnoreTag(parsed.tags)) continue;
 
 		const key = ingredientKey(parsed.name, parsed.unit);

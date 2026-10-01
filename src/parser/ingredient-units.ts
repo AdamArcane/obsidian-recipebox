@@ -73,3 +73,20 @@ export const UNIT_SYNONYMS: Record<string, string> = {
 	// filler words
 	unit: "", units: "", whole: "", each: "",
 };
+
+export interface IngredientUnitOptions {
+	/** One mapping per line: aliases separated by commas, then `->` canonical unit. */
+	customSynonyms?: string;
+}
+
+export function compileUnitSynonyms(customSynonyms = ""): Record<string, string> {
+	const result = { ...UNIT_SYNONYMS };
+	for (const line of customSynonyms.split("\n")) {
+		const [aliasesText, canonicalText] = line.split("->", 2).map((part) => part?.trim());
+		if (!aliasesText || canonicalText === undefined) continue;
+		for (const alias of aliasesText.split(",").map((value) => value.trim().toLowerCase()).filter(Boolean)) {
+			result[alias] = canonicalText;
+		}
+	}
+	return result;
+}

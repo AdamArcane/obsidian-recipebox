@@ -10,6 +10,7 @@ import { renderSectionShopping } from "./section-shopping";
 import { renderSectionSuggester } from "./section-suggester";
 import { renderSectionHealthSafety } from "./section-health-safety";
 import { renderSectionPropertyNames } from "./section-property-names";
+import { renderSectionRecipeParser } from "./section-recipe-parser";
 
 const MEAL_NOTATION_OPTIONS: Record<string, string> = {
 	tag: "Obsidian tag  (#meal/dinner)",
@@ -267,6 +268,22 @@ export function buildDeclarativeSettingDefinitions(
 					name: "Value source",
 					desc: "How nutrition values are stored in frontmatter.",
 					control: { type: "dropdown", key: "nutritionSource", options: NUTRITION_SOURCE_OPTIONS },
+				},
+			],
+		},
+		{
+			type: "page",
+			name: "Recipe parser",
+			desc: "Localized ingredient unit mappings and filler-word parsing.",
+			items: [
+				{
+					name: "Recipe parser settings",
+					aliases: ["units", "synonyms", "localized ingredients", "filler word"],
+					render: (setting) => {
+						renderLegacySectionInDeclarative(ctx, setting, (containerEl, save) => {
+							renderSectionRecipeParser(containerEl, ctx.plugin.settings, save);
+						});
+					},
 				},
 			],
 		},

@@ -17,6 +17,7 @@ import { renderSectionMealPlan as renderSectionMealPlan } from "./section-meal-p
 import { renderSectionPropertyNames } from "./section-property-names";
 import { renderSectionExport } from "./section-export";
 import { renderSectionSharing } from "./section-sharing";
+import { renderSectionRecipeParser } from "./section-recipe-parser";
 
 interface LegacySettingsContext {
 	app: App;
@@ -49,6 +50,7 @@ export function renderLegacySettings(context: LegacySettingsContext): void {
 	renderSectionTimers(context.containerEl, context.plugin.settings, save, context.rerender);
 	renderSectionNutrition(context.containerEl, context.plugin.settings, save, context.rerender);
 	renderSectionHealthSafety(context.containerEl, context.plugin.settings, save, context.rerender, context.app);
+	renderSectionRecipeParser(context.containerEl, context.plugin.settings, save);
 	renderSectionImporter(context.containerEl, context.plugin.settings, save, context.rerender, context.app);
 	renderSectionPropertyNames(context.containerEl, context.plugin.settings, save, context.rerender);
 	renderSectionExport(context.containerEl, context.plugin.settings, save, context.rerender, context.app);
