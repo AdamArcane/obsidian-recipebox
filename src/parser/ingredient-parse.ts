@@ -2,7 +2,7 @@
  * Parses a single raw ingredient line into a structured ParsedIngredient with
  * quantity, unit, name, inline note, and tags.
  */
-import { ParsedIngredient } from "../types";
+import { AlternateMeasure, ParsedIngredient } from "../types";
 import type { RecipeBoxSettings } from "../settings/settings-types";
 import { parseLeadingQuantity } from "./quantity-parse";
 import { getUnitLookup, IngredientUnitOptions } from "./ingredient-units";
@@ -44,7 +44,9 @@ export function consumeUnit(input: string, options: IngredientParserOptions = {}
 			while (lower[end] === ".") end++;
 		}
 		const next = lower[end];
-		if (next && !/[\s,;:]/.test(next)) continue;
+		// "/" and "|" can sit directly against a unit in a dual measure
+		// ("1 cup/240 ml", "8 cups|1892 ml water").
+		if (next && !/[\s,;:/|]/.test(next)) continue;
 		// A separator right after the unit ("3 lbs, trimmed beef") would
 		// otherwise stay at the front of the name.
 		const remaining = rest.slice(end).replace(/^[\s,;:]+/, "");
@@ -52,6 +54,28 @@ export function consumeUnit(input: string, options: IngredientParserOptions = {}
 	}
 
 	return { unit: "", remaining: rest };
+}
+
+// Matches the separator between two measures: "125 g / 4 oz", "8 cups|1892 ml".
+const ALT_SEPARATOR = /^\s*[/|]\s*/;
+
+/**
+ * Reads an optional second measure ("/ 4 oz") that follows the first unit. It
+ * must be a number plus a recognised unit, so a stray slash in the name
+ * ("1 can / tin of beans" or "2 g / some note") is left alone. Goes through
+ * consumeUnit so custom unit synonyms apply to the second measure too.
+ */
+function consumeAlternateMeasure(
+	input: string,
+	options: IngredientParserOptions
+): { alt?: AlternateMeasure; remaining: string } {
+	const sep = input.match(ALT_SEPARATOR);
+	if (!sep) return { remaining: input };
+	const { quantity, rest } = parseLeadingQuantity(input.slice(sep[0].length));
+	if (quantity === null) return { remaining: input };
+	const { unit, remaining } = consumeUnit(rest, options);
+	if (!unit) return { remaining: input };
+	return { alt: { quantity, unit }, remaining };
 }
 
 export function parseIngredientLine(line: string, options: IngredientParserOptions = {}): ParsedIngredient | null {
@@ -68,11 +92,14 @@ export function parseIngredientLine(line: string, options: IngredientParserOptio
 	const { cleaned: afterNotes, note } = extractInlineNotes(text);
 	text = afterNotes;
 
-	const { quantity, rest: afterQty } = parseLeadingQuantity(text);
+	const { quantity, min, rest: afterQty } = parseLeadingQuantity(text);
 	text = stripOf(afterQty, options.fillerWord);
 
 	const { unit, remaining: afterUnit } = consumeUnit(text, options);
-	text = stripOf(afterUnit, options.fillerWord);
+	// Only look for a second measure when the first had a unit, so a bare
+	// "1 / 2 ..." is not mistaken for "1 <unit> / 2 <unit>".
+	const { alt, remaining: afterAlt } = unit ? consumeAlternateMeasure(afterUnit, options) : { alt: undefined, remaining: afterUnit };
+	text = stripOf(afterAlt, options.fillerWord);
 
 	// Strip trailing punctuation
 	text = text.replace(/[,;:.]+$/, "").trim();
@@ -83,5 +110,10 @@ export function parseIngredientLine(line: string, options: IngredientParserOptio
 	// A quantity with nothing else attached is not a valid ingredient
 	if (quantity !== null && !name) return null;
 
-	return { quantity, unit, name, note, tags, raw };
+	const result: ParsedIngredient = { quantity, unit, name, note, tags, raw };
+	// Optional fields are only set when present so existing callers and
+	// toEqual comparisons on plain ingredients are unaffected.
+	if (min !== undefined) result.quantityMin = min;
+	if (alt) result.alt = alt;
+	return result;
 }

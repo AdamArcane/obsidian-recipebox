@@ -137,3 +137,37 @@ describe("filler word list, normalization and mapping parsing", () => {
 	});
 });
 
+
+describe("ranges and second measures", () => {
+	it("parses the examples from the feature request", () => {
+		expect(parseIngredientLine("2-3 bananas")).toMatchObject({ quantity: 3, quantityMin: 2, name: "bananas" });
+		expect(parseIngredientLine("3 to 4 large eggs")).toMatchObject({ quantity: 4, quantityMin: 3, name: "large eggs" });
+		expect(parseIngredientLine("1/2 - 3/4 tsp sea salt")).toMatchObject({ quantity: 0.75, quantityMin: 0.5, unit: "tsp", name: "sea salt" });
+		expect(parseIngredientLine("125 g / 4 oz rice sticks")).toMatchObject({ quantity: 125, unit: "g", alt: { quantity: 4, unit: "oz" }, name: "rice sticks" });
+		expect(parseIngredientLine("8 cups|1892 ml water")).toMatchObject({ quantity: 8, unit: "cup", alt: { quantity: 1892, unit: "ml" }, name: "water" });
+		expect(parseIngredientLine("1 ½ cups panko")).toMatchObject({ quantity: 1.5, unit: "cup", name: "panko" });
+	});
+
+	it("leaves plain ingredients free of the optional fields", () => {
+		const parsed = parseIngredientLine("2 cups flour");
+		expect(parsed).not.toHaveProperty("quantityMin");
+		expect(parsed).not.toHaveProperty("alt");
+	});
+
+	it("does not treat a slash without a number and unit as a second measure", () => {
+		expect(parseIngredientLine("2 cups / some note")).toMatchObject({ unit: "cup", name: "/ some note" });
+		expect(parseIngredientLine("1/2 cup sugar")).toMatchObject({ quantity: 0.5, unit: "cup", name: "sugar" });
+	});
+
+	it("matches a custom unit synonym on the second measure", () => {
+		const options = { customSynonyms: "cuillère à soupe, cas -> tbsp" };
+		expect(parseIngredientLine("1 cup / 2 cuillère à soupe de moutarde", { ...options, fillerWord: "de" }))
+			.toMatchObject({ unit: "cup", alt: { quantity: 2, unit: "tbsp" }, name: "moutarde" });
+	});
+
+	it("strips the filler word after a range and a second measure", () => {
+		const options = { fillerWord: "of, de" };
+		expect(parseIngredientLine("2-3 cups of flour", options)).toMatchObject({ quantity: 3, quantityMin: 2, name: "flour" });
+		expect(parseIngredientLine("125 g / 4 oz de riz", options)).toMatchObject({ alt: { quantity: 4, unit: "oz" }, name: "riz" });
+	});
+});

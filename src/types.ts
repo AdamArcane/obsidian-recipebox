@@ -8,8 +8,19 @@ export type GroceryContributionSource =
 	| { kind: "recipe"; path: string; day?: string; mealType?: string }
 	| { kind: "manual" };
 
+/** A second measure written alongside the first, e.g. the "4 oz" in "125 g / 4 oz rice sticks". */
+export interface AlternateMeasure {
+	quantity: number;
+	unit: string;
+}
+
 export interface ParsedIngredient {
+	/** The amount, or the upper bound when written as a range, so totals and scaling see one number. */
 	quantity: number | null;
+	/** Lower bound of a range ("2-3 bananas" has quantity 3, quantityMin 2). */
+	quantityMin?: number;
+	/** Second measure in another unit system, display and export only. */
+	alt?: AlternateMeasure;
 	unit: string;
 	name: string;
 	note: string | null;

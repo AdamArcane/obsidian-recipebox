@@ -13,7 +13,7 @@ import { hasIgnoreTag, ingredientKey } from "../../parser/ingredient-clean";
 import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
 import { compileGiDictionary } from "../../parser/glycemic-dictionary";
-import { formatQuantity } from "../../parser/quantity-format";
+import { scaleAmount } from "../../parser/ingredient-amount";
 
 export async function renderIngredientsSection(
 	container: HTMLElement,
@@ -59,7 +59,7 @@ export async function renderIngredientsSection(
 			const parsed = parseIngredientLine(raw, ingredientParserOptions(settings));
 			if (!parsed || !parsed.name || hasIgnoreTag(parsed.tags)) continue;
 
-			const scaled = parsed.quantity !== null ? parsed.quantity * multiplier : null;
+			const amount = scaleAmount(parsed, multiplier);
 			const key = ingredientKey(parsed.name, parsed.unit);
 			const inGrocery = groceryKeySet.has(key);
 
@@ -71,11 +71,19 @@ export async function renderIngredientsSection(
 				});
 			}
 
-			const qtyWrap = row.createSpan({ cls: scaled !== null ? "rb-ingredient-qty" : "rb-ingredient-qty rb-qty-empty" });
-			const qtyStr = scaled !== null ? formatQuantity(scaled) : "";
+			const qtyStr = amount.text;
+			const qtyWrap = row.createSpan({ cls: qtyStr ? "rb-ingredient-qty" : "rb-ingredient-qty rb-qty-empty" });
 			if (qtyStr) {
-				qtyWrap.createSpan({ cls: "rb-qty-number", text: qtyStr });
-				if (parsed.unit) qtyWrap.createSpan({ cls: "rb-qty-unit", text: parsed.unit });
+				const mainLine = qtyWrap.createSpan({ cls: "rb-qty-line" });
+				mainLine.createSpan({ cls: "rb-qty-number", text: qtyStr });
+				if (parsed.unit) mainLine.createSpan({ cls: "rb-qty-unit", text: parsed.unit });
+				// The second measure gets its own line, styled as a smaller copy
+				// of the first, because side by side the two read as one run of text.
+				if (amount.alt) {
+					const altLine = qtyWrap.createSpan({ cls: "rb-qty-line rb-qty-alt-line" });
+					altLine.createSpan({ cls: "rb-qty-alt-number", text: `(${amount.alt.text}` });
+					altLine.createSpan({ cls: "rb-qty-alt-unit", text: `${amount.alt.unit})` });
+				}
 			} else {
 				qtyWrap.createSpan({ cls: "rb-qty-dash", text: "—" });
 			}

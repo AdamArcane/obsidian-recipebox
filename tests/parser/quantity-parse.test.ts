@@ -55,3 +55,33 @@ describe("decimal notation", () => {
 		expect(parseLeadingQuantity("2, peeled onions")).toEqual({ quantity: 2, rest: ", peeled onions" });
 	});
 });
+
+describe("parseLeadingQuantity ranges and spaced mixed numbers", () => {
+	it("parses a whole number, a space, and a unicode fraction", () => {
+		expect(parseLeadingQuantity("1 ½ cups panko")).toEqual({ quantity: 1.5, rest: "cups panko" });
+	});
+
+	it("reports the upper bound as quantity and the lower bound as min", () => {
+		expect(parseLeadingQuantity("2-3 bananas")).toEqual({ quantity: 3, min: 2, rest: "bananas" });
+		expect(parseLeadingQuantity("3 to 4 large eggs")).toEqual({ quantity: 4, min: 3, rest: "large eggs" });
+		expect(parseLeadingQuantity("1/2 - 3/4 tsp sea salt")).toEqual({ quantity: 0.75, min: 0.5, rest: "tsp sea salt" });
+		expect(parseLeadingQuantity("2–3 bananas")).toEqual({ quantity: 3, min: 2, rest: "bananas" });
+		expect(parseLeadingQuantity("1 ½ - 2 cups milk")).toEqual({ quantity: 2, min: 1.5, rest: "cups milk" });
+	});
+
+	it("collapses an equal pair to a single number", () => {
+		expect(parseLeadingQuantity("2-2 bananas")).toEqual({ quantity: 2, rest: "bananas" });
+	});
+
+	it("does not read hyphenated names, descending pairs, or chained numbers as ranges", () => {
+		expect(parseLeadingQuantity("2-inch piece ginger")).toEqual({ quantity: 2, rest: "-inch piece ginger" });
+		expect(parseLeadingQuantity("5-1 thing").min).toBeUndefined();
+		expect(parseLeadingQuantity("1-2-3 sauce").min).toBeUndefined();
+		expect(parseLeadingQuantity("2 tomatoes")).toEqual({ quantity: 2, rest: "tomatoes" });
+		expect(parseLeadingQuantity("1 to taste")).toEqual({ quantity: 1, rest: "to taste" });
+	});
+
+	it("keeps a following digit as part of the name", () => {
+		expect(parseLeadingQuantity("2-3 12 oz cans tomatoes")).toEqual({ quantity: 3, min: 2, rest: "12 oz cans tomatoes" });
+	});
+});

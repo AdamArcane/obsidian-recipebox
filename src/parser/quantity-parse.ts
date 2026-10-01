@@ -1,13 +1,22 @@
 /**
  * Parses the leading quantity token from an ingredient string, handling integers,
- * decimals, ASCII fractions, mixed numbers, and Unicode vulgar fractions.
+ * decimals, ASCII fractions, mixed numbers, Unicode vulgar fractions, and ranges
+ * ("2-3", "1/2 - 3/4", "3 to 4"). A range reports its upper bound as `quantity`
+ * and its lower bound as `min`, so callers that only know about one number keep
+ * working and simply see the larger amount.
  */
 import { UNICODE_FRACTIONS, UNICODE_FRACTION_PATTERN } from "./quantity-fractions";
 
 export interface QuantityResult {
 	quantity: number | null;
 	rest: string;
+	/** Lower bound when the amount was written as a range; absent otherwise. */
+	min?: number;
 }
+
+// "-", en dash, em dash, or the word "to" (which needs spaces on both sides so
+// it cannot eat the start of a word like "tomatoes").
+const RANGE_SEPARATOR = /^\s*(?:[-\u2013\u2014]|\bto\b)\s*/i;
 
 const FRACTION_SLASH = /[/⁄]/;
 
@@ -20,9 +29,7 @@ function tryAsciiFraction(token: string): number | null {
 	return num / den;
 }
 
-export function parseLeadingQuantity(input: string): QuantityResult {
-	const trimmed = input.trim();
-
+function parseSingleQuantity(trimmed: string): QuantityResult {
 	// "a" or "an" followed by a space
 	if (/^an?\s+\S/i.test(trimmed)) {
 		return { quantity: 1, rest: trimmed.replace(/^an?\s+/i, "") };
@@ -36,6 +43,18 @@ export function parseLeadingQuantity(input: string): QuantityResult {
 		const whole = parseInt(unicodeMixed[1], 10);
 		const frac = UNICODE_FRACTIONS[unicodeMixed[2]] ?? 0;
 		return { quantity: whole + frac, rest: unicodeMixed[3].trim() };
+	}
+
+	// whole number, a space, then a unicode fraction e.g. "1 ½". RecipeMD writes
+	// mixed amounts this way. Without this the "1" was taken alone and the "½"
+	// stayed at the front of the ingredient name ("½ cups panko").
+	const unicodeSpaced = trimmed.match(
+		new RegExp(`^(\\d+)\\s+(${UNICODE_FRACTION_PATTERN.source})(.*)$`)
+	);
+	if (unicodeSpaced) {
+		const whole = parseInt(unicodeSpaced[1], 10);
+		const frac = UNICODE_FRACTIONS[unicodeSpaced[2]] ?? 0;
+		return { quantity: whole + frac, rest: unicodeSpaced[3].trim() };
 	}
 
 	// standalone unicode fraction with no preceding whole number
@@ -73,4 +92,27 @@ export function parseLeadingQuantity(input: string): QuantityResult {
 	}
 
 	return { quantity: null, rest: trimmed };
+}
+
+export function parseLeadingQuantity(input: string): QuantityResult {
+	const trimmed = input.trim();
+	const first = parseSingleQuantity(trimmed);
+	// "a"/"an" is a word, not a digit, so "a to b" must not read as a range.
+	if (first.quantity === null || /^an?\s/i.test(trimmed)) return first;
+
+	const sep = first.rest.match(RANGE_SEPARATOR);
+	if (!sep) return first;
+
+	// Only a range when a real number follows the separator. That keeps
+	// "2-inch piece ginger" and "1 to taste" from being misread: the text after
+	// the separator has no leading number, so the first parse stands.
+	const second = parseSingleQuantity(first.rest.slice(sep[0].length));
+	if (second.quantity === null || /^an?\s/i.test(first.rest.slice(sep[0].length))) return first;
+	// A descending pair is not a range ("5-1"), and a trailing "-" or "/" means
+	// this was part of a longer token such as "1-2-3 sauce". A following digit is
+	// fine: "2-3 12 oz cans" is a range of 12 oz cans.
+	if (second.quantity < first.quantity || /^[-/]/.test(second.rest)) return first;
+
+	if (second.quantity === first.quantity) return { quantity: first.quantity, rest: second.rest };
+	return { quantity: second.quantity, min: first.quantity, rest: second.rest };
 }

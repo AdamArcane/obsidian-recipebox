@@ -9,7 +9,7 @@
  * unchanged).
  */
 import { IngredientParserOptions, parseIngredientLine } from "../parser/ingredient-parse";
-import { formatQuantity } from "../parser/quantity-format";
+import { scaleAmount } from "../parser/ingredient-amount";
 
 // Captures the bullet/number marker plus an optional task-list checkbox
 // ("- [ ] ", "- [x] ", "1. [?] ") -- mirrors ingredient-clean.ts's
@@ -26,10 +26,12 @@ export function rescaleIngredientLine(raw: string, multiplier: number, parserOpt
 	const markerMatch = raw.match(LIST_MARKER_RE);
 	const marker = markerMatch ? markerMatch[1] : "- ";
 
-	const scaledQty = parsed.quantity !== null ? parsed.quantity * multiplier : null;
-	const qtyStr = scaledQty !== null ? formatQuantity(scaledQty) : "";
+	// A range is rebuilt as "2-3" and a second measure as "/ 8 oz" so neither
+	// is dropped or pushed into the name when the line is rescaled.
+	const amount = scaleAmount(parsed, multiplier, "-");
+	const altStr = amount.alt ? `/ ${amount.alt.text} ${amount.alt.unit}` : "";
 
-	let line = [qtyStr, parsed.unit, parsed.name].filter(Boolean).join(" ");
+	let line = [amount.text, parsed.unit, altStr, parsed.name].filter(Boolean).join(" ");
 	if (parsed.note) line += ` (${parsed.note})`;
 	for (const tag of parsed.tags) line += ` #${tag}`;
 

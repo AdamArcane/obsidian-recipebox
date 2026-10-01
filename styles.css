@@ -1076,14 +1076,22 @@ button:not(.clickable-icon).rb-start-timer-btn {
 .rb-ingredient-qty {
   width: 6rem;
   display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 0.2rem;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   padding-right: 0.5rem;
   padding-top: 0.25rem;
   border-right: 1px solid var(--background-modifier-border);
+}
+
+/* One measure per line: the main amount, then an optional smaller second measure below */
+.rb-qty-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.2rem;
 }
 
 .rb-qty-number {
@@ -1095,6 +1103,22 @@ button:not(.clickable-icon).rb-start-timer-btn {
 
 .rb-qty-unit {
   font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-faint);
+  text-transform: lowercase;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.rb-qty-alt-number {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.rb-qty-alt-unit {
+  font-size: 0.6rem;
   font-weight: 500;
   color: var(--text-faint);
   text-transform: lowercase;
