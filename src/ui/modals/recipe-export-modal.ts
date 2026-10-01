@@ -26,6 +26,7 @@ import { downloadTextFile } from "../../recipe-export/download-file";
 import { readRecipeMultiplier } from "../../parser/recipe-multiplier";
 import { NotePathSuggest } from "../components/note-path-suggest";
 import { ensureParentFolders } from "../../utils/vault-notes";
+import { joinExportPath } from "../../utils/export-path";
 import { BaseModal } from "./modal-shell";
 
 const FORMAT_LABELS: Record<RecipeExportFormat, string> = {
@@ -170,7 +171,7 @@ export class RecipeExportModal extends BaseModal {
 			this.outputSection.createDiv({ cls: "rb-modal-section-heading", text: "Save as note" });
 			const pathField = this.outputSection.createDiv({ cls: "rb-modal-field" });
 			const defaultName = `${this.file.basename} (export)`;
-			const defaultPath = this.settings.exportFolder ? `${this.settings.exportFolder}/${defaultName}` : defaultName;
+			const defaultPath = joinExportPath(this.settings.exportFolder, defaultName);
 			this.pathInput = pathField.createEl("input", {
 				cls: "rb-modal-input",
 				type: "text",

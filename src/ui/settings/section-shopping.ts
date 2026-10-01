@@ -26,8 +26,6 @@ export function renderSectionShopping(
 	app: App,
 	getKnownCategories: () => string[],
 ): void {
-	new Setting(container).setName("Shopping assistant").setHeading();
-
 	new Setting(container)
 		.setName("Default grouping")
 		.addDropdown((dd) =>

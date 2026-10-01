@@ -20,8 +20,6 @@ export function renderSectionSuggester(
 	app: App,
 	getDiscovery: () => DiscoveryResult | null,
 ): void {
-	new Setting(container).setName("Meal suggester").setHeading();
-
 	// Modes list lives inside a single Setting, matching the badge-list pattern
 	const modesSetting = new Setting(container)
 		.setName("Modes")

@@ -8,6 +8,7 @@ import { ExportFormat, EXPORT_FORMAT_LABELS } from "../../grocery/export-format"
 import { exportGroceryList } from "../../grocery/export-render";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { NotePathSuggest } from "../components/note-path-suggest";
+import { joinExportPath, normalizeExportFolder } from "../../utils/export-path";
 import { BaseModal } from "./modal-shell";
 
 export class ExportModal extends BaseModal {
@@ -68,8 +69,8 @@ export class ExportModal extends BaseModal {
 		appendSection.createDiv({ cls: "rb-modal-section-heading", text: "Append to note" });
 
 		const appendField = appendSection.createDiv({ cls: "rb-modal-field" });
-		const defaultPath = this.settings.exportFolder
-			? `${this.settings.exportFolder}/Grocery List`
+		const defaultPath = normalizeExportFolder(this.settings.exportFolder)
+			? joinExportPath(this.settings.exportFolder, "Grocery List")
 			: "";
 		this.appendInput = appendField.createEl("input", {
 			cls: "rb-modal-input",

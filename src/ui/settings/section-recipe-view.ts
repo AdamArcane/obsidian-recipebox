@@ -18,8 +18,6 @@ export function renderSectionRecipeView(
 	app: App,
 	getDiscovery?: () => DiscoveryResult | null,
 ): void {
-	new Setting(container).setName("Recipe view").setHeading();
-
 	new Setting(container)
 		.setName("Auto-open recipe view")
 		.setDesc("Automatically switch to recipe view when opening a recipe note.")

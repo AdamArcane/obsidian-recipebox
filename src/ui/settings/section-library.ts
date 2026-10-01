@@ -16,8 +16,6 @@ export function renderSectionLibrary(
 	rerender: () => void,
 	app: App
 ): void {
-	new Setting(container).setName("Recipe library").setHeading();
-
 	// The folder list is appended directly inside this card so it stays one visual unit.
 	const folderDesc = createFragment();
 	folderDesc.appendText("Folders the plugin scans for recipe notes. ");

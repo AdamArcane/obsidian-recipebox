@@ -4,10 +4,6 @@ Obsidian plugin (TypeScript, esbuild). Plan meals, manage a grocery list,
 and view recipes as interactive cards — all backed by plain markdown
 notes in the user's vault.
 
-This is a clean-room implementation. Do not reference, port, or compare
-against any other plugin's source. Build everything here from first
-principles and the specs/instructions given in-session.
-
 ## Build
 
 - `npm run dev` — watch build

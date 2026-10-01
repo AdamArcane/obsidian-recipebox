@@ -1,11 +1,11 @@
 /**
- * Obsidian settings tab that assembles all plugin settings sections into a
- * single scrollable settings page.
+ * Obsidian settings tab. Builds the declarative (1.13+) definition tree and
+ * routes native control reads and writes through the plugin's settings.
  */
 import { App, PluginSettingTab, SettingDefinitionItem } from "obsidian";
 import RecipeBoxPlugin from "../../main";
 import { buildDeclarativeSettingDefinitions } from "./settings-tab-declarative";
-import { renderLegacySettings } from "./settings-tab-legacy";
+import { readSettingValue, writeSettingValue } from "./settings-control-binding";
 
 export class RecipeBoxSettingsTab extends PluginSettingTab {
 	private plugin: RecipeBoxPlugin;
@@ -16,31 +16,18 @@ export class RecipeBoxSettingsTab extends PluginSettingTab {
 	}
 
 	getSettingDefinitions(): SettingDefinitionItem[] {
-		return buildDeclarativeSettingDefinitions({
-			app: this.app,
-			plugin: this.plugin,
-			containerEl: this.containerEl,
-		});
+		return buildDeclarativeSettingDefinitions({ app: this.app, plugin: this.plugin });
 	}
 
-	// Obsidian < 1.13.0 fallback renderer.
-	display(): void {
-		renderLegacySettings({
-			app: this.app,
-			plugin: this.plugin,
-			containerEl: this.containerEl,
-			rerender: () => this.rerenderPreservingScroll(),
-		});
+	getControlValue(key: string): unknown {
+		return readSettingValue(this.plugin.settings, key);
 	}
 
-	private rerenderPreservingScroll(): void {
-		const scrollTop = this.containerEl.scrollTop;
-		renderLegacySettings({
-			app: this.app,
-			plugin: this.plugin,
-			containerEl: this.containerEl,
-			rerender: () => this.rerenderPreservingScroll(),
-		});
-		this.containerEl.scrollTop = scrollTop;
+	// Overridden so every native control save ends in plugin.saveSettings().
+	// The default may persist via saveData directly, which would skip the
+	// recipe view, gallery, and ribbon refreshes that saveSettings performs.
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		writeSettingValue(this.plugin.settings, key, value);
+		await this.plugin.saveSettings();
 	}
 }
