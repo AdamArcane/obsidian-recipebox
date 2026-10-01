@@ -43,21 +43,28 @@ describe("formatQuantity", () => {
 
 describe("formatQuantity with metric units", () => {
 	it("uses decimals instead of fractions for metric units", () => {
-		expect(formatQuantity(41 + 2 / 3, "g")).toBe("42");
+		expect(formatQuantity(41 + 2 / 3, "g")).toBe("41.7");
 		expect(formatQuantity(630 + 2 / 3, "ml")).toBe("631");
-		expect(formatQuantity(83 + 1 / 3, "ml")).toBe("83");
+		expect(formatQuantity(83 + 1 / 3, "ml")).toBe("83.3");
 		expect(formatQuantity(1.5, "kg")).toBe("1.5");
-		expect(formatQuantity(2 / 3, "l")).toBe("0.7");
+		expect(formatQuantity(2 / 3, "l")).toBe("0.67");
 	});
 
-	it("rounds to whole numbers from 10 and to one decimal below that", () => {
-		expect(formatQuantity(9.96, "g")).toBe("10");
-		expect(formatQuantity(9.94, "g")).toBe("9.9");
+	it("keeps amounts the author wrote at 1x", () => {
+		expect(formatQuantity(12.5, "g")).toBe("12.5");
+		expect(formatQuantity(1.25, "kg")).toBe("1.25");
+		expect(formatQuantity(0.25, "l")).toBe("0.25");
+	});
+
+	it("rounds to whole numbers from 100, one decimal from 10, two below", () => {
+		expect(formatQuantity(99.96, "g")).toBe("100");
+		expect(formatQuantity(100.4, "g")).toBe("100");
+		expect(formatQuantity(9.994, "g")).toBe("9.99");
 		expect(formatQuantity(2, "g")).toBe("2");
 	});
 
 	it("keeps a tiny nonzero amount from rounding to zero", () => {
-		expect(formatQuantity(0.04, "g")).toBe("0.04");
+		expect(formatQuantity(0.004, "g")).toBe("0.004");
 		expect(formatQuantity(0, "g")).toBe("0");
 	});
 

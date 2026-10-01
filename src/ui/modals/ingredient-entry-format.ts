@@ -4,8 +4,21 @@
  * unit tested.
  */
 import { parseLeadingQuantity } from "../../parser/quantity-parse";
+import { formatQuantity } from "../../parser/quantity-format";
 import { consumeAlternateMeasure, consumeUnit, IngredientParserOptions } from "../../parser/ingredient-parse";
 import { stripListMarkers, extractInlineNotes, stripOf } from "../../parser/ingredient-clean";
+
+// String(1/3) is "0.3333333333333333", and saving that row would write the
+// float into the note. A number that is already a short decimal ("0.35") is
+// kept exactly as typed; anything longer goes through formatQuantity, which
+// gives "1/3" and re-parses to the same value.
+function fieldNumber(value: number, unit: string): string {
+	return parseFloat(value.toFixed(2)) === value ? String(value) : formatQuantity(value, unit);
+}
+
+function fieldAmount(max: number, min: number | undefined, unit: string): string {
+	return min === undefined ? fieldNumber(max, unit) : `${fieldNumber(min, unit)}-${fieldNumber(max, unit)}`;
+}
 
 // Mirrors parseIngredientLine's pipeline but skips its final normaliseName
 // step -- that lowercases the name for grocery-list matching, which is
@@ -27,8 +40,8 @@ export function decomposeIngredient(line: string, options: IngredientParserOptio
 	// The qty and unit fields are free text, so a range goes in qty as "2-3"
 	// and a second measure rides in the unit field as "cup / 240 ml". compose()
 	// just joins the fields, so both re-parse and nothing is lost on save.
-	const qty = quantity === null ? "" : min !== undefined ? `${min}-${quantity}` : String(quantity);
-	const altText = alt ? ` / ${alt.quantityMin !== undefined ? `${alt.quantityMin}-` : ""}${alt.quantity} ${alt.unit}` : "";
+	const qty = quantity === null ? "" : fieldAmount(quantity, min, unit);
+	const altText = alt ? ` / ${fieldAmount(alt.quantity, alt.quantityMin, alt.unit)} ${alt.unit}` : "";
 	return { qty, unit: `${unit}${altText}`, name: text, note: note ?? "" };
 }
 

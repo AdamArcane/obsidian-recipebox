@@ -24,15 +24,18 @@ function nearestFraction(value: number): string | null {
 // Canonical unit spellings (see ingredient-units.ts) that read as decimals.
 const METRIC_UNITS = new Set(["g", "kg", "mg", "ml", "l"]);
 
-// Whole numbers from 10 up, one decimal below that. The 2-decimal fallback
-// stops a small nonzero amount (0.04 g) from rounding down to a misleading "0".
+// Precision shrinks as the amount grows: 12.5 g yeast and 0.25 l stock are
+// amounts the author wrote and must survive at 1x, while 630.666 ml is only
+// noise from scaling. Trailing zeros are trimmed so whole values stay "2".
+// The 3-decimal fallback stops a tiny nonzero amount (0.004 g) rounding to "0".
 function formatMetric(qty: number): string {
 	const abs = Math.abs(qty);
 	const sign = qty < 0 ? "-" : "";
-	if (abs >= 10) return `${sign}${Math.round(abs)}`;
-	const oneDecimal = Math.round(abs * 10) / 10;
-	if (oneDecimal > 0) return `${sign}${oneDecimal}`;
-	return `${sign}${parseFloat(abs.toFixed(2))}`;
+	if (abs >= 100) return `${sign}${Math.round(abs)}`;
+	const places = abs >= 10 ? 1 : 2;
+	const rounded = parseFloat(abs.toFixed(places));
+	if (rounded > 0) return `${sign}${rounded}`;
+	return `${sign}${parseFloat(abs.toFixed(3))}`;
 }
 
 export function formatQuantity(qty: number | null, unit = ""): string {

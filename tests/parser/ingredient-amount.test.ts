@@ -20,9 +20,12 @@ describe("scaleAmount", () => {
 	});
 
 	it("shows scaled metric amounts as decimals, in both measures", () => {
-		expect(amountOf("125 g / 4 oz rice sticks", 1 / 3).text).toBe("42");
+		expect(amountOf("125 g / 4 oz rice sticks", 1 / 3).text).toBe("41.7");
 		expect(amountOf("8 cups|1892 ml water", 1 / 3).alt).toEqual({ text: "631", unit: "ml" });
 		expect(amountOf("1 1/2 kg flour", 1).text).toBe("1.5");
+		expect(amountOf("12.5 g yeast", 1).text).toBe("12.5");
+		expect(amountOf("1.25 kg potatoes", 1).text).toBe("1.25");
+		expect(amountOf("0.25 l stock", 1).text).toBe("0.25");
 	});
 
 	it("shows one number when a scaled range collapses", () => {

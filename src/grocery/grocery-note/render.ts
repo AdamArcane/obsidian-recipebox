@@ -8,7 +8,7 @@ import { GrocerySection } from "./parse";
 
 export function renderGroceryLine(name: string, unit: string, quantity: number | null, checked: boolean): string {
 	const checkbox = checked ? "- [x] " : "- [ ] ";
-	const qty = quantity !== null ? formatQuantity(quantity) : "";
+	const qty = quantity !== null ? formatQuantity(quantity, unit) : "";
 	const prefix = qty ? (unit ? `${qty} ${unit} ` : `${qty} `) : (unit ? `${unit} ` : "");
 	return `${checkbox}${prefix}${name}`;
 }

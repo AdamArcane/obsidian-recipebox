@@ -4,6 +4,11 @@ import { DEFAULT_SETTINGS } from "../../src/settings/settings-defaults";
 import type { GrocerySection } from "../../src/grocery/grocery-note/parse";
 
 describe("renderGroceryLine", () => {
+	it("writes metric amounts as decimals, not fractions", () => {
+		expect(renderGroceryLine("rice", "g", 41 + 2 / 3, false)).toBe("- [ ] 41.7 g rice");
+		expect(renderGroceryLine("flour", "cup", 1.5, false)).toBe("- [ ] 1 1/2 cup flour");
+	});
+
 	it("renders quantity + unit + name for an unchecked item", () => {
 		expect(renderGroceryLine("flour", "cup", 2, false)).toBe("- [ ] 2 cup flour");
 	});
