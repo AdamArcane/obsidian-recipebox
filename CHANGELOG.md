@@ -1,3 +1,10 @@
+## [0.1.13-beta.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.4...0.1.13-beta.5) (2026-10-02)
+
+### Features
+
+* add edit recipe modal and form for in-place editing of recipes ([920c59c](https://github.com/AdamArcane/obsidian-recipebox/commit/920c59ce34b19baea5463513d094fb3258f78b16))
+* enhance recipe editing capabilities and documentation ([2442629](https://github.com/AdamArcane/obsidian-recipebox/commit/244262963a3ebccf491f7db3f2f29841e7c49b1c))
+
 ## [0.1.13-beta.4](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.2...0.1.13-beta.4) (2026-10-01)
 
 ### Features
