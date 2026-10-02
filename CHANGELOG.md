@@ -1,6 +1,17 @@
-## [0.2.01](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12...0.2.01) (2026-10-02)
+## [0.2.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12...0.2.1) (2026-10-02)
 
-## [0.1.13](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.5...0.1.13) (2026-10-02)
+### Features
+
+* add edit recipe modal and form for in-place editing of recipes ([920c59c](https://github.com/AdamArcane/obsidian-recipebox/commit/920c59ce34b19baea5463513d094fb3258f78b16))
+* enhance recipe editing capabilities and documentation ([2442629](https://github.com/AdamArcane/obsidian-recipebox/commit/244262963a3ebccf491f7db3f2f29841e7c49b1c))
+* update minimum app version to 1.13.0 ([54fa742](https://github.com/AdamArcane/obsidian-recipebox/commit/54fa74268e4242acea077ec3d7bb066c76995d2b))
+* enhance quantity formatting to support decimals for metric units and implement ingredient range handling in parsing and rendering ([bafa749](https://github.com/AdamArcane/obsidian-recipebox/commit/bafa7493314119bbc7ecdc53c556f5449497dda7))
+* add support for ingredient ranges and second measures in parsing and scaling ([1236aaa](https://github.com/AdamArcane/obsidian-recipebox/commit/1236aaa456f7443dfa241565c015df07d3e2f13c))
+* implement support for ingredient ranges and second measures across parsing, scaling, and exports ([7ab5c86](https://github.com/AdamArcane/obsidian-recipebox/commit/7ab5c86300836f91d1054fe181cad9af5eb184f6))
+* update quantity formatting to include unit in exports and ingredient checklist; add tests for metric unit formatting ([2fe6a0f](https://github.com/AdamArcane/obsidian-recipebox/commit/2fe6a0f3825ffd87be431f7db17922633f90b0f6))
+* enhance field filter functionality and improve stats row rendering ([4d61828](https://github.com/AdamArcane/obsidian-recipebox/commit/4d6182849f248a233751e45c8bed60bb6eae685f))
+* enhance ingredient parsing with multi-filler word support and unit normalization ([3a039d4](https://github.com/AdamArcane/obsidian-recipebox/commit/3a039d4bb8cc295b18a68e580d320bd7eb129cdc))
+* implement localized ingredient unit mappings and filler word settings ([4a082b3](https://github.com/AdamArcane/obsidian-recipebox/commit/4a082b3ae5c868bffbc0befb627093f4e3b4328f))
 
 ## [0.1.13-beta.5](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.13-beta.4...0.1.13-beta.5) (2026-10-02)
 
