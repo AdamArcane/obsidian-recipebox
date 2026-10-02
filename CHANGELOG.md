@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.2.1...0.2.2) (2026-10-02)
+
+### Features
+
+* implement bulk recipe import functionality ([820f03d](https://github.com/AdamArcane/obsidian-recipebox/commit/820f03d50686e24737c9562260d90ad815ba88ea))
+* add support for wikilinks with hover previews and link handling in recipe view ([998d209](https://github.com/AdamArcane/obsidian-recipebox/commit/998d209b38bc8f53dffff925ada789e519d83754))
+
 ## [0.2.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.1.12...0.2.1) (2026-10-02)
 
 ### Features
