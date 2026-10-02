@@ -6,6 +6,7 @@
  */
 import RecipeBoxPlugin from "../main";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
+import { ImportFilesModal } from "../ui/modals/import-files-modal";
 import { AddGroceryItemModal } from "../ui/modals/add-grocery-item-modal";
 import { AddToMealPlanModal } from "../ui/modals/add-to-meal-plan-modal";
 import { SuggestMealModal } from "../ui/modals/suggest-meal-modal";
@@ -39,6 +40,14 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 		id: "import-recipe",
 		name: "Add recipe",
 		callback: () => new ImportRecipeModal(plugin.app, plugin.settings).open(),
+	});
+
+	// Separate from "Add recipe": that modal is a single-recipe edit-before-save
+	// flow, and bulk import has no per-recipe review step.
+	plugin.addCommand({
+		id: "import-recipes-from-file",
+		name: "Import recipes from file",
+		callback: () => new ImportFilesModal(plugin.app, plugin.settings).open(),
 	});
 
 	plugin.addCommand({

@@ -6673,3 +6673,24 @@ input[type='search'].rb-gallery-search {
   width: var(--icon-s);
   height: var(--icon-s);
 }
+
+/* ── Import recipes from file modal ──────────────────────────────────────── */
+
+.rb-import-file-status {
+  margin-top: 0.75rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.rb-import-file-summary {
+  margin-top: 0.5rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.rb-import-file-line {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  padding: 0.15rem 0;
+  word-break: break-word;
+}

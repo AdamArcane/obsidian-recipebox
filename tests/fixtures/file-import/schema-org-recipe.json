@@ -1,0 +1,12 @@
+{
+  "@context": "https://schema.org", "@type": "Recipe",
+  "name": "Pancakes", "description": "Fluffy.", "url": "https://www.allrecipes.com/recipe/1/pancakes/",
+  "image": "https://example.com/pancakes.jpg", "author": { "@type": "Person", "name": "Sam" },
+  "recipeYield": "4 servings", "prepTime": "PT10M", "cookTime": "PT15M", "totalTime": "PT25M",
+  "recipeIngredient": ["1 cup flour", "1 egg", "1 cup milk"],
+  "recipeInstructions": [
+    { "@type": "HowToStep", "text": "Mix." },
+    { "@type": "HowToStep", "text": "Fry." }
+  ],
+  "nutrition": { "@type": "NutritionInformation", "calories": "250 kcal" }
+}

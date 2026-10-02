@@ -1,0 +1,21 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "Recipe",
+  "name": "Classic Pesto Pasta",
+  "description": "A simple and fast weeknight dinner using fresh basil pesto and parmesan cheese.",
+  "image": "classic-pesto-pasta.jpg",
+  "prepTime": "PT10M",
+  "cookTime": "PT15M",
+  "totalTime": "PT25M",
+  "recipeYield": "4 servings",
+  "recipeCategory": ["Dinner", "Italian"],
+  "recipeCuisine": ["Italian"],
+  "keywords": "pasta, quick, vegetarian",
+  "recipeIngredient": ["1 lb penne pasta", "1 cup basil pesto", "1/2 cup grated parmesan cheese", "2 tbsp olive oil", "Salt and black pepper to taste"],
+  "recipeInstructions": [
+    { "@type": "HowToStep", "text": "Bring a large pot of generously salted water to a boil. Add the penne pasta and cook according to package directions until al dente." },
+    { "@type": "HowToStep", "text": "Reserve 1/2 cup of pasta water before draining the pasta." },
+    { "@type": "HowToStep", "text": "Toss the warm pasta with olive oil, basil pesto, and parmesan cheese, adding splashes of the reserved pasta water as needed to coat evenly." }
+  ],
+  "notes": ["Top with fresh cherry tomatoes or toasted pine nuts for extra crunch."]
+}
