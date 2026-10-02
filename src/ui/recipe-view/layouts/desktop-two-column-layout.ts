@@ -32,6 +32,7 @@ export const renderDesktopTwoColumnLayout: RecipeLayoutRenderer = async ({
     component,
     deps,
     context,
+    onEditSection,
 }) => {
 
     const topContainer = container.createDiv({ cls: "rb-desktop-two-col-top" });
@@ -156,6 +157,7 @@ export const renderDesktopTwoColumnLayout: RecipeLayoutRenderer = async ({
                 (key) => { void deps.removeGroceryByKey(key); },
                 () => { deps.openAddToGroceryModal(context.file); },
                 component,
+                onEditSection && (() => onEditSection("ingredients")),
             );
         }
 
@@ -183,6 +185,7 @@ export const renderDesktopTwoColumnLayout: RecipeLayoutRenderer = async ({
                 context.instructionGroups,
                 context.settings,
                 timerOpts,
+                onEditSection && (() => onEditSection("instructions")),
             );
         }
     }

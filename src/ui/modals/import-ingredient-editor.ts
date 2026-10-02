@@ -8,7 +8,7 @@
 import { ingredientParserOptions } from "../../parser/ingredient-parse";
 import { decomposeIngredient, composeIngredient } from "./ingredient-entry-format";
 import type { RecipeBoxSettings } from "../../settings/settings-types";
-import { renderEntryListEditor, EntryField } from "./import-entry-list-editor";
+import { renderEntryListEditor, EntryField, EntryListHandle, EntryListOptions } from "./import-entry-list-editor";
 
 const FIELDS: EntryField[] = [
 	{ key: "qty", label: "Qty", placeholder: "1", cls: "rb-import-entry-cell--qty" },
@@ -27,7 +27,8 @@ export function renderIngredientListEditor(
 	initialItems: string[],
 	onChange: (items: string[]) => void,
 	settings: RecipeBoxSettings,
-): void {
+	listOptions?: EntryListOptions,
+): EntryListHandle {
 	const options = ingredientParserOptions(settings);
-	renderEntryListEditor(parent, FIELDS, initialItems, (line) => decomposeIngredient(line, options), composeIngredient, renderSummary, onChange);
+	return renderEntryListEditor(parent, FIELDS, initialItems, (line) => decomposeIngredient(line, options), composeIngredient, renderSummary, onChange, listOptions);
 }

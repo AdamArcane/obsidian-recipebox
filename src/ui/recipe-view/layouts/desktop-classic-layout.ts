@@ -19,6 +19,7 @@ export const renderDesktopClassicLayout: RecipeLayoutRenderer = async ({
     component,
     deps,
     context,
+    onEditSection,
 }) => {
     renderMetaBanner(
         container,
@@ -59,6 +60,7 @@ export const renderDesktopClassicLayout: RecipeLayoutRenderer = async ({
                 (key) => { void deps.removeGroceryByKey(key); },
                 () => { deps.openAddToGroceryModal(context.file); },
                 component,
+                onEditSection && (() => onEditSection("ingredients")),
             );
         }
         if (hasRightCol) {
@@ -93,6 +95,7 @@ export const renderDesktopClassicLayout: RecipeLayoutRenderer = async ({
             context.instructionGroups,
             context.settings,
             timerOpts,
+            onEditSection && (() => onEditSection("instructions")),
         );
     }
 

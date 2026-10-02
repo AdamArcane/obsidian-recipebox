@@ -987,6 +987,57 @@
   flex: 1;
 }
 
+/* Editable title (section-title-edit.ts): shrinks to its text so only the
+   text is the click target; the spacer takes over the stretching. */
+.rb-section-title--editable {
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  border-radius: var(--radius-s);
+}
+
+.rb-section-title--editable:hover,
+.rb-section-title--editable:focus-visible {
+  color: var(--text-normal);
+}
+
+.rb-section-title-spacer {
+  flex: 1;
+}
+
+.rb-section-title-edit-icon {
+  display: inline-flex;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.rb-section-title-edit-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.rb-section-title--editable:hover .rb-section-title-edit-icon,
+.rb-section-title--editable:focus-visible .rb-section-title-edit-icon {
+  opacity: 1;
+}
+
+/* No hover on touch, so the pencil is always visible there. */
+body.is-mobile .rb-section-title-edit-icon {
+  opacity: 0.7;
+}
+
+/* Rename file checkbox under the Edit Recipe title field */
+.rb-edit-rename-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.25rem 0 0.75rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
 button:not(.clickable-icon).rb-grocery-add-btn,
 button:not(.clickable-icon).rb-start-timer-btn {
   display: flex;
@@ -2576,6 +2627,49 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
   min-width: 1.4rem;
+}
+
+/* Reorder grip (entry-row-drag.ts). touch-action: none keeps a touch drag
+   that starts on the handle from scrolling the modal; the rest of the row
+   still scrolls normally. */
+.rb-import-entry-item-handle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rb-import-entry-item-handle svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.rb-import-entry-item:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -1px;
+}
+
+.rb-import-entry-item--dragging {
+  opacity: 0.45;
+}
+
+.rb-import-entry-item--drop-before {
+  box-shadow: 0 -2px 0 0 var(--interactive-accent);
+}
+
+.rb-import-entry-item--drop-after {
+  box-shadow: 0 2px 0 0 var(--interactive-accent);
+}
+
+.rb-import-entry-list--drop-end {
+  box-shadow: 0 2px 0 0 var(--interactive-accent);
+}
+
+/* An empty group's list has no rows to drop onto; give it a landing area. */
+.rb-import-entry-list:empty {
+  min-height: 0.5rem;
 }
 
 .rb-import-entry-item-text {

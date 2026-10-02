@@ -14,6 +14,7 @@ import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
 import { compileGiDictionary } from "../../parser/glycemic-dictionary";
 import { scaleAmount } from "../../parser/ingredient-amount";
+import { makeSectionTitleEditable } from "./section-title-edit";
 
 export async function renderIngredientsSection(
 	container: HTMLElement,
@@ -26,6 +27,7 @@ export async function renderIngredientsSection(
 	onRemoveFromGrocery: (key: string) => void,
 	onOpenGroceryModal: () => void,
 	component: Component,
+	onEditSection?: () => void,
 ): Promise<void> {
 	const groceryKeySet = new Set(groceryItems.map(i => i.key));
 	const giPatterns = settings.showHighGIWarnings ? compileGiDictionary(settings.giDictionary).patterns : [];
@@ -34,7 +36,9 @@ export async function renderIngredientsSection(
 	const header = section.createDiv({ cls: "rb-section-header" });
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "carrot");
-	header.createSpan({ cls: "rb-section-title", text: settings.ingredientsHeading });
+	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.ingredientsHeading });
+	// Without a handler (e.g. a future read-only embed) the title stays plain text.
+	if (onEditSection) makeSectionTitleEditable(titleEl, `Edit ${settings.ingredientsHeading}`, onEditSection);
 
 	const addBtn = header.createEl("button", {
 		cls: "rb-grocery-add-btn",

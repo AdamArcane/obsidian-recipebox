@@ -11,14 +11,20 @@ import { RecipeBoxSettings } from "../settings/settings-types";
 import { buildTokenTable } from "./note-template-tokens";
 import { readNoteOrEmpty } from "../utils/vault-notes";
 
+// Every frontmatter key here goes through a {{...Property}} token so new
+// notes use the user's configured property names. image/servings/prep/cook/
+// total used to be literal keys ("prep:", "cook:"), which wrote names the
+// settings didn't control; readers only coped because the alias lists in
+// recipe-meta-aliases.ts happen to include them. `source` stays literal
+// because there is no configurable setting for it yet.
 const DEFAULT_TEMPLATE = `---
 {{recipeTypePropertyName}}: {{recipeType}}
-image: {{image}}
+{{imageProperty}}: {{image}}
 source: {{sourceUrl}}
-servings: {{servings}}
-prep: {{prepTime}}
-cook: {{cookTime}}
-total: {{totalTime}}
+{{servingsProperty}}: {{servings}}
+{{prepTimeProperty}}: {{prepTime}}
+{{cookTimeProperty}}: {{cookTime}}
+{{totalTimeProperty}}: {{totalTime}}
 {{caloriesProperty}}: {{calories}}
 {{proteinProperty}}: {{protein}}
 {{fatProperty}}: {{fat}}

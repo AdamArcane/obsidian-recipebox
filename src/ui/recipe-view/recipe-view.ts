@@ -27,6 +27,8 @@ import { resolveHeroImageValue, defaultRecipeImageValue } from "../../parser/res
 import { usableImageValue } from "./image-resolve";
 import { makeLightboxable } from "../components/lightbox";
 import { suppressAutoOpenOnce } from "../../lifecycle/recipe-file-detection";
+import { EditRecipeModal } from "../modals/edit-recipe-modal";
+import type { EditSectionTarget } from "../modals/edit-recipe-form";
 
 export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
 
@@ -71,6 +73,9 @@ export class RecipeView extends TextFileView {
 		this.addAction("pencil", "Edit as Markdown", () => {
 			if (this.file) this.deps.editAsMarkdown(this.file.path);
 		});
+
+		// Structured editor; sits right after the Markdown pencil, which stays as-is.
+		this.addAction("file-pen", "Edit recipe", () => this.openEditRecipe());
 
 		this.shareActionEl = this.addAction("share-2", "Share recipe", () => {
 			if (this.file) {
@@ -154,6 +159,12 @@ export class RecipeView extends TextFileView {
 			);
 
 			menu.addItem(item =>
+				item.setTitle("Edit recipe")
+					.setIcon("file-pen")
+					.onClick(() => this.openEditRecipe())
+			);
+
+			menu.addItem(item =>
 				item.setTitle("Open as Markdown")
 					.setIcon("pencil")
 					.onClick(() => this.deps.editAsMarkdown(file.path))
@@ -174,6 +185,11 @@ export class RecipeView extends TextFileView {
 			menu.addSeparator();
 		}
 		super.onPaneMenu(menu, source);
+	}
+
+	private openEditRecipe(section?: EditSectionTarget): void {
+		if (!this.file) return;
+		new EditRecipeModal(this.app, this.file, this.deps.getSettings(), this.deps.editAsMarkdown, section).open();
 	}
 
 	private async toggleCookMode(): Promise<void> {
@@ -272,6 +288,7 @@ export class RecipeView extends TextFileView {
 			component: this,
 			deps: this.deps,
 			context,
+			onEditSection: (section) => this.openEditRecipe(section),
 		});
 
 		this.attachLightboxToInlineImages(wrap);

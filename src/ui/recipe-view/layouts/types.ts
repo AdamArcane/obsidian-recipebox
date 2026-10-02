@@ -9,6 +9,7 @@ import { RecipeBoxSettings } from "../../../settings/settings-types";
 import { RecipeViewDeps } from "../recipe-view-deps";
 import { TrailingSection } from "../section-extra-content";
 import { ShareStatus } from "../../../sharing/share-status";
+import type { EditSectionTarget } from "../../modals/edit-recipe-form";
 
 export type RecipeLayoutId = "mobile-tabs" | "desktop-classic" | "desktop-two-column";
 
@@ -39,6 +40,8 @@ export interface RecipeLayoutRenderArgs {
     component: Component;
     deps: RecipeViewDeps;
     context: RecipeLayoutContext;
+    /** Opens the Edit Recipe modal at a section; omitted for read-only renders. */
+    onEditSection?: (section: EditSectionTarget) => void;
 }
 
 export type RecipeLayoutRenderer = (args: RecipeLayoutRenderArgs) => Promise<void>;

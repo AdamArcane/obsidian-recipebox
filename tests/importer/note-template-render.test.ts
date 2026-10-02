@@ -70,4 +70,33 @@ describe("buildRecipeNote", () => {
 		expect(note).toContain(`## ${DEFAULT_SETTINGS.notesHeading}`);
 		expect(note).toContain("Freezes well.");
 	});
+
+	it("writes frontmatter keys using the configured property names", async () => {
+		const note = await buildRecipeNote(FAKE_APP, recipe(), DEFAULT_SETTINGS);
+		expect(note).toContain(`${DEFAULT_SETTINGS.imageProperty}: hero.jpg`);
+		expect(note).toContain(`${DEFAULT_SETTINGS.servingsProperty}: 4`);
+		expect(note).toContain(`${DEFAULT_SETTINGS.prepTimeProperty}: 10`);
+		expect(note).toContain(`${DEFAULT_SETTINGS.cookTimeProperty}: 20`);
+		expect(note).toContain(`${DEFAULT_SETTINGS.totalTimeProperty}: 30`);
+	});
+
+	it("honors custom property names instead of the old literal keys", async () => {
+		const settings = {
+			...DEFAULT_SETTINGS,
+			imageProperty: "cover",
+			servingsProperty: "yield",
+			prepTimeProperty: "prep_time",
+			cookTimeProperty: "cook_time",
+			totalTimeProperty: "total_time",
+		};
+		const note = await buildRecipeNote(FAKE_APP, recipe(), settings);
+		expect(note).toContain("cover: hero.jpg");
+		expect(note).toContain("yield: 4");
+		expect(note).toContain("prep_time: 10");
+		expect(note).toContain("cook_time: 20");
+		expect(note).toContain("total_time: 30");
+		expect(note).not.toMatch(/^prep: /m);
+		expect(note).not.toMatch(/^cook: /m);
+		expect(note).not.toMatch(/^total: /m);
+	});
 });

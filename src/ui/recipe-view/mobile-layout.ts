@@ -31,6 +31,7 @@ import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
 import { renderCookHistoryList } from "../../recipe-history/cook-history-render";
 import { ShareStatus } from "../../sharing/share-status";
 import { ShareRecipeModal } from "../modals/share-recipe-modal";
+import type { EditSectionTarget } from "../modals/edit-recipe-form";
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
@@ -420,6 +421,7 @@ export async function renderMobileLayout(
 	groceryItems: GroceryItem[],
 	deps: RecipeViewDeps,
 	shareStatus: ShareStatus,
+	onEditSection?: (section: EditSectionTarget) => void,
 ): Promise<void> {
 	let _panels: HTMLElement[] = [];
 	let _tabs: HTMLElement[] = [];
@@ -516,6 +518,7 @@ export async function renderMobileLayout(
 		(key) => { void deps.removeGroceryByKey(key); },
 		() => { deps.openAddToGroceryModal(file); },
 		component,
+		onEditSection && (() => onEditSection("ingredients")),
 	);
 
 	// Steps tab
@@ -528,7 +531,10 @@ export async function renderMobileLayout(
 			void findOrOpenLeaf(app, RECIPE_VIEW_TYPE, file.path);
 		},
 	} : undefined;
-	await renderInstructionsSection(panelSteps, app, component, file.path, instructionGroups, settings, timerOpts);
+	await renderInstructionsSection(
+		panelSteps, app, component, file.path, instructionGroups, settings, timerOpts,
+		onEditSection && (() => onEditSection("instructions")),
+	);
 
 	// Info tab — nutrition + source URL + notes content
 	renderMobileNutritionStrip(panelInfo, app, file, fm, settings, servings, multiplier);

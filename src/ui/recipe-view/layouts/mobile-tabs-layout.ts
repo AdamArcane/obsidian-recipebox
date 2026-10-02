@@ -11,6 +11,7 @@ export const renderMobileTabsLayout: RecipeLayoutRenderer = async ({
     component,
     deps,
     context,
+    onEditSection,
 }) => {
     await renderMobileLayout(
         container,
@@ -31,5 +32,6 @@ export const renderMobileTabsLayout: RecipeLayoutRenderer = async ({
         context.groceryItems,
         deps,
         context.shareStatus,
+        onEditSection,
     );
 };

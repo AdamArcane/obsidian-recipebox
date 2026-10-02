@@ -7,7 +7,7 @@
  * ingredients use rather than inventing a second convention.
  */
 import { extractInlineNotes } from "../../parser/ingredient-clean";
-import { renderEntryListEditor, EntryField } from "./import-entry-list-editor";
+import { renderEntryListEditor, EntryField, EntryListHandle, EntryListOptions } from "./import-entry-list-editor";
 
 const FIELDS: EntryField[] = [
 	{ key: "description", label: "Step", placeholder: "Preheat the oven to 350°F", cls: "rb-import-entry-cell--name" },
@@ -34,6 +34,7 @@ export function renderStepListEditor(
 	parent: HTMLElement,
 	initialItems: string[],
 	onChange: (items: string[]) => void,
-): void {
-	renderEntryListEditor(parent, FIELDS, initialItems, decompose, compose, renderSummary, onChange);
+	listOptions?: EntryListOptions,
+): EntryListHandle {
+	return renderEntryListEditor(parent, FIELDS, initialItems, decompose, compose, renderSummary, onChange, listOptions);
 }

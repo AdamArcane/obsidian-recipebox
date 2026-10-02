@@ -7,6 +7,7 @@ import { InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { TimerOptions, processTimerNodes } from "../timer/timer-dom-process";
 import { StartTimerModal } from "../modals/start-timer-modal";
+import { makeSectionTitleEditable } from "./section-title-edit";
 export type { TimerOptions };
 
 export async function renderInstructionsSection(
@@ -17,12 +18,14 @@ export async function renderInstructionsSection(
 	groups: InstructionGroup[],
 	settings: RecipeBoxSettings,
 	timerOpts?: TimerOptions,
+	onEditSection?: () => void,
 ): Promise<void> {
 	const section = container.createDiv({ cls: "rb-instructions-section" });
 	const header = section.createDiv({ cls: "rb-section-header" });
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "list-ordered");
-	header.createSpan({ cls: "rb-section-title", text: settings.instructionsHeading });
+	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.instructionsHeading });
+	if (onEditSection) makeSectionTitleEditable(titleEl, `Edit ${settings.instructionsHeading}`, onEditSection);
 
 	if (settings.timersEnabled) {
 		const timerBtn = header.createEl("button", {

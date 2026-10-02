@@ -7,14 +7,34 @@
  * itself. Clicking a list row loads it back into the fields for editing
  * in place (replaced at the same index on commit) rather than removing and
  * re-appending it, so editing never reorders the list.
+ *
+ * Rows can be reordered by dragging the grip handle or with Alt+Up/Down. The
+ * returned handle lets a group editor move rows between lists.
  */
 import { setIcon } from "obsidian";
+import { attachRowDrag, DragList, registerDragList } from "./entry-row-drag";
+import { editIndexAfterInsert, editIndexAfterMove, editIndexAfterRemove, reorder } from "./entry-order";
 
 export interface EntryField {
 	key: string;
 	label: string;
 	placeholder: string;
 	cls: string;
+}
+
+export interface EntryListOptions {
+	/** Lists sharing a scope object accept each other's dragged rows. Defaults to this list alone. */
+	scope?: object;
+	/**
+	 * Alt+Up on the first row / Alt+Down on the last row. Return true if the
+	 * row was moved into a neighbouring list (the caller then owns focus).
+	 */
+	onEdgeMove?: (direction: -1 | 1, index: number) => boolean;
+}
+
+export interface EntryListHandle {
+	list: DragList;
+	focusRow(index: number): void;
 }
 
 export function renderEntryListEditor(
@@ -25,9 +45,13 @@ export function renderEntryListEditor(
 	compose: (values: Record<string, string>) => string,
 	renderSummary: (values: Record<string, string>, textEl: HTMLElement) => void,
 	onChange: (items: string[]) => void,
-): void {
-	const items: string[] = [...initialItems];
+	options: EntryListOptions = {},
+): EntryListHandle {
+	let items: string[] = [...initialItems];
 	let editIndex: number | null = null;
+	// Row to refocus after the next render; keyboard moves rebuild the DOM, so
+	// without this focus would drop to the body and break repeated Alt+Arrow.
+	let focusAfterRender: number | null = null;
 
 	const listEl = parent.createDiv({ cls: "rb-import-entry-list" });
 	const row = parent.createDiv({ cls: "rb-import-entry-row" });
@@ -72,15 +96,85 @@ export function renderEntryListEditor(
 		setEditingUI(false);
 	}
 
+	// Every structural change goes through these three so the edit-index
+	// bookkeeping lives in one place. Removing a row ABOVE the one being
+	// edited used to leave editIndex pointing one row too far, so Update
+	// would overwrite the wrong entry.
+	function removeAt(index: number): string {
+		const [removed] = items.splice(index, 1);
+		const next = editIndexAfterRemove(editIndex, index);
+		if (editIndex !== null && next === null) clearFields();
+		else editIndex = next;
+		renderList();
+		onChange(items);
+		return removed;
+	}
+
+	function insertAt(index: number, line: string): void {
+		items.splice(index, 0, line);
+		editIndex = editIndexAfterInsert(editIndex, index);
+		renderList();
+		onChange(items);
+	}
+
+	function move(from: number, to: number): void {
+		if (from === to || to < 0 || to >= items.length) return;
+		items = reorder(items, from, to);
+		// The row loaded into the fields moves with the list; otherwise Update
+		// would overwrite whatever row now sits at the old position.
+		editIndex = editIndexAfterMove(editIndex, from, to);
+		renderList();
+		onChange(items);
+	}
+
+	const dragList: DragList = {
+		scope: options.scope ?? {},
+		el: listEl,
+		length: () => items.length,
+		removeAt,
+		insertAt,
+		move,
+	};
+	registerDragList(dragList);
+
+	function focusRow(index: number): void {
+		const el = listEl.children[index];
+		if (el.instanceOf(HTMLElement)) el.focus();
+	}
+
+	function onRowKeydown(e: KeyboardEvent, i: number): void {
+		if (!e.altKey || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
+		// Only act when the row itself is focused, not the remove button or a field.
+		if (e.target !== e.currentTarget) return;
+		e.preventDefault();
+		const dir = e.key === "ArrowUp" ? -1 : 1;
+		const to = i + dir;
+		if (to >= 0 && to < items.length) {
+			focusAfterRender = to;
+			move(i, to);
+		} else {
+			options.onEdgeMove?.(dir, i);
+		}
+	}
+
 	function renderList(): void {
 		listEl.empty();
 		items.forEach((line, i) => {
 			const v = decompose(line);
-			const itemEl = listEl.createDiv({ cls: "rb-import-entry-item" });
+			const itemEl = listEl.createDiv({ cls: "rb-import-entry-item", attr: { tabindex: "0" } });
 			itemEl.toggleClass("rb-import-entry-item--editing", i === editIndex);
+			const handle = itemEl.createSpan({
+				cls: "rb-import-entry-item-handle",
+				attr: { "aria-label": "Drag to reorder" },
+			});
+			setIcon(handle, "grip-vertical");
+			// A tap on the handle is a drag gesture, never "load this row".
+			handle.addEventListener("click", (e) => e.stopPropagation());
+			attachRowDrag(itemEl, handle, dragList, i);
 			itemEl.createSpan({ cls: "rb-import-entry-item-index", text: `${i + 1}.` });
 			const textEl = itemEl.createSpan({ cls: "rb-import-entry-item-text" });
 			renderSummary(v, textEl);
+			itemEl.addEventListener("keydown", (e) => onRowKeydown(e, i));
 			itemEl.addEventListener("click", () => {
 				for (const f of fields) inputs[f.key].value = v[f.key] ?? "";
 				editIndex = i;
@@ -95,14 +189,14 @@ export function renderEntryListEditor(
 			setIcon(removeBtn, "x");
 			removeBtn.addEventListener("click", (e) => {
 				e.stopPropagation();
-				items.splice(i, 1);
-				// Editing the item that just got removed would otherwise leave
-				// editIndex pointing at whatever now sits at that position.
-				if (editIndex === i) clearFields();
-				renderList();
-				onChange(items);
+				removeAt(i);
 			});
 		});
+		if (focusAfterRender !== null) {
+			const target = focusAfterRender;
+			focusAfterRender = null;
+			focusRow(target);
+		}
 	}
 
 	function commit(): void {
@@ -125,4 +219,5 @@ export function renderEntryListEditor(
 	}
 
 	renderList();
+	return { list: dragList, focusRow };
 }
