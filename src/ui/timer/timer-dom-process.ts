@@ -14,6 +14,9 @@ export function processTimerNodes(container: HTMLElement, opts: TimerOptions): v
 	let node: Node | null;
 	while ((node = walker.nextNode())) {
 		const text = node as Text;
+		// A duration inside link text ("[[10 minute pasta]]") must stay a plain
+		// link; a timer button nested in an anchor would fight the link click.
+		if (text.parentElement?.closest("a")) continue;
 		const content = text.textContent ?? "";
 		DURATION_RE.lastIndex = 0;
 		if (!DURATION_RE.test(content)) continue;

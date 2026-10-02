@@ -57,6 +57,9 @@ function openGroceryModalForFile(plugin: RecipeBoxPlugin, file: TFile): void {
 }
 
 export function registerViews(plugin: RecipeBoxPlugin): void {
+	// Lets Page Preview show hover cards for links inside the recipe view.
+	// defaultMod matches reading view, where Ctrl/Cmd is held to preview.
+	plugin.registerHoverLinkSource(RECIPE_VIEW_TYPE, { display: "Recipe Box", defaultMod: true });
 	plugin.registerView(
 		GROCERY_VIEW_TYPE,
 		(leaf) =>

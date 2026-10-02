@@ -2,7 +2,7 @@
  * The recipe view — an Obsidian TextFileView that renders a recipe note as a
  * structured cooking card with ingredients, instructions, metadata, and timers.
  */
-import { EventRef, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
+import { EventRef, HoverParent, HoverPopover, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
 import { stripRedundantBodyContent } from "../../parser/recipe-body-clean";
@@ -29,10 +29,15 @@ import { makeLightboxable } from "../components/lightbox";
 import { suppressAutoOpenOnce } from "../../lifecycle/recipe-file-detection";
 import { EditRecipeModal } from "../modals/edit-recipe-modal";
 import type { EditSectionTarget } from "../modals/edit-recipe-form";
+import { registerLinkHandlers } from "./link-handlers";
+import { RECIPE_VIEW_TYPE } from "./recipe-view-type";
 
-export const RECIPE_VIEW_TYPE = "recipe-box-recipe-view";
+// Re-exported so existing imports of RECIPE_VIEW_TYPE from this file keep working.
+export { RECIPE_VIEW_TYPE };
 
-export class RecipeView extends TextFileView {
+export class RecipeView extends TextFileView implements HoverParent {
+	// Required by Obsidian so link hover previews can anchor to this view.
+	hoverPopover: HoverPopover | null = null;
 	private deps: RecipeViewDeps;
 	private unsubscribe: (() => void) | null = null;
 	private metaRef: EventRef | null = null;
@@ -64,6 +69,14 @@ export class RecipeView extends TextFileView {
 	}
 
 	async onOpen(): Promise<void> {
+		// One delegated set of link handlers on the content root covers every
+		// section and layout, and survives re-renders because contentEl itself
+		// is never replaced, only emptied.
+		registerLinkHandlers(this.app, this, this.contentEl, () => this.file?.path ?? "", {
+			hoverSource: RECIPE_VIEW_TYPE,
+			hoverParent: this,
+			getLeaf: () => this.leaf,
+		});
 		// Cook mode sits left of the pencil so it's easy to reach while cooking.
 		// sun-dim = off (screen may sleep), sun = on (screen stays awake).
 		this.cookModeActionEl = this.addAction("sun-dim", "Cook mode: off", () => {

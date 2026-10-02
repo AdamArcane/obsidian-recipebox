@@ -70,7 +70,9 @@ export async function renderIngredientsSection(
 			const row = lineContainer.createDiv({ cls: "rb-ingredient-row" });
 			if (settings.crossOffWhileCooking) {
 				row.addEventListener("click", (e) => {
-					if ((e.target as HTMLElement).closest("button")) return;
+					// A link click navigates (see link-handlers.ts) and must not also
+					// strike the row through.
+					if ((e.target as HTMLElement).closest("button, a")) return;
 					row.toggleClass("rb-crossed-off", !row.hasClass("rb-crossed-off"));
 				});
 			}

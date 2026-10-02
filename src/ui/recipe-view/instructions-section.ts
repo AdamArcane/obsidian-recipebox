@@ -56,7 +56,12 @@ export async function renderInstructionsSection(
 		for (const step of group.steps) {
 			const li = ol.createEl("li", { cls: "rb-step" });
 			if (settings.crossOffWhileCooking) {
-				li.addEventListener("click", () => li.toggleClass("rb-crossed-off", !li.hasClass("rb-crossed-off")));
+				li.addEventListener("click", (e) => {
+					// Links navigate and timer buttons start a timer; neither should
+					// also strike the step through.
+					if ((e.target as HTMLElement).closest("button, a, .rb-duration-btn")) return;
+					li.toggleClass("rb-crossed-off", !li.hasClass("rb-crossed-off"));
+				});
 			}
 			await MarkdownRenderer.render(app, step, li, sourcePath, component);
 			if (timerOpts) processTimerNodes(li, timerOpts);
