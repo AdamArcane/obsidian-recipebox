@@ -45,6 +45,10 @@ The suggester does more than shuffle your recipe list. You can use it to build n
 
 Ingredients from your meal plan are consolidated automatically... quantities summed, duplicates merged... and then grouped by category, recipe, or source. Add ad-hoc items easily, check things off as you shop, and export in multiple formats. The list is a markdown note, editable by hand or through the plugin.
 
+### ✏️ Recipe editing
+
+Fix a recipe without leaving the card. Click the Ingredients or Instructions heading, or use the Edit recipe button, to open a structured editor: change or remove entries, drag to reorder (or Alt+Up/Down), move items between groups, and add, rename, or delete groups. Times, servings, image, notes, and nutrition are editable too, and the note can be renamed from the same dialog. Only what you change is written, so the rest of your note is left untouched. Sections with content the editor can't safely represent (paragraphs, nested lists, multi-line steps) offer an Open as Markdown shortcut instead.
+
 ### 📓 Cook history
 
 Mark a recipe as cooked and Recipe Box logs the date, optional notes, and a photo. History is stored as a structured array in frontmatter, making it queryable with Dataview or Obsidian Bases. Find every recipe you cooked last month, your most-made meals, or anything you haven't made in over a month -- all from a standard Dataview query.

@@ -77,6 +77,19 @@ dependency rather than hand-rolled parsing — don't reimplement that.
   horizontal-scroll on overflow rather than wrap. Order is Cancel then
   the primary action. Primary action gets `mod-cta` (`mod-warning` if
   destructive), not custom color CSS.
+- **Edit recipe never regenerates the note.** `EditRecipeModal` reuses the
+  Add Recipe form builders (`add-recipe-form-sections.ts`) but saves through
+  `src/recipe-edit/`, never the import template. Rules that must hold: only
+  fields and sections the user changed are written (dirty tracking, compared
+  against the loaded values); body sections are replaced via one
+  `vault.process` that re-checks each section against its load snapshot and
+  aborts on mismatch (sync conflict); frontmatter goes through
+  `processFrontMatter` using the configured property names and removes alias
+  keys; rename runs last and is opt-in. Ingredients and Steps are only
+  structurally editable when every line is a single-line list item or a
+  sub-heading (`section-eligibility.ts`), otherwise the UI falls back to
+  Open as Markdown. Everything in `recipe-edit/` except
+  `save-recipe-edits.ts` is pure and Obsidian-free; keep it that way.
 - Recipe folders (where to scan) and recipe type (what counts as a
   recipe) combine with AND, not OR — folders narrow scope, type filters
   within that scope.
