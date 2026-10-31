@@ -1,3 +1,19 @@
+## [0.3.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.2.2...0.3.0) (2026-10-31)
+
+### Features
+
+* add image storage location settings and update image handling logic ([2df5f12](https://github.com/AdamArcane/obsidian-recipebox/commit/2df5f12cef5d0a6a9f5f7e43f067be036a05b6d7))
+* add option to download recipe images on import ([0cb4f44](https://github.com/AdamArcane/obsidian-recipebox/commit/0cb4f4446c610555ef65927e1e8f2e25c06d4f6e))
+* add preserve name case option for ingredient parsing and localise decimal separators ([99bc81b](https://github.com/AdamArcane/obsidian-recipebox/commit/99bc81b882f0eb58fac95c498f253706886a223c))
+* enhance image handling in recipe body parser and add tests for non-image embeds ([afd10dd](https://github.com/AdamArcane/obsidian-recipebox/commit/afd10dda418cfd22c439ad4541695e5848b6585a))
+
+### Bug Fixes
+
+* image lookup in the recipe view skips embeds that are not images, such as PDFs (#26)
+* step numbers in the recipe view are readable on themes with a dark accent colour (#30)
+* the grocery list action bar no longer leaves a gap at the top on mobile (#29)
+* ingredient and alternate units keep the casing of the note or unit mapping (#30)
+
 ## [0.2.2](https://github.com/AdamArcane/obsidian-recipebox/compare/0.2.1...0.2.2) (2026-10-02)
 
 ### Features
