@@ -12,6 +12,7 @@ export interface BodyCleanOptions {
 
 
 const IMAGE_TOKEN_RE = /!\[\[([^\]\n]+)\]\]|!\[[^\]\n]*\]\(([^)\n]+)\)/g;
+const IMAGE_EXTENSIONS = new Set(["avif", "bmp", "gif", "jpeg", "jpg", "png", "svg", "webp"]);
 
 // Unwrap wikilink/embed syntax to bare filename: ![[x|alias]] → x, [[x#anchor]] → x
 export function resolveImageTarget(value: string): string {
@@ -40,12 +41,21 @@ function resolveImageTokenTarget(match: RegExpExecArray): string | null {
 	return null;
 }
 
-// Finds the first image reference in the note body in reading order.
+function isSupportedImageTarget(target: string): boolean {
+	const path = target.split(/[?#]/, 1)[0];
+	const extension = path?.match(/\.([^./]+)$/)?.[1]?.toLowerCase();
+	return extension !== undefined && IMAGE_EXTENSIONS.has(extension);
+}
+
+// Only known image files are eligible; other Obsidian embeds (such as PDFs) still render in the body.
 export function findFirstImageInBody(body: string): string | null {
 	IMAGE_TOKEN_RE.lastIndex = 0;
-	const match = IMAGE_TOKEN_RE.exec(body);
-	if (!match) return null;
-	return resolveImageTokenTarget(match);
+	let match: RegExpExecArray | null;
+	while ((match = IMAGE_TOKEN_RE.exec(body)) !== null) {
+		const target = resolveImageTokenTarget(match);
+		if (target && isSupportedImageTarget(target)) return target;
+	}
+	return null;
 }
 
 const EXCESS_BLANK_RE = /\n{3,}/g;

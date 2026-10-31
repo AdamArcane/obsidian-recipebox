@@ -29,6 +29,14 @@ describe("findFirstImageInBody", () => {
 		expect(findFirstImageInBody("![[first.png]]\n![[second.png]]")).toBe("first.png");
 	});
 
+	it("skips non-image embeds before the first image", () => {
+		expect(findFirstImageInBody("![[cookbook.pdf#page=120]]\n![[photo.jpg]]")).toBe("photo.jpg");
+	});
+
+	it("returns null when the body only embeds a non-image file", () => {
+		expect(findFirstImageInBody("![[cookbook.pdf#page=120]]")).toBeNull();
+	});
+
 	it("returns null when there is no image", () => {
 		expect(findFirstImageInBody("Just text, no images.")).toBeNull();
 	});
