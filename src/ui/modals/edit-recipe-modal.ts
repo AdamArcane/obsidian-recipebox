@@ -80,7 +80,7 @@ export class EditRecipeModal extends BaseModal {
 			const img = built.request.frontmatter.image;
 			if (img?.startsWith("data:")) {
 				if (this.uploaded?.uri !== img) {
-					const path = await downloadRecipeImage(this.app, img, this.file.basename, this.file.parent?.path ?? "");
+					const path = await downloadRecipeImage(this.app, img, this.file.basename, this.file.parent?.path ?? "", this.settings);
 					if (!path) {
 						form.showError("Could not save the uploaded image. Nothing was saved.");
 						return;

@@ -3,7 +3,7 @@
  * parser, and the merged import/export/sharing page.
  */
 import { SettingsBuildContext, SettingsDefinition } from "./settings-build-context";
-import { EXPORT_FORMAT_OPTIONS } from "./settings-options";
+import { EXPORT_FORMAT_OPTIONS, IMAGE_STORAGE_OPTIONS } from "./settings-options";
 import { sectionPage } from "./section-row-host";
 import { renderSectionLibrary } from "./section-library";
 import { renderSectionPropertyNames } from "./section-property-names";
@@ -61,6 +61,20 @@ export function buildLibraryDataGroup(ctx: SettingsBuildContext): SettingsDefini
 								desc: "When off, keep the source image URL in the recipe instead of downloading it. Images bundled with file imports are still saved to the vault.",
 								aliases: ["importer", "images", "image urls"],
 								control: { type: "toggle", key: "downloadImagesOnImport" },
+							},
+							{
+								name: "Image storage location",
+								desc: "Choose where downloaded and bundled recipe images are saved.",
+								aliases: ["importer", "image folder", "image location"],
+								control: { type: "dropdown", key: "imageStorageLocation", options: IMAGE_STORAGE_OPTIONS },
+							},
+							{
+								name: "Custom image folder",
+								desc: "Choose the vault root to save at the top level.",
+								aliases: ["importer", "custom image folder"],
+								visible: () => plugin.settings.imageStorageLocation === "custom",
+								searchable: () => plugin.settings.imageStorageLocation === "custom",
+								control: { type: "folder", key: "customImageStorageFolder", includeRoot: true },
 							},
 						],
 					},

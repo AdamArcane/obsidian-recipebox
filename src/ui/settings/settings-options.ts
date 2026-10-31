@@ -28,3 +28,9 @@ export const EXPORT_FORMAT_OPTIONS: Record<string, string> = {
 	json: "JSON",
 	"json-ld": "JSON-LD",
 };
+
+export const IMAGE_STORAGE_OPTIONS: Record<string, string> = {
+	"obsidian-default": "Obsidian Default",
+	"recipe-folder": "Recipe Folder",
+	custom: "Custom location",
+};

@@ -121,7 +121,7 @@ export async function writeRecipeNote(
 	// never blocks the import.
 	let recipeToSave = recipe;
 	if (!options.imageHandled && settings.downloadImagesOnImport && recipe.heroImage) {
-		const imagePath = await downloadRecipeImage(app, recipe.heroImage, recipe.title || "recipe", folder);
+		const imagePath = await downloadRecipeImage(app, recipe.heroImage, recipe.title || "recipe", folder, settings);
 		if (imagePath) recipeToSave = { ...recipe, heroImage: imagePath };
 	}
 	const content = await buildRecipeNote(app, recipeToSave, settings);

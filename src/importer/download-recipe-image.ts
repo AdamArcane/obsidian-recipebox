@@ -1,12 +1,14 @@
 /**
  * Downloads a recipe's hero image (HTTP/HTTPS URL or data: URI) into the vault,
- * placing it in Obsidian's configured attachment folder relative to the recipe note.
+ * placing it according to the selected image storage location.
  * Returns the vault-relative path on success, or null on any failure -- callers
  * treat failure as non-fatal and fall back to storing the original URL as-is.
  */
 import { App, requestUrl } from "obsidian";
 import { titleToFilename } from "./note-filename";
+import { resolveImageStorageFolder } from "./attachment-folder";
 import { ensureParentFolders } from "../utils/vault-notes";
+import { RecipeBoxSettings } from "../settings/settings-types";
 
 const MIME_TO_EXT: Record<string, string> = {
 	"image/jpeg": "jpg",
@@ -34,25 +36,25 @@ function extensionFromUrl(url: string): string | null {
 }
 
 /** Resolves where to put attachments for a note in the given vault folder. */
-function resolveAttachmentFolder(app: App, noteFolder: string): string {
+function resolveAttachmentFolder(app: App, noteFolder: string, settings: RecipeBoxSettings): string {
 	let configured: string;
-	try {
-		// getConfig is an internal Obsidian API -- it exists on all desktop and
-		// mobile builds, but isn't in the public type definitions.
-		configured = (app.vault as unknown as { getConfig(key: string): unknown }).getConfig("attachmentFolderPath") as string ?? "";
-	} catch {
+	if (settings.imageStorageLocation === "obsidian-default") {
+		try {
+			// getConfig is an internal Obsidian API -- it exists on all desktop and
+			// mobile builds, but isn't in the public type definitions.
+			configured = (app.vault as unknown as { getConfig(key: string): unknown }).getConfig("attachmentFolderPath") as string ?? "";
+		} catch {
+			configured = "";
+		}
+	} else {
 		configured = "";
 	}
-	// "/" or "" means vault root.
-	if (!configured || configured === "/") return "";
-	// "./" or "./sub" means relative to the note's folder.
-	if (configured.startsWith("./")) {
-		const sub = configured.slice(2);
-		if (!sub) return noteFolder;
-		return noteFolder ? `${noteFolder}/${sub}` : sub;
-	}
-	// Absolute vault path.
-	return configured;
+	return resolveImageStorageFolder(
+		settings.imageStorageLocation,
+		configured,
+		settings.customImageStorageFolder,
+		noteFolder,
+	);
 }
 
 /** Returns the first vault path for baseName.ext that doesn't already exist. */
@@ -103,8 +105,8 @@ export async function fetchImageBytes(source: string): Promise<FetchedImage | nu
 }
 
 /**
- * Writes already-fetched image bytes into the vault's attachment folder for a
- * note in noteFolder. Returns the vault path, or null on failure.
+ * Writes already-fetched image bytes into the selected image storage folder.
+ * Returns the vault path, or null on failure.
  */
 export async function writeImageToVault(
 	app: App,
@@ -112,9 +114,10 @@ export async function writeImageToVault(
 	ext: string,
 	recipeTitle: string,
 	noteFolder: string,
+	settings: RecipeBoxSettings,
 ): Promise<string | null> {
 	try {
-		const attachmentFolder = resolveAttachmentFolder(app, noteFolder);
+		const attachmentFolder = resolveAttachmentFolder(app, noteFolder, settings);
 		const baseName = titleToFilename(recipeTitle || "recipe");
 		const vaultPath = await uniqueVaultPath(app, attachmentFolder, baseName, ext);
 
@@ -131,8 +134,9 @@ export async function downloadRecipeImage(
 	heroImage: string,
 	recipeTitle: string,
 	noteFolder: string,
+	settings: RecipeBoxSettings,
 ): Promise<string | null> {
 	const fetched = await fetchImageBytes(heroImage);
 	if (!fetched) return null;
-	return writeImageToVault(app, fetched.bytes, fetched.ext, recipeTitle, noteFolder);
+	return writeImageToVault(app, fetched.bytes, fetched.ext, recipeTitle, noteFolder, settings);
 }

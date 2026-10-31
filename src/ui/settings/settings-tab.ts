@@ -29,5 +29,6 @@ export class RecipeBoxSettingsTab extends PluginSettingTab {
 	async setControlValue(key: string, value: unknown): Promise<void> {
 		writeSettingValue(this.plugin.settings, key, value);
 		await this.plugin.saveSettings();
+		if (key === "imageStorageLocation") this.update();
 	}
 }
