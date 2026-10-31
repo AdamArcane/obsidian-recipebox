@@ -56,6 +56,12 @@ export function buildLibraryDataGroup(ctx: SettingsBuildContext): SettingsDefini
 								aliases: ["importer", "import folder"],
 								control: { type: "folder", key: "importerDefaultFolder" },
 							},
+							{
+								name: "Download recipe images on import",
+								desc: "When off, keep the source image URL in the recipe instead of downloading it. Images bundled with file imports are still saved to the vault.",
+								aliases: ["importer", "images", "image urls"],
+								control: { type: "toggle", key: "downloadImagesOnImport" },
+							},
 						],
 					},
 					{
