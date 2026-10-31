@@ -1156,7 +1156,6 @@ button:not(.clickable-icon).rb-start-timer-btn {
   font-size: 0.7rem;
   font-weight: 500;
   color: var(--text-faint);
-  text-transform: lowercase;
   letter-spacing: 0.01em;
   line-height: 1;
 }
@@ -1172,7 +1171,6 @@ button:not(.clickable-icon).rb-start-timer-btn {
   font-size: 0.6rem;
   font-weight: 500;
   color: var(--text-faint);
-  text-transform: lowercase;
   letter-spacing: 0.01em;
   line-height: 1;
 }
@@ -1323,7 +1321,9 @@ button:not(.clickable-icon).rb-grocery-remove-btn:hover {
   min-width: 1.5rem;
   height: 1.5rem;
   background: var(--interactive-accent);
-  /* color: var(--interactive-accent); */
+  /* The badge fills with the accent colour, so the number needs the matching
+     on-accent text colour; without it dark themes rendered dark-on-dark. */
+  color: var(--text-on-accent);
   border: 1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent);
   border-radius: 4px;
   font-weight: 800;
@@ -3659,6 +3659,14 @@ body.is-mobile .rb-duration-btn {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+/* On mobile, Obsidian's floating view header and safe-area inset offset the
+   scroll container, so top: 0 pinned the bar well below the screen top and
+   scrolled content showed through the gap above it (issue #29). The bar scrolls
+   with the list there instead of sticking. */
+body.is-mobile .rb-gv-header {
+  position: static;
 }
 
 .rb-gv-header-btn {

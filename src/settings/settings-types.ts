@@ -126,6 +126,7 @@ export interface RecipeBoxSettings {
 	// Ingredient parsing aliases use one mapping per line: alias, alias -> unit.
 	ingredientUnitSynonyms: string;
 	ingredientFillerWord: string;
+	ingredientPreserveNameCase: boolean;
 
 	// Timers
 	timersEnabled: boolean;

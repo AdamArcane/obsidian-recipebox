@@ -171,3 +171,10 @@ describe("ranges and second measures", () => {
 		expect(parseIngredientLine("125 g / 4 oz de riz", options)).toMatchObject({ alt: { quantity: 4, unit: "oz" }, name: "riz" });
 	});
 });
+
+describe("preserveNameCase option", () => {
+	it("lowercases names by default and keeps casing when enabled", () => {
+		expect(parseIngredientLine("2 Eier")?.name).toBe("eier");
+		expect(parseIngredientLine("2 Eier", { preserveNameCase: true })?.name).toBe("Eier");
+	});
+});

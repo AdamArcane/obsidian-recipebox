@@ -4,7 +4,7 @@
  * Ingredient names are rendered through Obsidian's full markdown renderer so
  * that wikilinks, bold, and other inline formatting work naturally.
  */
-import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, moment, setIcon, TFile } from "obsidian";
 import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { GroceryItem } from "../../types";
@@ -14,6 +14,7 @@ import { detectMeatTemp } from "../../parser/meat-detect";
 import { isHighGi } from "../../parser/glycemic-match";
 import { compileGiDictionary } from "../../parser/glycemic-dictionary";
 import { scaleAmount } from "../../parser/ingredient-amount";
+import { decimalSeparatorFor, localiseDecimals } from "../../parser/decimal-locale";
 import { makeSectionTitleEditable } from "./section-title-edit";
 
 export async function renderIngredientsSection(
@@ -30,6 +31,9 @@ export async function renderIngredientsSection(
 	onEditSection?: () => void,
 ): Promise<void> {
 	const groceryKeySet = new Set(groceryItems.map(i => i.key));
+	// moment.locale() follows Obsidian's interface language, so a German UI
+	// shows 0,5 l without a setting.
+	const decimalSeparator = decimalSeparatorFor(moment.locale());
 	const giPatterns = settings.showHighGIWarnings ? compileGiDictionary(settings.giDictionary).patterns : [];
 
 	const section = container.createDiv({ cls: "rb-ingredients-section" });
@@ -77,7 +81,7 @@ export async function renderIngredientsSection(
 				});
 			}
 
-			const qtyStr = amount.text;
+			const qtyStr = localiseDecimals(amount.text, decimalSeparator);
 			const qtyWrap = row.createSpan({ cls: qtyStr ? "rb-ingredient-qty" : "rb-ingredient-qty rb-qty-empty" });
 			if (qtyStr) {
 				const mainLine = qtyWrap.createSpan({ cls: "rb-qty-line" });
@@ -87,7 +91,7 @@ export async function renderIngredientsSection(
 				// of the first, because side by side the two read as one run of text.
 				if (amount.alt) {
 					const altLine = qtyWrap.createSpan({ cls: "rb-qty-line rb-qty-alt-line" });
-					altLine.createSpan({ cls: "rb-qty-alt-number", text: `(${amount.alt.text}` });
+					altLine.createSpan({ cls: "rb-qty-alt-number", text: `(${localiseDecimals(amount.alt.text, decimalSeparator)}` });
 					altLine.createSpan({ cls: "rb-qty-alt-unit", text: `${amount.alt.unit})` });
 				}
 			} else {

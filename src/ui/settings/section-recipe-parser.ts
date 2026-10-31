@@ -114,4 +114,15 @@ export function renderSectionRecipeParser(
 			}),
 		);
 	fillerSetting.settingEl.addClass("rb-parser-filler-setting");
+
+	new Setting(container)
+		.setName("Preserve ingredient name casing")
+		.setDesc("Show ingredient names as written in the note instead of lowercasing them. Useful for languages that capitalise nouns. Grocery list matching still ignores casing.")
+		.addToggle((toggle) => toggle
+			.setValue(settings.ingredientPreserveNameCase)
+			.onChange((value) => {
+				settings.ingredientPreserveNameCase = value;
+				void save();
+			}),
+		);
 }
