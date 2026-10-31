@@ -29,6 +29,7 @@ export type GallerySortField =
 	| "times-cooked";
 export type GallerySortDirection = "asc" | "desc";
 export type DashboardActivityRangeWeeks = 2 | 4 | 8 | 12;
+export type ImageStorageLocation = "obsidian-default" | "recipe-folder" | "custom";
 
 // All gallery filter/sort state travels together as one persisted unit (see
 // "settings that always travel together get one toggle" convention) rather
@@ -144,6 +145,8 @@ export interface RecipeBoxSettings {
 	importerTemplatePath: string;
 	importerDefaultFolder: string;
 	downloadImagesOnImport: boolean;
+	imageStorageLocation: ImageStorageLocation;
+	customImageStorageFolder: string;
 
 	// Header badges
 	headerBadges: CustomBadge[];

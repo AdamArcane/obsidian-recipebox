@@ -30,11 +30,11 @@ export function createVaultImportDeps(app: App, settings: RecipeBoxSettings): Im
 					unit.image.bytes.byteOffset,
 					unit.image.bytes.byteOffset + unit.image.bytes.byteLength,
 				) as ArrayBuffer;
-				const saved = await writeImageToVault(app, bytes, ext, recipe.title, folder);
+				const saved = await writeImageToVault(app, bytes, ext, recipe.title, folder, settings);
 				if (saved) toSave = { ...recipe, heroImage: saved };
 				else warnings.push("The bundled image could not be saved.");
 			} else if (settings.downloadImagesOnImport && recipe.heroImage) {
-				const saved = await downloadRecipeImage(app, recipe.heroImage, recipe.title, folder);
+				const saved = await downloadRecipeImage(app, recipe.heroImage, recipe.title, folder, settings);
 				if (saved) toSave = { ...recipe, heroImage: saved };
 				else warnings.push("The image could not be downloaded; the original link was kept.");
 			}

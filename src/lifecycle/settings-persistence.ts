@@ -23,6 +23,7 @@ import {
 	GallerySavedState,
 	GallerySortDirection,
 	GallerySortField,
+	ImageStorageLocation,
 	NutritionDisplay,
 	NutritionSource,
 	RecipeBoxSettings,
@@ -308,6 +309,8 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		importerTemplatePath: str(r.importerTemplatePath, d.importerTemplatePath),
 		importerDefaultFolder: str(r.importerDefaultFolder, d.importerDefaultFolder),
 		downloadImagesOnImport: bool(r.downloadImagesOnImport, d.downloadImagesOnImport),
+		imageStorageLocation: oneOf<ImageStorageLocation>(r.imageStorageLocation, ["obsidian-default", "recipe-folder", "custom"], d.imageStorageLocation),
+		customImageStorageFolder: str(r.customImageStorageFolder, d.customImageStorageFolder),
 
 		headerBadges: Array.isArray(r.headerBadges)
 			? (r.headerBadges as unknown[]).map(validateBadge).filter((x): x is CustomBadge => x !== null)
