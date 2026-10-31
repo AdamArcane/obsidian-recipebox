@@ -294,6 +294,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		giDictionary: str(r.giDictionary, d.giDictionary),
 		ingredientUnitSynonyms: str(r.ingredientUnitSynonyms, d.ingredientUnitSynonyms),
 		ingredientFillerWord: str(r.ingredientFillerWord, d.ingredientFillerWord),
+		ingredientPreserveNameCase: bool(r.ingredientPreserveNameCase, d.ingredientPreserveNameCase),
 
 		timersEnabled: bool(r.timersEnabled, d.timersEnabled),
 		timerAutoStart: bool(r.timerAutoStart, d.timerAutoStart),

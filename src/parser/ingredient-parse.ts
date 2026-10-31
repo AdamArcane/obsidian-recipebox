@@ -17,10 +17,15 @@ import {
 
 export interface IngredientParserOptions extends IngredientUnitOptions {
 	fillerWord?: string;
+	preserveNameCase?: boolean;
 }
 
-export function ingredientParserOptions(settings: Pick<RecipeBoxSettings, "ingredientUnitSynonyms" | "ingredientFillerWord">): IngredientParserOptions {
-	return { customSynonyms: settings.ingredientUnitSynonyms, fillerWord: settings.ingredientFillerWord };
+export function ingredientParserOptions(settings: Pick<RecipeBoxSettings, "ingredientUnitSynonyms" | "ingredientFillerWord" | "ingredientPreserveNameCase">): IngredientParserOptions {
+	return {
+		customSynonyms: settings.ingredientUnitSynonyms,
+		fillerWord: settings.ingredientFillerWord,
+		preserveNameCase: settings.ingredientPreserveNameCase,
+	};
 }
 
 export function consumeUnit(input: string, options: IngredientParserOptions = {}): { unit: string; remaining: string } {
@@ -107,7 +112,7 @@ export function parseIngredientLine(line: string, options: IngredientParserOptio
 	// Strip trailing punctuation
 	text = text.replace(/[,;:.]+$/, "").trim();
 
-	const name = normaliseName(text);
+	const name = normaliseName(text, options.preserveNameCase);
 	if (!name) return null;
 
 	// A quantity with nothing else attached is not a valid ingredient

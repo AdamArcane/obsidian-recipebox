@@ -98,9 +98,11 @@ export function stripOf(text: string, fillerWord = "of"): string {
 	return text;
 }
 
-export function normaliseName(name: string): string {
-	return name
-		.toLowerCase()
+// Lowercasing is what lets "Eggs" and "eggs" merge, but ingredientKey() does its
+// own lowercasing, so display can keep the author's casing (German nouns are
+// capitalised) without affecting grocery matching.
+export function normaliseName(name: string, preserveCase = false): string {
+	return (preserveCase ? name : name.toLowerCase())
 		.replace(/\s+/g, " ")
 		.replace(/^[-–—]+|[-–—]+$/g, "")
 		.trim();

@@ -94,6 +94,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	giDictionary: DEFAULT_GI_DICTIONARY,
 	ingredientUnitSynonyms: "",
 	ingredientFillerWord: "of",
+	ingredientPreserveNameCase: false,
 
 	timersEnabled: true,
 	timerAutoStart: false,
