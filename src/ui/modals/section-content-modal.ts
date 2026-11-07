@@ -6,6 +6,7 @@ import { App, Component, HoverParent, HoverPopover, MarkdownRenderer } from "obs
 import { BaseModal } from "./modal-shell";
 import { registerLinkHandlers } from "../recipe-view/link-handlers";
 import { RECIPE_VIEW_TYPE } from "../recipe-view/recipe-view-type";
+import { renderWikilinksAsText } from "../../utils/wikilink-display";
 
 export class SectionContentModal extends BaseModal implements HoverParent {
     hoverPopover: HoverPopover | null = null;
@@ -25,7 +26,7 @@ export class SectionContentModal extends BaseModal implements HoverParent {
     }
 
     getTitle(): string {
-        return this.sectionHeading;
+        return renderWikilinksAsText(this.sectionHeading);
     }
 
     getIcon(): string {
