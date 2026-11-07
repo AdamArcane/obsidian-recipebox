@@ -110,19 +110,30 @@ function renderSourceCell(
 
 	// The title attribute carries the untruncated value, since the cell is
 	// width-capped and a source is not always a short hostname.
-	if (display.href) {
-		cell.createEl("a", {
-			cls: "rb-source-value",
-			href: display.href,
-			text: display.label,
-			attr: { target: "_blank", rel: "noopener", title: display.href },
-		});
-	} else {
-		cell.createSpan({
-			cls: "rb-source-value",
-			text: display.label,
-			attr: { title: display.label },
-		});
+	switch (display.kind) {
+		case "internal":
+			cell.createEl("a", {
+				cls: "rb-source-value internal-link",
+				href: display.linktext,
+				text: display.label,
+				attr: { "data-href": display.linktext, title: display.linktext },
+			});
+			break;
+		case "external":
+			cell.createEl("a", {
+				cls: "rb-source-value",
+				href: display.href,
+				text: display.label,
+				attr: { target: "_blank", rel: "noopener", title: display.href },
+			});
+			break;
+		case "text":
+			cell.createSpan({
+				cls: "rb-source-value",
+				text: display.label,
+				attr: { title: display.label },
+			});
+			break;
 	}
 }
 
