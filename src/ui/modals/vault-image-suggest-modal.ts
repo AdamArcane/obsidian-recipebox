@@ -2,6 +2,7 @@
  * Fuzzy-search modal for picking an image file from the vault, used when
  * attaching a photo to a cook history entry.
  */
+import { t as translateUi } from "../../i18n";
 import { App, FuzzySuggestModal, TFile } from "obsidian";
 
 const IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif", "heic", "heif"]);
@@ -12,7 +13,7 @@ export class VaultImageSuggestModal extends FuzzySuggestModal<TFile> {
 		private readonly onSelect: (file: TFile) => void,
 	) {
 		super(app);
-		this.setPlaceholder("Search for an image in your vault…");
+		this.setPlaceholder(translateUi("Search for an image in your vault…"));
 	}
 
 	getItems(): TFile[] {

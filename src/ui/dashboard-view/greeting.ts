@@ -3,12 +3,13 @@
  * with generous surrounding space so the view opens with some breathing room
  * instead of jumping straight into dense cards.
  */
+import { t as translateUi } from "../../i18n";
 function timeOfDayGreeting(): string {
 	const hour = new Date().getHours();
-	if (hour < 5) return "Good evening";
-	if (hour < 12) return "Good morning";
-	if (hour < 17) return "Good afternoon";
-	return "Good evening";
+	if (hour < 5) return translateUi("Good evening");
+	if (hour < 12) return translateUi("Good morning");
+	if (hour < 17) return translateUi("Good afternoon");
+	return translateUi("Good evening");
 }
 
 export function renderGreeting(container: HTMLElement): void {

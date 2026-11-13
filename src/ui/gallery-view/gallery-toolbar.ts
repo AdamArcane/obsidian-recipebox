@@ -10,6 +10,7 @@
  * which has no submenus and closes after any one click -- so it's a plain
  * panel that expands below the toolbar and stays open across changes.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { GallerySavedState, GallerySortField, RecipeBoxSettings } from "../../settings/settings-types";
 import { debounce } from "../../utils/debounce";
@@ -20,12 +21,12 @@ import { buildPickerFieldList } from "../components/field-picker";
 import { renderFieldFilterRow } from "../components/filter-row";
 
 const SORT_FIELD_LABELS: Record<GallerySortField, string> = {
-	title: "Title",
-	"date-added": "Date added",
-	"date-modified": "Last modified",
-	"last-cooked": "Last cooked",
-	rating: "Rating",
-	"times-cooked": "Times cooked",
+	title: translateUi("Title"),
+	"date-added": translateUi("Date added"),
+	"date-modified": translateUi("Last modified"),
+	"last-cooked": translateUi("Last cooked"),
+	rating: translateUi("Rating"),
+	"times-cooked": translateUi("Times cooked"),
 };
 
 const SORT_FIELD_ICONS: Record<GallerySortField, string> = {
@@ -38,12 +39,12 @@ const SORT_FIELD_ICONS: Record<GallerySortField, string> = {
 };
 
 const RATING_LABELS: Record<number, string> = {
-	0: "Any rating",
-	1: "1+ stars",
-	2: "2+ stars",
-	3: "3+ stars",
-	4: "4+ stars",
-	5: "5 stars",
+	0: translateUi("Any rating"),
+	1: translateUi("1+ stars"),
+	2: translateUi("2+ stars"),
+	3: translateUi("3+ stars"),
+	4: translateUi("4+ stars"),
+	5: translateUi("5 stars"),
 };
 
 const CLEARED_FILTERS: Pick<GallerySavedState, "folder" | "tag" | "favoriteOnly" | "minRating" | "neverCooked" | "excludeAllergens" | "fieldFilters"> = {
@@ -82,13 +83,13 @@ function openSortMenu(evt: MouseEvent, state: GallerySavedState, onChange: (next
 	menu.addSeparator();
 
 	menu.addItem((item) =>
-		item.setTitle("Ascending")
+		item.setTitle(translateUi("Ascending"))
 			.setIcon("arrow-up-narrow-wide")
 			.setChecked(state.sortDirection === "asc")
 			.onClick(() => onChange({ ...state, sortDirection: "asc" }))
 	);
 	menu.addItem((item) =>
-		item.setTitle("Descending")
+		item.setTitle(translateUi("Descending"))
 			.setIcon("arrow-down-wide-narrow")
 			.setChecked(state.sortDirection === "desc")
 			.onClick(() => onChange({ ...state, sortDirection: "desc" }))
@@ -112,7 +113,7 @@ function renderAddFieldFilterButton(
 ): void {
 	const addBtn = panel.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
 	setIcon(addBtn, "plus");
-	addBtn.createSpan({ text: "Property filter" });
+	addBtn.createSpan({ text: translateUi("Property filter") });
 	addBtn.addEventListener("click", () => {
 		const filter: FieldFilter = { field: "", operator: "eq", value: "" };
 		state.fieldFilters = [...state.fieldFilters, filter];
@@ -190,7 +191,7 @@ function renderFilterPanel(
 	if (hasActiveFilters(state)) {
 		const clearBtn = header.createEl("button", { cls: "rb-gallery-filter-panel-btn" });
 		setIcon(clearBtn, "eraser");
-		clearBtn.createSpan({ text: "Clear" });
+		clearBtn.createSpan({ text: translateUi("Clear") });
 		clearBtn.addEventListener("click", () => onChange({ ...state, ...CLEARED_FILTERS }));
 	}
 
@@ -198,14 +199,14 @@ function renderFilterPanel(
 	const rememberToggle = header.createEl("label", { cls: "rb-gallery-toggle" });
 	const rememberCheckbox = rememberToggle.createEl("input", { attr: { type: "checkbox" } });
 	rememberCheckbox.checked = settings.galleryRememberFilters;
-	rememberToggle.createSpan({ text: "Remember filters" });
+	rememberToggle.createSpan({ text: translateUi("Remember filters") });
 	rememberCheckbox.addEventListener("change", () => {
 		onToggleRememberFilters(rememberCheckbox.checked);
 	});
 
 
 	const folderSelect = panel.createEl("select", { cls: "rb-gallery-select" });
-	folderSelect.createEl("option", { value: "", text: "All folders" });
+	folderSelect.createEl("option", { value: "", text: translateUi("All folders") });
 	const folders = distinctFolders(files);
 	// A folder-click (see src/integrations/) can set state.folder to a path
 	// with no in-scope recipes yet, which wouldn't otherwise appear here --
@@ -221,7 +222,7 @@ function renderFilterPanel(
 	});
 
 	const tagSelect = panel.createEl("select", { cls: "rb-gallery-select" });
-	tagSelect.createEl("option", { value: "", text: "All tags" });
+	tagSelect.createEl("option", { value: "", text: translateUi("All tags") });
 	for (const tag of distinctTags(app, files)) {
 		const opt = tagSelect.createEl("option", { value: tag, text: tag });
 		if (state.tag === tag) opt.selected = true;
@@ -248,7 +249,7 @@ function renderFilterPanel(
 	const favoriteToggle = panel.createEl("label", { cls: "rb-gallery-toggle" });
 	const favoriteCheckbox = favoriteToggle.createEl("input", { attr: { type: "checkbox" } });
 	favoriteCheckbox.checked = state.favoriteOnly;
-	favoriteToggle.createSpan({ text: "Favorites only" });
+	favoriteToggle.createSpan({ text: translateUi("Favorites only") });
 	favoriteCheckbox.addEventListener("change", () => {
 		onChange({ ...state, favoriteOnly: favoriteCheckbox.checked });
 	});
@@ -256,7 +257,7 @@ function renderFilterPanel(
 	const neverCookedToggle = panel.createEl("label", { cls: "rb-gallery-toggle" });
 	const neverCookedCheckbox = neverCookedToggle.createEl("input", { attr: { type: "checkbox" } });
 	neverCookedCheckbox.checked = state.neverCooked;
-	neverCookedToggle.createSpan({ text: "Never cooked" });
+	neverCookedToggle.createSpan({ text: translateUi("Never cooked") });
 	neverCookedCheckbox.addEventListener("change", () => {
 		onChange({ ...state, neverCooked: neverCookedCheckbox.checked });
 	});
@@ -265,7 +266,7 @@ function renderFilterPanel(
 		const allergenToggle = panel.createEl("label", { cls: "rb-gallery-toggle" });
 		const allergenCheckbox = allergenToggle.createEl("input", { attr: { type: "checkbox" } });
 		allergenCheckbox.checked = state.excludeAllergens;
-		allergenToggle.createSpan({ text: "Exclude my allergens" });
+		allergenToggle.createSpan({ text: translateUi("Exclude my allergens") });
 		allergenCheckbox.addEventListener("change", () => {
 			onChange({ ...state, excludeAllergens: allergenCheckbox.checked });
 		});
@@ -295,7 +296,7 @@ export function renderGalleryToolbar(
 
 	const searchInput = searchWrap.createEl("input", {
 		cls: "rb-gallery-search",
-		attr: { type: "search", placeholder: "Search recipes…", "data-rb-focus-key": "gallery-search" },
+		attr: { type: "search", placeholder: translateUi("Search recipes…"), "data-rb-focus-key": "gallery-search" },
 	});
 	searchInput.value = state.search;
 	const debouncedSearch = debounce(() => onChange({ ...state, search: searchInput.value }), 200);
@@ -305,7 +306,7 @@ export function renderGalleryToolbar(
 
 	const filterBtn = actions.createDiv({
 		cls: "rb-gallery-toolbar-btn",
-		attr: { role: "button", "aria-label": "Filter", tabindex: "0" },
+		attr: { role: "button", "aria-label": translateUi("Filter"), tabindex: "0" },
 	});
 	filterBtn.toggleClass("is-active", filterPanelOpen);
 	filterBtn.toggleClass("has-active-filters", hasActiveFilters(state));
@@ -314,7 +315,7 @@ export function renderGalleryToolbar(
 
 	const sortBtn = actions.createDiv({
 		cls: "rb-gallery-toolbar-btn",
-		attr: { role: "button", "aria-label": "Sort", tabindex: "0" },
+		attr: { role: "button", "aria-label": translateUi("Sort"), tabindex: "0" },
 	});
 	setIcon(sortBtn, "arrow-up-down");
 	sortBtn.addEventListener("click", (evt) => openSortMenu(evt, state, onChange));

@@ -2,6 +2,7 @@
  * Renders the instructions section of the recipe view, including sub-group
  * headings and Markdown-rendered steps with optional inline timer injection.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, MarkdownRenderer, setIcon } from "obsidian";
 import { InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -25,12 +26,12 @@ export async function renderInstructionsSection(
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "list-ordered");
 	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.instructionsHeading });
-	if (onEditSection) makeSectionTitleEditable(titleEl, `Edit ${settings.instructionsHeading}`, onEditSection);
+	if (onEditSection) makeSectionTitleEditable(titleEl, translateUi`Edit ${settings.instructionsHeading}`, onEditSection);
 
 	if (settings.timersEnabled) {
 		const timerBtn = header.createEl("button", {
 			cls: "rb-start-timer-btn",
-			attr: { "aria-label": "Start a timer" },
+			attr: { "aria-label": translateUi("Start a timer") },
 		});
 		setIcon(timerBtn, "timer");
 		timerBtn.addEventListener("click", () => new StartTimerModal(app, settings).open());

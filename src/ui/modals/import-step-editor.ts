@@ -6,11 +6,12 @@
  * view), so the note is decomposed with the same parenthetical extractor
  * ingredients use rather than inventing a second convention.
  */
+import { t as translateUi } from "../../i18n";
 import { extractInlineNotes } from "../../parser/ingredient-clean";
 import { renderEntryListEditor, EntryField, EntryListHandle, EntryListOptions } from "./import-entry-list-editor";
 
 const FIELDS: EntryField[] = [
-	{ key: "description", label: "Step", placeholder: "Preheat the oven to 350°F", cls: "rb-import-entry-cell--name" },
+	{ key: "description", label: translateUi("Step"), placeholder: translateUi("Preheat the oven to 350°F"), cls: "rb-import-entry-cell--name" },
 	{ key: "note", label: "Note", placeholder: "optional", cls: "rb-import-entry-cell--note" },
 ];
 

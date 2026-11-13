@@ -5,6 +5,7 @@
  * The desktop layout is handled by meta-banner.ts, ingredients-section.ts,
  * instructions-section.ts, and section-sidebar.ts instead.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, getAllTags, MarkdownRenderer, Modal, setIcon, TFile } from "obsidian";
 import { CustomBadge, IngredientGroup, InstructionGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -141,12 +142,12 @@ function renderNativeCard(
 	const metaCol = card.createDiv({ cls: "rb-mobile-native-meta" });
 
 	const ratingGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
-	ratingGroup.createDiv({ cls: "rb-label-caps", text: "Rating" });
+	ratingGroup.createDiv({ cls: "rb-label-caps", text: translateUi("Rating") });
 	renderStarRating(ratingGroup, app, file, fm, settings.ratingProperty, { hoverPreview: false });
 
 	if (settings.cookHistoryEnabled) {
 		const lastGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
-		lastGroup.createDiv({ cls: "rb-label-caps", text: "Last prepared" });
+		lastGroup.createDiv({ cls: "rb-label-caps", text: translateUi("Last prepared") });
 		const dateText = meta.lastMade ? formatDateValue(meta.lastMade) : "–";
 		lastGroup.createDiv({ cls: "rb-mobile-native-value", text: dateText });
 	}
@@ -155,11 +156,11 @@ function renderNativeCard(
 	// box only ever shows fields with real values, never an empty/dash state.
 	if (shareStatus.kind === "shared") {
 		const shareGroup = metaCol.createDiv({ cls: "rb-mobile-native-group" });
-		shareGroup.createDiv({ cls: "rb-label-caps", text: "Shared" });
+		shareGroup.createDiv({ cls: "rb-label-caps", text: translateUi("Shared") });
 		const days = shareStatus.daysLeft;
 		const value = shareGroup.createDiv({
 			cls: "rb-mobile-native-value rb-mobile-native-value--tappable",
-			text: `${days} day${days === 1 ? "" : "s"} left`,
+			text: translateUi`${days} day${days === 1 ? "" : "s"} left`,
 		});
 		value.addEventListener("click", () => {
 			new ShareRecipeModal(app, file, settings, saveSettings).open();
@@ -176,9 +177,9 @@ function renderMobileStatRow(
 
 	const cells: { label: string; value: string }[] = [];
 	if (enabled.some((badge) => isMobilePrepBadge(badge, settings)) && meta.times.prep !== null)
-		cells.push({ label: "Prep time", value: formatMinutes(meta.times.prep) });
+		cells.push({ label: translateUi("Prep time"), value: formatMinutes(meta.times.prep) });
 	if (enabled.some((badge) => isMobileCookBadge(badge, settings)) && meta.times.cook !== null)
-		cells.push({ label: "Cook time", value: formatMinutes(meta.times.cook) });
+		cells.push({ label: translateUi("Cook time"), value: formatMinutes(meta.times.cook) });
 	if (enabled.some((badge) => isMobileTotalBadge(badge, settings)) && meta.times.total !== null)
 		cells.push({ label: "Total", value: formatMinutes(meta.times.total) });
 
@@ -203,7 +204,7 @@ class ScalePickerModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.titleEl.setText("Scale recipe");
+		this.titleEl.setText(translateUi("Scale recipe"));
 		const { contentEl } = this;
 		const grid = contentEl.createDiv({ cls: "rb-scale-grid" });
 		for (const p of [0.5, 1, 1.5, 2, 3, 4]) {
@@ -213,12 +214,12 @@ class ScalePickerModal extends Modal {
 			btn.addEventListener("click", () => { void this.onSelect(p); this.close(); });
 		}
 		const customRow = contentEl.createDiv({ cls: "rb-scale-custom-row" });
-		customRow.createSpan({ cls: "rb-scale-custom-label", text: "Custom" });
+		customRow.createSpan({ cls: "rb-scale-custom-label", text: translateUi("Custom") });
 		const input = customRow.createEl("input", { type: "text", cls: "rb-scale-custom-input" });
 		input.inputMode = "decimal";
 		input.value = String(this.current);
-		input.placeholder = "e.g. 2.5";
-		const applyBtn = customRow.createEl("button", { text: "Apply", cls: "rb-scale-apply-btn" });
+		input.placeholder = translateUi("e.g. 2.5");
+		const applyBtn = customRow.createEl("button", { text: translateUi("Apply"), cls: "rb-scale-apply-btn" });
 		const apply = (): void => {
 			const v = parseFloat(input.value);
 			if (v > 0) { void this.onSelect(Math.round(v * 2) / 2); this.close(); }
@@ -248,14 +249,14 @@ function renderScaleActionsRow(
 
 	// Scale cell
 	const scaleCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
-	scaleCell.createDiv({ cls: "rb-label-caps", text: "Scale" });
+	scaleCell.createDiv({ cls: "rb-label-caps", text: translateUi("Scale") });
 	const scaleValue = scaleCell.createDiv({ cls: "rb-mobile-scale-value", text: `${current}×` });
 
 	// Servings cell (only if the recipe has a servings value)
 	if (servings !== null) {
 		scaleCol.createDiv({ cls: "rb-mobile-scale-divider" });
 		const servingsCell = scaleCol.createDiv({ cls: "rb-mobile-scale-cell" });
-		servingsCell.createDiv({ cls: "rb-label-caps", text: "Serves" });
+		servingsCell.createDiv({ cls: "rb-label-caps", text: translateUi("Serves") });
 		const servingsValue = servingsCell.createDiv({ cls: "rb-mobile-scale-value" });
 		const updateServings = (mult: number): void => {
 			const scaled = Math.round(servings * mult * 10) / 10;
@@ -310,7 +311,7 @@ function renderMobileNutritionStrip(
 ): void {
 	const strip = container.createDiv({
 		cls: "rb-mobile-nutrition-strip rb-mobile-nutrition-strip--editable",
-		attr: { role: "button", tabindex: "0", "aria-label": "Edit nutrition" },
+		attr: { role: "button", tabindex: "0", "aria-label": translateUi("Edit nutrition") },
 	});
 	for (const field of NUTRITION_FIELDS) {
 		const cell = strip.createDiv({ cls: "rb-mobile-nutrition-cell" });
@@ -433,7 +434,7 @@ export async function renderMobileLayout(
 	if (descriptionText) {
 		const descWrap = container.createDiv({ cls: "rb-mobile-desc" });
 		descWrap.createSpan({ cls: "rb-mobile-desc-text", text: descriptionText });
-		const moreLink = descWrap.createEl("a", { cls: "rb-mobile-desc-more", text: "More" });
+		const moreLink = descWrap.createEl("a", { cls: "rb-mobile-desc-more", text: translateUi("More") });
 		moreLink.addEventListener("click", () => {
 			activateTab(_panels, _tabs, _tabBar, 2);
 			// _panelsWrapper is set once tabs are built; scroll there so content is in view
@@ -472,8 +473,8 @@ export async function renderMobileLayout(
 	const tabBar = container.createDiv({ cls: "rb-tab-bar" });
 	_tabBar = tabBar;
 	const tabIngr = tabBar.createEl("button", { cls: "rb-tab-btn", text: "Ingredients" });
-	const tabSteps = tabBar.createEl("button", { cls: "rb-tab-btn", text: "Steps" });
-	const tabInfo = tabBar.createEl("button", { cls: "rb-tab-btn", text: "Info" });
+	const tabSteps = tabBar.createEl("button", { cls: "rb-tab-btn", text: translateUi("Steps") });
+	const tabInfo = tabBar.createEl("button", { cls: "rb-tab-btn", text: translateUi("Info") });
 
 	// All panels live inside this wrapper. display:grid with grid-area:1/1 makes them
 	// stack in the same cell so the wrapper height always equals the tallest panel.
@@ -489,7 +490,7 @@ export async function renderMobileLayout(
 
 	// 4th tab: cook history (icon-only to keep tab bar compact)
 	if (settings.cookHistoryEnabled) {
-		const tabHistory = tabBar.createEl("button", { cls: "rb-tab-btn rb-tab-btn--icon", attr: { "aria-label": "Cook history" } });
+		const tabHistory = tabBar.createEl("button", { cls: "rb-tab-btn rb-tab-btn--icon", attr: { "aria-label": translateUi("Cook history") } });
 		setIcon(tabHistory, "clock");
 		const panelHistory = panelsWrapper.createDiv({ cls: "rb-tab-panel" });
 		_panels.push(panelHistory);
@@ -588,3 +589,4 @@ export async function renderMobileLayout(
 	// Scope swipe to the panels wrapper so it doesn't fire on the header/action rows above
 	attachSwipeGesture(panelsWrapper, component, _panels, _tabs, tabBar);
 }
+

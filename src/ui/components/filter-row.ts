@@ -11,6 +11,7 @@
  * value inputs settle (blur or Enter) rather than on every keystroke -- see
  * `commitOnSettle`.
  */
+import { t as translateUi } from "../../i18n";
 import { setIcon } from "obsidian";
 import { FieldFilter, OPERATORS, FilterableType } from "../../discovery/filter-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
@@ -80,7 +81,7 @@ function buildValueInput(
 		const [lo, hi] = Array.isArray(filter.value) ? filter.value as [unknown, unknown] : [undefined, undefined];
 		const loInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
 		const hiInput = wrap.createEl("input", { cls: "rb-modal-input rb-filter-between-input", attr: { type: inputType } });
-		wrap.createSpan({ cls: "rb-filter-between-sep", text: "To" });
+		wrap.createSpan({ cls: "rb-filter-between-sep", text: translateUi("To") });
 		if (lo !== undefined && lo !== null) loInput.value = `${lo as string | number}`;
 		if (hi !== undefined && hi !== null) hiInput.value = `${hi as string | number}`;
 		if (focusKey) {
@@ -107,7 +108,7 @@ function buildValueInput(
 			filter.value = parseInt(input.value, 10) || 0;
 		});
 		commitOnSettle(input, onChange);
-		wrap.createSpan({ cls: "rb-filter-days-label", text: "Days" });
+		wrap.createSpan({ cls: "rb-filter-days-label", text: translateUi("Days") });
 		return;
 	}
 
@@ -135,7 +136,7 @@ function buildValueInput(
 
 		const input = wrap.createEl("input", {
 			cls: "rb-modal-input",
-			attr: { type: "text", placeholder: "Comma-separated values" },
+			attr: { type: "text", placeholder: translateUi("Comma-separated values") },
 		});
 		if (Array.isArray(filter.value)) input.value = (filter.value as string[]).join(", ");
 		if (focusKey) input.setAttribute("data-rb-focus-key", `${focusKey}-value`);

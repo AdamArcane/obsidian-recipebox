@@ -5,6 +5,7 @@
  * 12-column CSS grid (section 11.1) so there's one source of truth for column
  * math instead of nested flexbox rows.
  */
+import { t as translateUi } from "../../i18n";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { RecipeBoxSettings, DashboardActivityRangeWeeks } from "../../settings/settings-types";
 import { DashboardViewDeps } from "./dashboard-view-deps";
@@ -34,7 +35,7 @@ export class DashboardView extends ItemView {
 	}
 
 	getViewType(): string { return DASHBOARD_VIEW_TYPE; }
-	getDisplayText(): string { return "Dashboard"; }
+	getDisplayText(): string { return translateUi("Dashboard"); }
 	getIcon(): string { return "chef-hat"; }
 
 	async onOpen(): Promise<void> {
@@ -61,7 +62,7 @@ export class DashboardView extends ItemView {
 
 	private renderMealPlanCard(grid: HTMLElement, settings: RecipeBoxSettings): void {
 		const card = grid.createDiv({ cls: "rb-dashboard-card rb-dashboard-span-12" });
-		card.createDiv({ cls: "rb-dashboard-card-label", text: "Meal plan this week" });
+		card.createDiv({ cls: "rb-dashboard-card-label", text: translateUi("Meal plan this week") });
 
 		const mealPlan = this.deps.getMealPlan();
 		renderMealPlanMiniGrid(card, this.app, mealPlan, settings, {
@@ -72,18 +73,18 @@ export class DashboardView extends ItemView {
 
 		if (mealPlan.length === 0) {
 			const empty = card.createDiv({ cls: "rb-dashboard-empty-cta" });
-			empty.createSpan({ cls: "rb-dashboard-empty-text", text: "Your meal plan is empty." });
-			const planBtn = empty.createEl("button", { cls: "rb-dashboard-empty-cta-btn", text: "Plan a meal" });
+			empty.createSpan({ cls: "rb-dashboard-empty-text", text: translateUi("Your meal plan is empty.") });
+			const planBtn = empty.createEl("button", { cls: "rb-dashboard-empty-cta-btn", text: translateUi("Plan a meal") });
 			planBtn.addEventListener("click", () => this.deps.openSuggestMealModal());
 		}
 
-		const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: "View/edit meal plan →" });
+		const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: translateUi("View/edit meal plan →") });
 		footer.addEventListener("click", () => this.deps.openMealPlanView());
 	}
 
 	private renderEmptyVaultCard(grid: HTMLElement): void {
 		const card = grid.createDiv({ cls: "rb-dashboard-card rb-dashboard-span-8 rb-dashboard-empty-vault-cta" });
-		const btn = card.createEl("button", { cls: "rb-dashboard-empty-cta-btn", text: "Add your first recipe" });
+		const btn = card.createEl("button", { cls: "rb-dashboard-empty-cta-btn", text: translateUi("Add your first recipe") });
 		btn.addEventListener("click", () => this.deps.openImportModal());
 	}
 

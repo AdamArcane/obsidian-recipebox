@@ -2,6 +2,8 @@
  * Renders the seven-column week grid and the unscheduled queue column for
  * the meal plan view, wiring drag-drop, recipe picker, and meal type popover.
  */
+import { dayLabel, mealLabel } from "../utils/localized-labels";
+import { t as translateUi } from "../../i18n";
 import { App, setIcon } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
@@ -33,19 +35,19 @@ function renderCustomMealCard(container: HTMLElement, entry: MealPlanEntry, deps
 	setIcon(thumb, entry.isLeftovers ? "utensils-crossed" : "utensils");
 
 	const body = card.createDiv({ cls: "rb-mpv-card-body" });
-	body.createDiv({ cls: "rb-mpv-card-name", text: entry.label ?? "Custom meal" });
-	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: entry.meal });
-	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: "(Leftovers)" });
+	body.createDiv({ cls: "rb-mpv-card-name", text: entry.label ?? translateUi("Custom meal") });
+	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: mealLabel(entry.meal) });
+	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: translateUi("(Leftovers)") });
 
 	card.addEventListener("click", () => {
 		deps.openEditEntryModal(entry);
 	});
 
 	const actions = card.createDiv({ cls: "rb-mpv-card-actions" });
-	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: "Edit" } });
+	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: translateUi("Edit") } });
 	setIcon(editBtn, "pencil");
 	editBtn.addEventListener("click", (e) => { e.stopPropagation(); deps.openEditEntryModal(entry); });
-	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: "Remove" } });
+	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: translateUi("Remove") } });
 	setIcon(removeBtn, "trash-2");
 	removeBtn.addEventListener("click", (e) => { e.stopPropagation(); void deps.removeFromMealPlan(entry.id); });
 }
@@ -61,7 +63,7 @@ function renderColumn(
 	const colEl = container.createDiv({ cls: "rb-mpv-col" });
 
 	const header = colEl.createDiv({ cls: "rb-mpv-col-header" });
-	header.createSpan({ cls: "rb-mpv-col-day", text: label });
+	header.createSpan({ cls: "rb-mpv-col-day", text: dayLabel(label) });
 	header.createSpan({ cls: "rb-mpv-col-count", text: String(colEntries.length) });
 
 	const addBtn = header.createEl("button", { cls: "rb-mpv-col-add", attr: { title: `Add recipe to ${label}`, "aria-label": `Add recipe to ${label}` } });
@@ -78,7 +80,7 @@ function renderColumn(
 	const body = colEl.createDiv({ cls: "rb-mpv-col-body" });
 
 	if (colEntries.length === 0) {
-		body.createDiv({ cls: "rb-mpv-col-empty", text: "Drop a recipe here" });
+		body.createDiv({ cls: "rb-mpv-col-empty", text: translateUi("Drop a recipe here") });
 	} else {
 		for (const entry of colEntries) {
 			if (entry.recipePath) {
@@ -114,7 +116,7 @@ export function renderWeekGrid(
 
 	// Queue — full-width strip at top
 	const unscheduledEntries = entries.filter(e => !e.day || !KNOWN_DAY_KEYS.has(e.day.toLowerCase()));
-	renderColumn(grid, "Queue", unscheduledEntries, undefined, app, deps);
+	renderColumn(grid, translateUi("Queue"), unscheduledEntries, undefined, app, deps);
 
 	// Day columns — wrap naturally to available width
 	const daysRow = grid.createDiv({ cls: "rb-mpv-days-row" });

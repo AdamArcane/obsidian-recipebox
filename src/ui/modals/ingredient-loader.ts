@@ -2,6 +2,7 @@
  * Loads parsed ingredients from a recipe file and renders an interactive
  * checklist used by both the add-to-meal-plan and add-to-grocery modals.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap } from "../../types";
@@ -64,7 +65,7 @@ export function renderIngredientChecklist(
 	onToggle: (key: string, checked: boolean) => void,
 ): void {
 	if (items.length === 0) {
-		container.createEl("p", { cls: "rb-modal-empty", text: "No ingredients found in this recipe." });
+		container.createEl("p", { cls: "rb-modal-empty", text: translateUi("No ingredients found in this recipe.") });
 		return;
 	}
 
@@ -72,11 +73,11 @@ export function renderIngredientChecklist(
 
 	const selectAll = controls.createEl("button", { cls: "rb-modal-link-btn" });
 	setIcon(selectAll.createSpan({ cls: "rb-modal-link-btn-icon" }), "check-check");
-	selectAll.createSpan({ text: "Select all" });
+	selectAll.createSpan({ text: translateUi("Select all") });
 
 	const deselectAll = controls.createEl("button", { cls: "rb-modal-link-btn" });
 	setIcon(deselectAll.createSpan({ cls: "rb-modal-link-btn-icon" }), "square");
-	deselectAll.createSpan({ text: "Deselect all" });
+	deselectAll.createSpan({ text: translateUi("Deselect all") });
 
 	const list = container.createDiv({ cls: "rb-ingredient-checklist" });
 	const checkboxes: HTMLInputElement[] = [];

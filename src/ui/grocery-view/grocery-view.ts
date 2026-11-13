@@ -2,6 +2,7 @@
  * The grocery list view — an Obsidian ItemView that renders grouped items,
  * the meal-plan carousel, and the summary bar, re-rendering on every "change" event.
  */
+import { t as translateUi } from "../../i18n";
 import { ItemView, setIcon, WorkspaceLeaf } from "obsidian";
 import { GroceryViewDeps } from "./grocery-view-deps";
 import { renderHeaderActions } from "./header-actions";
@@ -27,7 +28,7 @@ export class GroceryView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return "Shopping assistant";
+		return translateUi("Shopping assistant");
 	}
 
 	getIcon(): string {
@@ -69,10 +70,10 @@ export class GroceryView extends ItemView {
 
 		if (items.length === 0) {
 			const empty = content.createDiv({ cls: "rb-gv-empty" });
-			empty.createEl("p", { text: "Your grocery list is empty." });
+			empty.createEl("p", { text: translateUi("Your grocery list is empty.") });
 			empty.createEl("p", {
 				cls: "rb-gv-empty-hint",
-				text: 'Add meals to your meal plan note to populate the list, or tap + to add items manually.',
+				text: translateUi('Add meals to your meal plan note to populate the list, or tap + to add items manually.'),
 			});
 			return;
 		}
@@ -84,7 +85,7 @@ export class GroceryView extends ItemView {
 
 		const checkToggle = aboveLeft.createEl("button", { cls: "rb-gv-link-btn" });
 		setIcon(checkToggle.createSpan({ cls: "rb-gv-link-btn-icon" }), allChecked ? "square" : "square-check");
-		checkToggle.createSpan({ text: allChecked ? "Uncheck all" : "Check all" });
+		checkToggle.createSpan({ text: allChecked ? translateUi("Uncheck all") : translateUi("Check all") });
 		checkToggle.addEventListener("click", () => {
 			void this.deps.setAllChecked(!allChecked);
 		});
@@ -93,7 +94,7 @@ export class GroceryView extends ItemView {
 
 		const addItemBtn = aboveList.createEl("button", { cls: "rb-gv-link-btn" });
 		setIcon(addItemBtn.createSpan({ cls: "rb-gv-link-btn-icon" }), "plus");
-		addItemBtn.createSpan({ text: "Add item" });
+		addItemBtn.createSpan({ text: translateUi("Add item") });
 		addItemBtn.addEventListener("click", () => this.deps.openAddGroceryItemModal());
 
 		const groups = buildDisplayGroups(items, mode);

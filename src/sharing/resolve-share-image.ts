@@ -27,6 +27,7 @@
  * any detectable source URL at all, treat its image as scraper-origin and
  * show attribution rather than guessing it's safe to omit.
  */
+import { t as translateUi } from "../i18n";
 import { App, TFile } from "obsidian";
 import { RecipeExportData } from "../recipe-export/recipe-export-data";
 import { findSourceUrl } from "./find-source-url";
@@ -119,7 +120,7 @@ function canvasToJpegBytes(canvas: HTMLCanvasElement, quality: number): Promise<
 async function encodeVaultImage(app: App, file: TFile): Promise<{ bytes: ArrayBuffer | null; omittedReason: string | null }> {
 	const mime = MIME_BY_EXTENSION[file.extension.toLowerCase()];
 	if (!mime) {
-		return { bytes: null, omittedReason: "This image format isn't supported for sharing, so the recipe was shared without an image." };
+		return { bytes: null, omittedReason: translateUi("This image format isn't supported for sharing, so the recipe was shared without an image.") };
 	}
 
 	let canvas: HTMLCanvasElement;
@@ -138,7 +139,7 @@ async function encodeVaultImage(app: App, file: TFile): Promise<{ bytes: ArrayBu
 		if (buf.byteLength <= IMAGE_BUDGET_BYTES) return { bytes: buf, omittedReason: null };
 	}
 
-	return { bytes: null, omittedReason: "The recipe's image was too large to include even after compression, so the recipe was shared without it." };
+	return { bytes: null, omittedReason: translateUi("The recipe's image was too large to include even after compression, so the recipe was shared without it.") };
 }
 
 export async function resolveShareImage(

@@ -2,21 +2,22 @@
  * Settings section for grocery list display — grouping mode and category
  * source selection.
  */
+import { t as translateUi } from "../../i18n";
 import { Setting } from "obsidian";
 import { GroupingMode, CategorySource, CategoryOverride } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 
 const GROUPING_OPTIONS: Record<GroupingMode, string> = {
-	category: "By category",
-	recipe: "By recipe",
-	source: "By source",
-	none: "No grouping",
+	category: translateUi("By category"),
+	recipe: translateUi("By recipe"),
+	source: translateUi("By source"),
+	none: translateUi("No grouping"),
 };
 
 const CATEGORY_SOURCE_OPTIONS: Record<CategorySource, string> = {
-	dictionary: "Built-in dictionary",
-	tag: "Recipe tags",
-	"tag-then-dictionary": "Tags, then dictionary",
+	dictionary: translateUi("Built-in dictionary"),
+	tag: translateUi("Recipe tags"),
+	"tag-then-dictionary": translateUi("Tags, then dictionary"),
 };
 
 export function renderSectionGroceryDisplay(
@@ -25,10 +26,10 @@ export function renderSectionGroceryDisplay(
 	save: () => Promise<void>,
 	rerender: () => void
 ): void {
-	new Setting(container).setName("Grocery list display").setHeading();
+	new Setting(container).setName(translateUi("Grocery list display")).setHeading();
 
 	new Setting(container)
-		.setName("Grouping mode")
+		.setName(translateUi("Grouping mode"))
 		.addDropdown((dd) =>
 			dd
 				.addOptions(GROUPING_OPTIONS)
@@ -40,7 +41,7 @@ export function renderSectionGroceryDisplay(
 		);
 
 	new Setting(container)
-		.setName("Category source")
+		.setName(translateUi("Category source"))
 		.addDropdown((dd) =>
 			dd
 				.addOptions(CATEGORY_SOURCE_OPTIONS)
@@ -52,7 +53,7 @@ export function renderSectionGroceryDisplay(
 		);
 
 	new Setting(container)
-		.setName("Auto-sort categories alphabetically")
+		.setName(translateUi("Auto-sort categories alphabetically"))
 		.addToggle((t) =>
 			t.setValue(settings.autoSortCategories).onChange(async (v) => {
 				settings.autoSortCategories = v;
@@ -66,7 +67,7 @@ export function renderSectionGroceryDisplay(
 	}
 
 	new Setting(container)
-		.setName("Auto-collapse completed sections")
+		.setName(translateUi("Auto-collapse completed sections"))
 		.addToggle((t) =>
 			t.setValue(settings.autoCollapseCompletedSections).onChange(async (v) => {
 				settings.autoCollapseCompletedSections = v;
@@ -83,8 +84,8 @@ function renderCategoryOrder(
 	save: () => Promise<void>
 ): void {
 	const setting = new Setting(container)
-		.setName("Category order")
-		.setDesc("Drag or use buttons to reorder.");
+		.setName(translateUi("Category order"))
+		.setDesc(translateUi("Drag or use buttons to reorder."));
 
 	const list = setting.settingEl.createDiv("rb-order-list");
 
@@ -122,8 +123,8 @@ function renderCategoryOverrides(
 	save: () => Promise<void>
 ): void {
 	const setting = new Setting(container)
-		.setName("Category overrides")
-		.setDesc("Map ingredient name substrings to specific categories.");
+		.setName(translateUi("Category overrides"))
+		.setDesc(translateUi("Map ingredient name substrings to specific categories."));
 
 	const list = setting.settingEl.createDiv("rb-override-list");
 
@@ -131,8 +132,8 @@ function renderCategoryOverrides(
 		list.empty();
 		settings.categoryOverrides.forEach((override: CategoryOverride, i: number) => {
 			const row = list.createDiv("rb-list-row");
-			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: "Ingredient substring" });
-			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: "Category" });
+			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: translateUi("Ingredient substring") });
+			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: translateUi("Category") });
 			const del = row.createEl("button", { text: "✕" });
 
 			matchInput.addEventListener("change", () => {
@@ -149,7 +150,7 @@ function renderCategoryOverrides(
 			});
 		});
 
-		const addBtn = list.createEl("button", { text: "+ add override" });
+		const addBtn = list.createEl("button", { text: translateUi("+ add override") });
 		addBtn.addEventListener("click", () => {
 			settings.categoryOverrides.push({ match: "", category: "" });
 			void save().then(() => render());

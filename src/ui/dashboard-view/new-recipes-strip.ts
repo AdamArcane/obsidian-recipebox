@@ -5,6 +5,7 @@
  * Wires the same lazy-image pass the gallery view uses so cards without a
  * frontmatter image still resolve one from the note body.
  */
+import { t as translateUi } from "../../i18n";
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { renderGalleryCard, GalleryCardHandle, GalleryCardActions } from "../gallery-view/gallery-card";
@@ -24,7 +25,7 @@ export function renderNewRecipesStrip(
 	isCancelled: () => boolean,
 ): void {
 	const card = container.createDiv({ cls: "rb-dashboard-card rb-dashboard-new-recipes rb-dashboard-span-8" });
-	card.createDiv({ cls: "rb-dashboard-card-label", text: "New recipes" });
+	card.createDiv({ cls: "rb-dashboard-card-label", text: translateUi("New recipes") });
 
 	const newest = [...files].sort((a, b) => b.stat.ctime - a.stat.ctime).slice(0, STRIP_RECIPE_LIMIT);
 
@@ -50,6 +51,6 @@ export function renderNewRecipesStrip(
 		);
 	}
 
-	const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: "Browse all recipes →" });
+	const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: translateUi("Browse all recipes →") });
 	footer.addEventListener("click", () => openGalleryView());
 }

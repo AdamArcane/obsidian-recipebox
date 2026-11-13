@@ -3,6 +3,7 @@
  * Toolbar order: group-by dropdown — export — clear grocery list.
  * "Add item" and "check all / uncheck all" live above the list, not here.
  */
+import { t as translateUi } from "../../i18n";
 import { Notice, setIcon } from "obsidian";
 import { GroupingMode } from "../../types";
 import { GroceryViewDeps } from "./grocery-view-deps";
@@ -10,10 +11,10 @@ import { ConfirmModal } from "../modals/confirm-modal";
 import { App } from "obsidian";
 
 const GROUPING_LABELS: Record<GroupingMode, string> = {
-	category: "Group by category",
-	recipe: "Group by recipe",
-	source: "Group by source",
-	none: "No grouping",
+	category: translateUi("Group by category"),
+	recipe: translateUi("Group by recipe"),
+	source: translateUi("Group by source"),
+	none: translateUi("No grouping"),
 };
 
 export function renderHeaderActions(
@@ -36,22 +37,22 @@ export function renderHeaderActions(
 		void deps.saveSettings().then(() => onRefresh());
 	});
 
-	const exportBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": "Export grocery list" } });
+	const exportBtn = bar.createDiv({ cls: "rb-gv-header-btn", attr: { "aria-label": translateUi("Export grocery list") } });
 	setIcon(exportBtn, "share");
 	exportBtn.addEventListener("click", () => deps.openExportModal());
 
-	const clearBtn = bar.createDiv({ cls: "rb-gv-header-btn rb-gv-header-btn--danger", attr: { "aria-label": "Clear grocery list" } });
+	const clearBtn = bar.createDiv({ cls: "rb-gv-header-btn rb-gv-header-btn--danger", attr: { "aria-label": translateUi("Clear grocery list") } });
 	setIcon(clearBtn, "trash-2");
 	clearBtn.addEventListener("click", () => {
 		new ConfirmModal(
 			app,
-			"Clear grocery list",
-			"This will remove all items from the grocery note. The meal plan is not affected.",
-			"Clear grocery list",
+			translateUi("Clear grocery list"),
+			translateUi("This will remove all items from the grocery note. The meal plan is not affected."),
+			translateUi("Clear grocery list"),
 			{
 				destructive: true,
 				onConfirm: () => {
-					void deps.clearGroceryOnly().then(() => new Notice("Grocery list cleared."));
+					void deps.clearGroceryOnly().then(() => new Notice(translateUi("Grocery list cleared.")));
 				},
 			},
 		).open();

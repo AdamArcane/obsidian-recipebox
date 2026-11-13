@@ -2,6 +2,7 @@
  * Shows a context menu for a manually-added grocery item, offering edit,
  * category override, and remove actions.
  */
+import { t as translateUi } from "../../i18n";
 import { Menu } from "obsidian";
 import { GroceryItemEntry } from "../../types";
 import { LongPressPosition } from "./long-press";
@@ -15,18 +16,18 @@ export function openGroceryItemContextMenu(
 	const menu = new Menu();
 
 	menu.addItem((menuItem) => {
-		menuItem.setTitle("Edit item…").setIcon("pencil");
+		menuItem.setTitle(translateUi("Edit item…")).setIcon("pencil");
 		menuItem.onClick(() => deps.openAddGroceryItemModal(item));
 	});
 
 	menu.addItem((menuItem) => {
-		menuItem.setTitle("Move to category…").setIcon("folder");
+		menuItem.setTitle(translateUi("Move to category…")).setIcon("folder");
 		menuItem.onClick(() => {
 			const sub = new Menu();
 			const categories = deps.getKnownCategories();
 
 			sub.addItem((autoItem) => {
-				autoItem.setTitle("Auto-detect").setChecked(!item.categoryOverride);
+				autoItem.setTitle(translateUi("Auto-detect")).setChecked(!item.categoryOverride);
 				autoItem.onClick(() =>
 					void deps.updateGroceryItem(item.id, { categoryOverride: null })
 				);
@@ -44,7 +45,7 @@ export function openGroceryItemContextMenu(
 			sub.addSeparator();
 
 			sub.addItem((newCatItem) => {
-				newCatItem.setTitle("New category…").setIcon("plus");
+				newCatItem.setTitle(translateUi("New category…")).setIcon("plus");
 				newCatItem.onClick(() => deps.openAddGroceryItemModal(item));
 			});
 
@@ -55,7 +56,7 @@ export function openGroceryItemContextMenu(
 	menu.addSeparator();
 
 	menu.addItem((removeItem) => {
-		removeItem.setTitle("Remove").setIcon("trash-2").setWarning(true);
+		removeItem.setTitle(translateUi("Remove")).setIcon("trash-2").setWarning(true);
 		removeItem.onClick(() => void deps.removeGroceryItem(item.id));
 	});
 

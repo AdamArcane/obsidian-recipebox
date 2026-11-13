@@ -3,6 +3,7 @@
  * Shows a search input; results include an optional custom-meal row at position 0
  * (when input is non-empty) followed by up to 7 fuzzy-matched recipe rows.
  */
+import { t as translateUi } from "../../i18n";
 import { App, TFile, prepareFuzzySearch, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { isRecipeFile } from "../../lifecycle/recipe-file-detection";
@@ -54,7 +55,7 @@ export class RecipePickerModal extends BaseModal {
 	renderBody(bodyEl: HTMLElement): void {
 		const input = bodyEl.createEl("input", {
 			cls: "rb-recipe-picker-input",
-			attr: { type: "text", placeholder: "Search recipes or enter a meal name..." },
+			attr: { type: "text", placeholder: translateUi("Search recipes or enter a meal name...") },
 		});
 
 		this.resultsEl = bodyEl.createDiv({ cls: "rb-recipe-picker-results" });
@@ -75,7 +76,7 @@ export class RecipePickerModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
 	}
 
@@ -101,7 +102,7 @@ export class RecipePickerModal extends BaseModal {
 			const thumb = customRow.createDiv({ cls: "rb-recipe-picker-thumb rb-recipe-picker-thumb--custom" });
 			setIcon(thumb, "utensils");
 			const text = customRow.createDiv({ cls: "rb-recipe-picker-text" });
-			text.createDiv({ cls: "rb-recipe-picker-name", text: `Add "${this.query}" as a custom meal` });
+			text.createDiv({ cls: "rb-recipe-picker-name", text: translateUi`Add "${this.query}" as a custom meal` });
 			customRow.addEventListener("mouseenter", () => this.setHighlight(0));
 			customRow.addEventListener("click", () => this.selectCustom());
 			this.rows.push(customRow);
