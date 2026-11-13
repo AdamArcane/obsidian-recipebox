@@ -553,10 +553,21 @@ export async function renderMobileLayout(
 	if (source) {
 		const urlRow = panelInfo.createDiv({ cls: "rb-info-url" });
 		urlRow.createSpan({ cls: "rb-info-url-label", text: "Source: " });
-		if (source.href) {
-			urlRow.createEl("a", { href: source.href, text: source.label, attr: { target: "_blank", rel: "noopener" } });
-		} else {
-			urlRow.createSpan({ text: source.label });
+		switch (source.kind) {
+			case "internal":
+				urlRow.createEl("a", {
+					cls: "internal-link",
+					href: source.linktext,
+					text: source.label,
+					attr: { "data-href": source.linktext },
+				});
+				break;
+			case "external":
+				urlRow.createEl("a", { href: source.href, text: source.label, attr: { target: "_blank", rel: "noopener" } });
+				break;
+			case "text":
+				urlRow.createSpan({ text: source.label });
+				break;
 		}
 	}
 

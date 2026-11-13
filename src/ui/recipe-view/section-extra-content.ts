@@ -8,6 +8,7 @@ import { CookHistoryModal } from "../modals/cook-history-modal";
 import { SectionContentModal } from "../modals/section-content-modal";
 import { ShareRecipeModal } from "../modals/share-recipe-modal";
 import { ShareStatus } from "../../sharing/share-status";
+import { renderWikilinksAsText } from "../../utils/wikilink-display";
 
 export interface TrailingSection {
 	heading: string;
@@ -86,7 +87,7 @@ export function renderExtraSectionsButtons(
 		const btn = sectionButtons.createEl("button", { cls: "rb-sidebar-btn" });
 		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
 		setIcon(iconSpan, "file-text");
-		btn.createSpan({ cls: "rb-sidebar-btn-label", text: section.heading });
+		btn.createSpan({ cls: "rb-sidebar-btn-label", text: renderWikilinksAsText(section.heading) });
 		btn.addEventListener("click", () => {
 			new SectionContentModal(app, section.heading, section.body, recipeFile.path, component, onEditSection).open();
 		});
