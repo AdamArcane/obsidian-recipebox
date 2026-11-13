@@ -3,6 +3,7 @@
  * form. Fields show/save the raw stored value -- never the multiplier- or
  * per-serving/total-scaled display value the banner shows.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Setting, TFile } from "obsidian";
 import { BaseModal, addFooterButtons } from "./modal-shell";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -28,14 +29,14 @@ export class NutritionEditModal extends BaseModal {
 		}
 	}
 
-	getTitle(): string { return "Edit nutrition"; }
+	getTitle(): string { return translateUi("Edit nutrition"); }
 	getContentClasses(): string[] { return ["rb-nutrition-edit-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		const basisLabel = this.settings.nutritionSource === "per-serving" ? "per serving" : "recipe total";
+		const basisLabel = this.settings.nutritionSource === "per-serving" ? translateUi("per serving") : translateUi("recipe total");
 		bodyEl.createDiv({
 			cls: "rb-modal-desc",
-			text: `Values are stored as ${basisLabel}, unscaled by the current multiplier.`,
+			text: translateUi`Values are stored as ${basisLabel}, unscaled by the current multiplier.`,
 		});
 
 		for (const field of NUTRITION_FIELDS) {
@@ -54,7 +55,7 @@ export class NutritionEditModal extends BaseModal {
 
 	renderFooter(footerEl: HTMLElement): void {
 		addFooterButtons(footerEl, {
-			confirmLabel: "Save",
+			confirmLabel: translateUi("Save"),
 			onCancel: () => this.close(),
 			onConfirm: () => {
 				void saveNutritionEdits(this.app, this.file, this.settings, this.draft).then(() => this.close());

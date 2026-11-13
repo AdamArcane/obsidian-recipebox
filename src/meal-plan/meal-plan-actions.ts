@@ -2,6 +2,7 @@
  * Stateless action functions for adding, removing, and rescheduling meal plan
  * entries — each function updates settings state, saves, and writes to the notes.
  */
+import { t as translateUi } from "../i18n";
 import { App, Notice } from "obsidian";
 import { ContributionMap, GroceryContributionSource, MealPlanEntry } from "../types";
 import { RecipeBoxSettings } from "../settings/settings-types";
@@ -63,7 +64,7 @@ export async function addToMealPlan(
 
 	const name = resolveRecipeName(app, recipePath);
 	const dayMeal = [entry.day, entry.meal].filter(Boolean).join(", ");
-	new Notice(dayMeal ? `${name} added to meal plan (${dayMeal})` : `${name} added to meal plan`);
+	new Notice(dayMeal ? translateUi`${name} added to meal plan (${dayMeal})` : translateUi`${name} added to meal plan`);
 }
 
 /** Creates a new independent entry without replacing any existing entry for the same recipe. Used by drag-drop in the meal plan view, and by multi-day placement (add-to-meal-plan-modal) which needs one entry per day rather than addToMealPlan's replace-by-recipe-path behavior. Returns the new entry ID. */
@@ -92,7 +93,7 @@ export async function addMealPlanEntry(
 
 	const name = resolveRecipeName(app, recipePath);
 	const dayLabel = entry.day ? ` (${entry.day})` : "";
-	new Notice(`${name} added to meal plan${dayLabel}`);
+	new Notice(translateUi`${name} added to meal plan${dayLabel}`);
 	return entry.id;
 }
 
@@ -128,7 +129,7 @@ export async function addCustomMealEntry(
 	const entry: MealPlanEntry = {
 		id: generateEntryId(),
 		recipePath: "",
-		label: label.trim() || "Custom meal",
+		label: label.trim() || translateUi("Custom meal"),
 		day: day?.trim() || undefined,
 		meal: meal?.trim() || undefined,
 		isLeftovers: isLeftovers || undefined,
@@ -227,7 +228,7 @@ export async function removeFromMealPlan(
 	await reverseContributions(app, entry, settings);
 
 	const name = entry.label ?? resolveRecipeName(app, entry.recipePath);
-	new Notice(`${name} removed from meal plan.`);
+	new Notice(translateUi`${name} removed from meal plan.`);
 }
 
 export async function clearMealPlan(

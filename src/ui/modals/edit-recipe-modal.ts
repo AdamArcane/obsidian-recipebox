@@ -4,6 +4,7 @@
  * Saving goes through recipe-edit/save-recipe-edits.ts (targeted writes), never
  * the note template, so nothing the user didn't touch is regenerated.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { loadRecipeForEdit } from "../../recipe-edit/load-recipe-for-edit";
@@ -29,7 +30,7 @@ export class EditRecipeModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Edit recipe"; }
+	getTitle(): string { return translateUi("Edit recipe"); }
 	getSubtitle(): string { return this.file.basename; }
 	getContentClasses(): string[] { return ["rb-import-modal"]; }
 
@@ -57,7 +58,7 @@ export class EditRecipeModal extends BaseModal {
 
 	renderFooter(footerEl: HTMLElement): void {
 		this.saveBtn = addFooterButtons(footerEl, {
-			confirmLabel: "Save changes",
+			confirmLabel: translateUi("Save changes"),
 			onCancel: () => this.close(),
 			onConfirm: () => { void this.save(); },
 		});
@@ -82,7 +83,7 @@ export class EditRecipeModal extends BaseModal {
 				if (this.uploaded?.uri !== img) {
 					const path = await downloadRecipeImage(this.app, img, this.file.basename, this.file.parent?.path ?? "", this.settings);
 					if (!path) {
-						form.showError("Could not save the uploaded image. Nothing was saved.");
+						form.showError(translateUi("Could not save the uploaded image. Nothing was saved."));
 						return;
 					}
 					this.uploaded = { uri: img, path };
@@ -91,17 +92,17 @@ export class EditRecipeModal extends BaseModal {
 			}
 			const result = await saveRecipeEdits(this.app, this.file, this.settings, built.request);
 			if (result.status === "conflict") {
-				form.showError("This recipe changed since the editor was opened. Nothing was saved.");
+				form.showError(translateUi("This recipe changed since the editor was opened. Nothing was saved."));
 				return;
 			}
 			if (result.renameSkipped) {
-				new Notice("Recipe saved, but the file was not renamed: a note with that name already exists.");
+				new Notice(translateUi("Recipe saved, but the file was not renamed: a note with that name already exists."));
 			} else {
-				new Notice("Recipe saved");
+				new Notice(translateUi("Recipe saved"));
 			}
 			this.close();
 		} catch (err) {
-			new Notice(`Failed to save recipe: ${err instanceof Error ? err.message : String(err)}`);
+			new Notice(translateUi`Failed to save recipe: ${err instanceof Error ? err.message : String(err)}`);
 		} finally {
 			if (this.saveBtn) this.saveBtn.disabled = false;
 		}

@@ -3,6 +3,7 @@
  * search, filters, and sort. Re-renders on metadataCache changes (favorite/
  * rating/cook-history edits made elsewhere) via GalleryViewDeps.subscribeToChanges.
  */
+import { t as translateUi } from "../../i18n";
 import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { GalleryViewDeps } from "./gallery-view-deps";
 import { GallerySavedState, RecipeBoxSettings } from "../../settings/settings-types";
@@ -61,7 +62,7 @@ export class GalleryView extends ItemView {
 	}
 
 	getViewType(): string { return GALLERY_VIEW_TYPE; }
-	getDisplayText(): string { return "Recipe gallery"; }
+	getDisplayText(): string { return translateUi("Recipe gallery"); }
 	getIcon(): string { return "layout-grid"; }
 
 	async onOpen(): Promise<void> {
@@ -165,7 +166,7 @@ export class GalleryView extends ItemView {
 		if (sorted.length === 0) {
 			content.createDiv({
 				cls: "rb-gallery-empty",
-				text: files.length === 0 ? "No recipes found in your recipe folders." : "No recipes match the current filters.",
+				text: files.length === 0 ? translateUi("No recipes found in your recipe folders.") : translateUi("No recipes match the current filters."),
 			});
 			return;
 		}

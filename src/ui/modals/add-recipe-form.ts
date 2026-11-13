@@ -4,6 +4,7 @@
  * URL/Text popups (quick-import-modal.ts) -- into the body/footer elements
  * supplied by BaseModal's shell.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";
@@ -87,9 +88,9 @@ export function renderAddRecipeForm(
 		}
 		new ConfirmModal(
 			app,
-			"Replace current recipe?",
-			"Importing will replace everything currently entered in this form.",
-			"Replace",
+			translateUi("Replace current recipe?"),
+			translateUi("Importing will replace everything currently entered in this form."),
+			translateUi("Replace"),
 			{ destructive: true, onConfirm: () => callbacks.onImported(imported, importWarning) },
 		).open();
 	}
@@ -97,14 +98,14 @@ export function renderAddRecipeForm(
 	const quickImportRow = bodyEl.createDiv({ cls: "rb-import-quick-row" });
 	const importUrlBtn = quickImportRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 	setIcon(importUrlBtn.createSpan({ cls: "rb-modal-btn-icon" }), "link");
-	importUrlBtn.createSpan({ text: "Import from URL" });
+	importUrlBtn.createSpan({ text: translateUi("Import from URL") });
 	importUrlBtn.addEventListener("click", () => {
 		new ImportFromUrlModal(app, (imported, importWarning) => applyImportedRecipe(imported, importWarning)).open();
 	});
 
 	const importTextBtn = quickImportRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 	setIcon(importTextBtn.createSpan({ cls: "rb-modal-btn-icon" }), "clipboard-paste");
-	importTextBtn.createSpan({ text: "Import from text" });
+	importTextBtn.createSpan({ text: translateUi("Import from text") });
 	importTextBtn.addEventListener("click", () => {
 		new ImportFromTextModal(app, (imported) => applyImportedRecipe(imported, null)).open();
 	});
@@ -119,14 +120,14 @@ export function renderAddRecipeForm(
 	// more than a glance away while editing the URL/vault path next to it.
 	const { left: titleImageLeft, preview: previewWrap } = titleImageRow(bodyEl);
 
-	textField(titleImageLeft, "Title", recipe.title, (v) => { recipe.title = v; });
+	textField(titleImageLeft, translateUi("Title"), recipe.title, (v) => { recipe.title = v; });
 	renderImageField(app, titleImageLeft, previewWrap, recipe.heroImage, (img) => { recipe.heroImage = img; });
 
 	// Destination folder -- stacked under Image in the same half-width
 	// column, not full-width. Changes report back up via onFolderChange so
 	// the value survives a full form re-render if an import lands.
 	const folderField = titleImageLeft.createDiv({ cls: "rb-import-field" });
-	folderField.createDiv({ cls: "rb-import-field-label", text: "Destination folder" });
+	folderField.createDiv({ cls: "rb-import-field-label", text: translateUi("Destination folder") });
 	const folderInput = folderField.createEl("input", {
 		cls: "rb-import-text-input",
 		attr: { type: "text", placeholder: "Recipes" },
@@ -139,7 +140,7 @@ export function renderAddRecipeForm(
 	new FolderSuggest(app, folderInput);
 
 	// Basic info: description, timing, servings.
-	const basicBody = importSection(bodyEl, "Basic info");
+	const basicBody = importSection(bodyEl, translateUi("Basic info"));
 	textareaField(basicBody, "Description", recipe.description, (v) => { recipe.description = v; }, "rb-import-textarea rb-import-textarea--auto");
 
 	renderTimingFields(
@@ -161,7 +162,7 @@ export function renderAddRecipeForm(
 	);
 
 	renderIngredientsEditor(app, importSection(bodyEl, "Ingredients"), recipe.ingredientGroups, settings, (groups) => { recipe.ingredientGroups = groups; });
-	renderStepsEditor(app, importSection(bodyEl, "Steps"), recipe.instructionGroups, (groups) => { recipe.instructionGroups = groups; });
+	renderStepsEditor(app, importSection(bodyEl, translateUi("Steps")), recipe.instructionGroups, (groups) => { recipe.instructionGroups = groups; });
 
 	// Notes: still free text -- there's no fixed shape to a note the way there
 	// is to an ingredient or a step, so a structured form wouldn't fit.
@@ -173,7 +174,7 @@ export function renderAddRecipeForm(
 
 	renderNutritionFields(
 		importSection(bodyEl, "Nutrition"),
-		"Nutrition (per serving)",
+		translateUi("Nutrition (per serving)"),
 		{
 			cal: recipe.calories !== null ? String(recipe.calories) : "",
 			prot: recipe.protein !== null ? String(recipe.protein) : "",
@@ -189,14 +190,14 @@ export function renderAddRecipeForm(
 	);
 
 	// Cancel first, then Save (spec section 55)
-	footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+	footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 		.addEventListener("click", callbacks.onCancel);
 
-	const saveBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Save recipe" });
+	const saveBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Save recipe") });
 	saveBtn.addEventListener("click", () => { void (async () => {
-		if (!recipe.title.trim()) recipe.title = "Untitled recipe";
+		if (!recipe.title.trim()) recipe.title = translateUi("Untitled recipe");
 		saveBtn.disabled = true;
-		saveBtn.setText("Saving…");
+		saveBtn.setText(translateUi("Saving…"));
 		try {
 			await saveRecipe(
 				app,
@@ -206,9 +207,9 @@ export function renderAddRecipeForm(
 				(path, proceed) => {
 					new ConfirmModal(
 						app,
-						"Overwrite existing file?",
-						`A note already exists at "${path}". Replace it?`,
-						"Overwrite",
+						translateUi("Overwrite existing file?"),
+						translateUi`A note already exists at "${path}". Replace it?`,
+						translateUi("Overwrite"),
 						{ destructive: true, onConfirm: () => void proceed() },
 					).open();
 				},
@@ -216,7 +217,7 @@ export function renderAddRecipeForm(
 			);
 		} finally {
 			saveBtn.disabled = false;
-			saveBtn.setText("Save recipe");
+			saveBtn.setText(translateUi("Save recipe"));
 		}
 	})(); });
 }

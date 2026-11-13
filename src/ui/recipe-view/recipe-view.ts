@@ -2,6 +2,7 @@
  * The recipe view — an Obsidian TextFileView that renders a recipe note as a
  * structured cooking card with ingredients, instructions, metadata, and timers.
  */
+import { t as translateUi } from "../../i18n";
 import { EventRef, HoverParent, HoverPopover, Menu, Notice, setIcon, TextFileView, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeViewDeps } from "./recipe-view-deps";
 import { stripFrontmatter } from "../../parser/recipe-frontmatter-strip";
@@ -79,18 +80,18 @@ export class RecipeView extends TextFileView implements HoverParent {
 		});
 		// Cook mode sits left of the pencil so it's easy to reach while cooking.
 		// sun-dim = off (screen may sleep), sun = on (screen stays awake).
-		this.cookModeActionEl = this.addAction("sun-dim", "Cook mode: off", () => {
+		this.cookModeActionEl = this.addAction("sun-dim", translateUi("Cook mode: off"), () => {
 			void this.toggleCookMode();
 		});
 
-		this.addAction("pencil", "Edit as Markdown", () => {
+		this.addAction("pencil", translateUi("Edit as Markdown"), () => {
 			if (this.file) this.deps.editAsMarkdown(this.file.path);
 		});
 
 		// Structured editor; sits right after the Markdown pencil, which stays as-is.
-		this.addAction("file-pen", "Edit recipe", () => this.openEditRecipe());
+		this.addAction("file-pen", translateUi("Edit recipe"), () => this.openEditRecipe());
 
-		this.shareActionEl = this.addAction("share-2", "Share recipe", () => {
+		this.shareActionEl = this.addAction("share-2", translateUi("Share recipe"), () => {
 			if (this.file) {
 				new ShareRecipeModal(this.app, this.file, this.deps.getSettings(), this.deps.saveSettings).open();
 			}
@@ -149,7 +150,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 
 			if (settings.cookHistoryEnabled) {
 				menu.addItem(item =>
-					item.setTitle("Cook history")
+					item.setTitle(translateUi("Cook history"))
 						.setIcon("clock")
 						.onClick(() => new CookHistoryModal(this.app, file, settings).open())
 				);
@@ -158,7 +159,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 			const planEntries = this.deps.getMealPlan().filter(e => e.recipePath === file.path);
 			const inPlan = planEntries.length > 0;
 			menu.addItem(item =>
-				item.setTitle(inPlan ? "Remove from meal plan" : "Add to meal plan")
+				item.setTitle(inPlan ? translateUi("Remove from meal plan") : translateUi("Add to meal plan"))
 					.setIcon(inPlan ? "calendar-x-2" : "calendar-plus")
 					.onClick(() => {
 						if (inPlan) {
@@ -172,25 +173,25 @@ export class RecipeView extends TextFileView implements HoverParent {
 			);
 
 			menu.addItem(item =>
-				item.setTitle("Edit recipe")
+				item.setTitle(translateUi("Edit recipe"))
 					.setIcon("file-pen")
 					.onClick(() => this.openEditRecipe())
 			);
 
 			menu.addItem(item =>
-				item.setTitle("Open as Markdown")
+				item.setTitle(translateUi("Open as Markdown"))
 					.setIcon("pencil")
 					.onClick(() => this.deps.editAsMarkdown(file.path))
 			);
 
 			menu.addItem(item =>
-				item.setTitle("Export recipe")
+				item.setTitle(translateUi("Export recipe"))
 					.setIcon("download")
 					.onClick(() => new RecipeExportModal(this.app, file, settings).open())
 			);
 
 			menu.addItem(item =>
-				item.setTitle("Share recipe")
+				item.setTitle(translateUi("Share recipe"))
 					.setIcon("share-2")
 					.onClick(() => new ShareRecipeModal(this.app, file, settings, this.deps.saveSettings).open())
 			);
@@ -209,17 +210,17 @@ export class RecipeView extends TextFileView implements HoverParent {
 		this.cookModeActive = !this.cookModeActive;
 		if (this.cookModeActive) {
 			await this.requestWakeLock();
-			new Notice("Cook mode on · screen will stay awake");
+			new Notice(translateUi("Cook mode on · screen will stay awake"));
 		} else {
 			this.releaseWakeLock();
-			new Notice("Cook mode off");
+			new Notice(translateUi("Cook mode off"));
 		}
 		this.updateCookModeButton();
 	}
 
 	private async requestWakeLock(): Promise<void> {
 		if (!("wakeLock" in navigator)) {
-			new Notice("Screen wake lock is not supported on this device.");
+			new Notice(translateUi("Screen wake lock is not supported on this device."));
 			return;
 		}
 		try {
@@ -230,7 +231,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 				this.updateCookModeButton();
 			});
 		} catch {
-			new Notice("Could not activate screen wake lock.");
+			new Notice(translateUi("Could not activate screen wake lock."));
 			this.cookModeActive = false;
 		}
 	}
@@ -243,7 +244,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 	private updateCookModeButton(): void {
 		if (!this.cookModeActionEl) return;
 		setIcon(this.cookModeActionEl, this.cookModeActive ? "sun" : "sun-dim");
-		this.cookModeActionEl.setAttribute("aria-label", this.cookModeActive ? "Cook mode: on" : "Cook mode: off");
+		this.cookModeActionEl.setAttribute("aria-label", this.cookModeActive ? translateUi("Cook mode: on") : translateUi("Cook mode: off"));
 		this.cookModeActionEl.toggleClass("rb-cook-mode-active", this.cookModeActive);
 	}
 
@@ -258,7 +259,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 		// setIcon(this.shareActionEl, isShared ? "link-2" : "share-2");
 		this.shareActionEl.setAttribute(
 			"aria-label",
-			isShared ? `Recipe shared · expires in ${status.daysLeft} day${status.daysLeft === 1 ? "" : "s"}` : "Share recipe",
+			isShared ? translateUi`Recipe shared · expires in ${status.daysLeft} day${status.daysLeft === 1 ? "" : "s"}` : translateUi("Share recipe"),
 		);
 		this.shareActionEl.toggleClass("rb-share-active", isShared);
 	}
@@ -291,7 +292,7 @@ export class RecipeView extends TextFileView implements HoverParent {
 			const warning = wrap.createDiv({ cls: "rb-allergen-warning" });
 			const warnIcon = warning.createSpan();
 			setIcon(warnIcon, "alert-triangle");
-			warning.createSpan({ text: `Contains: ${allergenMatches.join(", ")}` });
+			warning.createSpan({ text: translateUi`Contains: ${allergenMatches.join(", ")}` });
 		}
 
 		const renderLayout = getRecipeLayoutRenderer(layoutId);

@@ -4,6 +4,7 @@
  * chosen per-run from the suggester modal itself, not configured here.
  * The old global "Exclusion window" setting lives in each mode's filters now.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import type { SuggesterMode } from "../../suggester/strategy-types";
@@ -23,7 +24,7 @@ export function renderSectionSuggester(
 	// Modes list lives inside a single Setting, matching the badge-list pattern
 	const modesSetting = new Setting(container)
 		.setName("Modes")
-		.setDesc("Each mode is an independent set of filters and scoring rules. Built-in modes can be edited but not deleted.");
+		.setDesc(translateUi("Each mode is an independent set of filters and scoring rules. Built-in modes can be edited but not deleted."));
 	modesSetting.settingEl.addClass("rb-modes-setting");
 
 	const listEl = modesSetting.settingEl.createDiv({ cls: "rb-strategies-list" });
@@ -31,10 +32,10 @@ export function renderSectionSuggester(
 
 	const footer = modesSetting.settingEl.createDiv({ cls: "rb-modes-footer" });
 
-	footer.createEl("button", { text: "+ new mode" }).addEventListener("click", () => {
+	footer.createEl("button", { text: translateUi("+ new mode") }).addEventListener("click", () => {
 		const newMode: SuggesterMode = {
 			id: `mode-${Date.now()}`,
-			name: "New mode",
+			name: translateUi("New mode"),
 			isBuiltin: false,
 			isDefault: false,
 			filters: [],
@@ -53,12 +54,12 @@ export function renderSectionSuggester(
 
 	// Reset all modes — destructive: removes custom modes and resets built-ins.
 	// Uses the confirm modal because this can permanently delete user-created content.
-	footer.createEl("button", { text: "Reset to defaults" }).addEventListener("click", () => {
+	footer.createEl("button", { text: translateUi("Reset to defaults") }).addEventListener("click", () => {
 		new ConfirmModal(
 			app,
-			"Reset all modes?",
-			"This restores every built-in mode to its shipped defaults and permanently deletes all custom modes you have created. This cannot be undone.",
-			"Reset all modes",
+			translateUi("Reset all modes?"),
+			translateUi("This restores every built-in mode to its shipped defaults and permanently deletes all custom modes you have created. This cannot be undone."),
+			translateUi("Reset all modes"),
 			{
 				destructive: true,
 				onConfirm: () => {
@@ -128,7 +129,7 @@ function renderModeRow(
 	// Edit
 	const editBtn = row.createEl("button", { cls: "rb-strategy-action-btn" });
 	setIcon(editBtn.createSpan(), "pencil");
-	editBtn.setAttribute("aria-label", "Edit");
+	editBtn.setAttribute("aria-label", translateUi("Edit"));
 	editBtn.addEventListener("click", () => {
 		new ModeEditorModal(app, mode, {
 			getDiscovery,
@@ -153,12 +154,12 @@ function renderModeRow(
 	// Duplicate
 	const dupBtn = row.createEl("button", { cls: "rb-strategy-action-btn" });
 	setIcon(dupBtn.createSpan(), "copy");
-	dupBtn.setAttribute("aria-label", "Duplicate");
+	dupBtn.setAttribute("aria-label", translateUi("Duplicate"));
 	dupBtn.addEventListener("click", () => {
 		const copy: SuggesterMode = {
 			...mode,
 			id: `mode-${Date.now()}`,
-			name: `${mode.name} (copy)`,
+			name: translateUi`${mode.name} (copy)`,
 			isBuiltin: false,
 			isDefault: false,
 			filters: mode.filters.map(f => ({ ...f })),
@@ -172,7 +173,7 @@ function renderModeRow(
 	if (!mode.isBuiltin) {
 		const delBtn = row.createEl("button", { cls: "rb-strategy-action-btn rb-strategy-action-btn--delete" });
 		setIcon(delBtn.createSpan(), "trash-2");
-		delBtn.setAttribute("aria-label", "Delete");
+		delBtn.setAttribute("aria-label", translateUi("Delete"));
 		delBtn.addEventListener("click", () => {
 			settings.suggesterModes = settings.suggesterModes.filter(m => m.id !== mode.id);
 			void save().then(rerender);

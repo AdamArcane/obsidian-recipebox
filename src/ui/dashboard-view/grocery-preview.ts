@@ -3,6 +3,7 @@
  * order the real grocery view uses, so this preview never disagrees with
  * what the user sees when they click through. See dashboard-spec.md section 5.
  */
+import { t as translateUi } from "../../i18n";
 import { GroceryItem } from "../../types";
 import { buildDisplayGroups } from "../grocery-view/display-groups";
 import { toTitleCase } from "../../utils/text-case";
@@ -20,11 +21,11 @@ export function renderGroceryPreview(
 	actions: GroceryPreviewActions,
 ): void {
 	const card = container.createDiv({ cls: "rb-dashboard-card rb-dashboard-grocery-preview rb-dashboard-span-4" });
-	card.createDiv({ cls: "rb-dashboard-card-label", text: "Grocery list" });
+	card.createDiv({ cls: "rb-dashboard-card-label", text: translateUi("Grocery list") });
 
 	const unchecked = items.filter((i) => !i.checked);
 	if (unchecked.length === 0) {
-		card.createDiv({ cls: "rb-dashboard-empty-text", text: "Grocery list is empty." });
+		card.createDiv({ cls: "rb-dashboard-empty-text", text: translateUi("Grocery list is empty.") });
 	} else {
 		const ordered = buildDisplayGroups(unchecked, "category").flatMap((g) => g.items);
 		const shown = ordered.slice(0, PREVIEW_ITEM_LIMIT);
@@ -37,9 +38,9 @@ export function renderGroceryPreview(
 			checkbox.addEventListener("change", () => actions.toggleChecked(item.key, checkbox.checked));
 			row.createSpan({ cls: "rb-dashboard-grocery-name", text: toTitleCase(item.name) });
 		}
-		if (remaining > 0) list.createDiv({ cls: "rb-dashboard-grocery-more", text: `+${remaining} more` });
+		if (remaining > 0) list.createDiv({ cls: "rb-dashboard-grocery-more", text: translateUi`+${remaining} more` });
 	}
 
-	const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: "View grocery list →" });
+	const footer = card.createEl("button", { cls: "rb-dashboard-footer-btn", text: translateUi("View grocery list →") });
 	footer.addEventListener("click", () => actions.openGroceryView());
 }

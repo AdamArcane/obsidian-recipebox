@@ -2,6 +2,7 @@
  * Shared field-picker button used in the mode editor and badge edit modal.
  * Opens an Obsidian Menu so each field entry can carry a type icon.
  */
+import { t as translateUi } from "../../i18n";
 import { Menu, setIcon } from "obsidian";
 import { FilterableType } from "../../discovery/filter-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
@@ -77,7 +78,7 @@ export function buildFieldPickerBtn(
 			nameSpan.textContent = match.key;
 		} else {
 			iconSpan.empty();
-			nameSpan.textContent = val || "-- field --";
+			nameSpan.textContent = val || translateUi("-- field --");
 		}
 	};
 
@@ -85,7 +86,7 @@ export function buildFieldPickerBtn(
 
 	btn.addEventListener("click", (e) => {
 		const menu = new Menu();
-		menu.addItem(item => item.setTitle("-- field --").onClick(() => {
+		menu.addItem(item => item.setTitle(translateUi("-- field --")).onClick(() => {
 			onChange("");
 			updateDisplay("");
 		}));

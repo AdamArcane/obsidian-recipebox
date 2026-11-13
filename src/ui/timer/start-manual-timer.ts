@@ -4,6 +4,7 @@
  * This is distinct from the inline duration-detection flow in
  * timer-dom-process.ts, which parses durations out of rendered instruction text.
  */
+import { t as translateUi } from "../../i18n";
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { isRecipeFile } from "../../lifecycle/recipe-file-detection";
@@ -24,7 +25,7 @@ export function startManualTimer(app: App, settings: RecipeBoxSettings, seconds:
 		autoStart: true,
 		compactByDefault: settings.timerCompactDisplay,
 		rangeDefault: settings.timerRangeDefault,
-		recipeName: linkedRecipe ? linkedRecipe.basename : "Timer",
+		recipeName: linkedRecipe ? linkedRecipe.basename : translateUi("Timer"),
 		onNavigate: () => {
 			if (linkedRecipe) void findOrOpenLeaf(app, RECIPE_VIEW_TYPE, linkedRecipe.path);
 		},

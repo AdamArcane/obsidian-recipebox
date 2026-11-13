@@ -8,6 +8,7 @@
  *  formula     -> "Edit badge: {name}" title, formula + label/icon/color
  *  regular     -> "Edit badge: {name}" title, property/prefix/suffix/split + label/icon/color
  */
+import { t as translateUi } from "../../i18n";
 import { App, Setting, setIcon } from "obsidian";
 import { CustomBadge, BadgeColor } from "../../types";
 import { BaseModal } from "./modal-shell";
@@ -17,12 +18,12 @@ import { buildFieldPickerBtn, buildPickerFieldList } from "../components/field-p
 import { propertyToLabel } from "../../utils/property-label";
 
 const COLOR_OPTIONS: Record<BadgeColor, string> = {
-	default: "Default",
-	green: "Green",
-	blue: "Blue",
-	purple: "Purple",
-	yellow: "Yellow",
-	red: "Red",
+	default: translateUi("Default"),
+	green: translateUi("Green"),
+	blue: translateUi("Blue"),
+	purple: translateUi("Purple"),
+	yellow: translateUi("Yellow"),
+	red: translateUi("Red"),
 };
 
 export class BadgeEditModal extends BaseModal {
@@ -45,7 +46,7 @@ export class BadgeEditModal extends BaseModal {
 	}
 
 	getTitle(): string {
-		return this.isNew ? "Add badge" : `Edit badge: ${this.draft.label || this.draft.property}`;
+		return this.isNew ? translateUi("Add badge") : translateUi`Edit badge: ${this.draft.label || this.draft.property}`;
 	}
 	getContentClasses(): string[] { return ["rb-badge-edit-modal"]; }
 
@@ -76,20 +77,20 @@ export class BadgeEditModal extends BaseModal {
 				this.renderFormulaSection(body);
 			} else {
 				new Setting(body)
-					.setName("Property")
-					.setDesc("Frontmatter key to read from the recipe note.")
+					.setName(translateUi("Property"))
+					.setDesc(translateUi("Frontmatter key to read from the recipe note."))
 					.addText((t) =>
 						t
 							.setValue(this.draft.property)
-							.setPlaceholder("E.g. Preptime")
+							.setPlaceholder(translateUi("E.g. Preptime"))
 							.onChange((v) => { this.draft.property = v; }),
 					);
 			}
 			this.renderLabelSection(body);
 		} else {
 			new Setting(body)
-				.setName("Use formula")
-				.setDesc("Replace property lookup with a custom JavaScript expression.")
+				.setName(translateUi("Use formula"))
+				.setDesc(translateUi("Replace property lookup with a custom JavaScript expression."))
 				.addToggle((t) =>
 					t.setValue(this.useFormula).onChange((v) => {
 						this.useFormula = v;
@@ -109,9 +110,9 @@ export class BadgeEditModal extends BaseModal {
 	}
 
 	private rebuildButtons(footer: HTMLElement): void {
-		footer.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footer.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
-		footer.createEl("button", { cls: "mod-cta", text: "Save" })
+		footer.createEl("button", { cls: "mod-cta", text: translateUi("Save") })
 			.addEventListener("click", () => {
 				this.onSave({ ...this.draft });
 				this.close();
@@ -120,9 +121,9 @@ export class BadgeEditModal extends BaseModal {
 
 	private renderFormulaSection(body: HTMLElement): void {
 		new Setting(body)
-			.setName("Formula")
+			.setName(translateUi("Formula"))
 			.setDesc(
-				"Simple arithmetic expression using frontmatter properties as variables: + - * /, parentheses, and || as a fallback for missing values (ex: prepTime || 0)."
+				translateUi("Simple arithmetic expression using frontmatter properties as variables: + - * /, parentheses, and || as a fallback for missing values (ex: prepTime || 0).")
 			)
 			.addTextArea((t) =>
 				t
@@ -140,8 +141,8 @@ export class BadgeEditModal extends BaseModal {
 		const selectedField = fields.find(f => f.key === this.draft.property);
 
 		const propSetting = new Setting(body)
-			.setName("Property")
-			.setDesc("Frontmatter key to read from the recipe note.");
+			.setName(translateUi("Property"))
+			.setDesc(translateUi("Frontmatter key to read from the recipe note."));
 
 		if (fields.length > 0) {
 			propSetting.settingEl.createDiv({ cls: "rb-badge-prop-picker" }, (el) => {
@@ -157,30 +158,30 @@ export class BadgeEditModal extends BaseModal {
 		} else {
 			// No discovery available -- fall back to text input.
 			propSetting.addText((t) =>
-				t.setValue(this.draft.property).setPlaceholder("E.g. Cuisine")
+				t.setValue(this.draft.property).setPlaceholder(translateUi("E.g. Cuisine"))
 					.onChange((v) => { this.draft.property = v; }),
 			);
 		}
 
 		new Setting(body)
-			.setName("Prefix")
-			.setDesc('Text prepended to the value, e.g. "$".')
+			.setName(translateUi("Prefix"))
+			.setDesc(translateUi('Text prepended to the value, e.g. "$".'))
 			.addText((t) =>
 				t
 					.setValue(this.draft.prefix ?? "")
-					.setPlaceholder("Ex. $")
+					.setPlaceholder(translateUi("Ex. $"))
 					.onChange((v) => {
 						this.draft.prefix = v || undefined;
 					}),
 			);
 
 		new Setting(body)
-			.setName("Suffix")
-			.setDesc('Text appended to the value, e.g. " kcal" or " min".')
+			.setName(translateUi("Suffix"))
+			.setDesc(translateUi('Text appended to the value, e.g. " kcal" or " min".'))
 			.addText((t) =>
 				t
 					.setValue(this.draft.suffix ?? "")
-					.setPlaceholder("Ex. Kcal")
+					.setPlaceholder(translateUi("Ex. Kcal"))
 					.onChange((v) => {
 						this.draft.suffix = v || undefined;
 					}),
@@ -191,9 +192,9 @@ export class BadgeEditModal extends BaseModal {
 		const showSplitArray = !selectedField || selectedField.hasArrayValues;
 		if (showSplitArray) {
 			new Setting(body)
-				.setName("Split array")
+				.setName(translateUi("Split array"))
 				.setDesc(
-					"When the property is a list, show one badge per item instead of a single comma-joined badge.",
+					translateUi("When the property is a list, show one badge per item instead of a single comma-joined badge."),
 				)
 				.addToggle((t) =>
 					t.setValue(this.draft.splitArray).onChange((v) => {
@@ -205,8 +206,8 @@ export class BadgeEditModal extends BaseModal {
 
 	private renderLabelSection(body: HTMLElement): void {
 		new Setting(body)
-			.setName("Show label")
-			.setDesc("When off, only the value is shown with no label text.")
+			.setName(translateUi("Show label"))
+			.setDesc(translateUi("When off, only the value is shown with no label text."))
 			.addToggle((t) =>
 				t.setValue(!(this.draft.hideLabel ?? false)).onChange((v) => {
 					this.draft.hideLabel = !v;
@@ -216,8 +217,8 @@ export class BadgeEditModal extends BaseModal {
 
 		if (!this.draft.hideLabel) {
 			new Setting(body)
-				.setName("Label")
-				.setDesc("Display label shown in the badge.")
+				.setName(translateUi("Label"))
+				.setDesc(translateUi("Display label shown in the badge."))
 				.addText((t) =>
 					t
 						.setValue(this.draft.label)
@@ -230,11 +231,11 @@ export class BadgeEditModal extends BaseModal {
 		}
 
 		new Setting(body)
-			.setName("Icon")
-			.setDesc("Lucide icon name shown inside the badge. Leave blank for no icon.")
+			.setName(translateUi("Icon"))
+			.setDesc(translateUi("Lucide icon name shown inside the badge. Leave blank for no icon."))
 			.addText((t) => {
 				t.setValue(this.draft.icon ?? "")
-					.setPlaceholder("Ex. Tag, globe, bookmark")
+					.setPlaceholder(translateUi("Ex. Tag, globe, bookmark"))
 					.onChange((v) => {
 						this.draft.icon = v.trim() || undefined;
 					});
@@ -253,7 +254,7 @@ export class BadgeEditModal extends BaseModal {
 			});
 
 		new Setting(body)
-			.setName("Color")
+			.setName(translateUi("Color"))
 			.addDropdown((dd) =>
 				dd
 					.addOptions(COLOR_OPTIONS)

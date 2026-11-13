@@ -4,6 +4,7 @@
  * sequential import with progress, Stop, and a per-recipe summary. Distinct
  * from the Add Recipe modal because bulk import has no per-recipe review step.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice } from "obsidian";
 import type { RecipeBoxSettings } from "../../settings/settings-types";
 import { prepareImport, type PreparedImport } from "../../importer/file-import/file-import-prepare";
@@ -31,19 +32,19 @@ export class ImportFilesModal extends BaseModal {
 		this.folder = resolveDestinationFolder(settings);
 	}
 
-	getTitle(): string { return "Import recipes from file"; }
-	getSubtitle(): string { return "Mealie, Nextcloud Cookbook, or any schema.org Recipe JSON."; }
+	getTitle(): string { return translateUi("Import recipes from file"); }
+	getSubtitle(): string { return translateUi("Mealie, Nextcloud Cookbook, or any schema.org Recipe JSON."); }
 	getContentClasses(): string[] { return ["rb-import-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "Files" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("Files") });
 		const fileInput = bodyEl.createEl("input", {
 			cls: "rb-import-text-input",
 			attr: { type: "file", multiple: "", accept: ".json,.zip" },
 		});
 		fileInput.addEventListener("change", () => void this.onFilesPicked(Array.from(fileInput.files ?? [])));
 
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "Destination folder" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("Destination folder") });
 		const folderInput = bodyEl.createEl("input", {
 			cls: "rb-import-text-input",
 			attr: { type: "text", placeholder: "Recipes" },
@@ -52,23 +53,23 @@ export class ImportFilesModal extends BaseModal {
 		folderInput.addEventListener("input", () => { this.folder = folderInput.value; });
 		new FolderSuggest(this.app, folderInput);
 
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "If a note already exists" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("If a note already exists") });
 		const group = bodyEl.createDiv({ cls: "rb-modal-radio-group" });
-		this.renderPolicyOption(group, "skip", "Skip it");
-		this.renderPolicyOption(group, "keep-both", "Keep both (add a number to the new note)");
+		this.renderPolicyOption(group, "skip", translateUi("Skip it"));
+		this.renderPolicyOption(group, "keep-both", translateUi("Keep both (add a number to the new note)"));
 
 		this.statusEl = bodyEl.createDiv({ cls: "rb-import-file-status" });
 		this.summaryEl = bodyEl.createDiv({ cls: "rb-import-file-summary" });
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		this.cancelBtn = footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: "Cancel" });
+		this.cancelBtn = footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: translateUi("Cancel") });
 		this.cancelBtn.addEventListener("click", () => {
 			// While running this is "Stop": finish the current recipe, keep what is written.
 			if (this.running) { this.stopRequested = true; this.cancelBtn.disabled = true; }
 			else this.close();
 		});
-		this.importBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
+		this.importBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Import") });
 		this.importBtn.disabled = true;
 		this.importBtn.addEventListener("click", () => void this.start());
 	}
@@ -85,10 +86,10 @@ export class ImportFilesModal extends BaseModal {
 		this.summaryEl.empty();
 		this.prepared = null;
 		this.importBtn.disabled = true;
-		this.importBtn.setText("Import");
+		this.importBtn.setText(translateUi("Import"));
 		if (files.length === 0) { this.statusEl.setText(""); return; }
 
-		this.statusEl.setText("Reading files…");
+		this.statusEl.setText(translateUi("Reading files…"));
 		const prepared = await prepareImport(files);
 		this.prepared = prepared;
 
@@ -99,7 +100,7 @@ export class ImportFilesModal extends BaseModal {
 		);
 		this.renderNotes(prepared.warnings, prepared.problems.map(p => `${p.label}: ${p.reason}`));
 		if (found > 0) {
-			this.importBtn.setText(`Import ${found} recipe${found === 1 ? "" : "s"}`);
+			this.importBtn.setText(translateUi`Import ${found} recipe${found === 1 ? "" : "s"}`);
 			this.importBtn.disabled = false;
 		}
 	}
@@ -115,19 +116,19 @@ export class ImportFilesModal extends BaseModal {
 		this.running = true;
 		this.stopRequested = false;
 		this.importBtn.disabled = true;
-		this.cancelBtn.setText("Stop");
+		this.cancelBtn.setText(translateUi("Stop"));
 		this.summaryEl.empty();
 
 		const { results, cancelled } = await runImport(prepared.units, createVaultImportDeps(this.app, this.settings), {
 			folder: this.folder,
 			policy: this.policy,
 			isCancelled: () => this.stopRequested,
-			onProgress: (done, total) => this.statusEl.setText(`Importing ${Math.min(done + 1, total)} of ${total}…`),
+			onProgress: (done, total) => this.statusEl.setText(translateUi`Importing ${Math.min(done + 1, total)} of ${total}…`),
 		});
 
 		this.running = false;
 		this.cancelBtn.disabled = false;
-		this.cancelBtn.setText("Close");
+		this.cancelBtn.setText(translateUi("Close"));
 		this.importBtn.hide();
 		this.showSummary(results, cancelled, prepared);
 	}
@@ -137,10 +138,10 @@ export class ImportFilesModal extends BaseModal {
 		const imported = count("imported");
 		const skipped = count("skipped");
 		const failed = count("failed") + prepared.problems.length;
-		const headline = `${imported} imported, ${skipped} skipped, ${failed} failed` + (cancelled ? " (stopped early)." : ".");
+		const headline = `${imported} imported, ${skipped} skipped, ${failed} failed` + (cancelled ? translateUi(" (stopped early).") : ".");
 		this.statusEl.setText(headline);
 		// One Notice for the whole run, never one per recipe.
-		new Notice(`Recipe import: ${headline}`);
+		new Notice(translateUi`Recipe import: ${headline}`);
 
 		this.summaryEl.empty();
 		for (const r of results) {

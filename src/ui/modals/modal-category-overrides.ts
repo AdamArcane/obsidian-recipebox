@@ -2,6 +2,7 @@
  * Modal for managing ingredient-name substring rules that force specific grocery
  * categories, overriding the automatic dictionary-based categorisation.
  */
+import { t as translateUi } from "../../i18n";
 import { App } from "obsidian";
 import { CategoryOverride } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -15,8 +16,8 @@ export class CategoryOverridesModal extends BaseModal {
 		private readonly getKnownCategories: () => string[],
 	) { super(app); }
 
-	getTitle(): string { return "Category overrides"; }
-	getSubtitle(): string { return "Map ingredient name substrings to specific categories."; }
+	getTitle(): string { return translateUi("Category overrides"); }
+	getSubtitle(): string { return translateUi("Map ingredient name substrings to specific categories."); }
 
 	renderBody(bodyEl: HTMLElement): void {
 		const list = bodyEl.createDiv("rb-override-list");
@@ -31,8 +32,8 @@ export class CategoryOverridesModal extends BaseModal {
 
 		this.settings.categoryOverrides.forEach((override: CategoryOverride, i: number) => {
 			const row = list.createDiv("rb-list-row");
-			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: "Ingredient substring" });
-			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: "Category" });
+			const matchInput = row.createEl("input", { type: "text", value: override.match, placeholder: translateUi("Ingredient substring") });
+			const catInput = row.createEl("input", { type: "text", value: override.category, placeholder: translateUi("Category") });
 
 			const datalist = catInput.createEl("datalist");
 			datalist.id = `rb-cat-datalist-${i}`;
@@ -55,7 +56,7 @@ export class CategoryOverridesModal extends BaseModal {
 			});
 		});
 
-		const addBtn = list.createEl("button", { text: "+ add override" });
+		const addBtn = list.createEl("button", { text: translateUi("+ add override") });
 		addBtn.addEventListener("click", () => {
 			this.settings.categoryOverrides.push({ match: "", category: "" });
 			void this.save().then(() => this.renderList(list));

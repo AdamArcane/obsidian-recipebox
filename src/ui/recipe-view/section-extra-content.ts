@@ -2,6 +2,7 @@
  * Splits trailing Markdown sections from the recipe body and renders them as
  * collapsible cards in the desktop sidebar, adjacent to the instructions column.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, MarkdownView, setIcon, TFile, WorkspaceLeaf } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { CookHistoryModal } from "../modals/cook-history-modal";
@@ -60,7 +61,7 @@ export function renderExtraSectionsButtons(
 		const btn = sectionButtons.createEl("button", { cls: "rb-sidebar-btn rb-sidebar-btn--history" });
 		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
 		setIcon(iconSpan, "history");
-		btn.createSpan({ cls: "rb-sidebar-btn-label", text: "Cook history" });
+		btn.createSpan({ cls: "rb-sidebar-btn-label", text: translateUi("Cook history") });
 		if (cookedCount > 0) {
 			btn.createSpan({ cls: "rb-sidebar-btn-badge", text: String(cookedCount) });
 		}
@@ -77,7 +78,7 @@ export function renderExtraSectionsButtons(
 		const iconSpan = btn.createSpan({ cls: "rb-sidebar-btn-icon rb-icon" });
 		setIcon(iconSpan, "link-2");
 		const days = shareStatus.daysLeft;
-		btn.createSpan({ cls: "rb-sidebar-btn-label", text: `Shared · expires in ${days} day${days === 1 ? "" : "s"}` });
+		btn.createSpan({ cls: "rb-sidebar-btn-label", text: translateUi`Shared · expires in ${days} day${days === 1 ? "" : "s"}` });
 		btn.addEventListener("click", () => {
 			new ShareRecipeModal(app, recipeFile, settings, saveSettings).open();
 		});
@@ -160,3 +161,4 @@ export async function openRecipeInEditorAtSectionHeading(
 		await delay(50);
 	}
 }
+

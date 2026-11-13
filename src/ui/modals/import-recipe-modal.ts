@@ -8,6 +8,7 @@
  * import landing) clears and repopulates the shell's body and footer rather
  * than trying to patch the existing form's DOM in place.
  */
+import { t as translateUi } from "../../i18n";
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";
@@ -30,7 +31,7 @@ export class ImportRecipeModal extends BaseModal {
 		this.folder = resolveDestinationFolder(settings);
 	}
 
-	getTitle(): string { return "Add recipe"; }
+	getTitle(): string { return translateUi("Add recipe"); }
 	getContentClasses(): string[] { return ["rb-import-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {

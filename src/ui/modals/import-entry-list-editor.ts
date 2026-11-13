@@ -11,6 +11,7 @@
  * Rows can be reordered by dragging the grip handle or with Alt+Up/Down. The
  * returned handle lets a group editor move rows between lists.
  */
+import { t as translateUi } from "../../i18n";
 import { setIcon } from "obsidian";
 import { attachRowDrag, DragList, registerDragList } from "./entry-row-drag";
 import { editIndexAfterInsert, editIndexAfterMove, editIndexAfterRemove, reorder } from "./entry-order";
@@ -69,12 +70,12 @@ export function renderEntryListEditor(
 	const addBtn = row.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 	const addBtnIcon = addBtn.createSpan({ cls: "rb-modal-btn-icon" });
 	setIcon(addBtnIcon, "plus");
-	const addBtnLabel = addBtn.createSpan({ text: "Add" });
+	const addBtnLabel = addBtn.createSpan({ text: translateUi("Add") });
 
 	const cancelBtn = row.createEl("button", {
 		cls: "rb-import-entry-cancel-btn",
 		attr: { type: "button" },
-		text: "Cancel",
+		text: translateUi("Cancel"),
 	});
 	cancelBtn.hide();
 
@@ -86,7 +87,7 @@ export function renderEntryListEditor(
 
 	function setEditingUI(editing: boolean): void {
 		setIcon(addBtnIcon, editing ? "check" : "plus");
-		addBtnLabel.setText(editing ? "Update" : "Add");
+		addBtnLabel.setText(editing ? translateUi("Update") : translateUi("Add"));
 		cancelBtn.toggle(editing);
 	}
 
@@ -165,7 +166,7 @@ export function renderEntryListEditor(
 			itemEl.toggleClass("rb-import-entry-item--editing", i === editIndex);
 			const handle = itemEl.createSpan({
 				cls: "rb-import-entry-item-handle",
-				attr: { "aria-label": "Drag to reorder" },
+				attr: { "aria-label": translateUi("Drag to reorder") },
 			});
 			setIcon(handle, "grip-vertical");
 			// A tap on the handle is a drag gesture, never "load this row".
@@ -184,7 +185,7 @@ export function renderEntryListEditor(
 			});
 			const removeBtn = itemEl.createEl("button", {
 				cls: "rb-import-entry-item-remove",
-				attr: { type: "button", "aria-label": "Remove" },
+				attr: { type: "button", "aria-label": translateUi("Remove") },
 			});
 			setIcon(removeBtn, "x");
 			removeBtn.addEventListener("click", (e) => {

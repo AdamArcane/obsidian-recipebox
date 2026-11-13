@@ -2,6 +2,7 @@
  * Responsive desktop layout that keeps ingredients and instructions in a
  * two-column split while preserving existing section helpers and interactions.
  */
+import { t as translateUi } from "../../../i18n";
 import { MarkdownRenderer } from "obsidian";
 import { findOrOpenLeaf } from "../../../utils/open-leaf";
 import { renderMetaBanner } from "../meta-banner";
@@ -78,7 +79,7 @@ export const renderDesktopTwoColumnLayout: RecipeLayoutRenderer = async ({
         const rightCol = main.createDiv({ cls: "rb-desktop-two-col-col" });
 
         divider.setAttribute("role", "separator");
-        divider.setAttribute("aria-label", "Resize recipe columns");
+        divider.setAttribute("aria-label", translateUi("Resize recipe columns"));
         divider.setAttribute("aria-orientation", "vertical");
         divider.tabIndex = 0;
 

@@ -2,6 +2,7 @@
  * Recipe view settings section. Owns view toggles, tag display,
  * and the collapsible header-badge list.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Platform, setIcon, Setting } from "obsidian";
 import { CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -19,8 +20,8 @@ export function renderSectionRecipeView(
 	getDiscovery?: () => DiscoveryResult | null,
 ): void {
 	new Setting(container)
-		.setName("Auto-open recipe view")
-		.setDesc("Automatically switch to recipe view when opening a recipe note.")
+		.setName(translateUi("Auto-open recipe view"))
+		.setDesc(translateUi("Automatically switch to recipe view when opening a recipe note."))
 		.addToggle((t) =>
 			t.setValue(settings.autoOpenRecipeView).onChange(async (v) => {
 				settings.autoOpenRecipeView = v;
@@ -29,12 +30,12 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Desktop recipe layout")
-		.setDesc("Choose the layout style for the desktop recipe view. Mobile view is not affected by this setting. In two-column mode, you can drag the center divider to resize columns.")
+		.setName(translateUi("Desktop recipe layout"))
+		.setDesc(translateUi("Choose the layout style for the desktop recipe view. Mobile view is not affected by this setting. In two-column mode, you can drag the center divider to resize columns."))
 		.addDropdown((d) =>
 			d
-				.addOption("two-column", "Two column")
-				.addOption("classic", "Classic single column")
+				.addOption("two-column", translateUi("Two column"))
+				.addOption("classic", translateUi("Classic single column"))
 				.setValue(settings.desktopRecipeLayout)
 				.onChange(async (value) => {
 					settings.desktopRecipeLayout = value === "classic" ? "classic" : "two-column";
@@ -44,10 +45,10 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Reset two-column split")
-		.setDesc("Restore the default 50/50 split for the resizable two-column layout.")
+		.setName(translateUi("Reset two-column split"))
+		.setDesc(translateUi("Restore the default 50/50 split for the resizable two-column layout."))
 		.addButton((b) =>
-			b.setButtonText("Reset")
+			b.setButtonText(translateUi("Reset"))
 				.setDisabled(settings.desktopTwoColumnSplitRatio === DEFAULT_SETTINGS.desktopTwoColumnSplitRatio)
 				.onClick(() => {
 					settings.desktopTwoColumnSplitRatio = DEFAULT_SETTINGS.desktopTwoColumnSplitRatio;
@@ -56,8 +57,8 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Show recipe source")
-		.setDesc("Show the recipe's source frontmatter, as a link when it is a web address. Appears in the banner on desktop and in the info tab on mobile.")
+		.setName(translateUi("Show recipe source"))
+		.setDesc(translateUi("Show the recipe's source frontmatter, as a link when it is a web address. Appears in the banner on desktop and in the info tab on mobile."))
 		.addToggle((t) =>
 			t.setValue(settings.showRecipeSource).onChange(async (v) => {
 				settings.showRecipeSource = v;
@@ -67,7 +68,7 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Show tags in header")
+		.setName(translateUi("Show tags in header"))
 		.addToggle((t) =>
 			t.setValue(settings.showTagsInHeader).onChange(async (v) => {
 				settings.showTagsInHeader = v;
@@ -78,7 +79,7 @@ export function renderSectionRecipeView(
 
 	if (settings.showTagsInHeader) {
 		new Setting(container)
-			.setName("Prefix tags with #")
+			.setName(translateUi("Prefix tags with #"))
 			.addToggle((t) =>
 				t.setValue(settings.prefixTagsWithHash).onChange(async (v) => {
 					settings.prefixTagsWithHash = v;
@@ -86,8 +87,8 @@ export function renderSectionRecipeView(
 				})
 			);
 		new Setting(container)
-			.setName("Show full tag path")
-			.setDesc("When off, only the last segment of a nested tag is shown.")
+			.setName(translateUi("Show full tag path"))
+			.setDesc(translateUi("When off, only the last segment of a nested tag is shown."))
 			.addToggle((t) =>
 				t.setValue(settings.showFullTagPath).onChange(async (v) => {
 					settings.showFullTagPath = v;
@@ -96,8 +97,8 @@ export function renderSectionRecipeView(
 			);
 	}
 	new Setting(container)
-		.setName("Cross off while cooking")
-		.setDesc("Clicking an ingredient or instruction step marks it as done for the current session.")
+		.setName(translateUi("Cross off while cooking"))
+		.setDesc(translateUi("Clicking an ingredient or instruction step marks it as done for the current session."))
 		.addToggle((t) =>
 			t.setValue(settings.crossOffWhileCooking).onChange(async (v) => {
 				settings.crossOffWhileCooking = v;
@@ -106,8 +107,8 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Strip duplicate title and hero image from body")
-		.setDesc("Remove a leading h1 from the note body if it matches the note title.\nRemove an inline image from the body if it matches the frontmatter image property.")
+		.setName(translateUi("Strip duplicate title and hero image from body"))
+		.setDesc(translateUi("Remove a leading h1 from the note body if it matches the note title.\nRemove an inline image from the body if it matches the frontmatter image property."))
 		.addToggle((t) =>
 			t.setValue(settings.cleanNoteBody).onChange(async (v) => {
 				settings.cleanNoteBody = v;
@@ -116,8 +117,8 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Use first image in note when frontmatter image is empty")
-		.setDesc("When enabled, recipe view uses the first image found in the note body if the image frontmatter property is not set.")
+		.setName(translateUi("Use first image in note when frontmatter image is empty"))
+		.setDesc(translateUi("When enabled, recipe view uses the first image found in the note body if the image frontmatter property is not set."))
 		.addToggle((t) =>
 			t.setValue(settings.useFirstBodyImageWhenFrontmatterEmpty).onChange(async (v) => {
 				settings.useFirstBodyImageWhenFrontmatterEmpty = v;
@@ -127,10 +128,10 @@ export function renderSectionRecipeView(
 		);
 
 	new Setting(container)
-		.setName("Default recipe image")
-		.setDesc("Shown in recipe view and gallery when a recipe has no frontmatter or body image. Accepts a vault path, wikilink, or URL -- same format as the image frontmatter property. Leave blank to disable. Never used on public shares.")
+		.setName(translateUi("Default recipe image"))
+		.setDesc(translateUi("Shown in recipe view and gallery when a recipe has no frontmatter or body image. Accepts a vault path, wikilink, or URL -- same format as the image frontmatter property. Leave blank to disable. Never used on public shares."))
 		.addText((t) =>
-			t.setPlaceholder("e.g. Attachments/default-recipe.png")
+			t.setPlaceholder(translateUi("e.g. Attachments/default-recipe.png"))
 				.setValue(settings.defaultRecipeImage)
 				.onChange(async (v) => {
 					settings.defaultRecipeImage = v;
@@ -144,22 +145,22 @@ export function renderSectionRecipeView(
 
 	// ── Inline badge list ────────────────────────────────────────────────────
 	const badgeSettings = new Setting(container)
-		.setName("Header badges")
-		.setDesc("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder.");
+		.setName(translateUi("Header badges"))
+		.setDesc(translateUi("Frontmatter properties to surface as badges in the recipe view header. Click a row to edit, drag to reorder."));
 
 	badgeSettings.settingEl.addClass("rb-badge-stack");
 
-	badgeSettings.settingEl.createDiv({ cls: "rb-settings-warning-text", text: "Note: if you change frontmatter properties, you will need to update any existing badges using that property." });
+	badgeSettings.settingEl.createDiv({ cls: "rb-settings-warning-text", text: translateUi("Note: if you change frontmatter properties, you will need to update any existing badges using that property.") });
 
 	const listEl = badgeSettings.settingEl.createDiv({ cls: "rb-badge-list" });
 	renderBadgeList(listEl, settings, save, app, getDiscovery);
 }
 
 function badgePrimary(badge: CustomBadge): string {
-	if (badge.type === "newline") return "↵ New line";
-	if (badge.type === "separator") return `${badge.property || "|"}  separator`;
-	if (badge.formula) return badge.label || "Formula";
-	return badge.property || "(no property)";
+	if (badge.type === "newline") return translateUi("↵ New line");
+	if (badge.type === "separator") return translateUi`${badge.property || "|"}  separator`;
+	if (badge.formula) return badge.label || translateUi("Formula");
+	return badge.property || translateUi("(no property)");
 }
 
 function badgeSecondary(badge: CustomBadge): string | null {
@@ -212,7 +213,7 @@ function renderBadgeList(
 
 		// Delete button — available for all badges
 		const del = row.createEl("button", { cls: "rb-badge-delete clickable-icon" });
-		del.setAttribute("aria-label", "Remove badge");
+		del.setAttribute("aria-label", translateUi("Remove badge"));
 		setIcon(del, "trash-2");
 		del.addEventListener("click", (e) => {
 			e.stopPropagation();
@@ -286,7 +287,7 @@ function renderBadgeList(
 	// Footer actions
 	const footer = listEl.createDiv({ cls: "rb-badge-footer" });
 
-	footer.createEl("button", { text: "+ add badge" }).addEventListener("click", () => {
+	footer.createEl("button", { text: translateUi("+ add badge") }).addEventListener("click", () => {
 		const blank: CustomBadge = {
 			type: "badge", property: "", label: "",
 			color: "default", valueType: "auto", splitArray: false,
@@ -298,14 +299,14 @@ function renderBadgeList(
 		}, true, getDiscovery, () => settings).open();
 	});
 
-	footer.createEl("button", { text: "+ separator" }).addEventListener("click", () => {
+	footer.createEl("button", { text: translateUi("+ separator") }).addEventListener("click", () => {
 		new SeparatorEditModal(app, null, (badge) => {
 			settings.headerBadges.push(badge);
 			void save().then(() => renderBadgeList(listEl, settings, save, app, getDiscovery));
 		}).open();
 	});
 
-	footer.createEl("button", { text: "+ new line" }).addEventListener("click", () => {
+	footer.createEl("button", { text: translateUi("+ new line") }).addEventListener("click", () => {
 		settings.headerBadges.push({
 			type: "newline", property: "", label: "",
 			color: "default", valueType: "auto", splitArray: false,
@@ -316,12 +317,12 @@ function renderBadgeList(
 
 	let resetPending = false;
 	let resetTimer: number | null = null;
-	const resetBtn = footer.createEl("button", { text: "Reset to defaults" });
+	const resetBtn = footer.createEl("button", { text: translateUi("Reset to defaults") });
 	resetBtn.addEventListener("click", () => {
 		if (!resetPending) {
 			resetPending = true;
-			resetBtn.textContent = "Confirm reset?";
-			resetTimer = window.setTimeout(() => { resetPending = false; resetBtn.textContent = "Reset to defaults"; }, 3000);
+			resetBtn.textContent = translateUi("Confirm reset?");
+			resetTimer = window.setTimeout(() => { resetPending = false; resetBtn.textContent = translateUi("Reset to defaults"); }, 3000);
 		} else {
 			if (resetTimer) window.clearTimeout(resetTimer);
 			settings.headerBadges = structuredClone(DEFAULT_SETTINGS.headerBadges);

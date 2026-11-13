@@ -2,6 +2,7 @@
  * Defines the four standard nutrition fields (calories, protein, fat, carbs)
  * and resolves their display values with per-serving or total scaling.
  */
+import { t as translateUi } from "../../i18n";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { fmNutrient } from "./frontmatter-read-helpers";
 
@@ -14,9 +15,9 @@ export interface NutritionFieldDef {
 
 export const NUTRITION_FIELDS: NutritionFieldDef[] = [
 	{ label: "Calories", unit: "", settingsKey: "caloriesProperty", aliases: ["calories", "kcal", "cal"] },
-	{ label: "Protein", unit: "g", settingsKey: "proteinProperty", aliases: ["protein"] },
-	{ label: "Fat", unit: "g", settingsKey: "fatProperty", aliases: ["fat", "total fat"] },
-	{ label: "Carbs", unit: "g", settingsKey: "carbsProperty", aliases: ["carbs", "carbohydrates", "carbohydrate"] },
+	{ label: translateUi("Protein"), unit: "g", settingsKey: "proteinProperty", aliases: ["protein"] },
+	{ label: translateUi("Fat"), unit: "g", settingsKey: "fatProperty", aliases: ["fat", "total fat"] },
+	{ label: translateUi("Carbs"), unit: "g", settingsKey: "carbsProperty", aliases: ["carbs", "carbohydrates", "carbohydrate"] },
 ];
 
 function formatNutritionNumber(n: number): string {

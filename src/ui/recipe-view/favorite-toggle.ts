@@ -2,6 +2,7 @@
  * Renders the heart-shaped favorite toggle button in the recipe view header
  * and persists its state to the "favorite" frontmatter property.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { getRecipeMetaAliases } from "../../parser/recipe-meta-aliases";
@@ -30,7 +31,7 @@ export function renderFavoriteToggle(
 	let active = toBoolean(findValue(fm, getRecipeMetaAliases(settings).favorite));
 	const btn = container.createEl("button", {
 		cls: ["rb-action-btn", active ? "rb-favorite-active" : ""],
-		attr: { "aria-pressed": String(active), "aria-label": "Toggle favorite" },
+		attr: { "aria-pressed": String(active), "aria-label": translateUi("Toggle favorite") },
 	});
 	const iconEl = btn.createSpan();
 	setIcon(iconEl, "heart");

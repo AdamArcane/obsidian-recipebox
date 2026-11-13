@@ -4,6 +4,7 @@
  * determines weight (first = highest influence). No weight number, no threshold.
  * Built-in modes show a "Reset to default" button that restores shipped defaults.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Platform, setIcon } from "obsidian";
 import type { SuggesterMode, ScoringRule, ScoringDirection } from "../../suggester/strategy-types";
 import { DiscoveryResult } from "../../discovery/discovery-cache";
@@ -34,14 +35,14 @@ function directionPhrase(
 	direction: "favor-high" | "favor-low" | "favor-none",
 ): string {
 	const label = field || "field";
-	if (direction === "favor-none") return `No ${label}`;
+	if (direction === "favor-none") return translateUi`No ${label}`;
 	if (type === "boolean") {
-		return direction === "favor-high" ? `Has ${label}` : `Doesn't have ${label}`;
+		return direction === "favor-high" ? translateUi`Has ${label}` : translateUi`Doesn't have ${label}`;
 	}
 	if (type === "date") {
-		return direction === "favor-high" ? `More recent ${label}` : `Less recent ${label}`;
+		return direction === "favor-high" ? translateUi`More recent ${label}` : translateUi`Less recent ${label}`;
 	}
-	return direction === "favor-high" ? `More ${label}` : `Less ${label}`;
+	return direction === "favor-high" ? translateUi`More ${label}` : translateUi`Less ${label}`;
 }
 
 function cloneMode(s: SuggesterMode): SuggesterMode {
@@ -64,7 +65,7 @@ export class ModeEditorModal extends BaseModal {
 		this.draft = cloneMode(mode);
 	}
 
-	getTitle(): string { return "Edit mode"; }
+	getTitle(): string { return translateUi("Edit mode"); }
 	getIcon(): string { return "sliders-horizontal"; }
 	getContentClasses(): string[] { return ["rb-strategy-editor-modal"]; }
 
@@ -79,7 +80,7 @@ export class ModeEditorModal extends BaseModal {
 
 	private renderNameRow(bodyEl: HTMLElement): void {
 		const row = bodyEl.createDiv({ cls: "rb-modal-field" });
-		row.createEl("label", { cls: "rb-modal-field-label", text: "Name" });
+		row.createEl("label", { cls: "rb-modal-field-label", text: translateUi("Name") });
 		const input = row.createEl("input", {
 			cls: "rb-modal-input",
 			attr: { type: "text", value: this.draft.name },
@@ -92,7 +93,7 @@ export class ModeEditorModal extends BaseModal {
 		const checkbox = row.createEl("input", { attr: { type: "checkbox", id: "rb-strategy-default" } });
 		checkbox.checked = this.draft.isDefault;
 		checkbox.addEventListener("change", () => { this.draft.isDefault = checkbox.checked; });
-		row.createEl("label", { attr: { for: "rb-strategy-default" }, text: "Use as default mode" });
+		row.createEl("label", { attr: { for: "rb-strategy-default" }, text: translateUi("Use as default mode") });
 	}
 
 	// ── Filters ──────────────────────────────────────────────────────────────────
@@ -100,15 +101,15 @@ export class ModeEditorModal extends BaseModal {
 	private renderFiltersSection(bodyEl: HTMLElement): void {
 		const section = bodyEl.createDiv({ cls: "rb-modal-section" });
 		const header = section.createDiv({ cls: "rb-modal-section-header" });
-		header.createSpan({ cls: "rb-modal-section-heading", text: "Filters" });
-		header.createSpan({ cls: "rb-modal-section-hint", text: "Narrow the recipe pool before scoring" });
+		header.createSpan({ cls: "rb-modal-section-heading", text: translateUi("Filters") });
+		header.createSpan({ cls: "rb-modal-section-hint", text: translateUi("Narrow the recipe pool before scoring") });
 
 		const listEl = section.createDiv({ cls: "rb-rule-list" });
 		for (const filter of this.draft.filters) {
 			this.renderFilterRow(listEl, filter);
 		}
 
-		section.createEl("button", { cls: "rb-add-rule-btn", text: "+ add filter" })
+		section.createEl("button", { cls: "rb-add-rule-btn", text: translateUi("+ add filter") })
 			.addEventListener("click", () => {
 				const f: FieldFilter = { field: "", operator: "eq", value: "" };
 				this.draft.filters.push(f);
@@ -132,12 +133,12 @@ export class ModeEditorModal extends BaseModal {
 	private renderRulesSection(bodyEl: HTMLElement): void {
 		const section = bodyEl.createDiv({ cls: "rb-modal-section" });
 		const header = section.createDiv({ cls: "rb-modal-section-header" });
-		header.createSpan({ cls: "rb-modal-section-heading", text: "Scoring rules" });
+		header.createSpan({ cls: "rb-modal-section-heading", text: translateUi("Scoring rules") });
 		header.createSpan({
 			cls: "rb-modal-section-hint",
 			text: Platform.isMobile
-				? "Use arrows to reorder — top rule matters most"
-				: "Drag to reorder — top rule matters most",
+				? translateUi("Use arrows to reorder — top rule matters most")
+				: translateUi("Drag to reorder — top rule matters most"),
 		});
 
 		const listEl = section.createDiv({ cls: "rb-rule-list" });
@@ -149,7 +150,7 @@ export class ModeEditorModal extends BaseModal {
 		};
 		renderAll();
 
-		section.createEl("button", { cls: "rb-add-rule-btn", text: "+ add rule" })
+		section.createEl("button", { cls: "rb-add-rule-btn", text: translateUi("+ add rule") })
 			.addEventListener("click", () => {
 				const rule: ScoringRule = { field: "", direction: "favor-high" };
 				this.draft.rules.push(rule);
@@ -189,7 +190,7 @@ export class ModeEditorModal extends BaseModal {
 
 		// "Prefer" select — two options, auto-phrased from field name + type
 		const preferWrap = row.createDiv({ cls: "rb-rule-prefer-wrap" });
-		preferWrap.createSpan({ cls: "rb-rule-label", text: "Prefer" });
+		preferWrap.createSpan({ cls: "rb-rule-label", text: translateUi("Prefer") });
 		const preferSel = preferWrap.createEl("select", { cls: "rb-select" });
 
 		const rebuildPreferOptions = (): void => {
@@ -274,16 +275,16 @@ export class ModeEditorModal extends BaseModal {
 	renderFooter(footerEl: HTMLElement): void {
 		// Delete — only for custom (non-built-in) modes, and only when a callback is wired up.
 		if (!this.draft.isBuiltin && this.deps.onDelete) {
-			const deleteBtn = footerEl.createEl("button", { cls: "mod-warning rb-mode-delete-btn", text: "Delete mode" });
+			const deleteBtn = footerEl.createEl("button", { cls: "mod-warning rb-mode-delete-btn", text: translateUi("Delete mode") });
 			let deletePending = false;
 			let deleteTimer: number | null = null;
 			deleteBtn.addEventListener("click", () => {
 				if (!deletePending) {
 					deletePending = true;
-					deleteBtn.textContent = "Confirm delete?";
+					deleteBtn.textContent = translateUi("Confirm delete?");
 					deleteTimer = window.setTimeout(() => {
 						deletePending = false;
-						deleteBtn.textContent = "Delete mode";
+						deleteBtn.textContent = translateUi("Delete mode");
 					}, 3000);
 				} else {
 					if (deleteTimer) window.clearTimeout(deleteTimer);
@@ -295,16 +296,16 @@ export class ModeEditorModal extends BaseModal {
 
 		// "Reset to default" is only meaningful for built-in modes that have shipped defaults.
 		if (this.draft.isBuiltin) {
-			const resetBtn = footerEl.createEl("button", { cls: "mod-warning rb-mode-reset-btn", text: "Reset to default" });
+			const resetBtn = footerEl.createEl("button", { cls: "mod-warning rb-mode-reset-btn", text: translateUi("Reset to default") });
 			let resetPending = false;
 			let resetTimer: number | null = null;
 			resetBtn.addEventListener("click", () => {
 				if (!resetPending) {
 					resetPending = true;
-					resetBtn.textContent = "Confirm reset?";
+					resetBtn.textContent = translateUi("Confirm reset?");
 					resetTimer = window.setTimeout(() => {
 						resetPending = false;
-						resetBtn.textContent = "Reset to default";
+						resetBtn.textContent = translateUi("Reset to default");
 					}, 3000);
 				} else {
 					if (resetTimer) window.clearTimeout(resetTimer);
@@ -320,7 +321,7 @@ export class ModeEditorModal extends BaseModal {
 		}
 
 		addFooterButtons(footerEl, {
-			confirmLabel: "Save",
+			confirmLabel: translateUi("Save"),
 			onCancel: () => this.close(),
 			onConfirm: () => {
 				void this.deps.onSave(this.draft).then(() => this.close());

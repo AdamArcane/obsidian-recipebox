@@ -2,6 +2,7 @@
  * Settings section for library configuration — recipe folders, auto-open
  * behavior, and the recipe type value used to identify recipe files.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon, Setting, TFolder } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { FolderSuggest } from "../components/folder-suggest";
@@ -18,12 +19,12 @@ export function renderSectionLibrary(
 ): void {
 	// The folder list is appended directly inside this card so it stays one visual unit.
 	const folderDesc = createFragment();
-	folderDesc.appendText("Folders the plugin scans for recipe notes. ");
-	folderDesc.createEl("strong", { text: "At least one is required" });
-	folderDesc.appendText("; add \"/\" to scan the entire vault instead of a specific folder.");
+	folderDesc.appendText(translateUi("Folders the plugin scans for recipe notes. "));
+	folderDesc.createEl("strong", { text: translateUi("At least one is required") });
+	folderDesc.appendText(translateUi("; add \"/\" to scan the entire vault instead of a specific folder."));
 
 	const folderSetting = new Setting(container)
-		.setName("Recipe folders")
+		.setName(translateUi("Recipe folders"))
 		.setDesc(folderDesc);
 	folderSetting.settingEl.addClass("rb-settings-folder-setting");
 
@@ -34,10 +35,10 @@ export function renderSectionLibrary(
 
 		settings.recipeFolders.forEach((folder, i) => {
 			const row = folderList.createDiv({ cls: "rb-settings-folder-row" });
-			row.createSpan({ cls: "rb-settings-folder-label", text: folder === "/" ? "/ (entire vault)" : folder });
+			row.createSpan({ cls: "rb-settings-folder-label", text: folder === "/" ? translateUi("/ (entire vault)") : folder });
 			const del = row.createEl("button", {
 				cls: "rb-settings-folder-delete clickable-icon",
-				attr: { title: "Remove" },
+				attr: { title: translateUi("Remove") },
 			});
 			setIcon(del, "trash-2");
 			del.addEventListener("click", () => {
@@ -57,7 +58,7 @@ export function renderSectionLibrary(
 		const addRow = folderList.createDiv({ cls: "rb-settings-folder-add-row" });
 		const input = addRow.createEl("input", {
 			cls: "rb-settings-folder-input",
-			attr: { type: "text", placeholder: "Add a folder..." },
+			attr: { type: "text", placeholder: translateUi("Add a folder...") },
 		});
 		new FolderSuggest(app, input);
 
@@ -98,14 +99,14 @@ export function renderSectionLibrary(
 		setIcon(icon, "alert-triangle");
 		warningEl.createSpan({
 			cls: "rb-settings-warning-text",
-			text: "Scanning the entire vault (\"/\") with no recipe type value set means every note in your vault will be treated as a recipe. Set a recipe type value below to narrow this, or replace \"/\" with a specific folder.",
+			text: translateUi("Scanning the entire vault (\"/\") with no recipe type value set means every note in your vault will be treated as a recipe. Set a recipe type value below to narrow this, or replace \"/\" with a specific folder."),
 		});
 	}
 	updateWarning();
 
 	new Setting(container)
-		.setName("Recipe type value")
-		.setDesc("Notes whose recipe type property matches this value are treated as recipes. When recipe folders are also set, both must match.")
+		.setName(translateUi("Recipe type value"))
+		.setDesc(translateUi("Notes whose recipe type property matches this value are treated as recipes. When recipe folders are also set, both must match."))
 		.addText((t) =>
 			t.setValue(settings.recipeType).onChange(async (v) => {
 				settings.recipeType = v;
@@ -116,8 +117,8 @@ export function renderSectionLibrary(
 	
 	
 	new Setting(container)
-		.setName("Enable dashboard")
-		.setDesc("Show the recipe box dashboard ribbon icon. If disabled, individual ribbon icons will not be shown.")
+		.setName(translateUi("Enable dashboard"))
+		.setDesc(translateUi("Show the recipe box dashboard ribbon icon. If disabled, individual ribbon icons will not be shown."))
 		.addToggle((t) =>
 			t.setValue(settings.enableDashboard).onChange(async (v) => {
 				settings.enableDashboard = v;
@@ -127,8 +128,8 @@ export function renderSectionLibrary(
 		);
 		
 	new Setting(container)
-		.setName("Open gallery when clicking a recipe folder")
-		.setDesc("Clicking a recipe folder in the file explorer opens the recipe gallery filtered to that folder, instead of expanding it.")
+		.setName(translateUi("Open gallery when clicking a recipe folder"))
+		.setDesc(translateUi("Clicking a recipe folder in the file explorer opens the recipe gallery filtered to that folder, instead of expanding it."))
 		.addToggle((t) =>
 			t.setValue(settings.openGalleryOnFolderClick).onChange(async (v) => {
 				settings.openGalleryOnFolderClick = v;
@@ -139,8 +140,8 @@ export function renderSectionLibrary(
 
 	if (settings.openGalleryOnFolderClick) {
 		new Setting(container)
-			.setName("Also apply to subfolders")
-			.setDesc("Clicking a subfolder inside a recipe folder opens the gallery filtered to that subfolder specifically.")
+			.setName(translateUi("Also apply to subfolders"))
+			.setDesc(translateUi("Clicking a subfolder inside a recipe folder opens the gallery filtered to that subfolder specifically."))
 			.addToggle((t) =>
 				t.setValue(settings.openGalleryOnFolderClickSubfolders).onChange(async (v) => {
 					settings.openGalleryOnFolderClickSubfolders = v;

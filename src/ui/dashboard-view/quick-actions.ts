@@ -5,6 +5,7 @@
  * one click away (see dashboard-spec.md section 7). Search hands off to the
  * gallery's own search/filter state rather than re-implementing matching here.
  */
+import { t as translateUi } from "../../i18n";
 import { setIcon } from "obsidian";
 
 export interface QuickActionsActions {
@@ -19,7 +20,7 @@ function renderSearchBox(row: HTMLElement, onSearch: (query: string) => void): v
 	setIcon(box.createSpan({ cls: "rb-dashboard-search-icon" }), "search");
 	const input = box.createEl("input", {
 		cls: "rb-dashboard-search-input",
-		attr: { type: "text", placeholder: "Search recipes…" },
+		attr: { type: "text", placeholder: translateUi("Search recipes…") },
 	});
 	input.addEventListener("keydown", (e) => {
 		if (e.key !== "Enter") return;
@@ -42,7 +43,7 @@ export function renderQuickActions(container: HTMLElement, actions: QuickActions
 	renderSearchBox(row, actions.searchRecipes);
 
 	const buttons = row.createDiv({ cls: "rb-dashboard-quick-action-buttons" });
-	renderActionButton(buttons, "plus", "Add recipe", actions.openImportModal);
-	renderActionButton(buttons, "shopping-cart", "Add grocery item", actions.openAddGroceryItemModal);
-	renderActionButton(buttons, "wand-sparkles", "Suggest a meal", actions.openSuggestMealModal);
+	renderActionButton(buttons, "plus", translateUi("Add recipe"), actions.openImportModal);
+	renderActionButton(buttons, "shopping-cart", translateUi("Add grocery item"), actions.openAddGroceryItemModal);
+	renderActionButton(buttons, "wand-sparkles", translateUi("Suggest a meal"), actions.openSuggestMealModal);
 }
