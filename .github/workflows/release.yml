@@ -4,6 +4,14 @@ on:
   push:
     tags:
       - "*"
+  # Manual run for when a tag cannot be pushed (e.g. from a phone). Run it
+  # from the branch that holds the version bump; the release creates the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to create, e.g. v0.3.1-beta.0 (must match the version in manifest.json)"
+        required: true
+        type: string
 
 jobs:
   build:
@@ -36,11 +44,26 @@ jobs:
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Passed through env, not interpolated into the script, so the input
+          # cannot inject shell commands.
+          DISPATCH_TAG: ${{ inputs.tag }}
         run: |
-          tag="${GITHUB_REF#refs/tags/}"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag="$DISPATCH_TAG"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
 
           # Strip leading 'v' from title so release shows '0.1.4' not 'v0.1.4'
           title="${tag#v}"
+
+          # A manual run could otherwise publish a tag that does not match the
+          # code it builds. Tag pushes already come from the version script.
+          manifest_version=$(node -p "require('./manifest.json').version")
+          if [[ "$title" != "$manifest_version" ]]; then
+            echo "Tag $tag does not match manifest.json version $manifest_version"
+            exit 1
+          fi
 
           # Pre-release if tag contains a pre-release identifier (-beta, -alpha, -rc, -preview)
           # Stable releases use clean version numbers: 0.1.4, 1.0.0, etc.
@@ -77,7 +100,10 @@ jobs:
             exit 1
           fi
 
+          # --target only applies when the tag does not exist yet (manual run);
+          # a pushed tag keeps pointing at the commit it was pushed on.
           gh release create "$tag" \
+            --target "$GITHUB_SHA" \
             --title="$title" \
             --notes-file "$notes_file" \
             $prerelease \
