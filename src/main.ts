@@ -69,7 +69,9 @@ export default class RecipeBoxPlugin extends Plugin {
 		);
 
 		this.app.workspace.onLayoutReady(() => {
-			void this.manager.refresh();
+			// Read the meal plan note too, so a plan synced in while Obsidian was
+			// closed shows up without opening the Grocery view first.
+			void this.manager.refresh().then(() => this.manager.syncFromMealPlanNote());
 			// Populate the discovery cache so the mode editor field picker has real fields.
 			void this.discoveryCache.refresh(this.app, this.settings);
 			// The earlier sync() call above runs before the workspace layout (and
