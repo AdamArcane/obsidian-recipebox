@@ -21,6 +21,8 @@ export { GroceryManagerSink };
 export class GroceryManager extends Events {
 	private items: GroceryItem[] = [];
 	private rebuilding: Promise<void> | null = null;
+	/** Meal plan edits made by this plugin that are still running. See syncFromMealPlanNote. */
+	private mealPlanMutations = 0;
 
 	constructor(private app: App, private sink: GroceryManagerSink) {
 		super();
@@ -47,9 +49,24 @@ export class GroceryManager extends Events {
 
 	// ── Meal plan ─────────────────────────────────────────────────────────────
 
+	/**
+	 * Runs one of our own meal plan edits. Several of them write the note in two
+	 * steps (remove the line, then insert it again), so for a moment the note is
+	 * missing an entry that still exists in saved state. A note-to-state sync that
+	 * ran in that gap would delete the entry and its grocery contributions.
+	 */
+	private async mutatingMealPlan<T>(fn: () => Promise<T>): Promise<T> {
+		this.mealPlanMutations++;
+		try {
+			return await fn();
+		} finally {
+			this.mealPlanMutations--;
+		}
+	}
+
 	async addToMealPlan(recipePath: string, day?: string, mealType?: string, contributions: ContributionMap = {}, isLeftovers = false): Promise<void> {
 		const s = this.sink.getSettings();
-		await addToMealPlan(this.app, recipePath, day, mealType, contributions, s, () => this.sink.save(), isLeftovers);
+		await this.mutatingMealPlan(() => addToMealPlan(this.app, recipePath, day, mealType, contributions, s, () => this.sink.save(), isLeftovers));
 		await this.refresh();
 	}
 
@@ -60,45 +77,51 @@ export class GroceryManager extends Events {
 	}
 
 	async addMealPlanEntry(recipePath: string, day?: string, isLeftovers = false): Promise<string> {
-		const id = await addMealPlanEntry(this.app, recipePath, day, this.sink.getSettings(), () => this.sink.save(), isLeftovers);
+		const id = await this.mutatingMealPlan(() => addMealPlanEntry(this.app, recipePath, day, this.sink.getSettings(), () => this.sink.save(), isLeftovers));
 		await this.refresh();
 		return id;
 	}
 
 	async setMealType(id: string, mealType: string | undefined): Promise<void> {
-		await setMealPlanEntryMealType(this.app, id, mealType, this.sink.getSettings(), () => this.sink.save());
+		await this.mutatingMealPlan(() => setMealPlanEntryMealType(this.app, id, mealType, this.sink.getSettings(), () => this.sink.save()));
 		this.trigger("change");
 	}
 
 	async addCustomMealEntry(label: string, day?: string, meal?: string, isLeftovers = false): Promise<string> {
-		const id = await addCustomMealEntry(this.app, label, day, meal, isLeftovers, this.sink.getSettings(), () => this.sink.save());
+		const id = await this.mutatingMealPlan(() => addCustomMealEntry(this.app, label, day, meal, isLeftovers, this.sink.getSettings(), () => this.sink.save()));
 		this.trigger("change");
 		return id;
 	}
 
 	async editCustomMealEntry(id: string, updates: { day?: string; meal?: string; label?: string; isLeftovers?: boolean }): Promise<void> {
-		await editCustomMealEntry(this.app, id, updates, this.sink.getSettings(), () => this.sink.save());
+		await this.mutatingMealPlan(() => editCustomMealEntry(this.app, id, updates, this.sink.getSettings(), () => this.sink.save()));
 		this.trigger("change");
 	}
 
 	async removeFromMealPlan(id: string): Promise<void> {
-		await removeFromMealPlan(this.app, id, this.sink.getSettings(), () => this.sink.save());
+		await this.mutatingMealPlan(() => removeFromMealPlan(this.app, id, this.sink.getSettings(), () => this.sink.save()));
 		await this.refresh();
 	}
 
 	async rescheduleMealPlanEntry(id: string, newDay: string | undefined): Promise<void> {
-		await rescheduleMealPlanEntry(this.app, id, newDay, this.sink.getSettings(), () => this.sink.save());
+		await this.mutatingMealPlan(() => rescheduleMealPlanEntry(this.app, id, newDay, this.sink.getSettings(), () => this.sink.save()));
 		this.trigger("change");
 	}
 
 	async clearMealPlan(alsoRemoveFromGrocery: boolean): Promise<number> {
-		const count = await clearMealPlan(this.app, alsoRemoveFromGrocery, this.sink.getSettings(), () => this.sink.save());
-		await writeNote(this.app, resolveNotePath(this.sink.getSettings().mealPlanPath), "# Meal Plan\n");
+		const count = await this.mutatingMealPlan(async () => {
+			const n = await clearMealPlan(this.app, alsoRemoveFromGrocery, this.sink.getSettings(), () => this.sink.save());
+			await writeNote(this.app, resolveNotePath(this.sink.getSettings().mealPlanPath), "# Meal Plan\n");
+			return n;
+		});
 		await this.refresh();
 		return count;
 	}
 
 	async syncFromMealPlanNote(): Promise<void> {
+		// Skip while one of our own edits is mid-write. Its final note state will
+		// match saved state, so nothing is lost by waiting for the next trigger.
+		if (this.mealPlanMutations > 0) return;
 		const changed = await syncMealPlanNote(this.app, this.sink);
 		if (changed) await this.refresh();
 	}

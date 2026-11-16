@@ -12,6 +12,7 @@ import { generateEntryId } from "../utils/date";
 import { localDateISO } from "../utils/date";
 import { readNoteOrEmpty, resolveNotePath } from "../utils/vault-notes";
 import { parseMealPlanNote } from "./meal-plan-note/parse";
+import { NoteSlot, reconcileSlots } from "./meal-plan-slot-reconcile";
 import { addToGroceryNote, removeFromGroceryNote } from "../grocery/grocery-note/write";
 import { recordContributions } from "../grocery/contribution-history";
 
@@ -116,6 +117,9 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 
 	// Separate recipe entries (wikilink) from custom meal entries (no wikilink)
 	const noteRecipes = new Map<string, { day: string | undefined; mealType: string | undefined; isLeftovers: boolean }>();
+	// Every explicit line per recipe. noteRecipes above keeps one per path for
+	// add/remove, but day and meal type need all lines to cope with multi-day placement.
+	const noteSlots = new Map<string, NoteSlot[]>();
 	const noteCustom: Array<{ label: string; day: string | undefined; mealType: string | undefined; isLeftovers: boolean }> = [];
 	const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
 
@@ -123,7 +127,10 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 		for (const line of section.lines) {
 			if (line.kind === "entry" && line.wikilink) {
 				const path = resolveWikilink(app, line.wikilink);
-				if (path) noteRecipes.set(path, { day: line.day, mealType: line.mealType, isLeftovers: line.isLeftovers ?? false });
+				if (path) {
+					noteRecipes.set(path, { day: line.day, mealType: line.mealType, isLeftovers: line.isLeftovers ?? false });
+					noteSlots.set(path, [...(noteSlots.get(path) ?? []), { day: line.day, mealType: line.mealType }]);
+				}
 			} else if (line.kind === "entry" && !line.wikilink && line.label) {
 				noteCustom.push({ label: line.label, day: line.day, mealType: line.mealType, isLeftovers: line.isLeftovers ?? false });
 			} else if (line.kind === "raw") {
@@ -175,6 +182,11 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 				existing.isLeftovers = isLeftovers || undefined;
 				changed = true;
 			}
+			// Day and meal type are copied from the note too. Before this, only adds,
+			// removes and the leftovers flag were read, so a plan edited on another
+			// device kept showing the old day here.
+			const slots = noteSlots.get(path);
+			if (slots && reconcileSlots(s.state.mealPlan.filter((e) => e.recipePath === path), slots)) changed = true;
 			if (!existing.autoAddProcessed && Object.keys(existing.contributions).length === 0 && s.autoAddOnSync) {
 				await tryAutoAdd(app, existing, s);
 				changed = true;
@@ -196,6 +208,10 @@ export async function syncMealPlanNote(app: App, sink: GroceryManagerSink): Prom
 			// Update isLeftovers if the note changed it
 			if (!!match.isLeftovers !== noted.isLeftovers) {
 				match.isLeftovers = noted.isLeftovers || undefined;
+				changed = true;
+			}
+			if ((match.meal ?? "").trim().toLowerCase() !== (noted.mealType ?? "").trim().toLowerCase()) {
+				match.meal = noted.mealType?.trim() || undefined;
 				changed = true;
 			}
 		} else {
