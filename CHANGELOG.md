@@ -1,3 +1,12 @@
+## [0.4.0-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...0.4.0-beta.0) (2026-11-16)
+
+### Features
+
+* add opt-in two-way Pantry sync for the grocery list ([87ba8c2](https://github.com/AdamArcane/obsidian-recipebox/commit/87ba8c2b74d915808dd0d396b51590e88958dced))
+* move Pantry settings under Integrations and send quantity separately ([8a85a08](https://github.com/AdamArcane/obsidian-recipebox/commit/8a85a089b444a434f43165ef9134ab19d6ee3076))
+* sync Pantry name and quantity edits in both directions ([d2179ed](https://github.com/AdamArcane/obsidian-recipebox/commit/d2179ed1c6624f6c9b2455b31c0d7df935a34919))
+* write source recipe names into the Pantry item description ([d2aaf16](https://github.com/AdamArcane/obsidian-recipebox/commit/d2aaf16dcc5fe889899b51ace7c2838abae8adfc))
+
 ## [0.3.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.2.2...0.3.0) (2026-10-31)
 
 ### Features
