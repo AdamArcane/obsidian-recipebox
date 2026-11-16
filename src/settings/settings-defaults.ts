@@ -202,6 +202,14 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	userGuid: "",
 	userShortId: "",
 
+	pantryEnabled: false,
+	pantryServerUrl: "",
+	pantryUsername: "",
+	pantryAppPassword: "",
+	pantryHouseId: 0,
+	pantryListId: 0,
+	pantryAutoSyncMinutes: 0,
+
 	state: {
 		mealPlan: [],
 		groceryItems: [],

@@ -45,6 +45,10 @@ The suggester does more than shuffle your recipe list. You can use it to build n
 
 Ingredients from your meal plan are consolidated automatically... quantities summed, duplicates merged... and then grouped by category, recipe, or source. Add ad-hoc items easily, check things off as you shop, and export in multiple formats. The list is a markdown note, editable by hand or through the plugin.
 
+### 🔄 Pantry sync (optional)
+
+Turn on Pantry sync in settings to keep your grocery list in step with a checklist in the Nextcloud Pantry app. Check items off on your phone in the store and they are checked in Obsidian, and items you add in either place show up in the other. Your list stays plain markdown: lines are matched to Pantry by item name, with nothing hidden added to the note. It is off by default and does nothing until you enable it. Run it from the command palette, or set an auto sync interval on one device.
+
 ### ✏️ Recipe editing
 
 Fix a recipe without leaving the card. Click the Ingredients or Instructions heading, or use the Edit recipe button, to open a structured editor: change or remove entries, drag to reorder (or Alt+Up/Down), move items between groups, and add, rename, or delete groups. Times, servings, image, notes, and nutrition are editable too, and the note can be renamed from the same dialog. Only what you change is written, so the rest of your note is left untouched. Sections with content the editor can't safely represent (paragraphs, nested lists, multi-line steps) offer an Open as Markdown shortcut instead.

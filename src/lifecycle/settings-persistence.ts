@@ -337,6 +337,13 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 		dashboardActivityRangeWeeks: oneOf<DashboardActivityRangeWeeks>(r.dashboardActivityRangeWeeks, [2, 4, 8, 12], d.dashboardActivityRangeWeeks),
 
 		shareServerUrl: str(r.shareServerUrl, d.shareServerUrl),
+		pantryEnabled: bool(r.pantryEnabled, d.pantryEnabled),
+		pantryServerUrl: str(r.pantryServerUrl, d.pantryServerUrl),
+		pantryUsername: str(r.pantryUsername, d.pantryUsername),
+		pantryAppPassword: str(r.pantryAppPassword, d.pantryAppPassword),
+		pantryHouseId: numInRange(r.pantryHouseId, d.pantryHouseId, 0, Number.MAX_SAFE_INTEGER),
+		pantryListId: numInRange(r.pantryListId, d.pantryListId, 0, Number.MAX_SAFE_INTEGER),
+		pantryAutoSyncMinutes: numInRange(r.pantryAutoSyncMinutes, d.pantryAutoSyncMinutes, 0, 1440),
 		shareDataProperty: str(r.shareDataProperty, d.shareDataProperty),
 		userGuid: str(r.userGuid, d.userGuid),
 		userShortId: str(r.userShortId, d.userShortId),
@@ -350,6 +357,7 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 				: [],
 			collapsedSections,
 			groceryContributions: validateGroceryContributions(state.groceryContributions),
+			pantryLinks: validatePantryLinks(state.pantryLinks),
 			// Support migration from old "lastUsedStrategyId" key
 			lastUsedModeId: typeof state.lastUsedModeId === "string" ? state.lastUsedModeId
 				: typeof state.lastUsedStrategyId === "string" ? state.lastUsedStrategyId : undefined,
@@ -358,6 +366,19 @@ export function mergeSettings(raw: unknown): RecipeBoxSettings {
 
 
 	return merged;
+}
+
+function validatePantryLinks(raw: unknown): RecipeBoxSettings["state"]["pantryLinks"] {
+	if (!raw || typeof raw !== "object") return undefined;
+	const r = raw as Record<string, unknown>;
+	if (typeof r.listId !== "number" || !r.items || typeof r.items !== "object") return undefined;
+	const items: Record<string, { id: number; base: boolean }> = {};
+	for (const [key, v] of Object.entries(r.items as Record<string, unknown>)) {
+		if (!v || typeof v !== "object") continue;
+		const e = v as Record<string, unknown>;
+		if (typeof e.id === "number" && typeof e.base === "boolean") items[key] = { id: e.id, base: e.base };
+	}
+	return { listId: r.listId, items };
 }
 
 function validateGroceryContributionSource(raw: unknown): GroceryContributionSource | null {
