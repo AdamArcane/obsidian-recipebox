@@ -204,9 +204,10 @@ export interface RecipeBoxSettings {
 
 	// Persisted runtime state
 	state: {
-		// Ingredient key -> Pantry item id and last agreed done state. Not a
-		// setting: losing it only costs a name-match repair on the next sync.
-		pantryLinks?: { listId: number; items: Record<string, { id: number; base: boolean }> };
+		// Pantry item id -> the line it is tied to plus the done state and texts both
+		// sides last agreed on. Keyed by id so a rename on either side keeps the
+		// link. Not a setting: losing it only costs a name-match repair on the next sync.
+		pantryLinks?: { listId: number; items: Record<string, { key: string; base: boolean; text?: string; remoteText?: string }> };
 		mealPlan: MealPlanEntry[];
 		groceryItems: GroceryItemEntry[];
 		collapsedSections: Record<string, boolean>;

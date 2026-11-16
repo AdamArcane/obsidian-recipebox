@@ -12,6 +12,14 @@ export interface SplitText {
 }
 
 /**
+ * The inverse of the split: how Pantry's quantity and name read as one line.
+ * Both the sync and its stored "last agreed" text use this one wording.
+ */
+export function joinQuantity(quantity: string, name: string): string {
+	return quantity ? `${quantity} ${name}` : name;
+}
+
+/**
  * Why we slice the original text instead of rebuilding from the parsed number:
  * the user's own wording ("1 1/2", "2-3", "lbs") should arrive in Pantry
  * untouched, and Pantry treats quantity as free text anyway. When anything

@@ -5,10 +5,10 @@
  * text inside the single vault.process call, so a keystroke made mid-sync is kept.
  */
 import { PantryClient } from "./PantryClient";
-import { KeyOf, insertItem, removeByKey, scanGroceryNote, setCheckedByKey } from "./groceryLines";
-import { Action, Links, RemoteEntry, planSync } from "./syncPlanner";
+import { KeyOf, insertItem, removeByKey, replaceLineByKey, scanGroceryNote, setCheckedByKey } from "./groceryLines";
+import { Action, LinkState, Links, RemoteEntry, planSync } from "./syncPlanner";
 import { PantryError } from "./pantryTypes";
-import { SplitText } from "./splitQuantity";
+import { SplitText, joinQuantity } from "./splitQuantity";
 
 export interface NoteAccess {
 	exists(): boolean;
@@ -18,7 +18,7 @@ export interface NoteAccess {
 }
 
 export interface RunnerDeps {
-	client: Pick<PantryClient, "listCategories" | "listItems" | "createItem" | "setDone" | "deleteItem">;
+	client: Pick<PantryClient, "listCategories" | "listItems" | "createItem" | "updateItem" | "setDone" | "deleteItem">;
 	listId: number;
 	keyOf: KeyOf;
 	/** Splits a line into Pantry quantity and name. Omitted means the whole line is the name. */
@@ -68,8 +68,8 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 		.filter((i) => !i.archived)
 		.map((i) => {
 			// Pantry's own quantity field is folded into the line text so the key
-			// matches what a pushed line (quantity inside the name) would produce.
-			const lineText = i.quantity ? `${i.quantity} ${i.name}` : i.name;
+			// matches what a line in the note would produce.
+			const lineText = joinQuantity(i.quantity, i.name);
 			return {
 				id: i.id,
 				key: keyOf(lineText),
@@ -83,6 +83,11 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 	const actions = planSync({ local, remote, links, remoteComplete: !fetched.truncated });
 	const result: RunResult = { links, created: 0, updated: 0, removed: 0, failed: 0, truncated: fetched.truncated };
 	const edits: LocalEdit[] = [];
+	// Merge into an existing link without losing its other fields.
+	const patch = (id: number, p: Partial<LinkState>): void => {
+		const cur = links[String(id)];
+		if (cur) links[String(id)] = { ...cur, ...p };
+	};
 
 	for (const action of actions) {
 		try {
@@ -103,57 +108,80 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 				const item = await client.createItem(listId, name, categoryId, quantity);
 				// Link right away: if the toggle below fails, the next run sees
 				// local checked vs remote unchecked vs base false and pushes it.
-				links[action.key] = { id: item.id, base: false };
+				links[String(item.id)] = { key: action.key, base: false, text: action.text, remoteText: joinQuantity(item.quantity, item.name) };
 				if (action.checked) {
 					await client.setDone(listId, item.id, true);
-					links[action.key] = { id: item.id, base: true };
+					patch(item.id, { base: true });
 				}
 				result.created++;
 				return;
 			}
 			case "pushDone":
 				await client.setDone(listId, action.id, action.done);
-				links[action.key] = { id: action.id, base: action.done };
+				patch(action.id, { base: action.done });
 				result.updated++;
 				return;
 			case "updateBase":
-				links[action.key] = { id: action.id, base: action.base };
+				patch(action.id, { base: action.base });
 				return;
-			case "adopt":
+			case "updateTexts":
+				patch(action.id, { text: action.text, remoteText: action.remoteText });
+				return;
+			case "pushText": {
+				const { quantity, name } = splitText(action.text);
+				const item = await client.updateItem(listId, action.id, name, quantity);
+				// Record what Pantry says it now holds, so the next run sees no change.
+				patch(action.id, { key: action.key, text: action.text, remoteText: joinQuantity(item.quantity, item.name) });
+				result.updated++;
+				return;
+			}
+			case "pullText":
+				edits.push({
+					apply: (t) => replaceLineByKey(t, action.key, action.text, action.checked, keyOf),
+					onApplied: () => {
+						patch(action.id, { key: action.newKey, text: action.text, remoteText: action.text, base: action.checked });
+						result.updated++;
+					},
+				});
+				return;
+			case "adopt": {
+				const link: LinkState = { key: action.key, base: action.done, text: action.text, remoteText: action.remoteText };
 				if (action.pushRemote) await client.setDone(listId, action.id, action.done);
 				if (!action.pullLocal) {
-					links[action.key] = { id: action.id, base: action.done };
+					links[String(action.id)] = link;
 					return;
 				}
 				edits.push({
 					apply: (t) => setCheckedByKey(t, action.key, action.done, keyOf),
-					onApplied: () => { links[action.key] = { id: action.id, base: action.done }; },
+					onApplied: () => { links[String(action.id)] = link; },
 				});
 				return;
+			}
 			case "pullDone":
 				edits.push({
 					apply: (t) => setCheckedByKey(t, action.key, action.done, keyOf),
-					onApplied: () => { links[action.key] = { id: action.id, base: action.done }; result.updated++; },
+					onApplied: () => { patch(action.id, { base: action.done }); result.updated++; },
 				});
 				return;
 			case "createLocal":
 				edits.push({
 					apply: (t) => insertItem(t, action.text, action.done, action.category ?? UNCATEGORIZED),
-					onApplied: () => { links[action.key] = { id: action.id, base: action.done }; result.created++; },
+					onApplied: () => { links[String(action.id)] = { key: action.key, base: action.done, text: action.text, remoteText: action.text }; result.created++; },
 				});
 				return;
 			case "removeLocal":
 				edits.push({
 					apply: (t) => removeByKey(t, action.key, keyOf),
-					onApplied: () => { delete links[action.key]; result.removed++; },
+					onApplied: () => { delete links[String(action.id)]; result.removed++; },
 				});
 				return;
 			case "deleteRemote":
 				await client.deleteItem(listId, action.id);
-				for (const [key, link] of Object.entries(links)) {
-					if (link.id === action.id) delete links[key];
-				}
+				delete links[String(action.id)];
 				result.removed++;
+				return;
+			case "dropLink":
+				delete links[String(action.id)];
 				return;
 		}
 	}

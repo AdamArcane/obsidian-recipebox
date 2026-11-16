@@ -57,6 +57,18 @@ export function setCheckedByKey(text: string, key: string, checked: boolean, key
 	return lines.join("\n");
 }
 
+/**
+ * Rewrites the line holding `key` with new text and checkbox state. Used when
+ * Pantry renamed or re-quantified an item. Returns null when the line is gone.
+ */
+export function replaceLineByKey(text: string, key: string, newText: string, checked: boolean, keyOf: KeyOf): string | null {
+	const item = scanGroceryNote(text, keyOf).find((i) => i.key === key);
+	if (!item) return null;
+	const lines = text.split("\n");
+	lines[item.lineIndex] = `${checked ? "- [x]" : "- [ ]"} ${newText}`;
+	return lines.join("\n");
+}
+
 /** Removes the line holding `key`. A heading left empty is kept on purpose, the generator may rely on it. */
 export function removeByKey(text: string, key: string, keyOf: KeyOf): string | null {
 	const item = scanGroceryNote(text, keyOf).find((i) => i.key === key);

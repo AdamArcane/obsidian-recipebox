@@ -372,11 +372,24 @@ function validatePantryLinks(raw: unknown): RecipeBoxSettings["state"]["pantryLi
 	if (!raw || typeof raw !== "object") return undefined;
 	const r = raw as Record<string, unknown>;
 	if (typeof r.listId !== "number" || !r.items || typeof r.items !== "object") return undefined;
-	const items: Record<string, { id: number; base: boolean }> = {};
-	for (const [key, v] of Object.entries(r.items as Record<string, unknown>)) {
+	const items: Record<string, { key: string; base: boolean; text?: string; remoteText?: string }> = {};
+	for (const [mapKey, v] of Object.entries(r.items as Record<string, unknown>)) {
 		if (!v || typeof v !== "object") continue;
 		const e = v as Record<string, unknown>;
-		if (typeof e.id === "number" && typeof e.base === "boolean") items[key] = { id: e.id, base: e.base };
+		if (typeof e.base !== "boolean") continue;
+		if (typeof e.id === "number") {
+			// Older format: keyed by ingredient key, with no text. Converted so an
+			// upgrade keeps every link and no line is rewritten (unknown text is
+			// adopted from both sides on the next run, never pulled).
+			items[String(e.id)] = { key: mapKey, base: e.base };
+		} else if (typeof e.key === "string" && Number.isInteger(Number(mapKey))) {
+			const link: { key: string; base: boolean; text?: string; remoteText?: string } = { key: e.key, base: e.base };
+			if (typeof e.text === "string" && typeof e.remoteText === "string") {
+				link.text = e.text;
+				link.remoteText = e.remoteText;
+			}
+			items[mapKey] = link;
+		}
 	}
 	return { listId: r.listId, items };
 }

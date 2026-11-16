@@ -49,6 +49,12 @@ describe("PantryClient", () => {
 		await c.createItem(5, "milk", 2);
 		expect(body).toEqual({ name: "milk", deleteOnDone: false, categoryId: 2 });
 	});
+	it("update patches name and always sends quantity, even when empty", async () => {
+		let seen: { method: string; body: unknown } | null = null;
+		const c = make(async (r) => { seen = { method: r.method, body: JSON.parse(r.body ?? "{}") }; return ok(item(11)); });
+		await c.updateItem(5, 11, "flour", "");
+		expect(seen).toEqual({ method: "PATCH", body: { name: "flour", quantity: "" } });
+	});
 	it("toggle always sends an explicit done value", async () => {
 		let body: unknown;
 		const c = make(async (r) => { body = JSON.parse(r.body ?? "{}"); return ok(null); });
