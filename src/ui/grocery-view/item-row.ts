@@ -2,6 +2,7 @@
  * Renders a single grocery item row with a checkbox, name, quantity, source
  * attribution, and a long-press / right-click context menu for manually-added items.
  */
+import { t as translateUi } from "../../i18n";
 import { setIcon } from "obsidian";
 import { GroceryItem, GroceryItemEntry, GroupingMode } from "../../types";
 import { toTitleCase } from "../../utils/text-case";
@@ -81,7 +82,7 @@ export function renderItemRow(
 
 	const removeBtn = row.createDiv({ cls: "rb-gv-item-remove" });
 	setIcon(removeBtn, "x");
-	removeBtn.setAttribute("aria-label", "Remove item");
+	removeBtn.setAttribute("aria-label", translateUi("Remove item"));
 	removeBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
 		if (entry) {

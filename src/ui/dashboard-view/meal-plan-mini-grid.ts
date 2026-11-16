@@ -8,6 +8,7 @@
  * rescheduling wiring, which a glance preview has no business owning (see
  * dashboard-spec.md section 11.3).
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -22,19 +23,19 @@ export interface MealPlanMiniGridActions {
 }
 
 const DAY_COLUMNS: Array<{ label: string; abbrev: string }> = [
-	{ label: "Monday", abbrev: "Mon" },
-	{ label: "Tuesday", abbrev: "Tue" },
-	{ label: "Wednesday", abbrev: "Wed" },
-	{ label: "Thursday", abbrev: "Thu" },
-	{ label: "Friday", abbrev: "Fri" },
-	{ label: "Saturday", abbrev: "Sat" },
-	{ label: "Sunday", abbrev: "Sun" },
+	{ label: "Monday", abbrev: translateUi("Mon") },
+	{ label: "Tuesday", abbrev: translateUi("Tue") },
+	{ label: "Wednesday", abbrev: translateUi("Wed") },
+	{ label: "Thursday", abbrev: translateUi("Thu") },
+	{ label: "Friday", abbrev: translateUi("Fri") },
+	{ label: "Saturday", abbrev: translateUi("Sat") },
+	{ label: "Sunday", abbrev: translateUi("Sun") },
 ];
 
 const MAX_VISIBLE_ENTRIES = 3;
 
 function entryTitle(entry: MealPlanEntry): string {
-	return entry.recipePath ? entry.recipePath.split("/").pop()!.replace(/\.md$/, "") : (entry.label ?? "Custom meal");
+	return entry.recipePath ? entry.recipePath.split("/").pop()!.replace(/\.md$/, "") : (entry.label ?? translateUi("Custom meal"));
 }
 
 // Frontmatter-only resolution, same as shared-recipes-preview.ts -- no lazy
@@ -119,7 +120,7 @@ export function renderMealPlanMiniGrid(
 				renderEntryRow(list, app, entry, settings, defaultSrc, actions);
 			}
 			if (dayEntries.length > MAX_VISIBLE_ENTRIES) {
-				list.createDiv({ cls: "rb-dashboard-mpg-more", text: `+${dayEntries.length - MAX_VISIBLE_ENTRIES} more` });
+				list.createDiv({ cls: "rb-dashboard-mpg-more", text: translateUi`+${dayEntries.length - MAX_VISIBLE_ENTRIES} more` });
 			}
 		}
 	}

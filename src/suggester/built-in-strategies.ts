@@ -1,6 +1,8 @@
 /**
  * The built-in suggester modes shipped with the plugin.
  * All are fully editable by the user but cannot be deleted (isBuiltin=true).
+ * Names stay English here because mergeModes() persists them to data.json; they are
+ * translated for display only (see modeLabel in ui/utils/localized-labels.ts).
  * Field names reference the plugin defaults; if the user has renamed a property
  * in settings, they can edit the rule to match.
  */

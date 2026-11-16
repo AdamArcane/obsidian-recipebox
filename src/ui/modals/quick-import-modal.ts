@@ -4,6 +4,7 @@
  * destination folder -- that lives on the form itself now) and, on success,
  * hands the extracted recipe back to the form via onImported and closes.
  */
+import { t as translateUi } from "../../i18n";
 import { App } from "obsidian";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";
 import { submitUrl, submitText } from "./import-submit";
@@ -21,11 +22,11 @@ export class ImportFromUrlModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Import from URL"; }
+	getTitle(): string { return translateUi("Import from URL"); }
 	getContentClasses(): string[] { return ["rb-import-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "Recipe URL" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("Recipe URL") });
 		this.urlInput = bodyEl.createEl("input", {
 			cls: "rb-import-text-input",
 			attr: { type: "url", placeholder: "HTTPS://…" },
@@ -43,13 +44,13 @@ export class ImportFromUrlModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		this.importBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
+		this.importBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Import") });
 		this.importBtn.addEventListener("click", () => void this.submit());
 	}
 
 	private async submit(): Promise<void> {
 		this.importBtn.disabled = true;
-		this.importBtn.setText("Importing…");
+		this.importBtn.setText(translateUi("Importing…"));
 		this.errorBox.empty();
 		this.errorBox.hide();
 		try {
@@ -63,7 +64,7 @@ export class ImportFromUrlModal extends BaseModal {
 			}
 		} finally {
 			this.importBtn.disabled = false;
-			this.importBtn.setText("Import");
+			this.importBtn.setText(translateUi("Import"));
 		}
 	}
 }
@@ -79,25 +80,25 @@ export class ImportFromTextModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Import from text"; }
+	getTitle(): string { return translateUi("Import from text"); }
 	getContentClasses(): string[] { return ["rb-import-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "Title (optional)" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("Title (optional)") });
 		this.titleInput = bodyEl.createEl("input", {
 			cls: "rb-import-text-input",
-			attr: { type: "text", placeholder: "My recipe" },
+			attr: { type: "text", placeholder: translateUi("My recipe") },
 		});
-		bodyEl.createDiv({ cls: "rb-import-field-label", text: "Paste recipe text" });
+		bodyEl.createDiv({ cls: "rb-import-field-label", text: translateUi("Paste recipe text") });
 		this.textArea = bodyEl.createEl("textarea", {
 			cls: "rb-import-textarea rb-import-textarea--tall",
-			attr: { placeholder: "Paste ingredients and instructions here…" },
+			attr: { placeholder: translateUi("Paste ingredients and instructions here…") },
 		});
 		this.textArea.focus();
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		const importBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Import" });
+		const importBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Import") });
 		importBtn.addEventListener("click", () => {
 			const recipe = submitText(this.textArea.value, this.titleInput.value);
 			if (recipe) {

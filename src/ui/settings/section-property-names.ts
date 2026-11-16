@@ -2,6 +2,7 @@
  * Consolidated "Property names" settings section — every setting that maps a
  * plugin concept to a frontmatter key, gathered in one place.
  */
+import { t as translateUi } from "../../i18n";
 import { Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { migrateModeFieldReferences } from "../../suggester/migrate-mode-fields";
@@ -22,12 +23,12 @@ function renderBody(
 	rerender: () => void
 ): void {
 	new Setting(body).setDesc(
-		"Most users can leave these as defaults. Change them only if your recipe notes use different frontmatter key names than the plugin expects. Changing these may require updating existing settings and/or frontmatter in your recipe notes to match the new names, or else some features may not work correctly."
+		translateUi("Most users can leave these as defaults. Change them only if your recipe notes use different frontmatter key names than the plugin expects. Changing these may require updating existing settings and/or frontmatter in your recipe notes to match the new names, or else some features may not work correctly.")
 	);
 
 	new Setting(body)
-		.setName("Recipe type")
-		.setDesc("Which frontmatter property holds the note-type value (default: type).")
+		.setName(translateUi("Recipe type"))
+		.setDesc(translateUi("Which frontmatter property holds the note-type value (default: type)."))
 		.addText((t) =>
 			t.setPlaceholder("Type").setValue(settings.recipeTypePropertyName).onChange(async (v) => {
 				settings.recipeTypePropertyName = v.trim() || "type";
@@ -36,8 +37,8 @@ function renderBody(
 		);
 
 	new Setting(body)
-		.setName("Recipe rating")
-		.setDesc("The property name used to store star ratings (1–5).")
+		.setName(translateUi("Recipe rating"))
+		.setDesc(translateUi("The property name used to store star ratings (1–5)."))
 		.addText((t) => {
 			t.setValue(settings.ratingProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.ratingProperty, v);
@@ -48,8 +49,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Recipe image")
-		.setDesc("Property name used for the recipe hero image.")
+		.setName(translateUi("Recipe image"))
+		.setDesc(translateUi("Property name used for the recipe hero image."))
 		.addText((t) => {
 			t.setValue(settings.imageProperty).onChange(async (v) => {
 				settings.imageProperty = v.trim() || "image";
@@ -60,7 +61,7 @@ function renderBody(
 
 	if (settings.cookHistoryEnabled) {
 		new Setting(body)
-			.setName("Stores the date recipe was last made")
+			.setName(translateUi("Stores the date recipe was last made"))
 			.addText((t) => {
 				t.setValue(settings.lastMadeProperty).onChange(async (v) => {
 					settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.lastMadeProperty, v);
@@ -73,8 +74,8 @@ function renderBody(
 
 	if (settings.cookHistoryEnabled) {
 		new Setting(body)
-			.setName("Cook history")
-			.setDesc("The frontmatter property that stores the cook history meta data.")
+			.setName(translateUi("Cook history"))
+			.setDesc(translateUi("The frontmatter property that stores the cook history meta data."))
 			.addText((t) =>
 				t.setValue(settings.cookHistoryFrontmatterProperty).onChange(async (v) => {
 					settings.cookHistoryFrontmatterProperty = v.trim() || "cookHistory";
@@ -83,8 +84,8 @@ function renderBody(
 			);
 
 		new Setting(body)
-			.setName("Times cooked")
-			.setDesc("The property used for the derived cook count value.")
+			.setName(translateUi("Times cooked"))
+			.setDesc(translateUi("The property used for the derived cook count value."))
 			.addText((t) => {
 				t.setValue(settings.cookedCountProperty).onChange(async (v) => {
 					settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.cookedCountProperty, v);
@@ -96,8 +97,8 @@ function renderBody(
 	}
 
 	new Setting(body)
-		.setName("Favorite")
-		.setDesc("Property name used by the recipe favorite toggle.")
+		.setName(translateUi("Favorite"))
+		.setDesc(translateUi("Property name used by the recipe favorite toggle."))
 		.addText((t) => {
 			t.setValue(settings.favoriteProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.favoriteProperty, v);
@@ -108,8 +109,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Allergens")
-		.setDesc("Property name holding a recipe's allergen list (CSV string or YAML list).")
+		.setName(translateUi("Allergens"))
+		.setDesc(translateUi("Property name holding a recipe's allergen list (CSV string or YAML list)."))
 		.addText((t) => {
 			t.setValue(settings.allergensProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.allergensProperty, v);
@@ -120,8 +121,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Diet")
-		.setDesc("Property name holding diet tags/labels.")
+		.setName(translateUi("Diet"))
+		.setDesc(translateUi("Property name holding diet tags/labels."))
 		.addText((t) => {
 			t.setValue(settings.dietProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.dietProperty, v);
@@ -132,8 +133,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Servings")
-		.setDesc("Primary property name for serving count.")
+		.setName(translateUi("Servings"))
+		.setDesc(translateUi("Primary property name for serving count."))
 		.addText((t) => {
 			t.setValue(settings.servingsProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.servingsProperty, v);
@@ -144,8 +145,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Prep time")
-		.setDesc("Primary property name for prep time in minutes.")
+		.setName(translateUi("Prep time"))
+		.setDesc(translateUi("Primary property name for prep time in minutes."))
 		.addText((t) => {
 			t.setValue(settings.prepTimeProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.prepTimeProperty, v);
@@ -156,8 +157,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Cook time")
-		.setDesc("Primary property name for cook time in minutes.")
+		.setName(translateUi("Cook time"))
+		.setDesc(translateUi("Primary property name for cook time in minutes."))
 		.addText((t) => {
 			t.setValue(settings.cookTimeProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.cookTimeProperty, v);
@@ -168,8 +169,8 @@ function renderBody(
 		});
 
 	new Setting(body)
-		.setName("Total time")
-		.setDesc("Primary property name for total time in minutes.")
+		.setName(translateUi("Total time"))
+		.setDesc(translateUi("Primary property name for total time in minutes."))
 		.addText((t) => {
 			t.setValue(settings.totalTimeProperty).onChange(async (v) => {
 				settings.suggesterModes = migrateModeFieldReferences(settings.suggesterModes, settings.totalTimeProperty, v);
@@ -181,9 +182,9 @@ function renderBody(
 
 	const nutritionFields: Array<[string, keyof RecipeBoxSettings]> = [
 		["Calories", "caloriesProperty"],
-		["Protein", "proteinProperty"],
-		["Fat", "fatProperty"],
-		["Carbs", "carbsProperty"],
+		[translateUi("Protein"), "proteinProperty"],
+		[translateUi("Fat"), "fatProperty"],
+		[translateUi("Carbs"), "carbsProperty"],
 	];
 	for (const [label, key] of nutritionFields) {
 		new Setting(body)
@@ -197,8 +198,8 @@ function renderBody(
 	}
 
 	new Setting(body)
-		.setName("Share data")
-		.setDesc("The frontmatter property that stores share state (slug, delete token, created/expires timestamps) as a nested object.")
+		.setName(translateUi("Share data"))
+		.setDesc(translateUi("The frontmatter property that stores share state (slug, delete token, created/expires timestamps) as a nested object."))
 		.addText((t) =>
 			t.setValue(settings.shareDataProperty).onChange(async (v) => {
 				settings.shareDataProperty = v.trim() || "recipe-share";

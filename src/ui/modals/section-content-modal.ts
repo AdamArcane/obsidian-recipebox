@@ -2,10 +2,12 @@
  * Lightweight modal that renders one trailing recipe section as markdown.
  * Used by recipe view section buttons so extra content opens on demand.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, HoverParent, HoverPopover, MarkdownRenderer } from "obsidian";
 import { BaseModal } from "./modal-shell";
 import { registerLinkHandlers } from "../recipe-view/link-handlers";
 import { RECIPE_VIEW_TYPE } from "../recipe-view/recipe-view-type";
+import { renderWikilinksAsText } from "../../utils/wikilink-display";
 
 export class SectionContentModal extends BaseModal implements HoverParent {
     hoverPopover: HoverPopover | null = null;
@@ -25,7 +27,7 @@ export class SectionContentModal extends BaseModal implements HoverParent {
     }
 
     getTitle(): string {
-        return this.sectionHeading;
+        return renderWikilinksAsText(this.sectionHeading);
     }
 
     getIcon(): string {
@@ -54,11 +56,12 @@ export class SectionContentModal extends BaseModal implements HoverParent {
     renderFooter(footerEl: HTMLElement): void {
 
         if (this.onEditSection) {
-            footerEl.createEl("button", { text: "Edit section" }).addEventListener("click", () => {
+            footerEl.createEl("button", { text: translateUi("Edit section") }).addEventListener("click", () => {
                 this.close();
                 this.onEditSection?.(this.sectionHeading);
             });
         }
-        footerEl.createEl("button", { cls: "mod-cta", text: "Close" }).addEventListener("click", () => this.close());
+        footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Close") }).addEventListener("click", () => this.close());
     }
 }
+

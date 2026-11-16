@@ -2,6 +2,7 @@
  * Orchestrates recipe extraction from a URL or raw text and writes the resulting
  * note to the vault, handling conflicts and social platform edge cases.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ExtractedRecipe } from "../../importer/recipe-extract-types";
@@ -22,13 +23,13 @@ export type SubmitUrlResult =
 export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 	const trimmed = url.trim();
 	if (!trimmed) {
-		return { kind: "error", message: "Please enter a URL." };
+		return { kind: "error", message: translateUi("Please enter a URL.") };
 	}
 
 	const platform = detectPlatform(trimmed);
 
 	if (platform === "instagram") {
-		return { kind: "error", message: "Instagram is not supported — copy the caption and use text mode instead." };
+		return { kind: "error", message: translateUi("Instagram is not supported — copy the caption and use text mode instead.") };
 	}
 
 	const { html, error: errMessage } = await fetchHtml(trimmed);
@@ -40,14 +41,14 @@ export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 		const meta = extractSocialMeta(html);
 		const recipe = extractRecipeFromText(meta.description, meta.title || undefined);
 		if (platform === "tiktok" && meta.description.length < 200) {
-			new Notice("Tiktok captions may be truncated in page metadata — double-check ingredient completeness.");
+			new Notice(translateUi("Tiktok captions may be truncated in page metadata — double-check ingredient completeness."));
 		}
 		return { kind: "success", recipe, warning: null };
 	}
 
 	const { recipe, usedAuthorFallback } = await extractRecipe(html, trimmed);
 	if (!recipe) {
-		return { kind: "error", message: "No recipe found. The site may require login or render content via JavaScript." };
+		return { kind: "error", message: translateUi("No recipe found. The site may require login or render content via JavaScript.") };
 	}
 	// The fallback author (this site's hostname) only exists to satisfy
 	// recipe-scrapers' extraction requirements internally -- it's never
@@ -55,7 +56,7 @@ export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 	// sign the page's structured data was thin elsewhere too, so it's worth
 	// flagging for a closer look before saving.
 	const warning: string | null = usedAuthorFallback
-		? "This site didn't list a recipe author. The import still worked, but double-check the details below since the page's structured data may be incomplete."
+		? translateUi("This site didn't list a recipe author. The import still worked, but double-check the details below since the page's structured data may be incomplete.")
 		: null;
 	return { kind: "success", recipe, warning };
 }
@@ -63,7 +64,7 @@ export async function submitUrl(url: string): Promise<SubmitUrlResult> {
 export function submitText(text: string, titleOverride: string): ExtractedRecipe | null {
 	const trimmed = text.trim();
 	if (!trimmed) {
-		new Notice("Please paste some recipe text.");
+		new Notice(translateUi("Please paste some recipe text."));
 		return null;
 	}
 	return extractRecipeFromText(trimmed, titleOverride.trim() || undefined);
@@ -149,10 +150,10 @@ export async function saveRecipe(
 	const doWrite = async (): Promise<void> => {
 		try {
 			await writeRecipeNote(app, recipe, filePath, settings);
-			new Notice(`Recipe saved: ${filename}`);
+			new Notice(translateUi`Recipe saved: ${filename}`);
 			onSuccess(filePath);
 		} catch (err) {
-			new Notice(`Failed to save recipe: ${err instanceof Error ? err.message : String(err)}`);
+			new Notice(translateUi`Failed to save recipe: ${err instanceof Error ? err.message : String(err)}`);
 		}
 	};
 

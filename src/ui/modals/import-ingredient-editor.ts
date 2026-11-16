@@ -5,15 +5,16 @@
  * understands, so scaling, the grocery list, and the ingredient checklist all
  * keep working on recipes built through this form.
  */
+import { t as translateUi } from "../../i18n";
 import { ingredientParserOptions } from "../../parser/ingredient-parse";
 import { decomposeIngredient, composeIngredient } from "./ingredient-entry-format";
 import type { RecipeBoxSettings } from "../../settings/settings-types";
 import { renderEntryListEditor, EntryField, EntryListHandle, EntryListOptions } from "./import-entry-list-editor";
 
 const FIELDS: EntryField[] = [
-	{ key: "qty", label: "Qty", placeholder: "1", cls: "rb-import-entry-cell--qty" },
-	{ key: "unit", label: "Unit", placeholder: "cup", cls: "rb-import-entry-cell--unit" },
-	{ key: "name", label: "Ingredient", placeholder: "flour", cls: "rb-import-entry-cell--name" },
+	{ key: "qty", label: translateUi("Qty"), placeholder: "1", cls: "rb-import-entry-cell--qty" },
+	{ key: "unit", label: translateUi("Unit"), placeholder: "cup", cls: "rb-import-entry-cell--unit" },
+	{ key: "name", label: translateUi("Ingredient"), placeholder: "flour", cls: "rb-import-entry-cell--name" },
 	{ key: "note", label: "Note", placeholder: "optional", cls: "rb-import-entry-cell--note" },
 ];
 

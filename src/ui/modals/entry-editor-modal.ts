@@ -4,6 +4,7 @@
  * an `onSave` callback that performs the actual write; this modal only collects
  * the form values.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Platform, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { CookedImageResult } from "../recipe-view/recipe-view-deps";
@@ -37,7 +38,7 @@ export class EntryEditorModal extends BaseModal {
 		this.notes = editing?.note ?? "";
 	}
 
-	getTitle(): string { return this.editing ? "Edit entry" : "Add entry"; }
+	getTitle(): string { return this.editing ? translateUi("Edit entry") : translateUi("Add entry"); }
 	getIcon(): string { return this.editing ? "pencil" : "plus"; }
 	getSubtitle(): string { return this.recipeFile.basename; }
 	getContentClasses(): string[] { return ["rb-mark-cooked-modal"]; }
@@ -58,7 +59,7 @@ export class EntryEditorModal extends BaseModal {
 		notesField.createEl("label", { cls: "rb-modal-field-label", text: "Notes" });
 		const notesInput = notesField.createEl("textarea", {
 			cls: "rb-modal-input rb-mark-cooked-notes-input",
-			attr: { rows: "6", placeholder: "How did it turn out?" },
+			attr: { rows: "6", placeholder: translateUi("How did it turn out?") },
 		});
 		notesInput.value = this.notes;
 		notesInput.addEventListener("input", () => { this.notes = notesInput.value; });
@@ -68,9 +69,9 @@ export class EntryEditorModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
-		footerEl.createEl("button", { cls: "mod-cta", text: this.editing ? "Save changes" : "Add entry" })
+		footerEl.createEl("button", { cls: "mod-cta", text: this.editing ? translateUi("Save changes") : translateUi("Add entry") })
 			.addEventListener("click", () => {
 				void this.onSave(this.selectedDate, this.notes.trim(), this.imageResult);
 				this.close();
@@ -99,7 +100,7 @@ export class EntryEditorModal extends BaseModal {
 			removeBtn.toggleClass("rb-hidden", !hasImage);
 		};
 
-		const vaultBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Choose from vault" });
+		const vaultBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: translateUi("Choose from vault") });
 		vaultBtn.addEventListener("click", () => {
 			new VaultImageSuggestModal(this.app, vaultFile => {
 				this.releasePreview();
@@ -109,26 +110,26 @@ export class EntryEditorModal extends BaseModal {
 			}).open();
 		});
 		setIcon(vaultBtn.createSpan({ cls: "rb-modal-btn-icon" }), "folder");
-		if (!Platform.isMobile) vaultBtn.createSpan({ text: "Select from vault" });
+		if (!Platform.isMobile) vaultBtn.createSpan({ text: translateUi("Select from vault") });
 
 		const uploadInput = container.createEl("input", { attr: { type: "file", accept: "image/*", style: "display:none" } });
 		uploadInput.addEventListener("change", () => void this.handleFileInput(uploadInput, showPreview));
-		const uploadBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Upload image" });
+		const uploadBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: translateUi("Upload image") });
 		uploadBtn.addEventListener("click", () => uploadInput.click());
 		setIcon(uploadBtn.createSpan({ cls: "rb-modal-btn-icon" }), "upload");
-		if (!Platform.isMobile) uploadBtn.createSpan({ text: "Upload" });
+		if (!Platform.isMobile) uploadBtn.createSpan({ text: translateUi("Upload") });
 
 		if (Platform.isMobile) {
 			const cameraInput = container.createEl("input", {
 				attr: { type: "file", accept: "image/*", capture: "environment", style: "display:none" },
 			});
-			const cameraBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: "Take photo", text: "" });
+			const cameraBtn = btnRow.createEl("button", { cls: "rb-modal-btn", title: translateUi("Take photo"), text: "" });
 			cameraBtn.addEventListener("click", () => cameraInput.click());
 			setIcon(cameraBtn, "camera");
 			cameraInput.addEventListener("change", () => void this.handleFileInput(cameraInput, showPreview));
 		}
 
-		const removeBtn = btnRow.createEl("button", { cls: "rb-modal-btn rb-modal-btn-danger rb-modal-btn-remove", title: "Remove image", text: "" });
+		const removeBtn = btnRow.createEl("button", { cls: "rb-modal-btn rb-modal-btn-danger rb-modal-btn-remove", title: translateUi("Remove image"), text: "" });
 		removeBtn.addEventListener("click", () => {
 			this.releasePreview();
 			this.userChangedImage = true;
@@ -137,7 +138,7 @@ export class EntryEditorModal extends BaseModal {
 			showPreview(null);
 		});
 		setIcon(removeBtn, "trash-2");
-		if (!Platform.isMobile) removeBtn.createSpan({ text: "Remove" });
+		if (!Platform.isMobile) removeBtn.createSpan({ text: translateUi("Remove") });
 
 		showPreview(null);
 

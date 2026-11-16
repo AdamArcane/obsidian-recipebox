@@ -7,6 +7,12 @@
 * sync Pantry name and quantity edits in both directions ([d2179ed](https://github.com/AdamArcane/obsidian-recipebox/commit/d2179ed1c6624f6c9b2455b31c0d7df935a34919))
 * write source recipe names into the Pantry item description ([d2aaf16](https://github.com/AdamArcane/obsidian-recipebox/commit/d2aaf16dcc5fe889899b51ace7c2838abae8adfc))
 
+## [0.3.1-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...0.3.1-beta.0) (2026-11-13)
+
+### Features
+
+* render wikilinks in section labels and recipe source ([#32](https://github.com/AdamArcane/obsidian-recipebox/issues/32)) ([77c8a4c](https://github.com/AdamArcane/obsidian-recipebox/commit/77c8a4cb8d5828fe3db284b8c730e1db6de7c4d2))
+
 ## [0.3.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.2.2...0.3.0) (2026-10-31)
 
 ### Features

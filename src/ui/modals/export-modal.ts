@@ -2,6 +2,7 @@
  * Modal for exporting the current grocery list in plain text, checklist, or
  * grouped Markdown format, with a live preview and copy-to-clipboard action.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice, TFile } from "obsidian";
 import { GroceryItem } from "../../types";
 import { ExportFormat, EXPORT_FORMAT_LABELS } from "../../grocery/export-format";
@@ -25,7 +26,7 @@ export class ExportModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Export grocery list"; }
+	getTitle(): string { return translateUi("Export grocery list"); }
 	getContentClasses(): string[] { return ["rb-export-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
@@ -46,7 +47,7 @@ export class ExportModal extends BaseModal {
 		const checkedField = opts.createDiv({ cls: "rb-modal-field rb-modal-field-row" });
 		const checkedBox = checkedField.createEl("input", { type: "checkbox" });
 		checkedBox.checked = true;
-		checkedField.createEl("label", { text: "Include checked items" });
+		checkedField.createEl("label", { text: translateUi("Include checked items") });
 		checkedBox.addEventListener("change", () => {
 			this.includeChecked = checkedBox.checked;
 			this.refreshPreview();
@@ -54,7 +55,7 @@ export class ExportModal extends BaseModal {
 
 		bodyEl.createEl("p", {
 			cls: "rb-modal-section-desc",
-			text: "Select all text below, then use your system's copy shortcut (Ctrl+C / ⌘C).",
+			text: translateUi("Select all text below, then use your system's copy shortcut (Ctrl+C / ⌘C)."),
 		});
 
 		this.previewEl = bodyEl.createEl("textarea", {
@@ -66,16 +67,16 @@ export class ExportModal extends BaseModal {
 		bodyEl.createEl("hr", { cls: "rb-modal-divider" });
 
 		const appendSection = bodyEl.createDiv({ cls: "rb-modal-section" });
-		appendSection.createDiv({ cls: "rb-modal-section-heading", text: "Append to note" });
+		appendSection.createDiv({ cls: "rb-modal-section-heading", text: translateUi("Append to note") });
 
 		const appendField = appendSection.createDiv({ cls: "rb-modal-field" });
 		const defaultPath = normalizeExportFolder(this.settings.exportFolder)
-			? joinExportPath(this.settings.exportFolder, "Grocery List")
+			? joinExportPath(this.settings.exportFolder, translateUi("Grocery List"))
 			: "";
 		this.appendInput = appendField.createEl("input", {
 			cls: "rb-modal-input",
 			type: "text",
-			placeholder: "Vault-relative path, e.g. Notes/Grocery Export",
+			placeholder: translateUi("Vault-relative path, e.g. Notes/Grocery Export"),
 			value: defaultPath,
 		});
 		new NotePathSuggest(this.app, this.appendInput);
@@ -83,9 +84,9 @@ export class ExportModal extends BaseModal {
 
 	renderFooter(footerEl: HTMLElement): void {
 		// Cancel first, then primary action (spec section 55)
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Close" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Close") })
 			.addEventListener("click", () => this.close());
-		footerEl.createEl("button", { cls: "mod-cta", text: "Append to note" })
+		footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Append to note") })
 			.addEventListener("click", () => { void this.appendToNote(this.appendInput.value); });
 	}
 
@@ -97,20 +98,20 @@ export class ExportModal extends BaseModal {
 	private async appendToNote(rawPath: string): Promise<void> {
 		const path = rawPath.trim();
 		if (!path) {
-			new Notice("Please enter a note path.");
+			new Notice(translateUi("Please enter a note path."));
 			return;
 		}
 
 		const content = this.previewEl.value;
 		if (!content.trim()) {
-			new Notice("Nothing to export — the list is empty with the current options.");
+			new Notice(translateUi("Nothing to export — the list is empty with the current options."));
 			return;
 		}
 
 		const normalizedPath = path.endsWith(".md") ? path : `${path}.md`;
 
 		if (!normalizedPath.endsWith(".md")) {
-			new Notice("Target must be a Markdown file.");
+			new Notice(translateUi("Target must be a Markdown file."));
 			return;
 		}
 
@@ -119,7 +120,7 @@ export class ExportModal extends BaseModal {
 
 			if (!existing) {
 				await this.app.vault.create(normalizedPath, content);
-				new Notice(`Exported to ${normalizedPath}.`);
+				new Notice(translateUi`Exported to ${normalizedPath}.`);
 				this.close();
 				return;
 			}
@@ -127,10 +128,10 @@ export class ExportModal extends BaseModal {
 			const currentContent = await this.app.vault.read(existing);
 			const separator = currentContent.endsWith("\n\n") ? "" : currentContent.endsWith("\n") ? "\n" : "\n\n";
 			await this.app.vault.modify(existing, currentContent + separator + content);
-			new Notice(`Appended to ${normalizedPath}.`);
+			new Notice(translateUi`Appended to ${normalizedPath}.`);
 			this.close();
 		} catch (err) {
-			new Notice(`Failed to write note: ${err instanceof Error ? err.message : String(err)}`);
+			new Notice(translateUi`Failed to write note: ${err instanceof Error ? err.message : String(err)}`);
 		}
 	}
 }

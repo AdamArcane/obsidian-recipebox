@@ -2,6 +2,7 @@
  * Renders the desktop recipe meta banner: the multiplier stepper, nutrition
  * cells, source link, and action buttons (favorite, mark cooked, meal plan).
  */
+import { t as translateUi } from "../../i18n";
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { RECIPE_FRONTMATTER } from "../../settings/frontmatter-keys";
@@ -56,7 +57,7 @@ function renderServingsCell(
 	const cell = container.createDiv({ cls: "rb-banner-cell rb-servings-cell" });
 	const scaled = baseServings * multiplier;
 	const display = Number.isInteger(scaled) ? String(scaled) : scaled.toFixed(2).replace(/\.?0+$/, "");
-	cell.createSpan({ cls: "rb-servings-label", text: "Serves" });
+	cell.createSpan({ cls: "rb-servings-label", text: translateUi("Serves") });
 	cell.createSpan({ cls: "rb-servings-value", text: display });
 }
 
@@ -71,7 +72,7 @@ function renderNutritionCell(
 ): void {
 	const cell = container.createDiv({
 		cls: "rb-banner-cell rb-nutrition-cell rb-nutrition-cell--editable",
-		attr: { role: "button", tabindex: "0", "aria-label": "Edit nutrition" },
+		attr: { role: "button", tabindex: "0", "aria-label": translateUi("Edit nutrition") },
 	});
 	const grid = cell.createDiv({ cls: "rb-nutrition-grid" });
 	for (const field of NUTRITION_FIELDS) {
@@ -110,19 +111,30 @@ function renderSourceCell(
 
 	// The title attribute carries the untruncated value, since the cell is
 	// width-capped and a source is not always a short hostname.
-	if (display.href) {
-		cell.createEl("a", {
-			cls: "rb-source-value",
-			href: display.href,
-			text: display.label,
-			attr: { target: "_blank", rel: "noopener", title: display.href },
-		});
-	} else {
-		cell.createSpan({
-			cls: "rb-source-value",
-			text: display.label,
-			attr: { title: display.label },
-		});
+	switch (display.kind) {
+		case "internal":
+			cell.createEl("a", {
+				cls: "rb-source-value internal-link",
+				href: display.linktext,
+				text: display.label,
+				attr: { "data-href": display.linktext, title: display.linktext },
+			});
+			break;
+		case "external":
+			cell.createEl("a", {
+				cls: "rb-source-value",
+				href: display.href,
+				text: display.label,
+				attr: { target: "_blank", rel: "noopener", title: display.href },
+			});
+			break;
+		case "text":
+			cell.createSpan({
+				cls: "rb-source-value",
+				text: display.label,
+				attr: { title: display.label },
+			});
+			break;
 	}
 }
 
@@ -150,3 +162,4 @@ export function renderMetaBanner(
 	renderMarkCookedButton(actions, app, file, settings, deps);
 	renderMealPlanToggle(actions, app, file, inPlan, planEntries, deps);
 }
+

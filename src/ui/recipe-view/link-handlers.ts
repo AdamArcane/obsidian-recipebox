@@ -4,6 +4,7 @@
  * itself, but a custom view gets only the <a> markup, so without this the links
  * render and do nothing.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, HoverParent, Keymap, Menu, PaneType, WorkspaceLeaf } from "obsidian";
 import { linkTargetFromAttributes, splitLinkpath } from "./link-target";
 
@@ -20,9 +21,9 @@ export interface LinkHandlerOptions {
 // Obsidian's reading view adds these three items from its own link handler,
 // not from the file-menu event, so a custom view has to add them itself.
 const OPEN_ITEMS: Array<{ title: string; icon: string; where: PaneType }> = [
-	{ title: "Open in new tab", icon: "file-plus", where: "tab" },
-	{ title: "Open to the right", icon: "separator-vertical", where: "split" },
-	{ title: "Open in new window", icon: "scan", where: "window" },
+	{ title: translateUi("Open in new tab"), icon: "file-plus", where: "tab" },
+	{ title: translateUi("Open to the right"), icon: "separator-vertical", where: "split" },
+	{ title: translateUi("Open in new window"), icon: "scan", where: "window" },
 ];
 
 function internalLink(evt: Event, root: HTMLElement): { anchor: HTMLAnchorElement; linktext: string } | null {

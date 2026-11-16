@@ -2,6 +2,7 @@
  * Opens a context menu for a specific meal plan entry in the recipe view,
  * providing navigate, edit, and remove actions.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Menu, TFile } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { RecipeViewDeps } from "../recipe-view/recipe-view-deps";
@@ -16,13 +17,13 @@ export function openMealPlanEntryMenu(
 	const menu = new Menu();
 
 	menu.addItem(item =>
-		item.setTitle("View in meal plan")
+		item.setTitle(translateUi("View in meal plan"))
 			.setIcon("calendar")
 			.onClick(() => deps.openMealPlanView())
 	);
 
 	menu.addItem(item =>
-		item.setTitle("Change day / meal type")
+		item.setTitle(translateUi("Change day / meal type"))
 			.setIcon("pencil")
 			.onClick(() => {
 				deps.openEditMealPlanEntry(file, entry, async (day, meal, isLeftovers) => {
@@ -35,7 +36,7 @@ export function openMealPlanEntryMenu(
 	menu.addSeparator();
 
 	menu.addItem(item =>
-		item.setTitle("Remove from meal plan")
+		item.setTitle(translateUi("Remove from meal plan"))
 			.setIcon("trash")
 			.onClick(async () => { await deps.removeFromMealPlanById(entry.id); })
 	);

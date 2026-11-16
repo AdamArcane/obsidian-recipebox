@@ -4,6 +4,7 @@
  * modal only owns the "Add entry" footer button and the self-referencing
  * refresh callback that re-renders the body after any mutation.
  */
+import { t as translateUi } from "../../i18n";
 import { App, EventRef, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { BaseModal } from "./modal-shell";
@@ -23,7 +24,7 @@ export class CookHistoryModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Cook history"; }
+	getTitle(): string { return translateUi("Cook history"); }
 	getIcon(): string { return "history"; }
 	getSubtitle(): string { return this.recipeFile.basename; }
 	getContentClasses(): string[] { return ["rb-ch-modal"]; }
@@ -36,7 +37,7 @@ export class CookHistoryModal extends BaseModal {
 	renderFooter(footerEl: HTMLElement): void {
 		const addBtn = footerEl.createEl("button", { cls: "mod-cta" });
 		setIcon(addBtn.createSpan({ cls: "rb-ch-btn-icon" }), "plus");
-		addBtn.createSpan({ text: "Add entry" });
+		addBtn.createSpan({ text: translateUi("Add entry") });
 		addBtn.addEventListener("click", () => {
 			new EntryEditorModal(this.app, this.recipeFile, this.settings, null, async (date, note, image) => {
 				await addCookHistoryEntry(this.app, this.recipeFile, this.settings, date, note, image ?? null);
@@ -45,7 +46,7 @@ export class CookHistoryModal extends BaseModal {
 		});
 
 		const closeBtn = footerEl.createEl("button", { cls: "rb-shell-cancel-btn" });
-		closeBtn.createSpan({ text: "Close" });
+		closeBtn.createSpan({ text: translateUi("Close") });
 		closeBtn.addEventListener("click", () => this.close());
 	}
 
