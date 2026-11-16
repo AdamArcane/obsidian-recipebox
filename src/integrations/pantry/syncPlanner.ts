@@ -26,6 +26,8 @@ export interface LinkState {
 	text?: string;
 	/** The same agreement in Pantry's wording. Differs from `text` when the split drops a filler word. */
 	remoteText?: string;
+	/** Description we last wrote to Pantry (recipe names). Unset until the first write. */
+	desc?: string;
 }
 
 /** Keyed by String(Pantry item id), because JSON object keys are strings. */

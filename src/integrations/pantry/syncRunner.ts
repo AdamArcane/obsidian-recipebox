@@ -23,6 +23,8 @@ export interface RunnerDeps {
 	keyOf: KeyOf;
 	/** Splits a line into Pantry quantity and name. Omitted means the whole line is the name. */
 	splitText?: (line: string) => SplitText;
+	/** Description for a line, by its ingredient key (recipe names). Omitted means none is written. */
+	describe?: (key: string) => string;
 	note: NoteAccess;
 	links: Links;
 }
@@ -50,6 +52,7 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 	if (!note.exists()) throw new PantryError("note", "The grocery list note does not exist yet.");
 
 	const links: Links = { ...deps.links };
+	const createdIds = new Set<number>();
 	const text = await note.read();
 	const local = scanGroceryNote(text, keyOf);
 	// An empty note next to existing links looks like "user deleted every line".
@@ -108,6 +111,7 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 				const item = await client.createItem(listId, name, categoryId, quantity);
 				// Link right away: if the toggle below fails, the next run sees
 				// local checked vs remote unchecked vs base false and pushes it.
+				createdIds.add(item.id);
 				links[String(item.id)] = { key: action.key, base: false, text: action.text, remoteText: joinQuantity(item.quantity, item.name) };
 				if (action.checked) {
 					await client.setDone(listId, item.id, true);
@@ -129,7 +133,7 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 				return;
 			case "pushText": {
 				const { quantity, name } = splitText(action.text);
-				const item = await client.updateItem(listId, action.id, name, quantity);
+				const item = await client.updateItem(listId, action.id, { name, quantity });
 				// Record what Pantry says it now holds, so the next run sees no change.
 				patch(action.id, { key: action.key, text: action.text, remoteText: joinQuantity(item.quantity, item.name) });
 				result.updated++;
@@ -203,5 +207,32 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 		});
 		for (const edit of applied) edit.onApplied();
 	}
+
+	if (deps.describe) await syncDescriptions(deps.describe);
 	return result;
+
+	/**
+	 * Recipe names go to Pantry one way. Pantry's description may hold something
+	 * the user typed, so a first write only happens when it is empty. After that
+	 * we only rewrite when the recipes behind the line changed, which is why the
+	 * last written text lives on the link and is not compared with Pantry's
+	 * copy (rich text editing can reshape it without the user changing anything).
+	 */
+	async function syncDescriptions(describe: (key: string) => string): Promise<void> {
+		const remoteById = new Map(fetched.items.map((i) => [i.id, i]));
+		for (const [idText, link] of Object.entries(links)) {
+			const id = Number(idText);
+			const remoteItem = remoteById.get(id);
+			if (!createdIds.has(id) && (!remoteItem || remoteItem.deleted || remoteItem.archived)) continue;
+			const wanted = describe(link.key);
+			if (link.desc === undefined ? !wanted || (remoteItem?.description ?? "") !== "" : wanted === link.desc) continue;
+			try {
+				await client.updateItem(listId, id, { description: wanted });
+				patch(id, { desc: wanted });
+			} catch (err) {
+				if (err instanceof PantryError && err.kind === "auth") throw err;
+				result.failed++;
+			}
+		}
+	}
 }

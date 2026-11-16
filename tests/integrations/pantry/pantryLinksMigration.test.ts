@@ -8,7 +8,7 @@ describe("saved Pantry links", () => {
 		expect(links({ "2 cups flour": { id: 12, base: true } })).toEqual({ listId: 7, items: { 12: { key: "2 cups flour", base: true } } });
 	});
 	it("keeps the new format, including agreed texts", () => {
-		const items = { 12: { key: "flour", base: false, text: "2 cups flour", remoteText: "2 cups flour" } };
+		const items = { 12: { key: "flour", base: false, text: "2 cups flour", remoteText: "2 cups flour", desc: "Pancakes" } };
 		expect(links(items)).toEqual({ listId: 7, items });
 	});
 	it("drops malformed entries instead of failing", () => {

@@ -163,11 +163,11 @@ export class PantryClient {
 	}
 
 	/**
-	 * Edits name and quantity. Quantity is always sent, even when empty, so a
-	 * quantity removed in Obsidian is cleared in Pantry rather than left behind.
+	 * Edits only the fields given. An empty string is sent as is, so a quantity
+	 * or description removed in Obsidian is cleared in Pantry, not left behind.
 	 */
-	async updateItem(listId: number, itemId: number, name: string, quantity: string): Promise<PantryItem> {
-		const data = await this.call("PATCH", `${this.housePath()}/lists/${listId}/items/${itemId}`, "", { name, quantity });
+	async updateItem(listId: number, itemId: number, fields: { name?: string; quantity?: string; description?: string }): Promise<PantryItem> {
+		const data = await this.call("PATCH", `${this.housePath()}/lists/${listId}/items/${itemId}`, "", fields);
 		const item = parseItem(data) ?? parseItem((data as { item?: unknown } | null)?.item);
 		if (!item) throw new PantryError("shape", "Pantry did not return the updated item.");
 		return item;

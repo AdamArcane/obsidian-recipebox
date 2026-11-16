@@ -13,6 +13,7 @@ import { resolveNotePath } from "../../utils/vault-notes";
 import { PantryError } from "./pantryTypes";
 import { runSync } from "./syncRunner";
 import { splitQuantity } from "./splitQuantity";
+import { describeSources } from "./recipeDescription";
 import { SyncScheduler } from "./syncScheduler";
 import { pantryClientFromSettings } from "./pantryConfig";
 
@@ -160,6 +161,7 @@ export class PantryModule {
 					return parsed?.name ? ingredientKey(parsed.name, parsed.unit) : null;
 				},
 				splitText: (line) => splitQuantity(line, parserOptions),
+				describe: (key) => describeSources(settings.state.groceryContributions[key]),
 				links,
 				note: {
 					exists: () => plugin.app.vault.getFileByPath(path) !== null,

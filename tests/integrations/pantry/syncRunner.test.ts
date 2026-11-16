@@ -12,22 +12,21 @@ const keyOf = (t: string): string | null => t.toLowerCase() || null;
 function fakePantry(initial: Array<Partial<PantryItem> & { id: number; name: string }> = [], categories = [{ id: 1, name: "Dairy" }]) {
 	let nextId = 100;
 	const items = new Map<number, PantryItem>();
-	for (const i of initial) items.set(i.id, { quantity: "", done: false, categoryId: null, deleted: false, archived: false, ...i });
+	for (const i of initial) items.set(i.id, { quantity: "", description: "", done: false, categoryId: null, deleted: false, archived: false, ...i });
 	const calls = { update: [] as unknown[], create: [] as unknown[], setDone: [] as unknown[], del: [] as number[] };
 	const client = {
 		listCategories: async () => categories,
 		listItems: async () => ({ items: [...items.values()], truncated: false }),
 		createItem: async (_l: number, name: string, categoryId: number | null, quantity = "") => {
 			calls.create.push(quantity ? { name, categoryId, quantity } : { name, categoryId });
-			const item: PantryItem = { id: nextId++, name, quantity, done: false, categoryId, deleted: false, archived: false };
+			const item: PantryItem = { id: nextId++, name, quantity, description: "", done: false, categoryId, deleted: false, archived: false };
 			items.set(item.id, item);
 			return item;
 		},
-		updateItem: async (_l: number, id: number, name: string, quantity: string) => {
-			calls.update.push({ id, name, quantity });
+		updateItem: async (_l: number, id: number, fields: { name?: string; quantity?: string; description?: string }) => {
+			calls.update.push({ id, ...fields });
 			const i = items.get(id)!;
-			i.name = name;
-			i.quantity = quantity;
+			Object.assign(i, fields);
 			return i;
 		},
 		setDone: async (_l: number, id: number, done: boolean) => { calls.setDone.push({ id, done }); const i = items.get(id); if (i) i.done = done; },
@@ -229,5 +228,40 @@ describe("name and quantity edits", () => {
 		expect(pantry.calls.del).toEqual([]);
 		expect(pantry.calls.create).toEqual([]);
 		expect(r.links[1].key).toBe("oat milk");
+	});
+});
+
+describe("recipe names in the description", () => {
+	const describe_ = (key: string) => (key === "flour" ? "Banana Bread, Pancakes" : "");
+	const withDesc = (p: ReturnType<typeof fakePantry>, n: ReturnType<typeof fakeNote>, links: Links = {}): RunnerDeps =>
+		({ ...deps(p, n, links), describe: describe_ });
+
+	it("writes recipe names to a new item and is quiet on the next run", async () => {
+		const note = fakeNote("## Other\n- [ ] flour\n- [ ] salt\n");
+		const pantry = fakePantry();
+		const first = await runSync(withDesc(pantry, note));
+		expect(pantry.calls.update).toEqual([{ id: 100, description: "Banana Bread, Pancakes" }]);
+		expect(first.links[100].desc).toBe("Banana Bread, Pancakes");
+		await runSync(withDesc(pantry, note, first.links));
+		expect(pantry.calls.update).toHaveLength(1);
+	});
+
+	it("rewrites only when the recipes change, and clears when none remain", async () => {
+		const note = fakeNote("## Other\n- [ ] flour\n");
+		const pantry = fakePantry([{ id: 1, name: "flour", description: "Old Recipe" }]);
+		const links: Links = { 1: { key: "flour", base: false, text: "flour", remoteText: "flour", desc: "Old Recipe" } };
+		const r = await runSync(withDesc(pantry, note, links));
+		expect(pantry.calls.update).toEqual([{ id: 1, description: "Banana Bread, Pancakes" }]);
+		const cleared = await runSync({ ...withDesc(pantry, note, r.links), describe: () => "" });
+		expect(pantry.calls.update[1]).toEqual({ id: 1, description: "" });
+		expect(cleared.links[1].desc).toBe("");
+	});
+
+	it("never overwrites a description the user wrote before we wrote one", async () => {
+		const note = fakeNote("## Other\n- [ ] flour\n");
+		const pantry = fakePantry([{ id: 1, name: "flour", description: "the good brand" }]);
+		const r = await runSync(withDesc(pantry, note, { 1: { key: "flour", base: false, text: "flour", remoteText: "flour" } }));
+		expect(pantry.calls.update).toEqual([]);
+		expect(r.links[1].desc).toBeUndefined();
 	});
 });

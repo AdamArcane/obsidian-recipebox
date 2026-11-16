@@ -24,6 +24,8 @@ export interface PantryItem {
 	name: string;
 	/** Free text in Pantry. Treated as opaque. Empty string when unset. */
 	quantity: string;
+	/** Free text, possibly rich text markup. Only read to avoid overwriting something the user wrote. */
+	description: string;
 	done: boolean;
 	categoryId: number | null;
 	/** Soft deleted (in the Pantry trash). Treated as gone. */
@@ -101,6 +103,7 @@ export function parseItem(raw: unknown): PantryItem | null {
 		id: raw.id,
 		name: raw.name,
 		quantity: typeof raw.quantity === "string" ? raw.quantity : "",
+		description: typeof raw.description === "string" ? raw.description : "",
 		done: raw.done === true,
 		categoryId: typeof raw.categoryId === "number" ? raw.categoryId : null,
 		deleted: isSet(raw.deletedAt),
