@@ -5,6 +5,7 @@
  * The old global "Exclusion window" setting lives in each mode's filters now.
  */
 import { t as translateUi } from "../../i18n";
+import { modeLabel } from "../utils/localized-labels";
 import { App, setIcon, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import type { SuggesterMode } from "../../suggester/strategy-types";
@@ -116,7 +117,7 @@ function renderModeRow(
 	row.createEl("label", {
 		cls: "rb-strategy-name",
 		attr: { for: `rb-md-${mode.id}` },
-		text: mode.name,
+		text: modeLabel(mode),
 	});
 
 	// if (mode.filters.length || mode.rules.length) {

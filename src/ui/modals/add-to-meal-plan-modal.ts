@@ -78,7 +78,7 @@ export class AddToMealPlanModal extends BaseModal {
 		return this.entry.kind === "recipe" && !this.editMode;
 	}
 
-	getTitle(): string { return (this.editMode ? "Edit" : translateUi("Add to")) + " meal plan"; }
+	getTitle(): string { return this.editMode ? translateUi("Edit meal plan") : translateUi("Add to meal plan"); }
 	getSubtitle(): string {
 		return this.entry.kind === "recipe" ? this.entry.file.basename : translateUi("Custom meal");
 	}

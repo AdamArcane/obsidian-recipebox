@@ -1,10 +1,11 @@
 /**
  * The built-in suggester modes shipped with the plugin.
  * All are fully editable by the user but cannot be deleted (isBuiltin=true).
+ * Names stay English here because mergeModes() persists them to data.json; they are
+ * translated for display only (see modeLabel in ui/utils/localized-labels.ts).
  * Field names reference the plugin defaults; if the user has renamed a property
  * in settings, they can edit the rule to match.
  */
-import { t as translateUi } from "../i18n";
 import type { SuggesterMode } from "./strategy-types";
 
 export const BUILTIN_MODE_IDS = {
@@ -16,7 +17,7 @@ export const BUILTIN_MODE_IDS = {
 export const BUILTIN_MODES: SuggesterMode[] = [
 	{
 		id: BUILTIN_MODE_IDS.rediscover,
-		name: translateUi("Rediscover favorite recipes"),
+		name: "Rediscover favorite recipes",
 		isBuiltin: true,
 		isDefault: false,
 		filters: [],
@@ -31,7 +32,7 @@ export const BUILTIN_MODES: SuggesterMode[] = [
 	},
 	{
 		id: BUILTIN_MODE_IDS.goTo,
-		name: translateUi("My Go-to recipes"),
+		name: "My Go-to recipes",
 		isBuiltin: true,
 		isDefault: false,
 		filters: [],
@@ -44,7 +45,7 @@ export const BUILTIN_MODES: SuggesterMode[] = [
 	},
 	{
 		id: BUILTIN_MODE_IDS.findNew,
-		name: translateUi("Find new recipes"),
+		name: "Find new recipes",
 		isBuiltin: true,
 		isDefault: true,
 		filters: [],

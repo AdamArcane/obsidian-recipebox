@@ -3,6 +3,7 @@
  * Suggestions run automatically on open and whenever the mode changes.
  */
 import { t as translateUi } from "../../i18n";
+import { modeLabel } from "../utils/localized-labels";
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { MealPlanEntry } from "../../types";
@@ -67,7 +68,7 @@ export class SuggestMealModal extends BaseModal {
 
 		const sel = controls.createEl("select", { cls: "rb-modal-select" });
 		for (const s of settings.suggesterModes) {
-			sel.createEl("option", { attr: { value: s.id }, text: s.name });
+			sel.createEl("option", { attr: { value: s.id }, text: modeLabel(s) });
 		}
 		sel.value = this.activeModeId || sel.options[0]?.value || "";
 		this.activeModeId = sel.value;
@@ -92,7 +93,7 @@ export class SuggestMealModal extends BaseModal {
 					await this.deps.saveSettings();
 					sel.empty();
 					for (const s of this.deps.getSettings().suggesterModes) {
-						sel.createEl("option", { attr: { value: s.id }, text: s.name });
+						sel.createEl("option", { attr: { value: s.id }, text: modeLabel(s) });
 					}
 					sel.value = updated.id;
 				},
@@ -103,7 +104,7 @@ export class SuggestMealModal extends BaseModal {
 					// Switch to first remaining mode and re-run
 					sel.empty();
 					for (const m of s.suggesterModes) {
-						sel.createEl("option", { attr: { value: m.id }, text: m.name });
+						sel.createEl("option", { attr: { value: m.id }, text: modeLabel(m) });
 					}
 					this.activeModeId = sel.options[0]?.value ?? "";
 					sel.value = this.activeModeId;
