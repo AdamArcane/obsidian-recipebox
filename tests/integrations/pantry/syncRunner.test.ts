@@ -17,9 +17,9 @@ function fakePantry(initial: Array<Partial<PantryItem> & { id: number; name: str
 	const client = {
 		listCategories: async () => categories,
 		listItems: async () => ({ items: [...items.values()], truncated: false }),
-		createItem: async (_l: number, name: string, categoryId: number | null) => {
-			calls.create.push({ name, categoryId });
-			const item: PantryItem = { id: nextId++, name, quantity: "", done: false, categoryId, deleted: false, archived: false };
+		createItem: async (_l: number, name: string, categoryId: number | null, quantity = "") => {
+			calls.create.push(quantity ? { name, categoryId, quantity } : { name, categoryId });
+			const item: PantryItem = { id: nextId++, name, quantity, done: false, categoryId, deleted: false, archived: false };
 			items.set(item.id, item);
 			return item;
 		},
@@ -172,5 +172,17 @@ describe("runSync", () => {
 		const pantry = fakePantry([{ id: 1, name: "old", archived: true }]);
 		await runSync(deps(pantry, note));
 		expect(note.state.text).not.toContain("old");
+	});
+});
+
+describe("quantity split on create", () => {
+	it("sends quantity and name separately", async () => {
+		const pantry = fakePantry();
+		const { note } = fakeNote("- [ ] 2 cups flour\n");
+		await runSync({
+			client: pantry.client, listId: 1, keyOf, note, links: {},
+			splitText: (line) => ({ quantity: "2 cups", name: line.replace("2 cups ", "") }),
+		});
+		expect(pantry.calls.create).toEqual([{ name: "flour", categoryId: null, quantity: "2 cups" }]);
 	});
 });

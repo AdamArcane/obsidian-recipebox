@@ -149,11 +149,13 @@ export class PantryClient {
 		}
 	}
 
-	async createItem(listId: number, name: string, categoryId: number | null): Promise<PantryItem> {
+	async createItem(listId: number, name: string, categoryId: number | null, quantity = ""): Promise<PantryItem> {
 		// deleteOnDone:false is always explicit. A list default of true would make
 		// checking an item in the store delete it, which we would read as a deletion.
 		const body: Record<string, unknown> = { name, deleteOnDone: false };
 		if (categoryId !== null) body.categoryId = categoryId;
+		// Opaque free text in Pantry. Only sent when there is one, to keep the request minimal.
+		if (quantity) body.quantity = quantity;
 		const data = await this.call("POST", `${this.housePath()}/lists/${listId}/items`, "", body);
 		const item = parseItem(data) ?? parseItem((data as { item?: unknown } | null)?.item);
 		if (!item) throw new PantryError("shape", "Pantry did not return the new item.");

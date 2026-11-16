@@ -12,6 +12,7 @@ import { debounce } from "../../utils/debounce";
 import { resolveNotePath } from "../../utils/vault-notes";
 import { PantryError } from "./pantryTypes";
 import { runSync } from "./syncRunner";
+import { splitQuantity } from "./splitQuantity";
 import { SyncScheduler } from "./syncScheduler";
 import { pantryClientFromSettings } from "./pantryConfig";
 
@@ -158,6 +159,7 @@ export class PantryModule {
 					const parsed = parseIngredientLine(text, parserOptions);
 					return parsed?.name ? ingredientKey(parsed.name, parsed.unit) : null;
 				},
+				splitText: (line) => splitQuantity(line, parserOptions),
 				links,
 				note: {
 					exists: () => plugin.app.vault.getFileByPath(path) !== null,

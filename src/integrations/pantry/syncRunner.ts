@@ -8,6 +8,7 @@ import { PantryClient } from "./PantryClient";
 import { KeyOf, insertItem, removeByKey, scanGroceryNote, setCheckedByKey } from "./groceryLines";
 import { Action, Links, RemoteEntry, planSync } from "./syncPlanner";
 import { PantryError } from "./pantryTypes";
+import { SplitText } from "./splitQuantity";
 
 export interface NoteAccess {
 	exists(): boolean;
@@ -20,6 +21,8 @@ export interface RunnerDeps {
 	client: Pick<PantryClient, "listCategories" | "listItems" | "createItem" | "setDone" | "deleteItem">;
 	listId: number;
 	keyOf: KeyOf;
+	/** Splits a line into Pantry quantity and name. Omitted means the whole line is the name. */
+	splitText?: (line: string) => SplitText;
 	note: NoteAccess;
 	links: Links;
 }
@@ -43,6 +46,7 @@ interface LocalEdit {
 
 export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 	const { client, listId, keyOf, note } = deps;
+	const splitText = deps.splitText ?? ((line: string): SplitText => ({ quantity: "", name: line }));
 	if (!note.exists()) throw new PantryError("note", "The grocery list note does not exist yet.");
 
 	const links: Links = { ...deps.links };
@@ -95,7 +99,8 @@ export async function runSync(deps: RunnerDeps): Promise<RunResult> {
 		switch (action.type) {
 			case "createRemote": {
 				const categoryId = action.category ? (categoryIdByName.get(action.category.trim().toLowerCase()) ?? null) : null;
-				const item = await client.createItem(listId, action.text, categoryId);
+				const { quantity, name } = splitText(action.text);
+				const item = await client.createItem(listId, name, categoryId, quantity);
 				// Link right away: if the toggle below fails, the next run sees
 				// local checked vs remote unchecked vs base false and pushes it.
 				links[action.key] = { id: item.id, base: false };

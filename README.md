@@ -47,7 +47,7 @@ Ingredients from your meal plan are consolidated automatically... quantities sum
 
 ### 🔄 Pantry sync (optional)
 
-Turn on Pantry sync in settings to keep your grocery list in step with a checklist in the Nextcloud Pantry app. Check items off on your phone in the store and they are checked in Obsidian, and items you add in either place show up in the other. Your list stays plain markdown: lines are matched to Pantry by item name, with nothing hidden added to the note. It is off by default and does nothing until you enable it. Run it from the command palette, or set an auto sync interval on one device.
+Turn on Nextcloud Pantry under Integrations in settings to keep your grocery list in step with a checklist in the Nextcloud Pantry app. Check items off on your phone in the store and they are checked in Obsidian, and items you add in either place show up in the other. Your list stays plain markdown: lines are matched to Pantry by item name, with nothing hidden added to the note. It is off by default and does nothing until you enable it. Run it from the command palette, or set an auto sync interval on one device.
 
 ### ✏️ Recipe editing
 

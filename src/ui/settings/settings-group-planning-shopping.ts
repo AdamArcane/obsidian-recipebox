@@ -8,7 +8,6 @@ import { renderNotePathRow } from "./settings-note-path-row";
 import { sectionPage } from "./section-row-host";
 import { renderSectionShopping } from "./section-shopping";
 import { renderSectionSuggester } from "./section-suggester";
-import { buildPantryPage } from "../../integrations/pantry/pantrySettings";
 
 export function buildPlanningShoppingGroup(ctx: SettingsBuildContext): SettingsDefinition {
 	const { app, plugin } = ctx;
@@ -113,7 +112,6 @@ export function buildPlanningShoppingGroup(ctx: SettingsBuildContext): SettingsD
 				["category order", "category overrides", "grouping", "shopping"],
 				(el, rerender) => renderSectionShopping(el, plugin.settings, save, rerender, app, () => plugin.manager.getKnownCategories()),
 			),
-			buildPantryPage(ctx),
 		],
 	};
 }
