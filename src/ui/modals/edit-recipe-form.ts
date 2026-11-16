@@ -6,6 +6,7 @@
  * (number parsing, list marker normalization) cannot damage content the user
  * did not edit.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ImportedGroup } from "../../importer/recipe-extract-types";
@@ -73,11 +74,11 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 	// Title: the recipe title IS the filename, so it is only editable when the
 	// user opts into renaming.
 	const { left, preview } = titleImageRow(bodyEl);
-	const titleInput = textField(left, "Title", titleValue, (v) => { titleValue = v; });
+	const titleInput = textField(left, translateUi("Title"), titleValue, (v) => { titleValue = v; });
 	titleInput.readOnly = true;
 	const renameRow = left.createEl("label", { cls: "rb-edit-rename-row" });
 	const renameBox = renameRow.createEl("input", { attr: { type: "checkbox" } });
-	renameRow.createSpan({ text: "Rename file" });
+	renameRow.createSpan({ text: translateUi("Rename file") });
 	renameBox.addEventListener("change", () => {
 		renameChecked = renameBox.checked;
 		titleInput.readOnly = !renameChecked;
@@ -96,11 +97,11 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 		const input = field.createEl("input", { cls: "rb-import-text-input", attr: { type: "text" } });
 		input.value = loaded.image.value;
 		input.readOnly = true;
-		field.createDiv({ cls: "rb-modal-desc", text: "Image comes from the note body; edit it as markdown." });
+		field.createDiv({ cls: "rb-modal-desc", text: translateUi("Image comes from the note body; edit it as markdown.") });
 		renderImagePreview(app, preview, loaded.image.value);
 	}
 
-	const basicBody = importSection(bodyEl, "Basic info");
+	const basicBody = importSection(bodyEl, translateUi("Basic info"));
 	renderTimingFields(basicBody, timing, (key, v) => { timing[key] = v; }, "text");
 
 	function listSection(
@@ -112,11 +113,11 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 		if (section.status === "ineligible") {
 			body.createDiv({
 				cls: "rb-modal-desc",
-				text: "This section has content the editor can't change safely (paragraphs, nested lists, multi-line steps, etc.).",
+				text: translateUi("This section has content the editor can't change safely (paragraphs, nested lists, multi-line steps, etc.)."),
 			});
 			const btn = body.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 			setIcon(btn.createSpan({ cls: "rb-modal-btn-icon" }), "pencil");
-			btn.createSpan({ text: "Open as Markdown" });
+			btn.createSpan({ text: translateUi("Open as Markdown") });
 			btn.addEventListener("click", opts.onOpenMarkdown);
 		} else {
 			renderEditor(body);
@@ -126,7 +127,7 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 
 	const ingredientsBody = listSection("Ingredients", loaded.ingredients, (body) =>
 		renderIngredientsEditor(app, body, ingredientGroups, settings, (g) => { ingredientGroups = g; }));
-	const stepsBody = listSection("Steps", loaded.steps, (body) =>
+	const stepsBody = listSection(translateUi("Steps"), loaded.steps, (body) =>
 		renderStepsEditor(app, body, stepGroups, (g) => { stepGroups = g; }));
 
 	// Raw markdown, written back verbatim -- not the list-marker-stripping
@@ -134,8 +135,8 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 	renderNotesTextarea(importSection(bodyEl, "Notes"), notesText, (v) => { notesText = v; });
 
 	const nutritionBody = importSection(bodyEl, "Nutrition");
-	const basis = settings.nutritionSource === "per-serving" ? "per serving" : "recipe total";
-	nutritionBody.createDiv({ cls: "rb-modal-desc", text: `Values are stored as ${basis}, unscaled by the current multiplier.` });
+	const basis = settings.nutritionSource === "per-serving" ? translateUi("per serving") : translateUi("recipe total");
+	nutritionBody.createDiv({ cls: "rb-modal-desc", text: translateUi`Values are stored as ${basis}, unscaled by the current multiplier.` });
 	renderNutritionFields(
 		nutritionBody,
 		"Nutrition",
@@ -180,10 +181,10 @@ export function renderEditRecipeForm(bodyEl: HTMLElement, opts: EditFormOptions)
 			let renameTo: string | null = null;
 			if (renameChecked) {
 				const trimmed = titleValue.trim();
-				if (!trimmed) return { kind: "invalid", message: "Title can't be empty." };
+				if (!trimmed) return { kind: "invalid", message: translateUi("Title can't be empty.") };
 				const collapsed = trimmed.replace(/\s+/g, " ");
 				if (titleToFilename(trimmed) !== collapsed) {
-					return { kind: "invalid", message: "Title can't contain any of these characters: \\ / : * ? \" < > | # [ ]" };
+					return { kind: "invalid", message: translateUi("Title can't contain any of these characters: \\ / : * ? \" < > | # [ ]") };
 				}
 				if (collapsed !== basename) renameTo = collapsed;
 			}

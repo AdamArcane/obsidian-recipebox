@@ -2,6 +2,8 @@
  * Shows a small floating popover for selecting or entering a meal type
  * (Breakfast, Lunch, Dinner, Snack, or a custom value) after a recipe is dropped.
  */
+import { mealLabel } from "../utils/localized-labels";
+import { t as translateUi } from "../../i18n";
 import { Platform } from "obsidian";
 import { MealPlanViewDeps } from "./meal-plan-view-deps";
 
@@ -24,21 +26,21 @@ export function showMealTypePopover(
 ): void {
 	const popover = activeDocument.body.createDiv({ cls: "rb-meal-type-popover" });
 
-	const closeBtn = popover.createEl("button", { cls: "rb-meal-type-close", attr: { title: "Dismiss", "aria-label": "Dismiss" }, text: "×" });
+	const closeBtn = popover.createEl("button", { cls: "rb-meal-type-close", attr: { title: translateUi("Dismiss"), "aria-label": translateUi("Dismiss") }, text: "×" });
 
 	const header = popover.createDiv({ cls: "rb-meal-type-popover-header" });
-	header.createDiv({ cls: "rb-meal-type-popover-label", text: "Meal type?" });
+	header.createDiv({ cls: "rb-meal-type-popover-label", text: translateUi("Meal type?") });
 
 	const chips = popover.createDiv({ cls: "rb-meal-type-chips" });
 	for (const option of MEAL_CHIPS) {
-		const btn = chips.createEl("button", { cls: "rb-meal-type-chip", text: option });
+		const btn = chips.createEl("button", { cls: "rb-meal-type-chip", text: mealLabel(option) });
 		btn.addEventListener("click", () => commit(option));
 	}
 
 	const row = popover.createDiv({ cls: "rb-meal-type-popover-row" });
 	const input = row.createEl("input", {
 		cls: "rb-meal-type-input",
-		attr: { type: "text", placeholder: "Custom…" },
+		attr: { type: "text", placeholder: translateUi("Custom…") },
 	});
 	const confirmBtn = row.createEl("button", { cls: "rb-meal-type-confirm", text: "✓" });
 

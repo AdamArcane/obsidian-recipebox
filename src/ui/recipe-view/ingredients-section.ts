@@ -4,6 +4,7 @@
  * Ingredient names are rendered through Obsidian's full markdown renderer so
  * that wikilinks, bold, and other inline formatting work naturally.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Component, MarkdownRenderer, moment, setIcon, TFile } from "obsidian";
 import { IngredientGroup } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -42,11 +43,11 @@ export async function renderIngredientsSection(
 	setIcon(sectionIcon, "carrot");
 	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.ingredientsHeading });
 	// Without a handler (e.g. a future read-only embed) the title stays plain text.
-	if (onEditSection) makeSectionTitleEditable(titleEl, `Edit ${settings.ingredientsHeading}`, onEditSection);
+	if (onEditSection) makeSectionTitleEditable(titleEl, translateUi`Edit ${settings.ingredientsHeading}`, onEditSection);
 
 	const addBtn = header.createEl("button", {
 		cls: "rb-grocery-add-btn",
-		attr: { "aria-label": "Add to grocery list" },
+		attr: { "aria-label": translateUi("Add to grocery list") },
 	});
 	setIcon(addBtn, "shopping-cart");
 	addBtn.addEventListener("click", onOpenGroceryModal);
@@ -114,13 +115,13 @@ export async function renderIngredientsSection(
 			}
 
 			if (settings.showHighGIWarnings && isHighGi(parsed.name, giPatterns)) {
-				row.createSpan({ cls: "rb-high-gi-badge", text: "High GI" });
+				row.createSpan({ cls: "rb-high-gi-badge", text: translateUi("High GI") });
 			}
 
 			if (inGrocery) {
 				const removeBtn = row.createEl("button", {
 					cls: "rb-grocery-remove-btn",
-					attr: { "aria-label": "Remove from grocery list" },
+					attr: { "aria-label": translateUi("Remove from grocery list") },
 				});
 				const iconDefault = removeBtn.createSpan({ cls: "rb-grocery-icon-default" });
 				setIcon(iconDefault, "list-check");

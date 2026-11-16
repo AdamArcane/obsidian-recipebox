@@ -21,6 +21,7 @@
  * not in the entry editor, because each group's entry editor is independent
  * and only this module can see its neighbours.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon } from "obsidian";
 import { ImportedGroup } from "../../importer/recipe-extract-types";
 import { ConfirmModal } from "./confirm-modal";
@@ -110,14 +111,14 @@ export function renderGroupListEditor(
 				});
 
 				const controls = header.createDiv({ cls: "rb-import-group-controls" });
-				const upBtn = iconBtn(controls, "chevron-up", "Move group up");
+				const upBtn = iconBtn(controls, "chevron-up", translateUi("Move group up"));
 				upBtn.disabled = i === 0;
 				upBtn.addEventListener("click", () => {
 					[groups[i - 1], groups[i]] = [groups[i], groups[i - 1]];
 					renderAll();
 					onChange(snapshot());
 				});
-				const downBtn = iconBtn(controls, "chevron-down", "Move group down");
+				const downBtn = iconBtn(controls, "chevron-down", translateUi("Move group down"));
 				downBtn.disabled = i === groups.length - 1;
 				downBtn.addEventListener("click", () => {
 					[groups[i], groups[i + 1]] = [groups[i + 1], groups[i]];
@@ -129,7 +130,7 @@ export function renderGroupListEditor(
 				// later group's items join the previous group. The first group has
 				// nothing above it and simply loses its name, becoming the unnamed
 				// lead list.
-				const ungroupBtn = iconBtn(controls, "ungroup", "Ungroup (keep items)");
+				const ungroupBtn = iconBtn(controls, "ungroup", translateUi("Ungroup (keep items)"));
 				ungroupBtn.addEventListener("click", () => {
 					if (i === 0) {
 						group.name = null;
@@ -141,7 +142,7 @@ export function renderGroupListEditor(
 					renderAll();
 					onChange(snapshot());
 				});
-				const deleteBtn = iconBtn(controls, "trash-2", "Delete group", true);
+				const deleteBtn = iconBtn(controls, "trash-2", translateUi("Delete group"), true);
 				const doDelete = (): void => {
 					groups.splice(i, 1);
 					if (groups.length === 0) groups.push({ name: null, items: [] });
@@ -154,9 +155,9 @@ export function renderGroupListEditor(
 					if (group.items.length === 0) { doDelete(); return; }
 					new ConfirmModal(
 						app,
-						"Delete group?",
+						translateUi("Delete group?"),
 						`Delete group and its ${group.items.length} item${group.items.length === 1 ? "" : "s"}?`,
-						"Delete",
+						translateUi("Delete"),
 						{ destructive: true, onConfirm: doDelete },
 					).open();
 				});
@@ -181,8 +182,8 @@ export function renderGroupListEditor(
 			// here only, not on later adds, makes that first split legible without
 			// stomping on a name the user has since cleared on purpose.
 			if (groups.length === 1 && groups[0].name === null) {
-				groups[0].name = "Group 1";
-				groups.push({ name: "Group 2", items: [] });
+				groups[0].name = translateUi("Group 1");
+				groups.push({ name: translateUi("Group 2"), items: [] });
 			} else {
 				groups.push({ name: null, items: [] });
 			}

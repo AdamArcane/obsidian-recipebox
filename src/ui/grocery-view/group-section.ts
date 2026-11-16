@@ -2,6 +2,7 @@
  * Renders a collapsible group section in the grocery view, including the header
  * with badge count and the list of item rows beneath it.
  */
+import { categoryLabel } from "../utils/localized-labels";
 import { setIcon } from "obsidian";
 import { GroupingMode } from "../../types";
 import { DisplayGroup } from "./display-groups";
@@ -28,7 +29,7 @@ export function renderGroupSection(
 		const chevron = header.createSpan({ cls: "rb-gv-chevron rb-icon" });
 		setIcon(chevron, isCollapsed ? "chevron-right" : "chevron-down");
 
-		header.createSpan({ cls: "rb-gv-group-name", text: group.name });
+		header.createSpan({ cls: "rb-gv-group-name", text: mode === "category" ? categoryLabel(group.name) : group.name });
 		header.createSpan({
 			cls: "rb-gv-group-badge",
 			text: `${checkedCount}/${group.items.length}`,

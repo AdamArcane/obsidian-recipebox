@@ -2,6 +2,7 @@
  * Settings for parsing localized ingredient units and filler words.
  * Mappings are edited as rows but remain stored in the parser's text format.
  */
+import { t as translateUi } from "../../i18n";
 import { Setting } from "obsidian";
 import { UNIT_SYNONYMS } from "../../parser/ingredient-units";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -49,8 +50,8 @@ export function renderSectionRecipeParser(
 	const mappings = readMappings(settings.ingredientUnitSynonyms);
 
 	const mappingSetting = new Setting(container)
-		.setName("Unit mappings")
-		.setDesc("Unit mappings teach the parser that localized words such as 'tasse' or 'el' mean a canonical unit like cup or tbsp. This lets recipes scale correctly and lets grocery items merge instead of remaining separate.");
+		.setName(translateUi("Unit mappings"))
+		.setDesc(translateUi("Unit mappings teach the parser that localized words such as 'tasse' or 'el' mean a canonical unit like cup or tbsp. This lets recipes scale correctly and lets grocery items merge instead of remaining separate."));
 	mappingSetting.settingEl.addClass("rb-unit-mapping-setting");
 
 	const list = mappingSetting.controlEl.createDiv("rb-unit-mapping-list");
@@ -62,17 +63,17 @@ export function renderSectionRecipeParser(
 			const aliases = row.createEl("input", {
 				type: "text",
 				value: mapping.aliases,
-				placeholder: "Aliases, separated by commas",
+				placeholder: translateUi("Aliases, separated by commas"),
 			});
 			const canonical = row.createEl("input", {
 				type: "text",
 				value: mapping.canonical,
-				placeholder: "Canonical unit",
+				placeholder: translateUi("Canonical unit"),
 			});
-			const remove = row.createEl("button", { text: "Remove" });
+			const remove = row.createEl("button", { text: translateUi("Remove") });
 			const hint = row.createDiv({
 				cls: "rb-unit-mapping-hint setting-item-description",
-				text: "This unit is not a built-in unit and no other mapping uses it, so it will not merge with other ingredients.",
+				text: translateUi("This unit is not a built-in unit and no other mapping uses it, so it will not merge with other ingredients."),
 			});
 			hint.toggle(isUnmergedCanonical(mappings, index));
 
@@ -93,7 +94,7 @@ export function renderSectionRecipeParser(
 			});
 		});
 
-		const add = list.createEl("button", { text: "Add unit mapping" });
+		const add = list.createEl("button", { text: translateUi("Add unit mapping") });
 		add.addEventListener("click", () => {
 			mappings.push({ aliases: "", canonical: "" });
 			void save().then(() => render());
@@ -103,11 +104,11 @@ export function renderSectionRecipeParser(
 	render();
 
 	const fillerSetting = new Setting(container)
-		.setName("Ingredient filler words")
-		.setDesc("Comma-separated words removed between a unit and ingredient name, such as 'of, de, di'. Leave empty to strip nothing.")
+		.setName(translateUi("Ingredient filler words"))
+		.setDesc(translateUi("Comma-separated words removed between a unit and ingredient name, such as 'of, de, di'. Leave empty to strip nothing."))
 		.addText((text) => text
 			.setValue(settings.ingredientFillerWord)
-			.setPlaceholder("Of, de")
+			.setPlaceholder(translateUi("Of, de"))
 			.onChange((value) => {
 				settings.ingredientFillerWord = value.trim();
 				void save();
@@ -116,8 +117,8 @@ export function renderSectionRecipeParser(
 	fillerSetting.settingEl.addClass("rb-parser-filler-setting");
 
 	new Setting(container)
-		.setName("Preserve ingredient name casing")
-		.setDesc("Show ingredient names as written in the note instead of lowercasing them. Useful for languages that capitalise nouns. Grocery list matching still ignores casing.")
+		.setName(translateUi("Preserve ingredient name casing"))
+		.setDesc(translateUi("Show ingredient names as written in the note instead of lowercasing them. Useful for languages that capitalise nouns. Grocery list matching still ignores casing."))
 		.addToggle((toggle) => toggle
 			.setValue(settings.ingredientPreserveNameCase)
 			.onChange((value) => {

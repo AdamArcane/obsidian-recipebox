@@ -2,6 +2,7 @@
  * The countdown timer widget — renders the timer UI, manages the countdown
  * interval, triggers audio on completion, and supports drag via timer-drag.ts.
  */
+import { t as translateUi } from "../../i18n";
 import { Notice, setIcon } from "obsidian";
 import { formatTime, parseTimeInput } from "./time-format";
 import { playCompletionSound } from "./timer-audio";
@@ -65,18 +66,18 @@ export class TimerWidget {
 		this.makeStepBtn(steppers, "chevron-down", -STEP_INCREMENT_SECONDS);
 
 		const controls = this.el.createDiv({ cls: "rb-timer-controls" });
-		this.playBtn = this.makeIconBtn(controls, "play", "Start", () => this.togglePlay(), "rb-timer-btn rb-timer-btn--play");
+		this.playBtn = this.makeIconBtn(controls, "play", translateUi("Start"), () => this.togglePlay(), "rb-timer-btn rb-timer-btn--play");
 
-		this.makeIconBtn(controls, "rotate-ccw", "Reset", () => this.reset());
+		this.makeIconBtn(controls, "rotate-ccw", translateUi("Reset"), () => this.reset());
 
-		const compactBtn = this.makeIconBtn(controls, this.compact ? "expand" : "minimize-2", "Toggle compact", () => {
+		const compactBtn = this.makeIconBtn(controls, this.compact ? "expand" : "minimize-2", translateUi("Toggle compact"), () => {
 			this.compact = !this.compact;
 			this.el.toggleClass("is-compact", this.compact);
 			setIcon(compactBtn.children[0] as HTMLElement, this.compact ? "expand" : "minimize-2");
-			compactBtn.setAttribute("aria-label", this.compact ? "Expand" : "Compact");
+			compactBtn.setAttribute("aria-label", this.compact ? translateUi("Expand") : translateUi("Compact"));
 		});
 
-		this.makeIconBtn(controls, "x", "Close", () => this.close());
+		this.makeIconBtn(controls, "x", translateUi("Close"), () => this.close());
 
 		const detachDrag = makeDraggable(this.el, handle);
 		this.cleanups.push(detachDrag);
@@ -150,7 +151,7 @@ export class TimerWidget {
 			if (this.remaining <= 0) this.finish();
 		}, 1000);
 		setIcon(this.playBtn.children[0] as HTMLElement, "pause");
-		this.playBtn.setAttribute("aria-label", "Pause");
+		this.playBtn.setAttribute("aria-label", translateUi("Pause"));
 	}
 
 	pause(): void {
@@ -158,7 +159,7 @@ export class TimerWidget {
 		window.clearInterval(this.intervalId);
 		this.intervalId = null;
 		setIcon(this.playBtn.children[0] as HTMLElement, "play");
-		this.playBtn.setAttribute("aria-label", "Start");
+		this.playBtn.setAttribute("aria-label", translateUi("Start"));
 	}
 
 	private reset(): void {
@@ -181,7 +182,7 @@ export class TimerWidget {
 		// background + mix-blend-mode via !important and broke this widget's paint.
 		this.el.addClass("rb-timer-flashing");
 		playCompletionSound();
-		new Notice(`Timer done: ${this.label}`);
+		new Notice(translateUi`Timer done: ${this.label}`);
 	}
 
 	private updateDisplay(): void {

@@ -2,6 +2,7 @@
  * Modal for editing the user's custom high-GI food pattern list, with a live
  * validation pass against the pattern compiler.
  */
+import { t as translateUi } from "../../i18n";
 import { App } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { compileGiDictionary, DEFAULT_GI_DICTIONARY } from "../../parser/glycemic-dictionary";
@@ -15,8 +16,8 @@ export class GiDictionaryModal extends BaseModal {
 		private readonly save: () => Promise<void>,
 	) { super(app); }
 
-	getTitle(): string { return "High-GI dictionary"; }
-	getSubtitle(): string { return "One regex pattern per line. Lines starting with # are comments."; }
+	getTitle(): string { return translateUi("High-GI dictionary"); }
+	getSubtitle(): string { return translateUi("One regex pattern per line. Lines starting with # are comments."); }
 
 	renderBody(bodyEl: HTMLElement): void {
 		const textarea = bodyEl.createEl("textarea", {
@@ -45,14 +46,14 @@ export class GiDictionaryModal extends BaseModal {
 
 		let resetPending = false;
 		let resetTimer: number | null = null;
-		const resetBtn = bodyEl.createEl("button", { cls: "rb-reset-btn", text: "Reset to defaults" });
+		const resetBtn = bodyEl.createEl("button", { cls: "rb-reset-btn", text: translateUi("Reset to defaults") });
 		resetBtn.addEventListener("click", () => {
 			if (!resetPending) {
 				resetPending = true;
-				resetBtn.textContent = "Confirm reset?";
+				resetBtn.textContent = translateUi("Confirm reset?");
 				resetTimer = window.setTimeout(() => {
 					resetPending = false;
-					resetBtn.textContent = "Reset to defaults";
+					resetBtn.textContent = translateUi("Reset to defaults");
 				}, 3000);
 			} else {
 				if (resetTimer) window.clearTimeout(resetTimer);
@@ -61,7 +62,7 @@ export class GiDictionaryModal extends BaseModal {
 				void this.save().then(() => {
 					showErrors(DEFAULT_GI_DICTIONARY);
 					resetPending = false;
-					resetBtn.textContent = "Reset to defaults";
+					resetBtn.textContent = translateUi("Reset to defaults");
 				});
 			}
 		});

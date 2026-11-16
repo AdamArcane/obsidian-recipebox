@@ -3,6 +3,7 @@
  * suggester results list: active mode's scoring-field values (in rule order,
  * capped at 3) followed by prep/cook times when set.
  */
+import { t as translateUi } from "../i18n";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { SuggesterMode } from "./strategy-types";
 import { RECIPE_FRONTMATTER } from "../settings/frontmatter-keys";
@@ -25,26 +26,26 @@ function ruleToken(
 	// lastMade: date-distance display
 	if (field === lastMadeKey || field === "lastMade") {
 		const raw = fm[lastMadeKey] ?? fm["lastMade"];
-		if (!raw || typeof raw !== "string") return "Never made";
+		if (!raw || typeof raw !== "string") return translateUi("Never made");
 		const days = daysSince(raw);
-		if (days === null) return "Never made";
-		if (days === 0) return "Made today";
-		if (days === 1) return "Made yesterday";
-		return `Last made ${days}d ago`;
+		if (days === null) return translateUi("Never made");
+		if (days === 0) return translateUi("Made today");
+		if (days === 1) return translateUi("Made yesterday");
+		return translateUi`Last made ${days}d ago`;
 	}
 
 	// favorite: only show when true — omit when false to avoid clutter
 	if (field === settings.favoriteProperty || field === RECIPE_FRONTMATTER.favorite) {
 		const val = findValue(fm, aliases.favorite);
-		return val === true || val === "true" ? "Favorited" : null;
+		return val === true || val === "true" ? translateUi("Favorited") : null;
 	}
 
 	// cookedCount: show as "Made N times"
 	if (field === settings.cookedCountProperty || field === RECIPE_FRONTMATTER.cookedCount) {
 		const raw = findValue(fm, aliases.cookedCount);
 		const n = typeof raw === "number" ? raw : null;
-		if (n === null || n === 0) return "Never cooked";
-		return `Made ${n}x`;
+		if (n === null || n === 0) return translateUi("Never cooked");
+		return translateUi`Made ${n}x`;
 	}
 
 	// Generic field: render the raw value as a string if present
@@ -59,9 +60,9 @@ function timingTokens(fm: Record<string, unknown>, settings: RecipeBoxSettings):
 	const aliases = getRecipeMetaAliases(settings);
 	const tokens: string[] = [];
 	const prep = findValue(fm, aliases.prepTime);
-	if (typeof prep === "number" && prep > 0) tokens.push(`Prep ${formatMinutes(prep)}`);
+	if (typeof prep === "number" && prep > 0) tokens.push(translateUi`Prep ${formatMinutes(prep)}`);
 	const cook = findValue(fm, aliases.cookTime);
-	if (typeof cook === "number" && cook > 0) tokens.push(`Cook ${formatMinutes(cook)}`);
+	if (typeof cook === "number" && cook > 0) tokens.push(translateUi`Cook ${formatMinutes(cook)}`);
 	return tokens;
 }
 

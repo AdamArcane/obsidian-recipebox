@@ -3,6 +3,7 @@
  * mobile recipe view's cook history tab. Reads entries fresh on every call so
  * callers only need to call `container.empty()` then re-invoke to refresh.
  */
+import { t as translateUi } from "../i18n";
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../settings/settings-types";
 import { attachLightboxToImages } from "../ui/components/lightbox";
@@ -31,7 +32,7 @@ export async function renderCookHistoryList(
 	if (sorted.length === 0) {
 		container.createDiv({
 			cls: "rb-ch-empty",
-			text: "No cook history yet. Use \"Mark as cooked\" to add your first entry.",
+			text: translateUi("No cook history yet. Use \"Mark as cooked\" to add your first entry."),
 		});
 		return;
 	}
@@ -75,7 +76,7 @@ function renderEntryRow(
 
 	const actions = row.createDiv({ cls: "rb-ch-entry-actions" });
 
-	const editBtn = actions.createEl("button", { cls: "rb-icon-btn", title: "Edit" });
+	const editBtn = actions.createEl("button", { cls: "rb-icon-btn", title: translateUi("Edit") });
 	setIcon(editBtn, "pencil");
 	editBtn.addEventListener("click", () => {
 		new EntryEditorModal(app, recipeFile, settings, entry, async (date, note, image) => {
@@ -84,14 +85,14 @@ function renderEntryRow(
 		}).open();
 	});
 
-	const deleteBtn = actions.createEl("button", { cls: "rb-icon-btn rb-icon-btn--danger", title: "Delete" });
+	const deleteBtn = actions.createEl("button", { cls: "rb-icon-btn rb-icon-btn--danger", title: translateUi("Delete") });
 	setIcon(deleteBtn, "trash-2");
 	deleteBtn.addEventListener("click", () => {
 		new ConfirmModal(
 			app,
-			"Delete entry?",
-			`Remove the ${entry.date} cook history entry. This cannot be undone.`,
-			"Delete",
+			translateUi("Delete entry?"),
+			translateUi`Remove the ${entry.date} cook history entry. This cannot be undone.`,
+			translateUi("Delete"),
 			{
 				destructive: true,
 				onConfirm: () => {

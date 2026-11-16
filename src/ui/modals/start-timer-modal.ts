@@ -3,6 +3,7 @@
  * and name, reached from the ingredients-header button and the command
  * palette rather than the inline duration-detection flow in instruction text.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { parseDurationInput } from "../timer/parse-duration-input";
@@ -17,19 +18,19 @@ export class StartTimerModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Start timer"; }
+	getTitle(): string { return translateUi("Start timer"); }
 	getContentClasses(): string[] { return ["rb-start-timer-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
 		const nameRow = bodyEl.createDiv({ cls: "rb-modal-fields rb-modal-fields--full" });
 		const nameField = nameRow.createDiv({ cls: "rb-modal-field rb-modal-field--half" });
-		nameField.createEl("label", { cls: "rb-modal-field-label", text: "Name" });
-		this.nameInput = nameField.createEl("input", { cls: "rb-modal-input", attr: { type: "text", placeholder: "Optional, e.g. Pasta boil" } });
+		nameField.createEl("label", { cls: "rb-modal-field-label", text: translateUi("Name") });
+		this.nameInput = nameField.createEl("input", { cls: "rb-modal-input", attr: { type: "text", placeholder: translateUi("Optional, e.g. Pasta boil") } });
 
 		const durationRow = bodyEl.createDiv({ cls: "rb-modal-fields rb-modal-fields--full" });
 		const durationField = durationRow.createDiv({ cls: "rb-modal-field rb-modal-field--half" });
-		durationField.createEl("label", { cls: "rb-modal-field-label", text: "Duration *" });
-		this.durationInput = durationField.createEl("input", { cls: "rb-modal-input", attr: { type: "text", placeholder: "Example: 10 min, 1 hour 30 min, 1:30, 90" } });
+		durationField.createEl("label", { cls: "rb-modal-field-label", text: translateUi("Duration *") });
+		this.durationInput = durationField.createEl("input", { cls: "rb-modal-input", attr: { type: "text", placeholder: translateUi("Example: 10 min, 1 hour 30 min, 1:30, 90") } });
 
 		const onEnter = (e: KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); this.submit(); } };
 		this.durationInput.addEventListener("keydown", onEnter);
@@ -39,19 +40,19 @@ export class StartTimerModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
-		footerEl.createEl("button", { cls: "mod-cta", text: "Start" })
+		footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Start") })
 			.addEventListener("click", () => this.submit());
 	}
 
 	private submit(): void {
 		const seconds = parseDurationInput(this.durationInput.value, this.settings.timerRangeDefault);
 		if (seconds === null) {
-			new Notice("Enter a valid duration, such as 10 min, 1 hour 30 min, 1:30, or 90.");
+			new Notice(translateUi("Enter a valid duration, such as 10 min, 1 hour 30 min, 1:30, or 90."));
 			return;
 		}
-		const name = this.nameInput.value.trim() || "Timer";
+		const name = this.nameInput.value.trim() || translateUi("Timer");
 		startManualTimer(this.app, this.settings, seconds, name);
 		this.close();
 	}

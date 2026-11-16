@@ -4,6 +4,7 @@
  * navigating to the view that already surfaces them as a button — genuine
  * "jump there" or "act on whatever I'm currently looking at" shortcuts.
  */
+import { t as translateUi } from "../i18n";
 import RecipeBoxPlugin from "../main";
 import { ImportRecipeModal } from "../ui/modals/import-recipe-modal";
 import { ImportFilesModal } from "../ui/modals/import-files-modal";
@@ -20,25 +21,25 @@ import { multiDayMealPlanDeps } from "../lifecycle/register-views";
 export function registerCommands(plugin: RecipeBoxPlugin): void {
 	plugin.addCommand({
 		id: "open-grocery-list",
-		name: "Open grocery list",
+		name: translateUi("Open grocery list"),
 		callback: () => plugin.activateGroceryView(),
 	});
 
 	plugin.addCommand({
 		id: "open-meal-plan",
-		name: "Open meal plan",
+		name: translateUi("Open meal plan"),
 		callback: () => plugin.activateMealPlanView(),
 	});
 
 	plugin.addCommand({
 		id: "open-recipe-gallery",
-		name: "Open recipe gallery",
+		name: translateUi("Open recipe gallery"),
 		callback: () => plugin.activateGalleryView(),
 	});
 
 	plugin.addCommand({
 		id: "import-recipe",
-		name: "Add recipe",
+		name: translateUi("Add recipe"),
 		callback: () => new ImportRecipeModal(plugin.app, plugin.settings).open(),
 	});
 
@@ -46,13 +47,13 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 	// flow, and bulk import has no per-recipe review step.
 	plugin.addCommand({
 		id: "import-recipes-from-file",
-		name: "Import recipes from file",
+		name: translateUi("Import recipes from file"),
 		callback: () => new ImportFilesModal(plugin.app, plugin.settings).open(),
 	});
 
 	plugin.addCommand({
 		id: "add-grocery-item",
-		name: "Add grocery item",
+		name: translateUi("Add grocery item"),
 		callback: () => {
 			new AddGroceryItemModal(plugin.app, {
 				addGroceryItem: (item) => plugin.manager.addGroceryItem(item),
@@ -64,7 +65,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "toggle-recipe-in-meal-plan",
-		name: "Toggle current recipe in meal plan",
+		name: translateUi("Toggle current recipe in meal plan"),
 		checkCallback: (checking) => {
 			const file = plugin.app.workspace.getActiveFile();
 			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
@@ -91,7 +92,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "open-current-as-recipe",
-		name: "Open current file as recipe",
+		name: translateUi("Open current file as recipe"),
 		checkCallback: (checking) => {
 			const file = plugin.app.workspace.getActiveFile();
 			// Eligible when a recipe file is active but not yet shown in the recipe view
@@ -107,7 +108,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "open-current-as-markdown",
-		name: "Open current file as Markdown",
+		name: translateUi("Open current file as Markdown"),
 		checkCallback: (checking) => {
 			// Only relevant when the active view is the recipe view
 			const view = plugin.app.workspace.getActiveViewOfType(RecipeView);
@@ -118,7 +119,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "export-current-recipe",
-		name: "Export current recipe",
+		name: translateUi("Export current recipe"),
 		checkCallback: (checking) => {
 			const file = plugin.app.workspace.getActiveFile();
 			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
@@ -130,7 +131,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "share-current-recipe",
-		name: "Share this recipe",
+		name: translateUi("Share this recipe"),
 		checkCallback: (checking) => {
 			const file = plugin.app.workspace.getActiveFile();
 			if (!file || !isRecipeFile(plugin.app, file, plugin.settings)) return false;
@@ -142,7 +143,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "start-timer",
-		name: "Start a timer",
+		name: translateUi("Start a timer"),
 		checkCallback: (checking) => {
 			if (!plugin.settings.timersEnabled) return false;
 			if (checking) return true;
@@ -153,7 +154,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 	plugin.addCommand({
 		id: "suggest-meal",
-		name: "Suggest a meal",
+		name: translateUi("Suggest a meal"),
 		callback: () => {
 			new SuggestMealModal(plugin.app, {
 				getSettings: () => plugin.settings,
@@ -177,7 +178,7 @@ export function registerCommands(plugin: RecipeBoxPlugin): void {
 
 		plugin.addCommand({
 			id: "open-dashboard",
-			name: "Open recipe dashboard",
+			name: translateUi("Open recipe dashboard"),
 			callback: async () => {
 				await plugin.activateDashboardView();
 			},

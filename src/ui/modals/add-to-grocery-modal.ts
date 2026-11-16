@@ -2,6 +2,7 @@
  * Modal for selectively adding or removing a recipe's ingredients from the
  * grocery list, showing a checklist of parsed ingredients with their current state.
  */
+import { t as translateUi } from "../../i18n";
 import { App, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ContributionMap, GroceryItem } from "../../types";
@@ -31,7 +32,7 @@ export class AddToGroceryModal extends BaseModal {
 		super(app);
 	}
 
-	getTitle(): string { return "Update grocery list"; }
+	getTitle(): string { return translateUi("Update grocery list"); }
 	getSubtitle(): string { return this.file.basename; }
 
 	async renderBody(bodyEl: HTMLElement): Promise<void> {
@@ -53,10 +54,10 @@ export class AddToGroceryModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
 
-		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Save changes" });
+		this.confirmBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Save changes") });
 		this.confirmBtn.addEventListener("click", () => { void (async () => {
 			this.confirmBtn.disabled = true;
 			const toAddKeys = new Set([...this.selectedKeys].filter(k => !this.initialChecked.has(k)));

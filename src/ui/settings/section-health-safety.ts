@@ -3,6 +3,7 @@
  * meat temperature warnings, high-GI warnings, and the GI pattern dictionary
  * editor.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Setting } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { AllergensModal } from "../modals/modal-allergens";
@@ -16,17 +17,17 @@ export function renderSectionHealthSafety(
 	app: App
 ): void {
 	new Setting(container)
-		.setName("My allergens")
+		.setName(translateUi("My allergens"))
 		.setDesc(`Warn when a recipe contains any of these: ${settings.myAllergens.length > 0 ? settings.myAllergens.join(", ") : "None configured"}`)
 		.addButton((btn) =>
-			btn.setButtonText("Edit allergens…").onClick(() => {
+			btn.setButtonText(translateUi("Edit allergens…")).onClick(() => {
 				new AllergensModal(app, settings, save).open();
 			})
 		);
 
 	new Setting(container)
-		.setName("Show meat temperature warnings")
-		.setDesc("Warn when an ingredient may need to reach a safe internal temperature.")
+		.setName(translateUi("Show meat temperature warnings"))
+		.setDesc(translateUi("Warn when an ingredient may need to reach a safe internal temperature."))
 		.addToggle((t) =>
 			t.setValue(settings.showMeatTempWarnings).onChange(async (v) => {
 				settings.showMeatTempWarnings = v;
@@ -35,8 +36,8 @@ export function renderSectionHealthSafety(
 		);
 
 	new Setting(container)
-		.setName("Show high-gi ingredients warnings")
-		.setDesc("Flag high-glycemic-index ingredients in the recipe view.")
+		.setName(translateUi("Show high-gi ingredients warnings"))
+		.setDesc(translateUi("Flag high-glycemic-index ingredients in the recipe view."))
 		.addToggle((t) =>
 			t.setValue(settings.showHighGIWarnings).onChange(async (v) => {
 				settings.showHighGIWarnings = v;
@@ -47,10 +48,10 @@ export function renderSectionHealthSafety(
 
 	if (settings.showHighGIWarnings) {
 		new Setting(container)
-			.setName("High-gi dictionary")
-			.setDesc("Regex patterns identifying high-gi ingredients.")
+			.setName(translateUi("High-gi dictionary"))
+			.setDesc(translateUi("Regex patterns identifying high-gi ingredients."))
 			.addButton((btn) =>
-				btn.setButtonText("Edit gi dictionary…").onClick(() => {
+				btn.setButtonText(translateUi("Edit gi dictionary…")).onClick(() => {
 					new GiDictionaryModal(app, settings, save).open();
 				})
 			);

@@ -4,6 +4,7 @@
  * row's aliases: search only indexes declarative rows, and anything rendered
  * inside a SettingPage is invisible to it.
  */
+import { t as translateUi } from "../../i18n";
 import { SettingDefinitionPage } from "obsidian";
 import { SettingsKey } from "./settings-build-context";
 
@@ -21,7 +22,7 @@ export function sectionPage(
 		desc,
 		items: [
 			{
-				name: `${name} settings`,
+				name: translateUi`${name} settings`,
 				aliases,
 				render: (setting) => {
 					setting.settingEl.addClass("rb-section-host-row");

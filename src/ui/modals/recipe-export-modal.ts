@@ -11,6 +11,7 @@
  * by default -- "Show preview" builds and reveals it on demand rather than
  * eagerly computing it on every option change.
  */
+import { t as translateUi } from "../../i18n";
 import { App, Notice, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings, RecipeExportFormat } from "../../settings/settings-types";
 import {
@@ -30,8 +31,8 @@ import { joinExportPath } from "../../utils/export-path";
 import { BaseModal } from "./modal-shell";
 
 const FORMAT_LABELS: Record<RecipeExportFormat, string> = {
-	"plain-markdown": "Markdown (plain)",
-	"importable-markdown": "Markdown (importable)",
+	"plain-markdown": translateUi("Markdown (plain)"),
+	"importable-markdown": translateUi("Markdown (importable)"),
 	json: "JSON",
 	"json-ld": "JSON-LD",
 };
@@ -70,7 +71,7 @@ export class RecipeExportModal extends BaseModal {
 		this.currentMultiplier = readRecipeMultiplier(app.metadataCache.getFileCache(file));
 	}
 
-	getTitle(): string { return "Export recipe"; }
+	getTitle(): string { return translateUi("Export recipe"); }
 	getContentClasses(): string[] { return ["rb-export-modal"]; }
 
 	renderBody(bodyEl: HTMLElement): void {
@@ -92,7 +93,7 @@ export class RecipeExportModal extends BaseModal {
 		const cookHistoryField = opts.createDiv({ cls: "rb-modal-field rb-modal-field-row" });
 		const cookHistoryBox = cookHistoryField.createEl("input", { type: "checkbox" });
 		cookHistoryBox.checked = this.options.includeCookHistoryAndSections;
-		cookHistoryField.createEl("label", { text: "Include cook history and other sections" });
+		cookHistoryField.createEl("label", { text: translateUi("Include cook history and other sections") });
 		cookHistoryBox.addEventListener("change", () => {
 			this.options.includeCookHistoryAndSections = cookHistoryBox.checked;
 			void this.refreshPreview();
@@ -101,10 +102,10 @@ export class RecipeExportModal extends BaseModal {
 		const imagesField = opts.createDiv({ cls: "rb-modal-field rb-modal-field-row" });
 		const imagesBox = imagesField.createEl("input", { type: "checkbox" });
 		imagesBox.checked = this.options.includeImages;
-		imagesField.createEl("label", { text: "Include images" });
+		imagesField.createEl("label", { text: translateUi("Include images") });
 		imagesField.createDiv({
 			cls: "rb-modal-field-hint",
-			text: "Image bundling isn't implemented yet, local images are omitted with a marker instead of embedded.",
+			text: translateUi("Image bundling isn't implemented yet, local images are omitted with a marker instead of embedded."),
 		});
 		imagesBox.addEventListener("change", () => {
 			this.options.includeImages = imagesBox.checked;
@@ -116,7 +117,7 @@ export class RecipeExportModal extends BaseModal {
 		if (this.currentMultiplier !== 1) {
 			const multiplierField = opts.createDiv({ cls: "rb-modal-field rb-modal-field-row" });
 			const multiplierBox = multiplierField.createEl("input", { type: "checkbox" });
-			multiplierField.createEl("label", { text: `Export at current multiplier (${this.currentMultiplier}x)` });
+			multiplierField.createEl("label", { text: translateUi`Export at current multiplier (${this.currentMultiplier}x)` });
 			multiplierBox.addEventListener("change", () => {
 				this.options.applyCurrentMultiplier = multiplierBox.checked;
 				void this.refreshPreview();
@@ -135,7 +136,7 @@ export class RecipeExportModal extends BaseModal {
 		this.previewContainer = bodyEl.createDiv({ cls: "rb-export-preview-container" });
 		this.previewContainer.createEl("p", {
 			cls: "rb-modal-section-desc",
-			text: "Select all text below, then use your system's copy shortcut (Ctrl+C / ⌘C).",
+			text: translateUi("Select all text below, then use your system's copy shortcut (Ctrl+C / ⌘C)."),
 		});
 		this.previewEl = this.previewContainer.createEl("textarea", {
 			cls: "rb-export-preview",
@@ -150,16 +151,16 @@ export class RecipeExportModal extends BaseModal {
 	}
 
 	renderFooter(footerEl: HTMLElement): void {
-		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: "Cancel" })
+		footerEl.createEl("button", { cls: "rb-shell-cancel-btn", text: translateUi("Cancel") })
 			.addEventListener("click", () => this.close());
-		this.primaryBtn = footerEl.createEl("button", { cls: "mod-cta", text: "Save" });
+		this.primaryBtn = footerEl.createEl("button", { cls: "mod-cta", text: translateUi("Save") });
 		this.primaryBtn.addEventListener("click", () => { void this.handlePrimaryAction(); });
 	}
 
 	private updatePreviewVisibility(): void {
 		this.previewContainer.toggleClass("rb-export-preview-hidden", !this.previewVisible);
 		setIcon(this.togglePreviewIconEl, this.previewVisible ? "chevron-down" : "chevron-right");
-		this.togglePreviewLabelEl.setText(this.previewVisible ? "Hide preview" : "Show preview");
+		this.togglePreviewLabelEl.setText(this.previewVisible ? translateUi("Hide preview") : translateUi("Show preview"));
 		if (this.previewVisible) void this.refreshPreview();
 	}
 
@@ -168,26 +169,26 @@ export class RecipeExportModal extends BaseModal {
 		this.pathInput = null;
 
 		if (isMarkdownFormat(this.format)) {
-			this.outputSection.createDiv({ cls: "rb-modal-section-heading", text: "Save as note" });
+			this.outputSection.createDiv({ cls: "rb-modal-section-heading", text: translateUi("Save as note") });
 			const pathField = this.outputSection.createDiv({ cls: "rb-modal-field" });
 			const defaultName = `${this.file.basename} (export)`;
 			const defaultPath = joinExportPath(this.settings.exportFolder, defaultName);
 			this.pathInput = pathField.createEl("input", {
 				cls: "rb-modal-input",
 				type: "text",
-				placeholder: "Vault-relative path, e.g. Exports/Carbonara",
+				placeholder: translateUi("Vault-relative path, e.g. Exports/Carbonara"),
 				value: defaultPath,
 			});
 			new NotePathSuggest(this.app, this.pathInput);
 		} else {
-			this.outputSection.createDiv({ cls: "rb-modal-section-heading", text: "Download" });
+			this.outputSection.createDiv({ cls: "rb-modal-section-heading", text: translateUi("Download") });
 			this.outputSection.createEl("p", {
 				cls: "rb-modal-section-desc",
-				text: "This format isn't vault content, saving triggers a file download instead of writing a note.",
+				text: translateUi("This format isn't vault content, saving triggers a file download instead of writing a note."),
 			});
 		}
 
-		this.primaryBtn?.setText(isMarkdownFormat(this.format) ? "Save" : "Download");
+		this.primaryBtn?.setText(isMarkdownFormat(this.format) ? translateUi("Save") : translateUi("Download"));
 	}
 
 	private async buildContent(): Promise<string> {
@@ -223,37 +224,37 @@ export class RecipeExportModal extends BaseModal {
 	private async saveToNote(rawPath: string): Promise<void> {
 		const path = rawPath.trim();
 		if (!path) {
-			new Notice("Please enter a note path.");
+			new Notice(translateUi("Please enter a note path."));
 			return;
 		}
 
 		const content = await this.buildContent();
 		if (!content.trim()) {
-			new Notice("Nothing to export.");
+			new Notice(translateUi("Nothing to export."));
 			return;
 		}
 
 		const normalizedPath = path.endsWith(".md") ? path : `${path}.md`;
 
 		if (this.app.vault.getFileByPath(normalizedPath)) {
-			new Notice(`${normalizedPath} already exists. Choose a different path.`);
+			new Notice(translateUi`${normalizedPath} already exists. Choose a different path.`);
 			return;
 		}
 
 		try {
 			await ensureParentFolders(this.app, normalizedPath);
 			await this.app.vault.create(normalizedPath, content);
-			new Notice(`Exported to ${normalizedPath}.`);
+			new Notice(translateUi`Exported to ${normalizedPath}.`);
 			this.close();
 		} catch (err) {
-			new Notice(`Failed to write note: ${err instanceof Error ? err.message : String(err)}`);
+			new Notice(translateUi`Failed to write note: ${err instanceof Error ? err.message : String(err)}`);
 		}
 	}
 
 	private async downloadExport(): Promise<void> {
 		const content = await this.buildContent();
 		if (!content.trim()) {
-			new Notice("Nothing to export.");
+			new Notice(translateUi("Nothing to export."));
 			return;
 		}
 
@@ -262,7 +263,7 @@ export class RecipeExportModal extends BaseModal {
 		const filename = `${this.file.basename}.${ext}`;
 
 		downloadTextFile(filename, content, mimeType);
-		new Notice(`Downloaded ${filename}.`);
+		new Notice(translateUi`Downloaded ${filename}.`);
 		this.close();
 	}
 }

@@ -9,6 +9,7 @@
  * no mutation logic lives here; rating changes and the modal wiring both stay
  * where they already are (RecipeView / register-views.ts).
  */
+import { t as translateUi } from "../../i18n";
 import { App, Menu, setIcon, TFile } from "obsidian";
 import { CustomBadge } from "../../types";
 import { RecipeBoxSettings } from "../../settings/settings-types";
@@ -43,7 +44,7 @@ function renderMetaItem(row: HTMLElement, icon: string, text: string): void {
 function renderMetaRow(container: HTMLElement, meta: RecipeMeta): void {
 	const row = container.createDiv({ cls: "rb-gallery-card-meta-row" });
 	if (meta.times.cook !== null) renderMetaItem(row, "clock", formatMinutes(meta.times.cook));
-	renderMetaItem(row, "repeat", meta.cookedCount > 0 ? `${meta.cookedCount}×` : "Never cooked");
+	renderMetaItem(row, "repeat", meta.cookedCount > 0 ? `${meta.cookedCount}×` : translateUi("Never cooked"));
 	if (meta.lastMade) renderMetaItem(row, "calendar-check", formatLastMadeDisplay(meta.lastMade));
 }
 
@@ -60,17 +61,17 @@ function skipBadgeOnCard(badge: CustomBadge): boolean {
 function openActionsMenu(evt: MouseEvent, file: TFile, actions: GalleryCardActions): void {
 	const menu = new Menu();
 	menu.addItem((item) =>
-		item.setTitle("Add to meal plan")
+		item.setTitle(translateUi("Add to meal plan"))
 			.setIcon("calendar-plus")
 			.onClick(() => actions.openAddToMealPlanModal(file))
 	);
 	menu.addItem((item) =>
-		item.setTitle("Add to grocery list")
+		item.setTitle(translateUi("Add to grocery list"))
 			.setIcon("shopping-cart")
 			.onClick(() => actions.openAddToGroceryModal(file))
 	);
 	menu.addItem((item) =>
-		item.setTitle("Share recipe")
+		item.setTitle(translateUi("Share recipe"))
 			.setIcon("share-2")
 			.onClick(() => actions.openShareModal(file))
 	);
@@ -119,7 +120,7 @@ export function renderGalleryCard(
 
 	const menuBtn = imageSlot.createDiv({
 		cls: "rb-gallery-card-menu-btn",
-		attr: { role: "button", "aria-label": "Recipe actions", tabindex: "0" },
+		attr: { role: "button", "aria-label": translateUi("Recipe actions"), tabindex: "0" },
 	});
 	setIcon(menuBtn, "more-vertical");
 	menuBtn.addEventListener("click", (evt) => {

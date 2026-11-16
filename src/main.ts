@@ -2,6 +2,7 @@
  * Plugin entry point — bootstraps the GroceryManager, registers all views,
  * commands, lifecycle hooks, and the settings tab on Obsidian load.
  */
+import { t as translateUi } from "./i18n";
 import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { findOrOpenLeaf } from "./utils/open-leaf";
 import { RecipeBoxSettings } from "./settings/settings-types";
@@ -132,11 +133,11 @@ export default class RecipeBoxPlugin extends Plugin {
 	// entirely: the DOM nodes never leave the ribbon, so there's nothing for
 	// Obsidian to resurrect.
 	private setUpRibbonIcons(): void {
-		this.dashboardRibbonIcon = this.addRibbonIcon("tool-case", "Recipe box dashboard", () => this.activateDashboardView());
+		this.dashboardRibbonIcon = this.addRibbonIcon("tool-case", translateUi("Recipe box dashboard"), () => this.activateDashboardView());
 		this.individualRibbonIcons = [
-			this.addRibbonIcon("shopping-cart", "Open grocery list", () => this.activateGroceryView()),
-			this.addRibbonIcon("calendar", "Open meal plan", () => this.activateMealPlanView()),
-			this.addRibbonIcon("layout-list", "Browse recipes", () => this.activateGalleryView()),
+			this.addRibbonIcon("shopping-cart", translateUi("Open grocery list"), () => this.activateGroceryView()),
+			this.addRibbonIcon("calendar", translateUi("Open meal plan"), () => this.activateMealPlanView()),
+			this.addRibbonIcon("layout-list", translateUi("Browse recipes"), () => this.activateGalleryView()),
 		];
 		this.refreshRibbonIcons();
 	}

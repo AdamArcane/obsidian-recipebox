@@ -2,6 +2,7 @@
  * Renders a row of stats about the current gallery view, based on the current
  * GallerySavedState and the number of files that passed the filters.
  */
+import { t as translateUi } from "../../i18n";
 import { TFile } from "obsidian";
 import { GallerySavedState } from "../../settings/settings-types";
 import { FieldFilter, OPERATORS } from "../../discovery/filter-types";
@@ -18,7 +19,7 @@ function operatorLabel(operator: string): string {
 function fieldFilterLabel(filter: FieldFilter): string {
 	if (filter.field.startsWith("#")) {
 		const name = filter.field.slice(1);
-		return filter.operator === "not-has" ? `not tagged #${name}` : `tagged #${name}`;
+		return filter.operator === "not-has" ? translateUi`not tagged #${name}` : translateUi`tagged #${name}`;
 	}
 
 	if (["is-true", "is-false"].includes(filter.operator)) {
@@ -27,7 +28,7 @@ function fieldFilterLabel(filter: FieldFilter): string {
 
 	if (filter.operator === "between" && Array.isArray(filter.value)) {
 		const [lo, hi] = filter.value as [string | number, string | number];
-		return `${filter.field} between ${String(lo)} and ${String(hi)}`;
+		return translateUi`${filter.field} between ${String(lo)} and ${String(hi)}`;
 	}
 
 	if (filter.operator === "within-last" || filter.operator === "not-within-last") {
@@ -35,7 +36,7 @@ function fieldFilterLabel(filter: FieldFilter): string {
 	}
 
 	if (filter.operator === "one-of" && Array.isArray(filter.value)) {
-		return `${filter.field} is one of ${(filter.value as string[]).join(", ")}`;
+		return translateUi`${filter.field} is one of ${(filter.value as string[]).join(", ")}`;
 	}
 
 	return `${filter.field} ${operatorLabel(filter.operator)} ${filter.value as string}`;
@@ -50,12 +51,12 @@ export function renderStatsRow(
 	type FilterChip = { key: keyof GallerySavedState | "fieldFilter"; label: string };
 
 	const filterChips: FilterChip[] = [];
-	if (state.folder) filterChips.push({ key: "folder", label: `in folder ${state.folder}` });
-	if (state.favoriteOnly) filterChips.push({ key: "favoriteOnly", label: "favorites only" });
-	if (state.tag) filterChips.push({ key: "tag", label: `tagged #${state.tag}` });
-	if (state.minRating > 0) filterChips.push({ key: "minRating", label: `rating ≥ ${state.minRating}` });
-	if (state.neverCooked) filterChips.push({ key: "neverCooked", label: "never cooked" });
-	if (state.excludeAllergens) filterChips.push({ key: "excludeAllergens", label: "excluding allergens" });
+	if (state.folder) filterChips.push({ key: "folder", label: translateUi`in folder ${state.folder}` });
+	if (state.favoriteOnly) filterChips.push({ key: "favoriteOnly", label: translateUi("favorites only") });
+	if (state.tag) filterChips.push({ key: "tag", label: translateUi`tagged #${state.tag}` });
+	if (state.minRating > 0) filterChips.push({ key: "minRating", label: translateUi`rating ≥ ${state.minRating}` });
+	if (state.neverCooked) filterChips.push({ key: "neverCooked", label: translateUi("never cooked") });
+	if (state.excludeAllergens) filterChips.push({ key: "excludeAllergens", label: translateUi("excluding allergens") });
 	// A filter row with no property chosen yet doesn't restrict anything (see
 	// filter-evaluate.ts), so it's excluded here too -- it shouldn't read as
 	// an active filter when it isn't functioning as one yet.

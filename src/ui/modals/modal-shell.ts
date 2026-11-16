@@ -7,6 +7,7 @@
  * literally cannot put content in the wrong place: BaseModal's onOpen() is
  * the only code that ever constructs the outer structure.
  */
+import { t as translateUi } from "../../i18n";
 
 import { Modal, setIcon } from "obsidian";
 
@@ -71,7 +72,7 @@ export function addFooterButtons(
 		onConfirm: () => void;
 	},
 ): HTMLButtonElement {
-	footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: opts.cancelLabel ?? "Cancel" })
+	footerEl.createEl("button", { cls: "rb-modal-cancel-btn", text: opts.cancelLabel ?? translateUi("Cancel") })
 		.addEventListener("click", opts.onCancel);
 	const btn = footerEl.createEl("button", {
 		cls: opts.destructive ? "mod-warning" : "mod-cta",

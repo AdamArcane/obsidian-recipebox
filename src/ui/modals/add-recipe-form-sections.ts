@@ -4,6 +4,7 @@
  * takes initial values plus change callbacks and owns no save logic; the two
  * forms decide how values map to a draft and what "dirty" means.
  */
+import { t as translateUi } from "../../i18n";
 import { App, setIcon } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { ImportedGroup } from "../../importer/recipe-extract-types";
@@ -146,7 +147,7 @@ export function renderImageField(
 		const isUpload = !!current?.startsWith("data:");
 		imageInput.value = isUpload ? uploadName ?? "" : current ?? "";
 		imageInput.disabled = isUpload;
-		imageInput.placeholder = isUpload ? "Image uploaded from this device" : "Image URL, or browse the vault";
+		imageInput.placeholder = isUpload ? translateUi("Image uploaded from this device") : translateUi("Image URL, or browse the vault");
 		removeBtn.toggle(!!current);
 	}
 
@@ -162,7 +163,7 @@ export function renderImageField(
 	imageField.createDiv({ cls: "rb-import-field-label", text: "Image" });
 	const imageInput = imageField.createEl("input", {
 		cls: "rb-import-text-input",
-		attr: { type: "text", placeholder: "Image URL, or browse the vault" },
+		attr: { type: "text", placeholder: translateUi("Image URL, or browse the vault") },
 	});
 	imageInput.addEventListener("input", () => setImage(imageInput.value));
 
@@ -170,7 +171,7 @@ export function renderImageField(
 
 	const browseBtn = imageBtnRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 	setIcon(browseBtn.createSpan({ cls: "rb-modal-btn-icon" }), "folder");
-	browseBtn.createSpan({ text: "Browse vault" });
+	browseBtn.createSpan({ text: translateUi("Browse vault") });
 	browseBtn.addEventListener("click", () => {
 		new VaultImageSuggestModal(app, (file) => { setImage(file.path); }).open();
 	});
@@ -178,7 +179,7 @@ export function renderImageField(
 	{
 		const uploadBtn = imageBtnRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 		setIcon(uploadBtn.createSpan({ cls: "rb-modal-btn-icon" }), "upload");
-		uploadBtn.createSpan({ text: "Upload from PC" });
+		uploadBtn.createSpan({ text: translateUi("Upload from PC") });
 		const fileInput = imageBtnRow.createEl("input", {
 			cls: "rb-hidden",
 			attr: { type: "file", accept: "image/*" },
@@ -198,7 +199,7 @@ export function renderImageField(
 
 	const removeBtn = imageBtnRow.createEl("button", { cls: "rb-modal-btn", attr: { type: "button" } });
 	setIcon(removeBtn.createSpan({ cls: "rb-modal-btn-icon" }), "x");
-	removeBtn.createSpan({ text: "Remove" });
+	removeBtn.createSpan({ text: translateUi("Remove") });
 	removeBtn.addEventListener("click", () => setImage(""));
 
 	renderImagePreview(app, previewWrap, current);
@@ -221,16 +222,16 @@ export function renderTimingFields(
 ): void {
 	parent.createDiv({
 		cls: "rb-import-field-label",
-		text: inputType === "number" ? "Timing (minutes)" : "Timing",
+		text: inputType === "number" ? translateUi("Timing (minutes)") : translateUi("Timing"),
 	});
 	inlineRow(parent, [
-		{ label: "Prep", placeholder: "15", value: values.prep, onInput: (v) => onInput("prep", v) },
-		{ label: "Cook", placeholder: "30", value: values.cook, onInput: (v) => onInput("cook", v) },
+		{ label: translateUi("Prep"), placeholder: "15", value: values.prep, onInput: (v) => onInput("prep", v) },
+		{ label: translateUi("Cook"), placeholder: "30", value: values.cook, onInput: (v) => onInput("cook", v) },
 		{ label: "Total", placeholder: "45", value: values.total, onInput: (v) => onInput("total", v) },
 	], inputType);
 
 	const servWrap = parent.createDiv({ cls: "rb-import-field" });
-	servWrap.createDiv({ cls: "rb-import-field-label", text: "Servings" });
+	servWrap.createDiv({ cls: "rb-import-field-label", text: translateUi("Servings") });
 	const attr: Record<string, string> = inputType === "number" ? { type: "number", min: "1", placeholder: "4" } : { type: "text", placeholder: "4" };
 	const servInput = servWrap.createEl("input", {
 		cls: "rb-import-text-input rb-import-text-input--short",
@@ -257,7 +258,7 @@ export function renderIngredientsEditor(
 		groups,
 		(body, items, onItems, options) => renderIngredientListEditor(body, items, onItems, settings, options),
 		onChange,
-		{ addGroup: "Add group", namePlaceholder: "Group name (optional)" },
+		{ addGroup: translateUi("Add group"), namePlaceholder: translateUi("Group name (optional)") },
 	);
 }
 
@@ -274,7 +275,7 @@ export function renderStepsEditor(
 		groups,
 		renderStepListEditor,
 		onChange,
-		{ addGroup: "Add group", namePlaceholder: "Group name (optional)" },
+		{ addGroup: translateUi("Add group"), namePlaceholder: translateUi("Group name (optional)") },
 	);
 }
 
@@ -296,8 +297,8 @@ export function renderNutritionFields(
 	parent.createDiv({ cls: "rb-import-field-label", text: label });
 	inlineRow(parent, [
 		{ label: "Calories", placeholder: "350", value: values.cal, onInput: (v) => onInput("cal", v) },
-		{ label: "Protein g", placeholder: "20", value: values.prot, onInput: (v) => onInput("prot", v) },
-		{ label: "Fat g", placeholder: "12", value: values.fat, onInput: (v) => onInput("fat", v) },
-		{ label: "Carbs g", placeholder: "40", value: values.carb, onInput: (v) => onInput("carb", v) },
+		{ label: translateUi("Protein g"), placeholder: "20", value: values.prot, onInput: (v) => onInput("prot", v) },
+		{ label: translateUi("Fat g"), placeholder: "12", value: values.fat, onInput: (v) => onInput("fat", v) },
+		{ label: translateUi("Carbs g"), placeholder: "40", value: values.carb, onInput: (v) => onInput("carb", v) },
 	]);
 }

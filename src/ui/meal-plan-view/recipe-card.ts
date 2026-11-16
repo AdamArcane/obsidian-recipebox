@@ -2,6 +2,8 @@
  * Renders a single recipe card within the meal plan week grid, including the
  * thumbnail, name, meal type, and drag handle.
  */
+import { mealLabel } from "../utils/localized-labels";
+import { t as translateUi } from "../../i18n";
 import { App, TFile, setIcon } from "obsidian";
 import { MealPlanEntry } from "../../types";
 import { makeDraggable } from "./drag-reschedule";
@@ -56,14 +58,14 @@ export function renderRecipeCard(
 	const name = entry.recipePath.split("/").pop()?.replace(/\.md$/i, "") ?? entry.recipePath;
 	const body = card.createDiv({ cls: "rb-mpv-card-body" });
 	body.createDiv({ cls: "rb-mpv-card-name", text: name });
-	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: entry.meal });
-	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: "(Leftovers)" });
+	if (entry.meal) body.createDiv({ cls: "rb-mpv-card-meal", text: mealLabel(entry.meal) });
+	if (entry.isLeftovers) body.createDiv({ cls: "rb-mpv-card-leftovers-badge", text: translateUi("(Leftovers)") });
 
 	const actions = card.createDiv({ cls: "rb-mpv-card-actions" });
-	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: "Edit" } });
+	const editBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn", attr: { title: translateUi("Edit") } });
 	setIcon(editBtn, "pencil");
 	editBtn.addEventListener("click", (e) => { e.stopPropagation(); deps.openEditEntryModal(entry); });
-	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: "Remove" } });
+	const removeBtn = actions.createEl("button", { cls: "rb-mpv-card-action-btn rb-mpv-card-action-btn--danger", attr: { title: translateUi("Remove") } });
 	setIcon(removeBtn, "trash-2");
 	removeBtn.addEventListener("click", (e) => { e.stopPropagation(); void deps.removeFromMealPlan(entry.id); });
 

@@ -2,6 +2,8 @@
  * Modal for the meal suggester: mode picker and auto-run results with thumbnails.
  * Suggestions run automatically on open and whenever the mode changes.
  */
+import { t as translateUi } from "../../i18n";
+import { modeLabel } from "../utils/localized-labels";
 import { App, setIcon, TFile } from "obsidian";
 import { RecipeBoxSettings } from "../../settings/settings-types";
 import { MealPlanEntry } from "../../types";
@@ -45,7 +47,7 @@ export class SuggestMealModal extends BaseModal {
 		this.activeModeId = active?.id ?? "";
 	}
 
-	getTitle(): string { return "Meal Suggester"; }
+	getTitle(): string { return translateUi("Meal Suggester"); }
 	getIcon(): string { return "wand-sparkles"; }
 	getContentClasses(): string[] { return ["rb-suggest-modal"]; }
 
@@ -66,7 +68,7 @@ export class SuggestMealModal extends BaseModal {
 
 		const sel = controls.createEl("select", { cls: "rb-modal-select" });
 		for (const s of settings.suggesterModes) {
-			sel.createEl("option", { attr: { value: s.id }, text: s.name });
+			sel.createEl("option", { attr: { value: s.id }, text: modeLabel(s) });
 		}
 		sel.value = this.activeModeId || sel.options[0]?.value || "";
 		this.activeModeId = sel.value;
@@ -79,7 +81,7 @@ export class SuggestMealModal extends BaseModal {
 		// Edit button
 		const editBtn = controls.createEl("button", { cls: "rb-suggest-icon-btn" });
 		setIcon(editBtn.createSpan(), "pencil");
-		editBtn.setAttribute("aria-label", "Edit mode");
+		editBtn.setAttribute("aria-label", translateUi("Edit mode"));
 		editBtn.addEventListener("click", () => {
 			const mode = this.currentMode();
 			if (!mode) return;
@@ -91,7 +93,7 @@ export class SuggestMealModal extends BaseModal {
 					await this.deps.saveSettings();
 					sel.empty();
 					for (const s of this.deps.getSettings().suggesterModes) {
-						sel.createEl("option", { attr: { value: s.id }, text: s.name });
+						sel.createEl("option", { attr: { value: s.id }, text: modeLabel(s) });
 					}
 					sel.value = updated.id;
 				},
@@ -102,7 +104,7 @@ export class SuggestMealModal extends BaseModal {
 					// Switch to first remaining mode and re-run
 					sel.empty();
 					for (const m of s.suggesterModes) {
-						sel.createEl("option", { attr: { value: m.id }, text: m.name });
+						sel.createEl("option", { attr: { value: m.id }, text: modeLabel(m) });
 					}
 					this.activeModeId = sel.options[0]?.value ?? "";
 					sel.value = this.activeModeId;
@@ -114,14 +116,14 @@ export class SuggestMealModal extends BaseModal {
 		// Duplicate button
 		const dupBtn = controls.createEl("button", { cls: "rb-suggest-icon-btn" });
 		setIcon(dupBtn.createSpan(), "copy");
-		dupBtn.setAttribute("aria-label", "Duplicate as new mode");
+		dupBtn.setAttribute("aria-label", translateUi("Duplicate as new mode"));
 		dupBtn.addEventListener("click", () => {
 			const mode = this.currentMode();
 			if (!mode) return;
 			const copy: SuggesterMode = {
 				...mode,
 				id: `mode-${Date.now()}`,
-				name: `${mode.name} (copy)`,
+				name: translateUi`${mode.name} (copy)`,
 				isBuiltin: false,
 				isDefault: false,
 				filters: mode.filters.map(f => ({ ...f })),
@@ -158,7 +160,7 @@ export class SuggestMealModal extends BaseModal {
 		this.updateAddBtn();
 
 		if (!mode) {
-			this.resultsEl.createEl("p", { cls: "rb-suggest-hint", text: "No mode selected." });
+			this.resultsEl.createEl("p", { cls: "rb-suggest-hint", text: translateUi("No mode selected.") });
 			return;
 		}
 
@@ -166,7 +168,7 @@ export class SuggestMealModal extends BaseModal {
 		const results = suggestRecipes(this.app, settings, mode, this.deps.getDiscovery(), this.maxResults);
 
 		if (results.length === 0) {
-			this.resultsEl.createEl("p", { cls: "rb-suggest-hint", text: "No recipes matched the current filters." });
+			this.resultsEl.createEl("p", { cls: "rb-suggest-hint", text: translateUi("No recipes matched the current filters.") });
 			return;
 		}
 
@@ -219,14 +221,14 @@ export class SuggestMealModal extends BaseModal {
 
 		if (totalCount === 0) {
 			this.scheduleBtn.addClass("rb-hidden");
-			this.scheduleBtn.textContent = "Schedule recipes";
+			this.scheduleBtn.textContent = translateUi("Schedule recipes");
 			return;
 		}
 
 		this.scheduleBtn.removeClass("rb-hidden");
 		this.scheduleBtn.textContent = selectedCount > 0
-			? `Schedule selected (${selectedCount})`
-			: `Schedule all (${totalCount})`;
+			? translateUi`Schedule selected (${selectedCount})`
+			: translateUi`Schedule all (${totalCount})`;
 	}
 
 	private openScheduleModal(): void {
@@ -241,11 +243,11 @@ export class SuggestMealModal extends BaseModal {
 	renderFooter(footerEl: HTMLElement): void {
 		const refreshBtn = footerEl.createEl("button", { cls: "rb-suggest-icon-btn" });
 		setIcon(refreshBtn.createSpan(), "refresh-cw");
-		refreshBtn.setAttribute("aria-label", "Refresh suggestions");
+		refreshBtn.setAttribute("aria-label", translateUi("Refresh suggestions"));
 		refreshBtn.addEventListener("click", () => this.runSuggestion());
 
 		const maxResultsSelect = footerEl.createEl("select", { cls: "rb-modal-select rb-suggest-max-results-select" });
-		maxResultsSelect.setAttribute("aria-label", "Number of suggestions");
+		maxResultsSelect.setAttribute("aria-label", translateUi("Number of suggestions"));
 		for (const n of MAX_RESULTS_OPTIONS) {
 			maxResultsSelect.createEl("option", { attr: { value: String(n) }, text: String(n) });
 		}
@@ -257,10 +259,10 @@ export class SuggestMealModal extends BaseModal {
 
 		footerEl.createDiv({ cls: "rb-modal-footer-spacer" });
 
-		const closeBtn = footerEl.createEl("button", { text: "Close" });
+		const closeBtn = footerEl.createEl("button", { text: translateUi("Close") });
 		closeBtn.addEventListener("click", () => this.close());
 
-		this.scheduleBtn = footerEl.createEl("button", { cls: "rb-suggest-add-btn mod-cta", text: "Schedule recipes" });
+		this.scheduleBtn = footerEl.createEl("button", { cls: "rb-suggest-add-btn mod-cta", text: translateUi("Schedule recipes") });
 		this.scheduleBtn.addEventListener("click", () => this.openScheduleModal());
 		this.updateAddBtn();
 	}
