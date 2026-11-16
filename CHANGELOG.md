@@ -1,3 +1,19 @@
+## [0.4.0-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.4.0-beta.0...v0.4.0-beta.1) (2026-11-16)
+
+### Features
+
+* add French interface localization with English fallback ([#37](https://github.com/AdamArcane/obsidian-recipebox/issues/37)) ([b977a3e](https://github.com/AdamArcane/obsidian-recipebox/commit/b977a3ed488b832ef71ea4dcadbf97bbe4090b7b)), references [#36](https://github.com/AdamArcane/obsidian-recipebox/issues/36)
+
+### Bug Fixes
+
+* re-read the meal plan note when it changes on disk ([#38](https://github.com/AdamArcane/obsidian-recipebox/issues/38)) ([55b4ac0](https://github.com/AdamArcane/obsidian-recipebox/commit/55b4ac09719accbbda7203efe5f6e25bdba44524)), references [#34](https://github.com/AdamArcane/obsidian-recipebox/issues/34)
+
+## [0.3.1-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...v0.3.1-beta.0) (2026-11-13)
+
+### Features
+
+* render wikilinks in section labels and recipe source ([#32](https://github.com/AdamArcane/obsidian-recipebox/issues/32)) ([77c8a4c](https://github.com/AdamArcane/obsidian-recipebox/commit/77c8a4cb8d5828fe3db284b8c730e1db6de7c4d2))
+
 ## [0.4.0-beta.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...0.4.0-beta.0) (2026-11-16)
 
 ### Features
