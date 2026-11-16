@@ -192,8 +192,22 @@ export interface RecipeBoxSettings {
 	userGuid: string;
 	userShortId: string;
 
+	// Pantry sync (opt-in module). pantryAppPassword holds the NAME of a secret in
+	// Obsidian's secret storage, never the password itself.
+	pantryEnabled: boolean;
+	pantryServerUrl: string;
+	pantryUsername: string;
+	pantryAppPassword: string;
+	pantryHouseId: number;
+	pantryListId: number;
+	pantryAutoSyncMinutes: number;
+
 	// Persisted runtime state
 	state: {
+		// Pantry item id -> the line it is tied to plus the done state and texts both
+		// sides last agreed on. Keyed by id so a rename on either side keeps the
+		// link. Not a setting: losing it only costs a name-match repair on the next sync.
+		pantryLinks?: { listId: number; items: Record<string, { key: string; base: boolean; text?: string; remoteText?: string; desc?: string }> };
 		mealPlan: MealPlanEntry[];
 		groceryItems: GroceryItemEntry[];
 		collapsedSections: Record<string, boolean>;

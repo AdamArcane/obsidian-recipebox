@@ -15,6 +15,8 @@ Recipe Box treats recipes the same way Obsidian treats everything else: as notes
 
 <span align="center">
 
+🎉 **NEW!** Sync your grocery list with Nextcloud Pantry, so items you check off in the store show up in Obsidian ([beta](https://github.com/AdamArcane/obsidian-recipebox/releases))
+
 🎉 **NEW!** Import your recipe collection from Mealie and other apps
 
 </span>
@@ -44,6 +46,18 @@ The suggester does more than shuffle your recipe list. You can use it to build n
 ### 🛒 Grocery list
 
 Ingredients from your meal plan are consolidated automatically... quantities summed, duplicates merged... and then grouped by category, recipe, or source. Add ad-hoc items easily, check things off as you shop, and export in multiple formats. The list is a markdown note, editable by hand or through the plugin.
+
+### 🔄 Nextcloud Pantry sync (optional, beta)
+
+Shop from your phone and let Obsidian keep up. Recipe Box syncs your grocery list both ways with a checklist in the [Nextcloud Pantry](https://github.com/chenasraf/nextcloud-pantry) app.
+
+- **Check off in the store.** Items you check in Pantry are checked in Obsidian, and the other way round.
+- **Add or edit anywhere.** New items, renames and quantity changes sync both ways. Quantity and name land in separate Pantry fields, and if you change the same item in both places, Pantry wins.
+- **Know why you're buying it.** The recipes a line came from are written into the Pantry item description.
+- **Categories carry over.** Items added in Pantry appear under the matching category heading in your list.
+- **Still plain markdown.** Nothing hidden is added to your note. Lines are matched to Pantry items by name, so a lost plugin data file never creates duplicates.
+
+It is off by default and does nothing until you turn it on under **Settings → Recipe Box → Integrations → Nextcloud Pantry**. Sync from the command palette, or set an auto sync interval on one device. See the [Pantry sync docs](https://recipebox-docs.arcanerecipes.com/Features/Nextcloud-Pantry-Sync) for setup. Pantry sync is available from the 0.4.0 beta releases.
 
 ### ✏️ Recipe editing
 

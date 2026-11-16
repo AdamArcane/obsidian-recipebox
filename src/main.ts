@@ -29,6 +29,8 @@ export default class RecipeBoxPlugin extends Plugin {
 	manager!: GroceryManager;
 	discoveryCache!: DiscoveryCache;
 	private folderClickGallery!: FolderClickGalleryController;
+	// Loaded lazily and only when pantryEnabled is true, so the module costs nothing when off.
+	private pantry: import("./integrations/pantry").PantryModule | null = null;
 	private dashboardRibbonIcon!: HTMLElement;
 	private individualRibbonIcons: HTMLElement[] = [];
 
@@ -51,6 +53,7 @@ export default class RecipeBoxPlugin extends Plugin {
 		this.addSettingTab(new RecipeBoxSettingsTab(this.app, this));
 
 		this.setUpRibbonIcons();
+		void this.applyPantry();
 
 		registerAutoOpen(
 			this,
@@ -90,6 +93,19 @@ export default class RecipeBoxPlugin extends Plugin {
 
 	onunload(): void {
 		this.folderClickGallery?.cleanup();
+		this.pantry?.stop();
+	}
+
+	private async applyPantry(): Promise<void> {
+		if (!this.settings.pantryEnabled) {
+			this.pantry?.stop();
+			return;
+		}
+		if (!this.pantry) {
+			const { PantryModule } = await import("./integrations/pantry");
+			this.pantry = new PantryModule(this);
+		}
+		this.pantry.apply();
 	}
 
 	async loadSettings(): Promise<void> {
@@ -124,6 +140,7 @@ export default class RecipeBoxPlugin extends Plugin {
 		// through here, so this is what makes toggling take effect immediately.
 		this.folderClickGallery?.sync();
 		this.refreshRibbonIcons();
+		void this.applyPantry();
 	}
 
 	// Creates both ribbon icon sets once, up front. Obsidian's ribbon doesn't
