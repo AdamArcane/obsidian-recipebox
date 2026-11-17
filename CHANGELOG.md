@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/AdamArcane/obsidian-recipebox/compare/0.4.0...0.4.1) (2026-11-17)
+
+### Bug Fixes
+
+* reword Pantry messages to follow Obsidian's sentence-case rule without lint suppressions ([3080911](https://github.com/AdamArcane/obsidian-recipebox/commit/3080911))
+* update zod and undici to clear dependency security advisories ([3080911](https://github.com/AdamArcane/obsidian-recipebox/commit/3080911))
+
 ## [0.4.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...0.4.0) (2026-11-17)
 
 ### Features
