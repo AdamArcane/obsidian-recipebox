@@ -1,3 +1,17 @@
+## [0.4.0](https://github.com/AdamArcane/obsidian-recipebox/compare/0.3.0...0.4.0) (2026-11-17)
+
+### Features
+
+* add opt-in two-way sync between the grocery list and a Nextcloud Pantry checklist, with its settings under a new Integrations group ([87ba8c2](https://github.com/AdamArcane/obsidian-recipebox/commit/87ba8c2b74d915808dd0d396b51590e88958dced)) ([8a85a08](https://github.com/AdamArcane/obsidian-recipebox/commit/8a85a089b444a434f43165ef9134ab19d6ee3076))
+* sync Pantry quantity and name edits in both directions, keeping quantity and name in separate Pantry fields ([d2179ed](https://github.com/AdamArcane/obsidian-recipebox/commit/d2179ed1c6624f6c9b2455b31c0d7df935a34919))
+* write the recipes a grocery line came from into the Pantry item description ([d2aaf16](https://github.com/AdamArcane/obsidian-recipebox/commit/d2aaf16dcc5fe889899b51ace7c2838abae8adfc))
+* add French interface localization with English fallback ([#37](https://github.com/AdamArcane/obsidian-recipebox/issues/37)) ([b977a3e](https://github.com/AdamArcane/obsidian-recipebox/commit/b977a3ed488b832ef71ea4dcadbf97bbe4090b7b))
+* render wikilinks in section labels and recipe source ([#32](https://github.com/AdamArcane/obsidian-recipebox/issues/32)) ([77c8a4c](https://github.com/AdamArcane/obsidian-recipebox/commit/77c8a4cb8d5828fe3db284b8c730e1db6de7c4d2))
+
+### Bug Fixes
+
+* re-read the meal plan note when it changes on disk, so a plan synced from another device shows up ([#38](https://github.com/AdamArcane/obsidian-recipebox/issues/38)) ([55b4ac0](https://github.com/AdamArcane/obsidian-recipebox/commit/55b4ac09719accbbda7203efe5f6e25bdba44524))
+
 ## [0.4.0-beta.1](https://github.com/AdamArcane/obsidian-recipebox/compare/v0.4.0-beta.0...v0.4.0-beta.1) (2026-11-16)
 
 ### Features
