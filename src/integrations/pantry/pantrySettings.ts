@@ -129,8 +129,7 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 									plugin.settings.pantryListId = list.id;
 									await save();
 									await reloadLists?.();
-									// eslint-disable-next-line obsidianmd/ui/sentence-case -- Pantry is a product name
-									new Notice("Created a Pantry list called Groceries.");
+									new Notice("Created a new grocery list.");
 								} catch (err) {
 									new Notice(friendly(err));
 								}
@@ -184,8 +183,7 @@ function renderPicker(setting: Setting, opts: PickerOptions): { reload: () => Pr
 			select.value = String(cur);
 			loaded = rows.length > 0;
 			if (reportErrors && rows.length === 0) {
-				// eslint-disable-next-line obsidianmd/ui/sentence-case -- "Test connection" is a button name
-				new Notice("Nothing found. Check the address, username and app password with Test connection.");
+				new Notice("Nothing found. Check the address, username and app password then test the connection again.");
 			}
 		} catch (err) {
 			if (reportErrors) new Notice(friendly(err));

@@ -62,8 +62,7 @@ export class PantryModule {
 		this.commandRegistered = true;
 		this.plugin.addCommand({
 			id: COMMAND_ID,
-			// eslint-disable-next-line obsidianmd/ui/sentence-case -- Pantry is a product name
-			name: "Sync grocery list with Pantry",
+			name: "Sync grocery list",
 			checkCallback: (checking) => {
 				if (!this.enabled) return false;
 				if (!checking) void this.syncNow();
@@ -128,8 +127,7 @@ export class PantryModule {
 	async syncNow(): Promise<void> {
 		this.lastManual = true;
 		const ran = await this.scheduler.trigger("manual");
-		// eslint-disable-next-line obsidianmd/ui/sentence-case -- Pantry is a product name
-		if (!ran) new Notice("A Pantry sync is already running.");
+		if (!ran) new Notice("A sync is already running.");
 	}
 
 	private async runOnce(): Promise<void> {
@@ -141,8 +139,7 @@ export class PantryModule {
 		if (!config) {
 			this.failed = true;
 			this.renderStatus();
-			// eslint-disable-next-line obsidianmd/ui/sentence-case -- Pantry is a product name
-			if (manual) new Notice("Pantry sync is not set up yet. Fill in the Pantry section in settings.");
+			if (manual) new Notice("Sync is not set up yet. Fill in the integration settings first.");
 			return;
 		}
 
