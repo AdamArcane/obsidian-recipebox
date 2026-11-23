@@ -1,6 +1,7 @@
 /** Language selection and display-only translations; stored identifiers stay unchanged. */
 import { getLanguage } from "obsidian";
 import { french } from "./fr";
+import { russian } from "./ru";
 
 /** Use the public Obsidian API; a missing runtime in tests falls back to English. */
 export function currentLanguage(): string {
