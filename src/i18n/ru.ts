@@ -141,7 +141,7 @@ export const russian: Record<string, string> = {
 	"tagged #{0}": "avec l’étiquette #{0}",
 	"{0} between {1} and {2}": "{0} между {1} и {2}",
 	"{0} is one of {1}": "{0} - один из {1}",
-	"in folder {0}": "в папкеr {0}",
+	"in folder {0}": "в папке {0}",
 	"favorites only": "только любимые",
 	"rating ≥ {0}": "оценка ≥ {0}",
 	"never cooked": ": никогда не готовили",
