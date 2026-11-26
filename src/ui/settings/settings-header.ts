@@ -17,7 +17,7 @@ const GITHUB_MARK_PATH = "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07
 
 const LINKS: { label: string; url: string; icon: string }[] = [
 	{ label: translateUi("Website"), url: "https://recipebox.arcanerecipes.com", icon: "globe" },
-	{ label: "Documentation", url: "https://recipebox-docs.arcanerecipes.com", icon: "book-open" },
+	{ label: translateUi("Documentation"), url: "https://recipebox-docs.arcanerecipes.com", icon: "book-open" },
 	{ label: translateUi("Support"), url: "https://github.com/AdamArcane/obsidian-recipebox/issues", icon: "life-buoy" },
 ];
 
