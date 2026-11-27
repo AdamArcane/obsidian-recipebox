@@ -829,4 +829,6 @@ export const russian: Record<string, string> = {
 	"Total": "Всего",
 	"TOTAL": "ВСЕГО", // на случай, если там капс
 	"Last made": "Последнее приготовление",
+	"Ingredients": "Ингредиенты",
+	"Instructions": "Инструкции",
 };
