@@ -1,6 +1,13 @@
 /** Language selection and display-only translations; stored identifiers stay unchanged. */
 import { getLanguage } from "obsidian";
 import { french } from "./fr";
+import { russian } from "./ru";
+
+/** Словари по префиксу языка (то, что возвращает getLanguage()). */
+const dictionaries: Record<string, Record<string, string>> = {
+	fr: french,
+	ru: russian,
+};
 
 /** Use the public Obsidian API; a missing runtime in tests falls back to English. */
 export function currentLanguage(): string {
@@ -13,7 +20,9 @@ export function currentLanguage(): string {
 
 /** English is the fallback for every missing key and unsupported language. */
 export function translate(language: string, key: string, ...values: unknown[]): string {
-	const text = /^fr(?:-|_|$)/i.test(language) && Object.prototype.hasOwnProperty.call(french, key) ? french[key] : key;
+	const prefix = language.toLowerCase().split(/[-_]/)[0];
+	const dict = dictionaries[prefix];
+	const text = dict && Object.prototype.hasOwnProperty.call(dict, key) ? dict[key] : key;
 	return text.replace(/\{(\d+)\}/g, (placeholder, index: string) =>
 		Number(index) < values.length ? String(values[Number(index)]) : placeholder
 	);

@@ -14,10 +14,10 @@ export interface NutritionFieldDef {
 }
 
 export const NUTRITION_FIELDS: NutritionFieldDef[] = [
-	{ label: "Calories", unit: "", settingsKey: "caloriesProperty", aliases: ["calories", "kcal", "cal"] },
-	{ label: translateUi("Protein"), unit: "g", settingsKey: "proteinProperty", aliases: ["protein"] },
-	{ label: translateUi("Fat"), unit: "g", settingsKey: "fatProperty", aliases: ["fat", "total fat"] },
-	{ label: translateUi("Carbs"), unit: "g", settingsKey: "carbsProperty", aliases: ["carbs", "carbohydrates", "carbohydrate"] },
+	{ label: translateUi("Calories"), unit: "", settingsKey: "caloriesProperty", aliases: ["calories", "kcal", "cal"] },
+	{ label: translateUi("Protein"), unit: translateUi("g"), settingsKey: "proteinProperty", aliases: ["protein"] },
+	{ label: translateUi("Fat"), unit: translateUi("g"), settingsKey: "fatProperty", aliases: ["fat", "total fat"] },
+	{ label: translateUi("Carbs"), unit: translateUi("g"), settingsKey: "carbsProperty", aliases: ["carbs", "carbohydrates", "carbohydrate"] },
 ];
 
 function formatNutritionNumber(n: number): string {

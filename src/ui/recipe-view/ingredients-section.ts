@@ -41,7 +41,7 @@ export async function renderIngredientsSection(
 	const header = section.createDiv({ cls: "rb-section-header" });
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "carrot");
-	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.ingredientsHeading });
+	const titleEl = header.createSpan({ cls: "rb-section-title", text: translateUi(settings.ingredientsHeading) });
 	// Without a handler (e.g. a future read-only embed) the title stays plain text.
 	if (onEditSection) makeSectionTitleEditable(titleEl, translateUi`Edit ${settings.ingredientsHeading}`, onEditSection);
 

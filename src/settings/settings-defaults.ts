@@ -5,6 +5,7 @@
 import { RecipeBoxSettings } from "./settings-types";
 import { DEFAULT_GI_DICTIONARY } from "../parser/glycemic-dictionary";
 import { BUILTIN_MODES } from "../suggester/built-in-strategies";
+import { t as translateUi } from "../i18n";
 
 export const DEFAULT_CATEGORY_ORDER: string[] = [
 	"Produce",
@@ -113,11 +114,11 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 	imageStorageLocation: "recipe-folder",
 	customImageStorageFolder: "",
 
-	headerBadges: [
+		headerBadges: [
 		{
 			type: "badge",
 			property: "diet",
-			label: "Diet",
+			label: translateUi("Diet"),
 			icon: "leaf",
 			color: "green",
 			valueType: "auto",
@@ -128,7 +129,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		{
 			type: "badge",
 			property: "prepTime",
-			label: "Prep",
+			label: translateUi("Prep"),
 			icon: "clock",
 			color: "default",
 			valueType: "minutes",
@@ -139,7 +140,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		{
 			type: "badge",
 			property: "cookTime",
-			label: "Cook",
+			label: translateUi("Cook"),
 			icon: "clock",
 			color: "default",
 			valueType: "minutes",
@@ -150,7 +151,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		{
 			type: "badge",
 			property: "total",
-			label: "Total",
+			label: translateUi("Total"),
 			icon: "clock",
 			color: "default",
 			valueType: "minutes",
@@ -162,7 +163,7 @@ export const DEFAULT_SETTINGS: RecipeBoxSettings = {
 		{
 			type: "badge",
 			property: "lastMade",
-			label: "Last made",
+			label: translateUi("Last made"),
 			icon: "calendar-check",
 			color: "default",
 			valueType: "auto",

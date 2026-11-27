@@ -25,7 +25,7 @@ export async function renderInstructionsSection(
 	const header = section.createDiv({ cls: "rb-section-header" });
 	const sectionIcon = header.createSpan({ cls: "rb-section-icon" });
 	setIcon(sectionIcon, "list-ordered");
-	const titleEl = header.createSpan({ cls: "rb-section-title", text: settings.instructionsHeading });
+	const titleEl = header.createSpan({ cls: "rb-section-title", text: translateUi(settings.instructionsHeading) });
 	if (onEditSection) makeSectionTitleEditable(titleEl, translateUi`Edit ${settings.instructionsHeading}`, onEditSection);
 
 	if (settings.timersEnabled) {
