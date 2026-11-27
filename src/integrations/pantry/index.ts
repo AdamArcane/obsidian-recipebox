@@ -16,6 +16,7 @@ import { splitQuantity } from "./splitQuantity";
 import { describeSources } from "./recipeDescription";
 import { SyncScheduler } from "./syncScheduler";
 import { pantryClientFromSettings } from "./pantryConfig";
+import { t as translateUi } from "../../i18n";
 
 const COMMAND_ID = "sync-grocery-list-with-pantry";
 
@@ -127,7 +128,7 @@ export class PantryModule {
 	async syncNow(): Promise<void> {
 		this.lastManual = true;
 		const ran = await this.scheduler.trigger("manual");
-		if (!ran) new Notice("A sync is already running.");
+		if (!ran) new Notice(translateUi("A sync is already running."));
 	}
 
 	private async runOnce(): Promise<void> {
@@ -139,7 +140,7 @@ export class PantryModule {
 		if (!config) {
 			this.failed = true;
 			this.renderStatus();
-			if (manual) new Notice("Sync is not set up yet. Fill in the integration settings first.");
+			if (manual) new Notice(translateUi("Sync is not set up yet. Fill in the integration settings first."));
 			return;
 		}
 
@@ -189,20 +190,32 @@ export class PantryModule {
 			this.renderStatus();
 			if (err instanceof PantryError && err.kind === "auth") {
 				this.authBlocked = true;
-				new Notice("Pantry sign in failed. Check your app password.");
+				new Notice(translateUi("Pantry sign in failed. Check your app password."));
 			} else if (manual && err instanceof PantryError) {
 				new Notice(err.message);
 			} else if (manual) {
-				new Notice("Pantry sync failed. Nothing was changed.");
+				new Notice(translateUi("Pantry sync failed. Nothing was changed."));
 			}
 		}
 	}
 
-	private reportResult(r: { created: number; updated: number; removed: number; failed: number; truncated: boolean }): void {
-		const parts = [`${r.created} added`, `${r.updated} updated`, `${r.removed} removed`];
-		let msg = `Pantry synced: ${parts.join(", ")}.`;
-		if (r.failed > 0) msg += ` ${r.failed} could not be synced and will be tried again.`;
-		if (r.truncated) msg += " Your Pantry list has more than 500 items, so only the first 500 were read.";
+		private reportResult(r: { created: number; updated: number; removed: number; failed: number; truncated: boolean }): void {
+		const parts = [
+			translateUi("{0} added", r.created),
+			translateUi("{0} updated", r.updated),
+			translateUi("{0} removed", r.removed)
+		];
+		
+		let msg = translateUi("Pantry synced: {0}.", parts.join(", "));
+		
+		if (r.failed > 0) {
+			msg += " " + translateUi("{0} could not be synced and will be tried again.", r.failed);
+		}
+		
+		if (r.truncated) {
+			msg += " " + translateUi("Your Pantry list has more than 500 items, so only the first 500 were read.");
+		}
+		
 		new Notice(msg);
 	}
 }

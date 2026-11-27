@@ -107,7 +107,7 @@ function renderSourceCell(
 	if (!display) return;
 
 	const cell = container.createDiv({ cls: "rb-banner-cell rb-source-cell" });
-	cell.createSpan({ cls: "rb-source-label", text: "Source" });
+	cell.createSpan({ cls: "rb-source-label", text: translateUi("Source") });
 
 	// The title attribute carries the untruncated value, since the cell is
 	// width-capped and a source is not always a short hostname.

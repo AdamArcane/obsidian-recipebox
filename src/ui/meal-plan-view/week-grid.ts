@@ -62,18 +62,30 @@ function renderColumn(
 ): void {
 	const colEl = container.createDiv({ cls: "rb-mpv-col" });
 
+	// 1. Переводим название дня (Monday -> Понедельник, Queue -> Очередь)
+	const localizedLabel = translateUi(label);
+
 	const header = colEl.createDiv({ cls: "rb-mpv-col-header" });
-	header.createSpan({ cls: "rb-mpv-col-day", text: dayLabel(label) });
+	
+	// 2. Используем переведенный label
+	header.createSpan({ cls: "rb-mpv-col-day", text: dayLabel(localizedLabel) });
 	header.createSpan({ cls: "rb-mpv-col-count", text: String(colEntries.length) });
 
-	const addBtn = header.createEl("button", { cls: "rb-mpv-col-add", attr: { title: `Add recipe to ${label}`, "aria-label": `Add recipe to ${label}` } });
+	// 3. Переводим подсказку для кнопки "+"
+	const addBtn = header.createEl("button", { 
+		cls: "rb-mpv-col-add", 
+		attr: { 
+			title: translateUi("Add recipe to {0}", localizedLabel), 
+			"aria-label": translateUi("Add recipe to {0}", localizedLabel) 
+		} 
+	});
 	addBtn.setText("+");
 	addBtn.addEventListener("click", (e) => {
 		e.stopPropagation();
 		new RecipePickerModal(
 			app, deps.getSettings(), dayKey,
 			(file) => { deps.openAddToMealPlanModal(file, { day: dayKey }); },
-			(label) => { deps.openAddCustomMealModal(label, dayKey); },
+			(label) => { deps.openAddCustomMealModal(label, dayKey); }, // Здесь label — это ввод пользователя, не трогаем
 		).open();
 	});
 

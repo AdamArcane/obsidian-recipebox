@@ -7,10 +7,11 @@ import { Notice, SecretComponent, Setting, SettingDefinitionPage } from "obsidia
 import { SettingsBuildContext, SettingsKey } from "../../ui/settings/settings-build-context";
 import { PantryError } from "./pantryTypes";
 import { pantryPickerClient } from "./pantryConfig";
+import { t as translateUi } from "../../i18n"; // Путь может отличаться, посмотри, откуда импортируют translateUi другие файлы в src/ui/settings/
 
 function friendly(err: unknown): string {
 	if (err instanceof PantryError) return err.message;
-	return "Something went wrong talking to Pantry.";
+	return translateUi("Something went wrong talking to Pantry.");;
 }
 
 export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPage<SettingsKey> {
@@ -23,30 +24,30 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 
 	return {
 		type: "page",
-		name: "Nextcloud Pantry",
-		desc: "Two-way sync between your grocery list and a checklist in the Nextcloud Pantry app.",
+		name: translateUi("Nextcloud Pantry"),
+		desc: translateUi("Two-way sync between your grocery list and a checklist in the Nextcloud Pantry app."),
 		items: [
 			{
-				name: "Enable Pantry sync",
-				desc: "Off by default. When off, Pantry code does not run and makes no network calls. When on, your grocery list stays plain markdown and is matched to Pantry by item name.",
+				name: translateUi("Enable Pantry sync"),
+				desc: translateUi("Off by default. When off, Pantry code does not run and makes no network calls. When on, your grocery list stays plain markdown and is matched to Pantry by item name."),
 				aliases: ["pantry", "nextcloud", "sync"],
 				control: { type: "toggle", key: "pantryEnabled" },
 			},
 			{
-				name: "Server address",
-				desc: "Your Nextcloud address, for example cloud.example.com.",
+				name: translateUi("Server address"),
+				desc: translateUi("Your Nextcloud address, for example cloud.example.com."),
 				visible: on,
 				control: { type: "text", key: "pantryServerUrl", placeholder: "https://cloud.example.com" },
 			},
 			{
-				name: "Username",
-				desc: "Your Nextcloud username.",
+				name: translateUi("Username"),
+				desc: translateUi("Your Nextcloud username."),
 				visible: on,
 				control: { type: "text", key: "pantryUsername" },
 			},
 			{
-				name: "App password",
-				desc: "Create one in Nextcloud under Personal settings, Security. It is kept in Obsidian's secret storage, not in your notes.",
+				name: translateUi("App password"),
+				desc: translateUi("Create one in Nextcloud under Personal settings, Security. It is kept in Obsidian's secret storage, not in your notes."),
 				visible: on,
 				render: (setting) => {
 					setting.addComponent((el) =>
@@ -60,21 +61,22 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 				},
 			},
 			{
-				name: "Test connection",
-				desc: "Checks the address, username and password.",
+				name: translateUi("Test connection"),
+				desc: translateUi("Checks the address, username and password."),
 				visible: on,
 				render: (setting) => {
 					setting.addButton((btn) =>
-						btn.setButtonText("Test connection").onClick(() => {
+						btn.setButtonText(translateUi("Test connection")).onClick(() => {
 							void (async () => {
 								const client = pantryPickerClient(app, plugin.settings);
 								if (!client) {
-									new Notice("Fill in the address, username and app password first.");
+									new Notice(translateUi("Fill in the address, username and app password first."));
 									return;
 								}
 								try {
 									const houses = await client.listHouses();
-									new Notice(`Connected. Found ${houses.length} ${houses.length === 1 ? "house" : "houses"}.`);
+									const houseWord = houses.length === 1 ? translateUi("house") : translateUi("houses");
+									new Notice(translateUi("Connected. Found {0} {1}.", houses.length, houseWord));
 								} catch (err) {
 									new Notice(friendly(err));
 								}
@@ -84,8 +86,8 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 				},
 			},
 			{
-				name: "House",
-				desc: "The Pantry house that holds your grocery checklist.",
+				name: translateUi("House"),
+				desc: translateUi("The Pantry house that holds your grocery checklist."),
 				visible: on,
 				render: (setting) => { renderPicker(setting, {
 					current: () => plugin.settings.pantryHouseId,
@@ -103,8 +105,8 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 				}); },
 			},
 			{
-				name: "Checklist",
-				desc: "The Pantry checklist to sync with.",
+				name: translateUi("Checklist"),
+				desc: translateUi("The Pantry checklist to sync with."),
 				// Always shown while on. Hiding it until a house is chosen meant it never
 				// appeared, because the row's visibility was only checked at first draw.
 				visible: on,
@@ -120,16 +122,16 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 					});
 					reloadLists = picker.reload;
 					setting.addButton((btn) =>
-						btn.setButtonText("Create new list").onClick(() => {
+						btn.setButtonText(translateUi("Create new list")).onClick(() => {
 							void (async () => {
 								const client = pantryPickerClient(app, plugin.settings, plugin.settings.pantryHouseId);
 								if (!client) return;
 								try {
-									const list = await client.createList("Groceries");
+									const list = await client.createList(translateUi("Groceries"));
 									plugin.settings.pantryListId = list.id;
 									await save();
 									await reloadLists?.();
-									new Notice("Created a new grocery list.");
+									new Notice(translateUi("Created a new grocery list."));
 								} catch (err) {
 									new Notice(friendly(err));
 								}
@@ -139,8 +141,8 @@ export function buildPantryPage(ctx: SettingsBuildContext): SettingDefinitionPag
 				},
 			},
 			{
-				name: "Auto sync every (minutes)",
-				desc: "0 means manual only. Turn this on for one device only, so two devices do not push the same item twice.",
+				name: translateUi("Auto sync every (minutes)"),
+				desc: translateUi("0 means manual only. Turn this on for one device only, so two devices do not push the same item twice."),
 				visible: on,
 				control: {
 					type: "number",
@@ -179,11 +181,11 @@ function renderPicker(setting: Setting, opts: PickerOptions): { reload: () => Pr
 			for (const row of rows) select.add(new Option(row.name, String(row.id)));
 			// The placeholder names the current id, which goes stale when the choice is reset.
 			const cur = opts.current();
-			if (select.options[0]) select.options[0].text = cur > 0 ? `Selected (id ${cur})` : "Not chosen";
+			if (select.options[0]) select.options[0].text = cur > 0 ? translateUi("Selected (id {0})", cur) : translateUi("Not chosen");
 			select.value = String(cur);
 			loaded = rows.length > 0;
 			if (reportErrors && rows.length === 0) {
-				new Notice("Nothing found. Check the address, username and app password then test the connection again.");
+				new Notice(translateUi("Nothing found. Check the address, username and app password then test the connection again."));
 			}
 		} catch (err) {
 			if (reportErrors) new Notice(friendly(err));
@@ -192,7 +194,7 @@ function renderPicker(setting: Setting, opts: PickerOptions): { reload: () => Pr
 
 	setting.addDropdown((dd) => {
 		const cur = opts.current();
-		dd.addOption("0", cur > 0 ? `Selected (id ${cur})` : "Not chosen");
+		dd.addOption("0", cur > 0 ? translateUi("Selected (id {0})", cur) : translateUi("Not chosen"));
 		dd.setValue(String(cur));
 		dd.onChange((value) => { void opts.choose(Number(value)); });
 		select = dd.selectEl;
@@ -203,7 +205,7 @@ function renderPicker(setting: Setting, opts: PickerOptions): { reload: () => Pr
 		void fill(false);
 	});
 	setting.addExtraButton((btn) =>
-		btn.setIcon("refresh-cw").setTooltip("Reload the list").onClick(() => { void fill(true); })
+		btn.setIcon("refresh-cw").setTooltip(translateUi("Reload the list")).onClick(() => { void fill(true); })
 	);
 	return { reload: () => fill(false) };
 }
